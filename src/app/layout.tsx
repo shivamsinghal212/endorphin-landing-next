@@ -54,7 +54,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         {/* Clash Display from Fontshare */}
         {/* eslint-disable-next-line @next/next/no-page-custom-font */}
         <link href="https://api.fontshare.com/v2/css?f[]=clash-display@500;600;700&display=swap" rel="stylesheet" />
-        <meta property="og:logo" content="https://www.endorfin.run/favicon.png" />
+        <meta property="og:logo" content="https://www.endorfin.run/logo.png" />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
         {/* Google Analytics */}
         <script async src="https://www.googletagmanager.com/gtag/js?id=G-P6TL1FG85X" />
