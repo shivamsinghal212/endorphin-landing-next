@@ -36,15 +36,72 @@ export const metadata: Metadata = {
   },
 };
 
-const jsonLd = {
+const appJsonLd = {
   '@context': 'https://schema.org',
-  '@type': 'WebApplication',
+  '@type': 'MobileApplication',
   name: 'Endorfin',
   url: 'https://www.endorfin.run',
   applicationCategory: 'SportsApplication',
   operatingSystem: 'Android',
-  description: 'Discover running events, marathons, and races across India.',
-  offers: { '@type': 'Offer', price: '0', priceCurrency: 'INR' },
+  description: 'Discover 500+ running events across India. Find marathons, half marathons, 10K and 5K races near you. RSVP instantly, create community runs, and connect with runners.',
+  featureList: [
+    'Running event discovery across 25+ Indian cities',
+    'One-tap RSVP for marathons and races',
+    'Create and host community runs',
+    'Per-event discussion threads',
+    'Runner social profiles and following',
+    'City-based smart search and filters',
+    'Push notifications for new events',
+    'Curated event feed',
+  ],
+  screenshot: 'https://www.endorfin.run/og-image.png',
+  aggregateRating: {
+    '@type': 'AggregateRating',
+    ratingValue: '4.8',
+    bestRating: '5',
+    ratingCount: '120',
+  },
+  offers: {
+    '@type': 'Offer',
+    price: '0',
+    priceCurrency: 'INR',
+    url: 'https://play.google.com/store/apps/details?id=com.endorfin.app',
+  },
+  installUrl: 'https://play.google.com/store/apps/details?id=com.endorfin.app',
+};
+
+const orgJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  name: 'Endorfin',
+  url: 'https://www.endorfin.run',
+  logo: {
+    '@type': 'ImageObject',
+    url: 'https://www.endorfin.run/logo.png',
+    width: 512,
+    height: 512,
+  },
+  description: "India's running community app. Discover events, RSVP instantly, and build your running crew.",
+  contactPoint: {
+    '@type': 'ContactPoint',
+    email: 'hello@endorfin.run',
+    contactType: 'customer support',
+    areaServed: 'IN',
+    availableLanguage: 'English',
+  },
+  sameAs: [
+    'https://play.google.com/store/apps/details?id=com.endorfin.app',
+    'https://twitter.com/endorfinapp',
+  ],
+};
+
+const websiteJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  name: 'Endorfin',
+  url: 'https://www.endorfin.run',
+  description: 'Discover 500+ running events across India. Find marathons, half marathons, 10K and 5K races near you.',
+  inLanguage: 'en-IN',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -55,7 +112,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         {/* eslint-disable-next-line @next/next/no-page-custom-font */}
         <link href="https://api.fontshare.com/v2/css?f[]=clash-display@500;600;700&display=swap" rel="stylesheet" />
         <meta property="og:logo" content="https://www.endorfin.run/logo.png" />
-        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(appJsonLd) }} />
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(orgJsonLd) }} />
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }} />
         {/* Google Analytics */}
         <script async src="https://www.googletagmanager.com/gtag/js?id=G-P6TL1FG85X" />
         <script dangerouslySetInnerHTML={{ __html: `

@@ -26,6 +26,13 @@ const StatsBar = () => {
   return (
     <section id="about" className="bg-signal relative grain">
       <h2 className="sr-only">Community Metrics</h2>
+      {/* Server-rendered stats for crawlers that don't execute JS */}
+      <div className="sr-only" aria-hidden="true">
+        <p>500+ Races Listed across India</p>
+        <p>10,000+ Runners Joined on Endorfin</p>
+        <p>25+ Cities Across India including Mumbai, Delhi, Bangalore, Pune, Hyderabad, Chennai</p>
+        <p>4.8 App Rating on Google Play</p>
+      </div>
       <motion.dl
         ref={ref}
         variants={stagger}

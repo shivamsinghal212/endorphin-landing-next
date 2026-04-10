@@ -1,0 +1,19 @@
+# Endorfin — Running Events in India
+
+> Endorfin is a free Android app for discovering and RSVPing to running events across India. It lists 500+ marathons, half marathons, 10K runs, and 5K races across 25+ cities including Mumbai, Delhi, Bangalore, Pune, Hyderabad, and Chennai. Users can also create community runs, follow other runners, and discuss race logistics in per-event chat threads. Available free on Google Play.
+
+## Pages
+
+- [Homepage](https://www.endorfin.run/) — Event discovery, app features, community overview
+- [Privacy Policy](https://www.endorfin.run/privacy) — Data handling and DPDPA 2023 compliance
+- [Terms of Service](https://www.endorfin.run/terms) — Usage terms for the Endorfin platform
+- [Support](https://www.endorfin.run/support) — Help and frequently asked questions
+
+## Key Facts
+
+- 500+ running events listed across India
+- 25+ cities covered (Mumbai, Delhi, Bangalore, Pune, Hyderabad, Chennai, and more)
+- 10,000+ runners on the platform
+- Free to use, available on Google Play
+- Features: event discovery, one-tap RSVP, community runs, event discussions, runner profiles
+- Contact: hello@endorfin.run

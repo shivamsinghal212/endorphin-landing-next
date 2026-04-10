@@ -62,9 +62,17 @@ const Footer = () => (
         <span className="font-body text-xs text-bone/60">
           &copy; {new Date().getFullYear()} Endorfin. All rights reserved.
         </span>
-        <a href="mailto:hello@endorfin.run" className="font-body text-xs text-bone/60 hover:text-signal transition-colors">
-          hello@endorfin.run
-        </a>
+        <div className="flex items-center gap-6">
+          <a href="https://twitter.com/endorfinapp" target="_blank" rel="noopener noreferrer" className="font-body text-xs text-bone/60 hover:text-signal transition-colors" aria-label="Follow Endorfin on Twitter">
+            Twitter
+          </a>
+          <a href="https://play.google.com/store/apps/details?id=com.endorfin.app" target="_blank" rel="noopener noreferrer" className="font-body text-xs text-bone/60 hover:text-signal transition-colors" aria-label="Endorfin on Google Play">
+            Google Play
+          </a>
+          <a href="mailto:hello@endorfin.run" className="font-body text-xs text-bone/60 hover:text-signal transition-colors">
+            hello@endorfin.run
+          </a>
+        </div>
       </div>
     </div>
   </footer>

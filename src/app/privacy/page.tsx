@@ -108,7 +108,7 @@ export default function PrivacyPolicy() {
 
           <section>
             <h2 className="text-xl font-display font-semibold uppercase text-foreground mb-3">11. Contact Us</h2>
-            <p>If you have questions about this Privacy Policy or wish to exercise your data rights, please contact us at <a href="mailto:shivam.singhal212@gmail.com" className="text-accent hover:underline">shivam.singhal212@gmail.com</a>.</p>
+            <p>If you have questions about this Privacy Policy or wish to exercise your data rights, please contact us at <a href="mailto:hello@endorfin.run" className="text-accent hover:underline">hello@endorfin.run</a>.</p>
           </section>
         </div>
       </div>
