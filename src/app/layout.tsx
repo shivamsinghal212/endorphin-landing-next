@@ -16,7 +16,7 @@ export const metadata: Metadata = {
     type: 'website',
     url: 'https://www.endorfin.run/',
     title: 'Endorfin — Find Running Events, Marathons & Races in India',
-    description: 'Discover 500+ running events across India. Marathons, half marathons, 10K & 5K races near you.',
+    description: 'Discover 500+ running events across India. Find marathons, half marathons, 10K & 5K races near you. RSVP instantly and connect with runners.',
     siteName: 'Endorfin',
     locale: 'en_IN',
     images: [{ url: 'https://www.endorfin.run/og-image.png', width: 1200, height: 630 }],
@@ -24,7 +24,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Endorfin — Find Running Events & Marathons in India',
-    description: 'Discover 500+ running events across India.',
+    description: 'Discover 500+ running events across India. Find marathons, half marathons, 10K & 5K races near you. RSVP instantly and connect with runners.',
     images: ['https://www.endorfin.run/og-image.png'],
     site: '@endorfinapp',
   },
