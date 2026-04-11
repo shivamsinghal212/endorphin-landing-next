@@ -8,8 +8,9 @@ import {
   getEventDetail, updateEvent, deleteEvent, enrichEvent,
   type AdminEvent,
 } from '@/lib/admin-api';
+import ReactMarkdown from 'react-markdown';
 import {
-  ArrowLeft, Save, Trash2, Sparkles, RefreshCw, ExternalLink,
+  ArrowLeft, Save, Trash2, Sparkles, RefreshCw, ExternalLink, Eye, PenLine,
 } from 'lucide-react';
 
 const DISTANCE_OPTIONS = ['3K', '5K', '10K', '15K', 'HM', 'M', '50K', '65K', '100K', 'Ultra'];
@@ -169,7 +170,11 @@ export function EventDetailContent({ eventId }: { eventId: string }) {
           {/* Basic info */}
           <Card title="Basic Information">
             <Field label="Title" value={form.title as string} onChange={(v) => updateField('title', v)} />
-            <Field label="Description" value={form.description as string} onChange={(v) => updateField('description', v)} textarea />
+            <MarkdownField
+              label="Description"
+              value={(form.description as string) || ''}
+              onChange={(v) => updateField('description', v)}
+            />
             <div className="grid grid-cols-2 gap-4">
               <Field label="Start Time" value={form.startTime as string} onChange={(v) => updateField('startTime', v)} type="datetime-local" />
               <Field label="End Time" value={form.endTime as string} onChange={(v) => updateField('endTime', v)} type="datetime-local" />
@@ -287,35 +292,73 @@ function Card({ title, children }: { title: string; children: React.ReactNode })
   );
 }
 
+function MarkdownField({
+  label, value, onChange,
+}: {
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+}) {
+  const [mode, setMode] = useState<'edit' | 'preview'>('preview');
+
+  return (
+    <div>
+      <div className="flex items-center justify-between mb-1">
+        <label className="block font-body text-xs font-medium text-jet/50">{label}</label>
+        <div className="flex gap-1">
+          <button
+            onClick={() => setMode('preview')}
+            className={`p-1 rounded cursor-pointer transition-colors ${mode === 'preview' ? 'bg-jet/10 text-jet' : 'text-jet/30 hover:text-jet/50'}`}
+            title="Preview"
+          >
+            <Eye className="w-3.5 h-3.5" />
+          </button>
+          <button
+            onClick={() => setMode('edit')}
+            className={`p-1 rounded cursor-pointer transition-colors ${mode === 'edit' ? 'bg-jet/10 text-jet' : 'text-jet/30 hover:text-jet/50'}`}
+            title="Edit"
+          >
+            <PenLine className="w-3.5 h-3.5" />
+          </button>
+        </div>
+      </div>
+      {mode === 'edit' ? (
+        <textarea
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          rows={12}
+          className="w-full px-3 py-2 rounded-lg border border-jet/10 font-mono text-sm text-jet focus:outline-none focus:border-signal/30 transition-colors resize-y"
+        />
+      ) : (
+        <div className="px-4 py-3 rounded-lg border border-jet/10 bg-jet/[0.02] min-h-[120px] max-h-[400px] overflow-y-auto prose prose-sm prose-jet max-w-none font-body [&_h2]:font-display [&_h2]:text-sm [&_h2]:font-semibold [&_h2]:uppercase [&_h2]:text-jet/70 [&_h2]:mt-4 [&_h2]:mb-2 [&_h3]:font-display [&_h3]:text-xs [&_h3]:font-semibold [&_h3]:uppercase [&_h3]:text-jet/60 [&_ul]:text-sm [&_p]:text-sm [&_li]:text-jet/70 [&_strong]:text-jet">
+          {value ? (
+            <ReactMarkdown>{value}</ReactMarkdown>
+          ) : (
+            <p className="text-jet/30 italic text-sm">No description</p>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
 function Field({
-  label, value, onChange, textarea, type = 'text',
+  label, value, onChange, type = 'text',
 }: {
   label: string;
   value: string | number | null | undefined;
   onChange: (v: string) => void;
-  textarea?: boolean;
   type?: string;
 }) {
-  const inputClasses = "w-full px-3 py-2 rounded-lg border border-jet/10 font-body text-sm text-jet placeholder:text-jet/30 focus:outline-none focus:border-signal/30 transition-colors";
-
   return (
     <div>
       <label className="block font-body text-xs font-medium text-jet/50 mb-1">{label}</label>
-      {textarea ? (
-        <textarea
-          value={value ?? ''}
-          onChange={(e) => onChange(e.target.value)}
-          rows={4}
-          className={`${inputClasses} resize-none`}
-        />
-      ) : (
-        <input
-          type={type}
-          value={value ?? ''}
-          onChange={(e) => onChange(e.target.value)}
-          className={inputClasses}
-        />
-      )}
+      <input
+        type={type}
+        value={value ?? ''}
+        onChange={(e) => onChange(e.target.value)}
+        className="w-full px-3 py-2 rounded-lg border border-jet/10 font-body text-sm text-jet placeholder:text-jet/30 focus:outline-none focus:border-signal/30 transition-colors"
+      />
     </div>
   );
 }
