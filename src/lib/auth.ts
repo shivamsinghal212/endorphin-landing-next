@@ -22,7 +22,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE || 'https://api.endorfin.run'}/api/v1/auth/google`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ token: account.id_token }),
+            body: JSON.stringify({ idToken: account.id_token }),
           });
           if (res.ok) {
             const data = await res.json();
