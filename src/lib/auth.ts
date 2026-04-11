@@ -26,7 +26,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           });
           if (res.ok) {
             const data = await res.json();
-            token.backendToken = data.token;
+            token.backendToken = data.accessToken;
           }
         } catch (e) {
           console.error('Failed to get backend token:', e);
