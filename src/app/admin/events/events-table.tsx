@@ -8,6 +8,7 @@ import {
   deleteEvent,
   type AdminEvent,
 } from '@/lib/admin-api';
+import Link from 'next/link';
 import {
   Search,
   ChevronLeft,
@@ -17,6 +18,7 @@ import {
   X,
   Check,
   RefreshCw,
+  Plus,
 } from 'lucide-react';
 
 const DISTANCE_OPTIONS = ['3K', '5K', '10K', '15K', 'HM', 'M', '50K', '65K', '100K', 'Ultra'];
@@ -91,7 +93,16 @@ export function EventsTable() {
 
   return (
     <div>
-      <h1 className="font-display text-2xl font-bold uppercase text-jet mb-6">Events</h1>
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="font-display text-2xl font-bold uppercase text-jet">Events</h1>
+        <Link
+          href="/admin/events/new"
+          className="flex items-center gap-2 px-4 py-2 rounded-lg bg-signal text-white text-sm font-body font-medium hover:bg-signal/90 transition-colors"
+        >
+          <Plus className="w-4 h-4" />
+          Add Event
+        </Link>
+      </div>
 
       {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-3 mb-4">
@@ -157,7 +168,9 @@ export function EventsTable() {
                           className="w-full px-2 py-1 rounded border border-jet/20 font-body text-sm"
                         />
                       ) : (
-                        <span className="font-body text-sm text-jet line-clamp-1">{event.title}</span>
+                        <Link href={`/admin/events/${event.id}`} className="font-body text-sm text-jet hover:text-signal line-clamp-1 transition-colors">
+                          {event.title}
+                        </Link>
                       )}
                     </td>
                     <td className="px-4 py-3">

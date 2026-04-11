@@ -2,16 +2,18 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { useAdminToken } from '@/lib/use-admin-token';
+import Link from 'next/link';
 import {
   getMessages, deleteMessage, getPhotos, deletePhoto,
-  type AdminMessage, type AdminPhoto,
+  getCommunityEvents, deleteEvent,
+  type AdminMessage, type AdminPhoto, type AdminEvent,
 } from '@/lib/admin-api';
 import {
   MessageSquare, Image as ImageIcon, Trash2, RefreshCw,
-  ChevronLeft, ChevronRight,
+  ChevronLeft, ChevronRight, Tent,
 } from 'lucide-react';
 
-type Tab = 'messages' | 'photos';
+type Tab = 'messages' | 'photos' | 'community';
 
 export function ModerationContent() {
   const token = useAdminToken();
@@ -26,6 +28,11 @@ export function ModerationContent() {
   const [photos, setPhotos] = useState<AdminPhoto[]>([]);
   const [photoTotal, setPhotoTotal] = useState(0);
   const [photoPage, setPhotoPage] = useState(1);
+
+  // Community events state
+  const [communityEvents, setCommunityEvents] = useState<AdminEvent[]>([]);
+  const [communityTotal, setCommunityTotal] = useState(0);
+  const [communityPage, setCommunityPage] = useState(1);
 
   const [loading, setLoading] = useState(true);
 
@@ -53,10 +60,23 @@ export function ModerationContent() {
     }
   }, [token, photoPage]);
 
+  const fetchCommunity = useCallback(async () => {
+    if (!token) return;
+    setLoading(true);
+    try {
+      const res = await getCommunityEvents(token, { page: communityPage, limit: 20 });
+      setCommunityEvents(res.events);
+      setCommunityTotal(res.total);
+    } finally {
+      setLoading(false);
+    }
+  }, [token, communityPage]);
+
   useEffect(() => {
     if (tab === 'messages') fetchMessages();
-    else fetchPhotos();
-  }, [tab, fetchMessages, fetchPhotos]);
+    else if (tab === 'photos') fetchPhotos();
+    else fetchCommunity();
+  }, [tab, fetchMessages, fetchPhotos, fetchCommunity]);
 
   const handleDeleteMessage = async (id: string) => {
     if (!token || !confirm('Delete this message?')) return;
@@ -79,6 +99,7 @@ export function ModerationContent() {
         {[
           { key: 'messages' as Tab, label: 'Messages', icon: MessageSquare },
           { key: 'photos' as Tab, label: 'Photos', icon: ImageIcon },
+          { key: 'community' as Tab, label: 'Community Events', icon: Tent },
         ].map(({ key, label, icon: Icon }) => (
           <button
             key={key}
@@ -121,7 +142,7 @@ export function ModerationContent() {
           </div>
           <Pagination page={msgPage} total={msgTotal} limit={20} onPageChange={setMsgPage} />
         </div>
-      ) : (
+      ) : tab === 'photos' ? (
         <>
           {photos.length === 0 ? (
             <div className="bg-white rounded-xl border border-jet/10 px-4 py-12 text-center font-body text-sm text-jet/40">
@@ -154,6 +175,46 @@ export function ModerationContent() {
             <Pagination page={photoPage} total={photoTotal} limit={20} onPageChange={setPhotoPage} />
           </div>
         </>
+      ) : (
+        <div className="bg-white rounded-xl border border-jet/10 overflow-hidden">
+          <div className="divide-y divide-jet/5">
+            {communityEvents.length === 0 ? (
+              <div className="px-4 py-12 text-center font-body text-sm text-jet/40">No community events.</div>
+            ) : (
+              communityEvents.map((evt) => (
+                <div key={evt.id} className="px-4 py-3 flex items-center justify-between gap-4 hover:bg-jet/[0.02]">
+                  <div className="min-w-0 flex-1">
+                    <Link href={`/admin/events/${evt.id}`} className="font-body text-sm text-jet font-medium hover:text-signal transition-colors">
+                      {evt.title}
+                    </Link>
+                    <p className="font-body text-xs text-jet/40 mt-0.5">
+                      {evt.locationName || '—'} &middot;{' '}
+                      {evt.startTime ? new Date(evt.startTime).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'} &middot;{' '}
+                      Status: {evt.eventStatus || 'live'}
+                    </p>
+                  </div>
+                  <div className="flex gap-1">
+                    <Link href={`/admin/events/${evt.id}`} className="px-3 py-1.5 rounded-lg border border-jet/10 text-xs font-body text-jet/60 hover:bg-jet/5 transition-colors">
+                      Review
+                    </Link>
+                    <button
+                      onClick={async () => {
+                        if (!token || !confirm(`Delete "${evt.title}"?`)) return;
+                        await deleteEvent(token, evt.id);
+                        fetchCommunity();
+                      }}
+                      className="p-1.5 rounded hover:bg-red-50 text-jet/30 hover:text-red-500 cursor-pointer"
+                      title="Delete"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+          <Pagination page={communityPage} total={communityTotal} limit={20} onPageChange={setCommunityPage} />
+        </div>
       )}
     </div>
   );

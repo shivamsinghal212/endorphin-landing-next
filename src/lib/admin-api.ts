@@ -213,6 +213,45 @@ export const runScraper = (token: string, source?: string) =>
 export const getScraperSources = (token: string) =>
   adminFetch<{ sources: string[] }>('/scraper/sources', token);
 
+export interface ScraperRun {
+  id: string;
+  source: string;
+  status: string;
+  eventsFetched: number;
+  eventsUpserted: number;
+  errorMessage: string | null;
+  startedAt: string | null;
+  finishedAt: string | null;
+}
+
+export const getScraperRuns = (token: string, limit = 20) =>
+  adminFetch<{ runs: ScraperRun[] }>(`/scraper/runs?limit=${limit}`, token);
+
+export const getLastRunsPerSource = (token: string) =>
+  adminFetch<Record<string, ScraperRun>>('/scraper/last-runs', token);
+
+// ── Event detail + create + enrich ─────────────────────────────────────────
+
+export const getEventDetail = (token: string, id: string) =>
+  adminFetch<AdminEvent>(`/events/${id}`, token);
+
+export const createEvent = (token: string, data: Record<string, unknown>) =>
+  adminFetch<AdminEvent>('/events', token, {
+    method: 'POST',
+    body: JSON.stringify(data),
+  });
+
+export const enrichEvent = (token: string, id: string) =>
+  adminFetch<AdminEvent>(`/events/${id}/enrich`, token, { method: 'POST' });
+
+export const getCommunityEvents = (token: string, params: Record<string, string | number>) => {
+  const qs = new URLSearchParams();
+  for (const [k, v] of Object.entries(params)) {
+    if (v !== undefined && v !== null && v !== '') qs.set(k, String(v));
+  }
+  return adminFetch<EventsResponse>(`/events/community?${qs}`, token);
+};
+
 // ── Notifications ──────────────────────────────────────────────────────────
 
 export const broadcastNotification = (
