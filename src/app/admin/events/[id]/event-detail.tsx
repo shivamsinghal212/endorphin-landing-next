@@ -40,6 +40,7 @@ export function EventDetailContent({ eventId }: { eventId: string }) {
   const handleSave = async () => {
     if (!token) return;
     setSaving(true);
+    setError(null);
     try {
       const updated = await updateEvent(token, eventId, {
         title: form.title,
@@ -64,18 +65,25 @@ export function EventDetailContent({ eventId }: { eventId: string }) {
       });
       setEvent(updated);
       setForm(updated as unknown as Record<string, unknown>);
+    } catch (e) {
+      setError(`Save failed: ${e instanceof Error ? e.message : 'Unknown error'}`);
     } finally {
       setSaving(false);
     }
   };
 
+  const [error, setError] = useState<string | null>(null);
+
   const handleEnrich = async () => {
     if (!token) return;
     setEnriching(true);
+    setError(null);
     try {
       const updated = await enrichEvent(token, eventId);
       setEvent(updated);
       setForm(updated as unknown as Record<string, unknown>);
+    } catch (e) {
+      setError(`Enrich failed: ${e instanceof Error ? e.message : 'Unknown error'}`);
     } finally {
       setEnriching(false);
     }
@@ -149,6 +157,12 @@ export function EventDetailContent({ eventId }: { eventId: string }) {
           </button>
         </div>
       </div>
+
+      {error && (
+        <div className="mb-4 px-4 py-3 rounded-lg bg-red-50 border border-red-200 font-body text-sm text-red-700">
+          {error}
+        </div>
+      )}
 
       <div className="grid lg:grid-cols-3 gap-6">
         {/* Left column — main fields */}
