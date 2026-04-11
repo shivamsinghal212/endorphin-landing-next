@@ -22,6 +22,7 @@ export function EventDetailContent({ eventId }: { eventId: string }) {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [enriching, setEnriching] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const fetchEvent = useCallback(async () => {
     if (!token) return;
@@ -71,8 +72,6 @@ export function EventDetailContent({ eventId }: { eventId: string }) {
       setSaving(false);
     }
   };
-
-  const [error, setError] = useState<string | null>(null);
 
   const handleEnrich = async () => {
     if (!token) return;
