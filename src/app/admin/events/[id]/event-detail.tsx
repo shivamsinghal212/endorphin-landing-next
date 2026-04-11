@@ -330,7 +330,7 @@ function MarkdownField({
           className="w-full px-3 py-2 rounded-lg border border-jet/10 font-mono text-sm text-jet focus:outline-none focus:border-signal/30 transition-colors resize-y"
         />
       ) : (
-        <div className="px-4 py-3 rounded-lg border border-jet/10 bg-jet/[0.02] min-h-[120px] max-h-[400px] overflow-y-auto prose prose-sm prose-jet max-w-none font-body [&_h2]:font-display [&_h2]:text-sm [&_h2]:font-semibold [&_h2]:uppercase [&_h2]:text-jet/70 [&_h2]:mt-4 [&_h2]:mb-2 [&_h3]:font-display [&_h3]:text-xs [&_h3]:font-semibold [&_h3]:uppercase [&_h3]:text-jet/60 [&_ul]:text-sm [&_p]:text-sm [&_li]:text-jet/70 [&_strong]:text-jet">
+        <div className="px-4 py-3 rounded-lg border border-jet/10 bg-white min-h-[120px] max-h-[400px] overflow-y-auto max-w-none font-body text-sm text-jet/80 leading-relaxed [&_h2]:font-display [&_h2]:text-base [&_h2]:font-semibold [&_h2]:uppercase [&_h2]:text-jet [&_h2]:mt-5 [&_h2]:mb-2 [&_h3]:font-display [&_h3]:text-sm [&_h3]:font-semibold [&_h3]:text-jet [&_h3]:mt-4 [&_h3]:mb-1 [&_ul]:my-2 [&_ul]:pl-5 [&_ul]:list-disc [&_ol]:my-2 [&_ol]:pl-5 [&_ol]:list-decimal [&_li]:text-jet/80 [&_li]:mb-1 [&_p]:my-2 [&_p]:text-jet/80 [&_strong]:text-jet [&_strong]:font-semibold [&_a]:text-signal [&_a]:underline [&_hr]:my-4 [&_hr]:border-jet/10">
           {value ? (
             <ReactMarkdown>{value}</ReactMarkdown>
           ) : (
