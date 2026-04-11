@@ -45,12 +45,16 @@ export function DashboardContent() {
   const [scraping, setScraping] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!token) return;
+    if (!token) {
+      setLoading(false);
+      return;
+    }
     Promise.all([getStats(token), getScraperSources(token)])
       .then(([s, src]) => {
         setStats(s);
         setSources(src.sources);
       })
+      .catch((e) => console.error('Failed to fetch stats:', e))
       .finally(() => setLoading(false));
   }, [token]);
 
@@ -68,6 +72,18 @@ export function DashboardContent() {
     return (
       <div className="flex items-center justify-center h-64">
         <RefreshCw className="w-5 h-5 animate-spin text-jet/30" />
+      </div>
+    );
+  }
+
+  if (!token) {
+    return (
+      <div className="bg-white rounded-xl border border-jet/10 p-6">
+        <h2 className="font-display text-lg font-bold text-jet mb-2">Backend Token Missing</h2>
+        <p className="font-body text-sm text-jet/60">
+          Could not obtain a backend JWT. Make sure <code className="bg-jet/5 px-1 rounded">ADMIN_EMAILS</code> is set on Railway
+          and includes your Google account email. Then sign out and sign in again.
+        </p>
       </div>
     );
   }
