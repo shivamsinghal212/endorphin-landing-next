@@ -17,6 +17,7 @@ export function ScrapersContent() {
   const [runs, setRuns] = useState<ScraperRun[]>([]);
   const [loading, setLoading] = useState(true);
   const [running, setRunning] = useState<string | null>(null);
+  const [enrichEnabled, setEnrichEnabled] = useState(true);
 
   const fetchData = useCallback(async () => {
     if (!token) return;
@@ -41,7 +42,7 @@ export function ScrapersContent() {
     if (!token) return;
     setRunning(source || 'all');
     try {
-      await runScraper(token, source);
+      await runScraper(token, source, enrichEnabled);
       // Poll for completion
       setTimeout(() => fetchData(), 5000);
       setTimeout(() => fetchData(), 15000);
@@ -85,14 +86,25 @@ export function ScrapersContent() {
     <div>
       <div className="flex items-center justify-between mb-6">
         <h1 className="font-display text-2xl font-bold uppercase text-jet">Scrapers</h1>
-        <button
-          onClick={() => handleRun()}
-          disabled={!!running}
-          className="flex items-center gap-2 px-4 py-2 rounded-lg bg-jet text-bone text-sm font-body font-medium hover:bg-jet/90 disabled:opacity-50 transition-colors cursor-pointer"
-        >
-          {running === 'all' ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Play className="w-4 h-4" />}
-          Run All Scrapers
-        </button>
+        <div className="flex items-center gap-4">
+          <label className="flex items-center gap-2 font-body text-sm text-jet/60 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={enrichEnabled}
+              onChange={(e) => setEnrichEnabled(e.target.checked)}
+              className="w-4 h-4 rounded accent-signal"
+            />
+            Enrich with AI
+          </label>
+          <button
+            onClick={() => handleRun()}
+            disabled={!!running}
+            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-jet text-bone text-sm font-body font-medium hover:bg-jet/90 disabled:opacity-50 transition-colors cursor-pointer"
+          >
+            {running === 'all' ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Play className="w-4 h-4" />}
+            Run All Scrapers
+          </button>
+        </div>
       </div>
 
       {/* Source cards */}

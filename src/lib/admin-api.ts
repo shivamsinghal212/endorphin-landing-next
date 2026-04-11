@@ -204,10 +204,10 @@ export const deletePhoto = (token: string, id: string) =>
 
 // ── Scrapers ───────────────────────────────────────────────────────────────
 
-export const runScraper = (token: string, source?: string) =>
+export const runScraper = (token: string, source?: string, enrich = true) =>
   adminFetch<{ ok: boolean; message: string }>('/scraper/run', token, {
     method: 'POST',
-    body: JSON.stringify({ source: source || null }),
+    body: JSON.stringify({ source: source || null, enrich }),
   });
 
 export const getScraperSources = (token: string) =>
