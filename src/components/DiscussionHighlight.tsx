@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import { fadeUp, stagger } from "@/lib/animations";
 
 const DiscussionHighlight = () => (
-  <section className="relative py-24 lg:py-32 bg-jet overflow-hidden">
+  <section className="relative py-24 md:py-32 bg-jet overflow-hidden">
     <div className="relative max-w-5xl mx-auto px-6 lg:px-8 text-center">
       <motion.div
         initial="hidden"

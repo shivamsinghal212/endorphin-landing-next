@@ -13,7 +13,7 @@ const features = [
 
 const MoreFeatures = () => (
   <section id="app" className="bg-bone relative overflow-hidden">
-    <div className="px-6 md:px-12 py-24 md:py-40">
+    <div className="px-6 md:px-12 py-24 md:py-32">
       {/* Section header — centered */}
       <motion.div
         variants={fadeUp}

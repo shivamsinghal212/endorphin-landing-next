@@ -1,13 +1,15 @@
+import { PLAY_STORE_URL } from "@/lib/store-links";
+
 const AboutSection = () => (
-  <section id="about" className="py-20 md:py-28 bg-bone">
+  <section id="about" className="py-24 md:py-32 bg-jet">
     <div className="max-w-4xl mx-auto px-6 md:px-12">
-      <p className="font-body text-[11px] uppercase tracking-[0.3em] text-jet/50 mb-4">
+      <p className="font-body text-[11px] uppercase tracking-[0.2em] text-signal mb-4">
         About Endorfin
       </p>
-      <h2 className="font-display text-3xl md:text-4xl font-bold uppercase text-jet mb-8">
+      <h2 className="font-display text-3xl md:text-4xl font-bold uppercase text-bone mb-8">
         Built for Indian Runners
       </h2>
-      <div className="font-body text-base text-jet/80 leading-relaxed space-y-4">
+      <div className="font-body text-base text-bone/60 leading-relaxed space-y-4">
         <p>
           Endorfin is a free running app purpose-built for the Indian running community. It
           aggregates 500+ running events across India — from 5K fun runs and 10K charity
@@ -26,7 +28,7 @@ const AboutSection = () => (
           Hyderabad, Chennai, Kolkata, Ahmedabad, Jaipur, and Chandigarh — with new cities
           and events added weekly. The app is available free on{' '}
           <a
-            href="https://play.google.com/store/apps/details?id=com.endorfin.app"
+            href={PLAY_STORE_URL}
             target="_blank"
             rel="noopener noreferrer"
             className="text-signal hover:underline"

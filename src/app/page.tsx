@@ -92,11 +92,11 @@ export default async function Home() {
       <HeroSection />
       <StatsBar />
       <EventsShowcase />
+      <KeyFeatures />
       <CommunitySection />
       <DiscussionHighlight />
-      <AboutSection />
-      <KeyFeatures />
       <MoreFeatures />
+      <AboutSection />
       <CTASection />
       <Footer />
     </main>

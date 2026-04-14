@@ -3,6 +3,7 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
 import { fadeUp, stagger } from "@/lib/animations";
+import { AppStoreButtons } from "./AppStoreButtons";
 
 interface Event {
   id: string;
@@ -16,8 +17,9 @@ interface Event {
 }
 
 const CITIES = ["All", "Mumbai", "Delhi", "Bangalore", "Pune", "Hyderabad", "Chennai"];
+import { PLAY_STORE_URL } from "@/lib/store-links";
+
 const API_BASE = "https://api.endorfin.run/api/v1";
-const PLAY_STORE = "https://play.google.com/store/apps/details?id=com.endorfin.app";
 
 function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString("en-GB", {
@@ -257,23 +259,7 @@ export default function EventsShowcase() {
               "Discover more events on the app"
             )}
           </p>
-          <a
-            href={PLAY_STORE}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="
-              inline-flex items-center gap-3
-              bg-jet text-white font-display text-base font-semibold uppercase tracking-wider
-              px-10 py-4 rounded-full
-              hover:bg-signal hover:shadow-xl hover:shadow-signal/20
-              transition-all duration-300 cursor-pointer
-            "
-          >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-              <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-            Download Endorfin
-          </a>
+          <AppStoreButtons variant="light" />
         </motion.div>
       </div>
     </section>

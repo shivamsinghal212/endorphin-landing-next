@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import Logo from "./Logo";
+import { PLAY_STORE_URL, APP_STORE_URL } from "@/lib/store-links";
 
 const Footer = () => (
   <footer className="bg-jet border-t border-bone/15">
@@ -19,7 +20,7 @@ const Footer = () => (
         {/* Links */}
         <div className="flex gap-16 md:gap-24">
           <nav aria-label="Product">
-            <h3 className="font-body text-[11px] uppercase tracking-[0.25em] text-bone/70 mb-5">
+            <h3 className="font-body text-[11px] uppercase tracking-[0.2em] text-bone/70 mb-5">
               Product
             </h3>
             <ul className="space-y-3">
@@ -37,7 +38,7 @@ const Footer = () => (
             </ul>
           </nav>
           <nav aria-label="Legal">
-            <h3 className="font-body text-[11px] uppercase tracking-[0.25em] text-bone/70 mb-5">
+            <h3 className="font-body text-[11px] uppercase tracking-[0.2em] text-bone/70 mb-5">
               Legal
             </h3>
             <ul className="space-y-3">
@@ -66,9 +67,14 @@ const Footer = () => (
           <a href="https://twitter.com/endorfinapp" target="_blank" rel="noopener noreferrer" className="font-body text-xs text-bone/60 hover:text-signal transition-colors" aria-label="Follow Endorfin on Twitter">
             Twitter
           </a>
-          <a href="https://play.google.com/store/apps/details?id=com.endorfin.app" target="_blank" rel="noopener noreferrer" className="font-body text-xs text-bone/60 hover:text-signal transition-colors" aria-label="Endorfin on Google Play">
+          <a href={PLAY_STORE_URL} target="_blank" rel="noopener noreferrer" className="font-body text-xs text-bone/60 hover:text-signal transition-colors" aria-label="Endorfin on Google Play">
             Google Play
           </a>
+          {APP_STORE_URL && (
+            <a href={APP_STORE_URL} target="_blank" rel="noopener noreferrer" className="font-body text-xs text-bone/60 hover:text-signal transition-colors" aria-label="Endorfin on App Store">
+              App Store
+            </a>
+          )}
           <a href="mailto:hello@endorfin.run" className="font-body text-xs text-bone/60 hover:text-signal transition-colors">
             hello@endorfin.run
           </a>

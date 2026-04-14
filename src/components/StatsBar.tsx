@@ -24,7 +24,7 @@ const StatsBar = () => {
   const { ref, inView } = useInView({ triggerOnce: true, threshold: 0.4 });
 
   return (
-    <section id="about" className="bg-signal relative grain">
+    <section className="bg-signal relative grain">
       <h2 className="sr-only">Community Metrics</h2>
       {/* Server-rendered stats for crawlers that don't execute JS */}
       <div className="sr-only" aria-hidden="true">

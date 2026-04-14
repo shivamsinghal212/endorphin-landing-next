@@ -23,8 +23,8 @@ const cards = [
 ];
 
 const CommunitySection = () => (
-  <section className="bg-jet relative overflow-hidden">
-    <div className="px-6 md:px-12 py-24 md:py-40">
+  <section className="bg-bone relative overflow-hidden">
+    <div className="px-6 md:px-12 py-24 md:py-32">
       {/* Section header — centered */}
       <motion.div
         variants={fadeUp}
@@ -33,13 +33,13 @@ const CommunitySection = () => (
         viewport={{ once: true }}
         className="text-center mb-16 md:mb-24 max-w-2xl mx-auto"
       >
-        <span className="font-body text-[11px] uppercase tracking-[0.3em] text-signal">
+        <span className="font-body text-[11px] uppercase tracking-[0.2em] text-signal">
           Community
         </span>
-        <h2 className="mt-4 font-display font-semibold text-5xl md:text-8xl uppercase text-bone leading-[0.95]">
+        <h2 className="mt-4 font-display font-semibold text-5xl md:text-8xl uppercase text-jet leading-[0.95]">
           CREATE YOUR<br />OWN RUNS
         </h2>
-        <p className="mt-6 font-body text-base text-bone/40">
+        <p className="mt-6 font-body text-base text-jet/50">
           Don't just find races — create them. Organize community runs, invite your crew, and chat with fellow runners before race day.
         </p>
       </motion.div>
@@ -54,13 +54,13 @@ const CommunitySection = () => (
       >
         {cards.map((card) => (
           <motion.div key={card.title} variants={fadeUp} className="text-center group">
-            <div className="w-14 h-14 rounded-full bg-bone/10 flex items-center justify-center mx-auto mb-5 group-hover:bg-signal transition-colors duration-300">
+            <div className="w-14 h-14 rounded-full bg-jet flex items-center justify-center mx-auto mb-5 group-hover:bg-signal transition-colors duration-300">
               <card.icon className="w-6 h-6 text-bone" />
             </div>
-            <h3 className="font-display font-medium text-lg uppercase text-bone">
+            <h3 className="font-display font-medium text-lg uppercase text-jet">
               {card.title}
             </h3>
-            <p className="mt-2 font-body text-sm text-bone/40 leading-relaxed">
+            <p className="mt-2 font-body text-sm text-jet/50 leading-relaxed">
               {card.desc}
             </p>
           </motion.div>
