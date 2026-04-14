@@ -19,6 +19,9 @@ import {
   Check,
   RefreshCw,
   Plus,
+  ArrowUpDown,
+  ArrowUp,
+  ArrowDown,
 } from 'lucide-react';
 
 const DISTANCE_OPTIONS = ['3K', '5K', '10K', '15K', 'HM', 'M', '50K', '65K', '100K', 'Ultra'];
@@ -34,18 +37,20 @@ export function EventsTable() {
   const [loading, setLoading] = useState(true);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editData, setEditData] = useState<Partial<AdminEvent>>({});
+  const [sort, setSort] = useState<'start_time' | 'updated_at'>('start_time');
+  const [order, setOrder] = useState<'asc' | 'desc'>('desc');
 
   const fetchEvents = useCallback(async () => {
     if (!token) return;
     setLoading(true);
     try {
-      const res = await getEvents(token, { page, limit, search, source: sourceFilter });
+      const res = await getEvents(token, { page, limit, search, source: sourceFilter, sort, order });
       setEvents(res.events);
       setTotal(res.total);
     } finally {
       setLoading(false);
     }
-  }, [token, page, limit, search, sourceFilter]);
+  }, [token, page, limit, search, sourceFilter, sort, order]);
 
   useEffect(() => { fetchEvents(); }, [fetchEvents]);
 
@@ -138,8 +143,24 @@ export function EventsTable() {
                 <th className="px-4 py-3 font-body text-xs font-medium text-jet/50 uppercase tracking-wider">Title</th>
                 <th className="px-4 py-3 font-body text-xs font-medium text-jet/50 uppercase tracking-wider">Source</th>
                 <th className="px-4 py-3 font-body text-xs font-medium text-jet/50 uppercase tracking-wider">City</th>
-                <th className="px-4 py-3 font-body text-xs font-medium text-jet/50 uppercase tracking-wider">Date</th>
-                <th className="px-4 py-3 font-body text-xs font-medium text-jet/50 uppercase tracking-wider">Updated</th>
+                <th className="px-4 py-3">
+                  <button
+                    onClick={() => { if (sort === 'start_time') { setOrder(o => o === 'desc' ? 'asc' : 'desc'); } else { setSort('start_time'); setOrder('desc'); } setPage(1); }}
+                    className="flex items-center gap-1 font-body text-xs font-medium text-jet/50 uppercase tracking-wider hover:text-jet cursor-pointer"
+                  >
+                    Date
+                    {sort === 'start_time' ? (order === 'desc' ? <ArrowDown className="w-3 h-3" /> : <ArrowUp className="w-3 h-3" />) : <ArrowUpDown className="w-3 h-3 opacity-30" />}
+                  </button>
+                </th>
+                <th className="px-4 py-3">
+                  <button
+                    onClick={() => { if (sort === 'updated_at') { setOrder(o => o === 'desc' ? 'asc' : 'desc'); } else { setSort('updated_at'); setOrder('desc'); } setPage(1); }}
+                    className="flex items-center gap-1 font-body text-xs font-medium text-jet/50 uppercase tracking-wider hover:text-jet cursor-pointer"
+                  >
+                    Updated
+                    {sort === 'updated_at' ? (order === 'desc' ? <ArrowDown className="w-3 h-3" /> : <ArrowUp className="w-3 h-3" />) : <ArrowUpDown className="w-3 h-3 opacity-30" />}
+                  </button>
+                </th>
                 <th className="px-4 py-3 font-body text-xs font-medium text-jet/50 uppercase tracking-wider">Tags</th>
                 <th className="px-4 py-3 font-body text-xs font-medium text-jet/50 uppercase tracking-wider">Status</th>
                 <th className="px-4 py-3 font-body text-xs font-medium text-jet/50 uppercase tracking-wider w-24">Actions</th>
