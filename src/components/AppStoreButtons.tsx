@@ -6,10 +6,10 @@ import { PLAY_STORE_URL, APP_STORE_URL } from "@/lib/store-links";
 export const AppStoreButtons = ({ variant = "dark" }: { variant?: "dark" | "light" }) => {
   const base = variant === "dark"
     ? "bg-white/10 border-white/10 text-white hover:bg-signal hover:border-signal"
-    : "bg-jet text-bone hover:bg-signal";
+    : "bg-jet border-jet text-bone hover:bg-signal hover:border-signal";
 
   return (
-    <div className="flex flex-col sm:flex-row items-center gap-4">
+    <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
       <a
         href={APP_STORE_URL ?? "#"}
         {...(APP_STORE_URL ? { target: "_blank", rel: "noopener noreferrer" } : {})}
