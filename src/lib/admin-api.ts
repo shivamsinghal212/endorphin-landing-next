@@ -70,6 +70,7 @@ export interface AdminEvent {
   registrationUrl: string | null;
   soldOut: boolean;
   createdAt: string | null;
+  updatedAt: string | null;
   distanceCategories: string[];
 }
 

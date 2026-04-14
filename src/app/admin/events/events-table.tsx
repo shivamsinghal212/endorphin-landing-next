@@ -139,6 +139,7 @@ export function EventsTable() {
                 <th className="px-4 py-3 font-body text-xs font-medium text-jet/50 uppercase tracking-wider">Source</th>
                 <th className="px-4 py-3 font-body text-xs font-medium text-jet/50 uppercase tracking-wider">City</th>
                 <th className="px-4 py-3 font-body text-xs font-medium text-jet/50 uppercase tracking-wider">Date</th>
+                <th className="px-4 py-3 font-body text-xs font-medium text-jet/50 uppercase tracking-wider">Updated</th>
                 <th className="px-4 py-3 font-body text-xs font-medium text-jet/50 uppercase tracking-wider">Tags</th>
                 <th className="px-4 py-3 font-body text-xs font-medium text-jet/50 uppercase tracking-wider">Status</th>
                 <th className="px-4 py-3 font-body text-xs font-medium text-jet/50 uppercase tracking-wider w-24">Actions</th>
@@ -147,13 +148,13 @@ export function EventsTable() {
             <tbody>
               {loading ? (
                 <tr>
-                  <td colSpan={7} className="px-4 py-12 text-center">
+                  <td colSpan={8} className="px-4 py-12 text-center">
                     <RefreshCw className="w-5 h-5 animate-spin text-jet/30 mx-auto" />
                   </td>
                 </tr>
               ) : events.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="px-4 py-12 text-center font-body text-sm text-jet/40">
+                  <td colSpan={8} className="px-4 py-12 text-center font-body text-sm text-jet/40">
                     No events found.
                   </td>
                 </tr>
@@ -181,6 +182,9 @@ export function EventsTable() {
                     <td className="px-4 py-3 font-body text-sm text-jet/60">{event.locationName || '—'}</td>
                     <td className="px-4 py-3 font-body text-xs text-jet/50 whitespace-nowrap">
                       {event.startTime ? new Date(event.startTime).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'}
+                    </td>
+                    <td className="px-4 py-3 font-body text-xs text-jet/50 whitespace-nowrap">
+                      {event.updatedAt ? new Date(event.updatedAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : '—'}
                     </td>
                     <td className="px-4 py-3">
                       {editingId === event.id ? (
