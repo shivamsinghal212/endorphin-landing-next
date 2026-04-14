@@ -6,7 +6,7 @@ import { stagger, letterReveal, fadeUp } from "@/lib/animations";
 
 const HeroParticles = lazy(() => import("./HeroParticles"));
 
-const HERO_IMG = "https://images.unsplash.com/photo-1571008887538-b36bb32f4571?w=1920&q=80&auto=format&fit=crop";
+const HERO_IMG = "/images/hero-race.jpg";
 
 const words = ["FIND", "YOUR", "NEXT", "RACE"];
 
@@ -23,7 +23,7 @@ const HeroSection = () => {
       <div className="absolute inset-0">
         <img
           src={HERO_IMG}
-          alt="Runners on a scenic trail"
+          alt="Runners at Delhi Half Marathon"
           className="absolute inset-0 w-full h-full object-cover opacity-50"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-jet via-jet/60 to-transparent" />
