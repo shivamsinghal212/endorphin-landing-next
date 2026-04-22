@@ -100,7 +100,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   }
   if (description.length < 110) {
     const prefix = description ? `${description} · ` : '';
-    description = `${prefix}${club.name} is a running community in ${club.city}. Join free on Endorfin.`;
+    description = `${prefix}${club.name} is a running community in ${club.city}. Join Club on Endorfin.`;
   }
   if (description.length > 160) {
     description = description.slice(0, 157).trimEnd() + '…';
