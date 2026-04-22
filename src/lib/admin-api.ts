@@ -266,3 +266,124 @@ export const broadcastNotification = (
 
 export const getQueueStatus = (token: string) =>
   adminFetch<{ pending: number; processed: number }>('/notifications/queue', token);
+
+// ── Clubs ──────────────────────────────────────────────────────────────────
+// GET is public; POST upserts and requires the admin JWT.
+// Routes live at /api/v1/clubs/* (not under /admin), so we hit them directly.
+
+export type ClubRunType = 'club_run' | 'race_event';
+
+export interface ClubStats {
+  members: number;
+  runsThisMonth: number;
+  kmThisMonth: number;
+  yearsRunning: number;
+}
+
+export interface ClubNextRun {
+  id?: string | null;
+  date: string;
+  time?: string | null;
+  location?: string | null;
+  title: string;
+  distanceKm?: number | null;
+  description?: string | null;
+  goingCount: number;
+  bgImageUrl?: string | null;
+  rsvpUrl?: string | null;
+  type: ClubRunType;
+}
+
+export interface ClubUpcomingRun {
+  id?: string | null;
+  date: string;
+  time?: string | null;
+  location?: string | null;
+  title: string;
+  distanceKm?: number | null;
+  goingCount: number;
+  rsvpUrl?: string | null;
+  type: ClubRunType;
+}
+
+export interface ClubLastRunStats {
+  showedUp: number;
+  distanceKm?: number | null;
+  location?: string | null;
+  paceGroups?: string | null;
+  after?: string | null;
+}
+
+export interface ClubLastRunPhoto {
+  url: string;
+  captionTitle?: string | null;
+  captionMeta?: string | null;
+}
+
+export interface ClubLastRun {
+  date: string;
+  title: string;
+  distanceKm?: number | null;
+  type: ClubRunType;
+  summary?: string | null;
+  stats: ClubLastRunStats;
+  photos: ClubLastRunPhoto[];
+}
+
+export interface ClubAdminPerson {
+  name: string;
+  role?: string | null;
+  avatarUrl?: string | null;
+  whatsappUrl?: string | null;
+  instagramUrl?: string | null;
+  stravaUrl?: string | null;
+}
+
+export interface Club {
+  id: string;
+  slug: string;
+  name: string;
+  city: string;
+  establishedYear: number | null;
+  logoUrl: string | null;
+  kicker: string | null;
+  subtitle: string | null;
+  description: string | null;
+  tags: string[];
+  isVerified: boolean;
+  publishedAt: string | null;
+  whatsappUrl: string | null;
+  instagramUrl: string | null;
+  stravaUrl: string | null;
+  joinUrl: string | null;
+  stats: ClubStats;
+  nextRun: ClubNextRun | null;
+  upcomingRuns: ClubUpcomingRun[];
+  lastRun: ClubLastRun | null;
+  admins: ClubAdminPerson[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export const getClub = async (slug: string): Promise<Club | null> => {
+  const res = await fetch(`${API_BASE}/api/v1/clubs/${encodeURIComponent(slug)}`);
+  if (res.status === 404) return null;
+  if (!res.ok) throw new AdminApiError(res.status, await res.text());
+  return res.json();
+};
+
+export const upsertClub = async (
+  token: string,
+  payload: Record<string, unknown>,
+): Promise<Club> => {
+  const res = await fetch(`${API_BASE}/api/v1/clubs`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(payload),
+  });
+  if (!res.ok) throw new AdminApiError(res.status, await res.text());
+  return res.json();
+};

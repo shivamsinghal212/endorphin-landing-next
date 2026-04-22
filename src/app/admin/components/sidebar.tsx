@@ -10,6 +10,7 @@ import {
   Shield,
   Cog,
   Bell,
+  Trophy,
   LogOut,
   Menu,
   X,
@@ -19,6 +20,7 @@ import { useState } from 'react';
 const NAV_ITEMS = [
   { href: '/admin', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/admin/events', label: 'Events', icon: Calendar },
+  { href: '/admin/clubs', label: 'Clubs', icon: Trophy },
   { href: '/admin/users', label: 'Users', icon: Users },
   { href: '/admin/moderation', label: 'Moderation', icon: Shield },
   { href: '/admin/scrapers', label: 'Scrapers', icon: Cog },
