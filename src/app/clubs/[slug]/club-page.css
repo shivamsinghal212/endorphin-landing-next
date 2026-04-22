@@ -323,6 +323,10 @@
 .club-page .hero-ident .hero-name {
   margin-top: 0;
   font-size: 88px;
+  /* Allow the h1 to shrink below its content width so long names wrap
+     at the column edge instead of overflowing past the logo column. */
+  min-width: 0;
+  flex: 1;
 }
 .club-page .club-subtitle {
   margin-top: 20px;

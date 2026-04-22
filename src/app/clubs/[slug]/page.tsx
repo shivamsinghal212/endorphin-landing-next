@@ -243,9 +243,15 @@ function HeroName({ name, isVerified }: { name: string; isVerified: boolean }) {
       </h1>
     );
   }
+  // 3+ words: let the head wrap naturally at the column width; pin only
+  // the final word + period + tick in a nowrap span so the tick never
+  // splits from the last word.
+  const head = words.slice(0, -1).join(' ');
+  const last = words[words.length - 1];
   return (
     <h1 className="hero-name">
-      <span className="hero-name-lastline">{clean}.{tick}</span>
+      {head}{' '}
+      <span className="hero-name-lastline">{last}.{tick}</span>
     </h1>
   );
 }

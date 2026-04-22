@@ -108,13 +108,19 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className={`${oswald.variable} ${poppins.variable}`}>
       <head>
-        {/* Clash Display from Fontshare — preconnect to CDN so the woff2
-            file fetch overlaps with other network work on mobile. The
-            stylesheet sits on api.fontshare.com; font binaries on
-            cdn.fontshare.com. Without these, the fallback sans-serif
-            shows on slow mobile connections. */}
+        {/* Clash Display from Fontshare — preconnect the CDN + explicitly
+            preload the weight-600 woff2 (used by the wordmark site-wide).
+            Without the preload, mobile often shows the fallback because
+            the font binary fetch only starts after CSS parsing. */}
         <link rel="preconnect" href="https://api.fontshare.com" />
         <link rel="preconnect" href="https://cdn.fontshare.com" crossOrigin="" />
+        <link
+          rel="preload"
+          href="https://cdn.fontshare.com/wf/FPDAZ2S6SW4QMSRIIKNNGTPM6VIXYMKO/5HNPQ453FRLIQWV2FNOBUU3FKTDZQVSG/Z3MGHFHX6DCTLQ55LJYRJ5MDCZPMFZU6.woff2"
+          as="font"
+          type="font/woff2"
+          crossOrigin=""
+        />
         {/* eslint-disable-next-line @next/next/no-page-custom-font */}
         <link href="https://api.fontshare.com/v2/css?f[]=clash-display@500;600;700&display=swap" rel="stylesheet" />
         <meta property="og:logo" content="https://www.endorfin.run/logo.png" />
