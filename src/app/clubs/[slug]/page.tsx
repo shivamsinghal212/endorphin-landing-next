@@ -423,6 +423,7 @@ function LastRun({ club }: { club: Club }) {
           <div className="kicker last-run-kicker">Last run · {fmtLastRunKickerDate(lr.date)}</div>
           <span className={`last-run-tag ${isRace ? 'race' : ''}`}>{isRace ? 'Race event' : 'Club run'}</span>
           <h2 className="last-run-title">{lr.title}</h2>
+          {lr.summary && <p className="last-run-summary">{lr.summary}</p>}
         </div>
         <div className="last-run-meta" aria-label="Run summary">
           <div className="row">

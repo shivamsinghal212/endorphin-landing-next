@@ -623,6 +623,20 @@
   font-size: 0.78em;
   letter-spacing: -0.005em;
 }
+/* Summary: pull-quote style — red left rule + indent make it read
+   as a standalone editorial note under the Fraunces italic title. */
+.club-page .last-run-summary {
+  margin-top: 18px;
+  padding-left: 18px;
+  border-left: 2px solid var(--red);
+  font-family: var(--font-poppins), sans-serif;
+  font-weight: 400;
+  font-size: 17px;
+  line-height: 1.6;
+  color: var(--jet);
+  opacity: 0.88;
+  max-width: 52ch;
+}
 .club-page .last-run-meta {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -770,6 +784,7 @@
   .club-page .last-run { padding: 40px 20px 36px; }
   .club-page .last-run-head { grid-template-columns: 1fr; gap: 22px; margin-bottom: 28px; }
   .club-page .last-run-title { font-size: 36px; }
+  .club-page .last-run-summary { font-size: 15px; margin-top: 14px; padding-left: 14px; max-width: none; }
   .club-page .last-run-meta .row-value { font-size: 20px; }
   .club-page .last-run-card { width: 76vw; max-width: 340px; }
   .club-page .last-run-arrows { display: none; }
