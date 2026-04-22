@@ -89,10 +89,22 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   const url = `https://www.endorfin.run/clubs/${club.slug}`;
   const title = `${club.name} — Running Club in ${club.city}`;
-  const description =
-    club.subtitle ||
-    club.description ||
-    `${club.name} is a running community in ${club.city}. Join runs, track training, and connect with runners.`;
+
+  // SEO best practice: description between 110–160 chars. Prefer the longer
+  // of subtitle/description; pad with generated context if still short.
+  let description = (club.description || '').trim();
+  if (description.length < 80 && club.subtitle) {
+    description = description
+      ? `${club.subtitle} · ${description}`
+      : club.subtitle.trim();
+  }
+  if (description.length < 110) {
+    const prefix = description ? `${description} · ` : '';
+    description = `${prefix}${club.name} is a running community in ${club.city}. Join free on Endorfin.`;
+  }
+  if (description.length > 160) {
+    description = description.slice(0, 157).trimEnd() + '…';
+  }
 
   // `images` is deliberately omitted — Next's file convention at
   // opengraph-image.tsx auto-wires og:image + twitter:image to the
@@ -211,16 +223,21 @@ function Masthead({ club }: { club: Club }) {
   );
 }
 
-function HeroName({ name }: { name: string }) {
-  // Match the mockup exactly: 2-word names break after word one with a
-  // trailing period on word two. Other lengths render as a single line
-  // with a period appended.
+function HeroName({ name, isVerified }: { name: string; isVerified: boolean }) {
+  // Match the mockup: 2-word names break after word one with a trailing
+  // period on word two; other lengths render single-line with period.
+  // Verified tick renders inline directly after the final period.
   const clean = name.trim().replace(/\.$/, '');
   const words = clean.split(/\s+/);
+  const tick = isVerified ? (
+    <span className="verified-inline" aria-label="Verified club">
+      <svg aria-hidden="true"><use href="#i-verified" /></svg>
+    </span>
+  ) : null;
   if (words.length === 2) {
-    return <h1 className="hero-name">{words[0]}<br />{words[1]}.</h1>;
+    return <h1 className="hero-name">{words[0]}<br />{words[1]}.{tick}</h1>;
   }
-  return <h1 className="hero-name">{clean}.</h1>;
+  return <h1 className="hero-name">{clean}.{tick}</h1>;
 }
 
 function Hero({ club }: { club: Club }) {
@@ -228,15 +245,7 @@ function Hero({ club }: { club: Club }) {
     <section className="hero">
       <div className="hero-grid">
         <div>
-          <div className="hero-kicker-row">
-            {club.kicker && <span className="kicker">{club.kicker}</span>}
-            {club.isVerified && (
-              <span className="verified-pill" title="Endorfin-verified club">
-                <svg className="check" aria-hidden="true"><use href="#i-verified" /></svg>
-                Verified club
-              </span>
-            )}
-          </div>
+          {club.kicker && <span className="kicker">{club.kicker}</span>}
           <div className="hero-ident">
             {club.logoUrl && (
               <div className="club-logo hero-logo">
@@ -244,7 +253,7 @@ function Hero({ club }: { club: Club }) {
                 <img src={club.logoUrl} alt={`${club.name} logo`} />
               </div>
             )}
-            <HeroName name={club.name} />
+            <HeroName name={club.name} isVerified={club.isVerified} />
           </div>
           {club.subtitle && <p className="club-subtitle">{club.subtitle}</p>}
           {club.tags.length > 0 && (

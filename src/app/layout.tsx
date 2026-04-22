@@ -108,7 +108,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className={`${oswald.variable} ${poppins.variable}`}>
       <head>
-        {/* Clash Display from Fontshare */}
+        {/* Clash Display from Fontshare — preconnect to CDN so the woff2
+            file fetch overlaps with other network work on mobile. The
+            stylesheet sits on api.fontshare.com; font binaries on
+            cdn.fontshare.com. Without these, the fallback sans-serif
+            shows on slow mobile connections. */}
+        <link rel="preconnect" href="https://api.fontshare.com" />
+        <link rel="preconnect" href="https://cdn.fontshare.com" crossOrigin="" />
         {/* eslint-disable-next-line @next/next/no-page-custom-font */}
         <link href="https://api.fontshare.com/v2/css?f[]=clash-display@500;600;700&display=swap" rel="stylesheet" />
         <meta property="og:logo" content="https://www.endorfin.run/logo.png" />

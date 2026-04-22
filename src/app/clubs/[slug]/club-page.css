@@ -207,13 +207,19 @@
 
 /* ─── Hero ─────────────────────────────────────── */
 .club-page .hero { padding: 48px 28px 36px; }
-/* Kicker + verified pill share a row, vertically centered. */
-.club-page .hero-kicker-row {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  flex-wrap: wrap;
+/* Inline Instagram-style verified tick — sits at the end of the
+   club name. Scales with the title via em units; blue scalloped
+   badge + white check from the shared #i-verified symbol. */
+.club-page .verified-inline {
+  display: inline-block;
+  width: 0.42em;
+  height: 0.42em;
+  margin-left: 0.18em;
+  color: #0095F6;
+  vertical-align: middle;
+  transform: translateY(-0.08em);
 }
+.club-page .verified-inline svg { width: 100%; height: 100%; display: block; }
 .club-page .hero-grid {
   display: grid;
   grid-template-columns: 1.5fr 1fr;
@@ -333,9 +339,9 @@
   .club-page .hero-ident { gap: 16px; margin-top: 14px; }
   .club-page .hero-logo { width: 72px; height: 72px; }
   .club-page .hero-ident .hero-name { font-size: 48px; }
-  .club-page .club-subtitle { font-size: 18px; margin-top: 14px; max-width: none; }
+  .club-page .club-subtitle { font-size: 17px; margin-top: 14px; max-width: none; }
   .club-page .hero-right { align-items: stretch; }
-  .club-page .hero-description { text-align: left; max-width: none; }
+  .club-page .hero-description { text-align: left; max-width: none; font-size: 15px; }
   .club-page .hero-cta-stack {
     width: auto;
     align-self: stretch;
@@ -505,7 +511,7 @@
   .club-page .run-description {
     text-align: left;
     max-width: none;
-    font-size: 15px;
+    font-size: 14px;
     margin: 10px 0 0;
     -webkit-line-clamp: 2;
   }
@@ -802,7 +808,7 @@
   .club-page .last-run { padding: 40px 20px 36px; }
   .club-page .last-run-head { grid-template-columns: 1fr; gap: 22px; margin-bottom: 28px; }
   .club-page .last-run-title { font-size: 36px; }
-  .club-page .last-run-summary { font-size: 15px; margin-top: 14px; padding-left: 14px; max-width: none; }
+  .club-page .last-run-summary { font-size: 14px; margin-top: 14px; padding-left: 14px; max-width: none; }
   .club-page .last-run-meta .row-value { font-size: 20px; }
   .club-page .last-run-card { width: 76vw; max-width: 340px; }
   .club-page .last-run-arrows { display: none; }

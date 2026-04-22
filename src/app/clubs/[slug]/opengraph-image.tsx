@@ -69,7 +69,7 @@ export default async function OGImage({ params }: Props) {
           }}
         />
 
-        {/* Top row: endorfin wordmark + breadcrumb */}
+        {/* Top row: endorfin wordmark + "Join the club →" CTA */}
         <div
           style={{
             display: 'flex', alignItems: 'baseline', justifyContent: 'space-between',
@@ -78,13 +78,17 @@ export default async function OGImage({ params }: Props) {
           <div style={{ fontSize: 28, fontWeight: 700, letterSpacing: '-0.01em' }}>endorfin</div>
           <div
             style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 8,
               fontSize: 18,
+              fontWeight: 600,
               textTransform: 'uppercase',
               letterSpacing: '0.16em',
-              color: MUTED,
+              color: RED,
             }}
           >
-            clubs · {club.city}
+            Join the club →
           </div>
         </div>
 
