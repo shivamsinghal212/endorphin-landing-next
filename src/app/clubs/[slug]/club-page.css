@@ -207,19 +207,21 @@
 
 /* ─── Hero ─────────────────────────────────────── */
 .club-page .hero { padding: 48px 28px 36px; }
-/* Inline Instagram-style verified tick — sits at the end of the
-   club name. Scales with the title via em units; blue scalloped
-   badge + white check from the shared #i-verified symbol. */
+/* Inline Instagram-style verified tick — positioned like a trademark
+   symbol: smaller, sitting at the cap-top of the italic. Scales with
+   the title via em units; blue scalloped badge + white check. */
 .club-page .verified-inline {
   display: inline-block;
-  width: 0.42em;
-  height: 0.42em;
-  margin-left: 0.18em;
+  width: 0.32em;
+  height: 0.32em;
+  margin-left: 0.08em;
   color: #0095F6;
-  vertical-align: middle;
-  transform: translateY(-0.08em);
+  vertical-align: text-top;
+  transform: translateY(0.05em);
 }
 .club-page .verified-inline svg { width: 100%; height: 100%; display: block; }
+/* Final word + tick pinned together so they never split across lines. */
+.club-page .hero-name-lastline { white-space: nowrap; }
 .club-page .hero-grid {
   display: grid;
   grid-template-columns: 1.5fr 1fr;

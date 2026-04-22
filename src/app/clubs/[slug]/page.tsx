@@ -235,9 +235,19 @@ function HeroName({ name, isVerified }: { name: string; isVerified: boolean }) {
     </span>
   ) : null;
   if (words.length === 2) {
-    return <h1 className="hero-name">{words[0]}<br />{words[1]}.{tick}</h1>;
+    return (
+      <h1 className="hero-name">
+        {words[0]}
+        <br />
+        <span className="hero-name-lastline">{words[1]}.{tick}</span>
+      </h1>
+    );
   }
-  return <h1 className="hero-name">{clean}.{tick}</h1>;
+  return (
+    <h1 className="hero-name">
+      <span className="hero-name-lastline">{clean}.{tick}</span>
+    </h1>
+  );
 }
 
 function Hero({ club }: { club: Club }) {
