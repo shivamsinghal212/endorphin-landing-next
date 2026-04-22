@@ -422,10 +422,7 @@ function LastRun({ club }: { club: Club }) {
         <div>
           <div className="kicker last-run-kicker">Last run · {fmtLastRunKickerDate(lr.date)}</div>
           <span className={`last-run-tag ${isRace ? 'race' : ''}`}>{isRace ? 'Race event' : 'Club run'}</span>
-          <h2 className="last-run-title">
-            {lr.title}
-            {lr.distanceKm != null && <span className="dist">{fmtDistance(lr.distanceKm)}</span>}
-          </h2>
+          <h2 className="last-run-title">{lr.title}</h2>
         </div>
         <div className="last-run-meta" aria-label="Run summary">
           <div className="row">
