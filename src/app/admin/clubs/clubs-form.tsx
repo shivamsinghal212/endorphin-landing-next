@@ -278,6 +278,13 @@ export function ClubsAdminContent({ initialSlug }: { initialSlug: string }) {
     try {
       const payload = buildPayload(form, upcomingRunsJson, lastRunPhotosJson, adminsJson);
       const saved = await upsertClub(token, payload);
+      // Ping the revalidation endpoint so /clubs/{slug} refreshes immediately
+      // instead of waiting for the 60s ISR window. Failure is non-fatal.
+      fetch('/api/revalidate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ slug: saved.slug }),
+      }).catch(() => {});
       setBanner({ tone: 'ok', msg: `Saved "${saved.name}" · /clubs/${saved.slug}` });
       router.replace(`/admin/clubs?slug=${encodeURIComponent(saved.slug)}`);
     } catch (e) {

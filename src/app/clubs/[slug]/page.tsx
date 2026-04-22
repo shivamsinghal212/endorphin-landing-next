@@ -128,6 +128,7 @@ export default async function ClubPage({ params }: PageProps) {
   return (
     <div className={`${fraunces.variable} club-page`}>
       <ClubIcons />
+      <ClubJsonLd club={club} />
       <main className="page">
         <Masthead club={club} />
         <Hero club={club} />
@@ -141,6 +142,47 @@ export default async function ClubPage({ params }: PageProps) {
         <MetaFooter slug={club.slug} />
       </main>
     </div>
+  );
+}
+
+// ─── JSON-LD ─────────────────────────────────────────
+
+function ClubJsonLd({ club }: { club: Club }) {
+  const url = `https://www.endorfin.run/clubs/${club.slug}`;
+  const sameAs = [club.instagramUrl, club.stravaUrl, club.whatsappUrl].filter(Boolean);
+
+  const data: Record<string, unknown> = {
+    '@context': 'https://schema.org',
+    '@type': 'SportsClub',
+    name: club.name,
+    url,
+    description: club.subtitle || club.description || undefined,
+    sport: 'Running',
+    address: {
+      '@type': 'PostalAddress',
+      addressLocality: club.city,
+      addressCountry: 'IN',
+    },
+  };
+  if (club.logoUrl) {
+    data.logo = { '@type': 'ImageObject', url: club.logoUrl };
+    data.image = club.logoUrl;
+  }
+  if (club.establishedYear) {
+    data.foundingDate = String(club.establishedYear);
+  }
+  if (sameAs.length > 0) {
+    data.sameAs = sameAs;
+  }
+  if (club.stats.members) {
+    data.numberOfEmployees = { '@type': 'QuantitativeValue', value: club.stats.members };
+  }
+
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }}
+    />
   );
 }
 
