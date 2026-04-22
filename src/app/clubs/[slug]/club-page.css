@@ -239,7 +239,7 @@
   font-weight: 700;
   font-style: italic;
   font-size: 96px;
-  line-height: 0.92;
+  line-height: 1;
   letter-spacing: -0.02em;
   margin-top: 18px;
   color: var(--jet);
@@ -345,7 +345,7 @@
 @media (max-width: 860px) {
   .club-page .hero { padding: 36px 20px 28px; }
   .club-page .hero-grid { grid-template-columns: 1fr; gap: 28px; align-items: start; }
-  .club-page .hero-name { font-size: 56px; line-height: 0.95; letter-spacing: -0.01em; }
+  .club-page .hero-name { font-size: 56px; line-height: 1; letter-spacing: -0.01em; }
   .club-page .hero-ident { gap: 16px; margin-top: 14px; }
   .club-page .hero-logo { width: 72px; height: 72px; }
   .club-page .hero-ident .hero-name { font-size: 48px; }
