@@ -93,8 +93,11 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     club.subtitle ||
     club.description ||
     `${club.name} is a running community in ${club.city}. Join runs, track training, and connect with runners.`;
-  const images = club.logoUrl ? [{ url: club.logoUrl, width: 512, height: 512 }] : undefined;
 
+  // `images` is deliberately omitted — Next's file convention at
+  // opengraph-image.tsx auto-wires og:image + twitter:image to the
+  // dynamic 1200x630 share card. Setting `images` here would override
+  // that and point previews at the square logo instead.
   return {
     title,
     description,
@@ -107,13 +110,11 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       description,
       siteName: 'Endorfin',
       locale: 'en_IN',
-      images,
     },
     twitter: {
       card: 'summary_large_image',
       title,
       description,
-      images: club.logoUrl ? [club.logoUrl] : undefined,
     },
   };
 }
