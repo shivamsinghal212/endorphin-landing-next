@@ -108,11 +108,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className={`${oswald.variable} ${poppins.variable}`}>
       <head>
-        {/* Clash Display from Fontshare — preconnect the CDN + explicitly
-            preload the weight-600 woff2 (used by the wordmark site-wide).
-            Without the preload, mobile often shows the fallback because
-            the font binary fetch only starts after CSS parsing. */}
-        <link rel="preconnect" href="https://api.fontshare.com" />
+        {/* Clash Display — @font-face rules live in globals.css so we
+            don't depend on Fontshare's CSS endpoint (which has returned
+            500s). Preconnect + preload the weight-600 woff2 (the one
+            used by the wordmark) so it's cached before stylesheet
+            parsing completes. */}
         <link rel="preconnect" href="https://cdn.fontshare.com" crossOrigin="" />
         <link
           rel="preload"
@@ -121,8 +121,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           type="font/woff2"
           crossOrigin=""
         />
-        {/* eslint-disable-next-line @next/next/no-page-custom-font */}
-        <link href="https://api.fontshare.com/v2/css?f[]=clash-display@500;600;700&display=swap" rel="stylesheet" />
         <meta property="og:logo" content="https://www.endorfin.run/logo.png" />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(appJsonLd) }} />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(orgJsonLd) }} />
