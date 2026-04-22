@@ -151,42 +151,55 @@
 
 .club-page .page { width: 100%; }
 
-/* ─── Masthead ─────────────────────────────────── */
+/* ─── Masthead (on jet) ───────────────────────── */
 .club-page .masthead {
   padding: 14px 28px;
-  border-bottom: 0.5px solid var(--hairline);
-  display: flex; align-items: center; justify-content: space-between;
+  background: var(--jet);
+  color: var(--bone);
+  display: flex; align-items: center;
 }
-.club-page .masthead-left { display: flex; align-items: baseline; gap: 18px; }
-.club-page .wordmark { font-size: 22px; color: var(--jet); letter-spacing: -0.01em; }
+.club-page .masthead-left { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; }
+/* Wordmark = red circle-mark + Clash Display "endorfin" (matches <Logo/>).
+   Scoped CSS so the colors flip when the masthead sits on jet. */
+.club-page .wordmark {
+  display: inline-flex; align-items: center; gap: 10px;
+  font-family: "Clash Display", sans-serif;
+  font-weight: 600;
+  font-size: 22px;
+  color: var(--bone);
+  letter-spacing: -0.025em;
+}
+.club-page .wordmark-mark {
+  width: 28px; height: 28px;
+  color: var(--red);
+  display: inline-flex;
+  transition: transform 300ms ease-out;
+}
+.club-page .wordmark:hover .wordmark-mark { transform: rotate(120deg); }
+.club-page .wordmark-mark svg { width: 100%; height: 100%; }
 .club-page .breadcrumb { color: var(--text-muted); }
+
+/* Verified pill — Instagram-style: blue scalloped badge with white
+   check + blue uppercase text. No container chrome. */
 .club-page .verified-pill {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  padding: 7px 14px 6px 10px;
-  background: rgba(230, 35, 42, 0.08);
-  border: 1px solid rgba(230, 35, 42, 0.32);
-  border-radius: 100px;
+  gap: 6px;
   font-family: var(--font-oswald), sans-serif;
   font-weight: 600;
   font-size: 13px;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: var(--red);
-  transition: background-color 180ms ease-out, box-shadow 180ms ease-out, transform 120ms ease-out;
+  color: #0095F6;
   cursor: default;
-}
-.club-page .verified-pill:hover {
-  background: rgba(230, 35, 42, 0.14);
-  box-shadow: 0 0 0 4px rgba(230, 35, 42, 0.06);
 }
 .club-page .verified-pill .check {
   width: 18px;
   height: 18px;
   flex-shrink: 0;
-  color: var(--red);
+  color: #0095F6;
 }
+
 @media (max-width: 640px) {
   .club-page .masthead { padding: 12px 20px; }
   .club-page .breadcrumb { display: none; }
@@ -194,6 +207,13 @@
 
 /* ─── Hero ─────────────────────────────────────── */
 .club-page .hero { padding: 48px 28px 36px; }
+/* Kicker + verified pill share a row, vertically centered. */
+.club-page .hero-kicker-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
 .club-page .hero-grid {
   display: grid;
   grid-template-columns: 1.5fr 1fr;
@@ -370,8 +390,6 @@
 
 /* ─── Stats strip ──────────────────────────────── */
 .club-page .stats {
-  border-top: 1px solid var(--jet);
-  border-bottom: 1px solid var(--jet);
   display: grid;
   grid-template-columns: repeat(4, 1fr);
 }
