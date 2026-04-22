@@ -216,8 +216,12 @@
   height: 0.32em;
   margin-left: 0.08em;
   color: #0095F6;
-  vertical-align: text-top;
-  transform: translateY(0.05em);
+  /* Baseline-relative position: tick bottom sits at x-height, top
+     lands at the italic's cap-top. -0.4em matches Fraunces 700
+     italic's cap-height proportion. */
+  vertical-align: baseline;
+  position: relative;
+  top: -0.4em;
 }
 .club-page .verified-inline svg { width: 100%; height: 100%; display: block; }
 /* Final word + tick pinned together so they never split across lines. */
