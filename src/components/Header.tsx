@@ -1,100 +1,108 @@
 'use client';
 
-import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import Logo from "./Logo";
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { useEffect, useRef, useState } from 'react';
 
-const links = [
-  { label: "About", href: "#about" },
-  { label: "Features", href: "#features" },
-  { label: "App", href: "#app" },
-  { label: "Download", href: "#download" },
+const NAV_LINKS = [
+  { label: 'Races', href: '/races', soon: false },
+  { label: 'Runners', href: '/runners', soon: false },
+  { label: 'Clubs', href: '/clubs', soon: false },
+  { label: 'Workout Plan', href: '/workout-plan', soon: true },
+  { label: 'Coaches', href: '/coaches', soon: true },
 ];
 
-const Header = () => {
-  const [scrolled, setScrolled] = useState(false);
-  const [open, setOpen] = useState(false);
+function isLinkActive(pathname: string | null, href: string) {
+  if (!pathname) return false;
+  if (href === '/') return pathname === '/';
+  return pathname === href || pathname.startsWith(`${href}/`);
+}
 
+const LogoMark = () => (
+  <svg viewBox="0 0 16 16" fill="none" aria-hidden="true" className="w-7 h-7">
+    <g fill="currentColor" fillRule="evenodd" clipRule="evenodd">
+      <path d="M8 1.5a6.48 6.48 0 00-4.707 2.017.75.75 0 11-1.086-1.034A7.98 7.98 0 018 0a7.98 7.98 0 015.793 2.483.75.75 0 11-1.086 1.034A6.48 6.48 0 008 1.5zM1.236 5.279a.75.75 0 01.514.927 6.503 6.503 0 004.727 8.115.75.75 0 11-.349 1.459 8.003 8.003 0 01-5.82-9.986.75.75 0 01.928-.515zm13.528 0a.75.75 0 01.928.515 8.003 8.003 0 01-5.82 9.986.75.75 0 01-.35-1.459 6.503 6.503 0 004.728-8.115.75.75 0 01.514-.927z" />
+      <path d="M8 4.5a3.5 3.5 0 100 7 3.5 3.5 0 000-7zM3 8a5 5 0 1110 0A5 5 0 013 8z" opacity=".25" />
+    </g>
+  </svg>
+);
+
+const Header = () => {
+  const navRef = useRef<HTMLElement | null>(null);
+  const [open, setOpen] = useState(false);
+  const pathname = usePathname();
+
+  // Measure real nav height → --nav-h so body padding matches
   useEffect(() => {
-    const fn = () => setScrolled(window.scrollY > 60);
-    window.addEventListener("scroll", fn);
-    return () => window.removeEventListener("scroll", fn);
+    const setH = () => {
+      const h = navRef.current?.offsetHeight ?? 68;
+      document.documentElement.style.setProperty('--nav-h', `${h}px`);
+    };
+    setH();
+    window.addEventListener('resize', setH);
+    return () => window.removeEventListener('resize', setH);
   }, []);
 
+  // Body scroll lock + Escape close
   useEffect(() => {
-    document.body.style.overflow = open ? "hidden" : "";
-    return () => { document.body.style.overflow = ""; };
+    document.body.classList.toggle('nav-open', open);
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setOpen(false); };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
   }, [open]);
 
+  const closeMenu = () => setOpen(false);
+
   return (
-    <>
-      <motion.header
-        initial={{ y: -100 }}
-        animate={{ y: 0 }}
-        transition={{ duration: 0.6, ease: [0.25, 0.1, 0.25, 1] }}
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
-          scrolled ? "bg-jet/90 backdrop-blur-md" : ""
-        }`}
-      >
-        <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[9999] focus:bg-signal focus:text-white focus:px-4 focus:py-2 focus:rounded-lg focus:font-body focus:text-sm">
-          Skip to main content
-        </a>
-        <div className="flex items-center justify-between px-6 md:px-12 h-20">
-          <Logo variant="light" />
+    <nav ref={navRef} className={`v1-nav ${open ? 'is-open' : ''}`} id="site-nav">
+      <div className="container v1-nav-inner">
+        <Link
+          href="/"
+          onClick={closeMenu}
+          className="flex items-center gap-2.5 group font-logo font-semibold text-[22px] tracking-tight text-bone"
+        >
+          <span className="text-signal transition-transform duration-300 group-hover:rotate-[120deg] inline-flex">
+            <LogoMark />
+          </span>
+          endorfin
+        </Link>
 
-          <nav className="hidden md:flex items-center gap-10">
-            {links.map((l) => (
-              <a
-                key={l.href}
-                href={l.href}
-                className="font-body text-[13px] uppercase tracking-[0.2em] text-bone/50 hover:text-signal transition-colors duration-300"
-              >
-                {l.label}
-              </a>
-            ))}
-          </nav>
+        <ul className="v1-nav-links">
+          {NAV_LINKS.map((l) => {
+            const active = isLinkActive(pathname, l.href);
+            const cls = [l.soon ? 'has-soon' : '', active ? 'is-current' : ''].filter(Boolean).join(' ') || undefined;
+            return (
+              <li key={l.href}>
+                <Link
+                  href={l.href}
+                  className={cls}
+                  aria-current={active ? 'page' : undefined}
+                  onClick={closeMenu}
+                >
+                  {l.label}
+                </Link>
+              </li>
+            );
+          })}
+          <li>
+            <a href="#download" className="v1-nav-cta" onClick={closeMenu}>Download</a>
+          </li>
+        </ul>
 
-          <button
-            onClick={() => setOpen(!open)}
-            className="md:hidden relative w-8 h-8 flex items-center justify-center z-50"
-            aria-label="Menu"
-            aria-expanded={open}
-            aria-controls="mobile-menu"
-          >
-            <span className={`block absolute w-6 h-[1.5px] bg-bone transition-all duration-300 ${open ? "rotate-45" : "-translate-y-1.5"}`} />
-            <span className={`block absolute w-6 h-[1.5px] bg-bone transition-all duration-300 ${open ? "opacity-0" : ""}`} />
-            <span className={`block absolute w-6 h-[1.5px] bg-bone transition-all duration-300 ${open ? "-rotate-45" : "translate-y-1.5"}`} />
-          </button>
-        </div>
-      </motion.header>
+        <a href="#download" className="v1-nav-cta">Download</a>
 
-      <AnimatePresence>
-        {open && (
-          <motion.div
-            initial={{ clipPath: "circle(0% at calc(100% - 40px) 40px)" }}
-            animate={{ clipPath: "circle(150% at calc(100% - 40px) 40px)" }}
-            exit={{ clipPath: "circle(0% at calc(100% - 40px) 40px)" }}
-            transition={{ duration: 0.6, ease: [0.77, 0, 0.175, 1] }}
-            id="mobile-menu"
-            className="fixed inset-0 z-40 bg-signal flex flex-col items-center justify-center gap-6"
-          >
-            {links.map((l, i) => (
-              <motion.a
-                key={l.href}
-                href={l.href}
-                onClick={() => setOpen(false)}
-                initial={{ opacity: 0, y: 40 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 + i * 0.08 }}
-                className="font-display text-5xl sm:text-7xl font-semibold uppercase text-white hover:text-jet transition-colors"
-              >
-                {l.label}
-              </motion.a>
-            ))}
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </>
+        <button
+          type="button"
+          className="v1-nav-toggle"
+          aria-controls="site-nav"
+          aria-expanded={open}
+          aria-label="Toggle menu"
+          onClick={() => setOpen((v) => !v)}
+        >
+          <span className="v1-nav-toggle-bars" aria-hidden="true" />
+        </button>
+      </div>
+    </nav>
   );
 };
 

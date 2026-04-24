@@ -1,9 +1,10 @@
 import type { Metadata } from 'next';
-import { Oswald, Poppins } from 'next/font/google';
+import { Oswald, Poppins, Fraunces } from 'next/font/google';
 import './globals.css';
 
 const oswald = Oswald({ subsets: ['latin'], variable: '--font-oswald', display: 'swap' });
 const poppins = Poppins({ subsets: ['latin'], weight: ['300', '400', '500', '600'], variable: '--font-poppins', display: 'swap' });
+const fraunces = Fraunces({ subsets: ['latin'], weight: ['400', '500', '600', '700'], style: ['italic', 'normal'], variable: '--font-fraunces', display: 'swap' });
 
 export const metadata: Metadata = {
   title: { default: 'Endorfin — Find Running Events, Marathons & Races in India', template: '%s | Endorfin' },
@@ -106,7 +107,7 @@ const websiteJsonLd = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${oswald.variable} ${poppins.variable}`}>
+    <html lang="en" className={`${oswald.variable} ${poppins.variable} ${fraunces.variable}`}>
       <head>
         {/* Clash Display — @font-face rules live in globals.css so we
             don't depend on Fontshare's CSS endpoint (which has returned

@@ -20,6 +20,7 @@ export default {
         logo: ['"Clash Display"', "sans-serif"],
         display: ["var(--font-oswald)", "sans-serif"],
         body: ["var(--font-poppins)", "sans-serif"],
+        serif: ["var(--font-fraunces)", "Georgia", "serif"],
       },
       colors: {
         jet: "#0A0A0A",

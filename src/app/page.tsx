@@ -1,12 +1,7 @@
 import Header from '@/components/Header';
 import HeroSection from '@/components/HeroSection';
-import StatsBar from '@/components/StatsBar';
-import EventsShowcase from '@/components/EventsShowcase';
-import KeyFeatures from '@/components/KeyFeatures';
-import MoreFeatures from '@/components/MoreFeatures';
-import CommunitySection from '@/components/CommunitySection';
-import DiscussionHighlight from '@/components/DiscussionHighlight';
-import AboutSection from '@/components/AboutSection';
+import PillarsAccordion from '@/components/PillarsAccordion';
+import MeetKip from '@/components/MeetKip';
 import CTASection from '@/components/CTASection';
 import Footer from '@/components/Footer';
 
@@ -90,13 +85,8 @@ export default async function Home() {
       )}
       <Header />
       <HeroSection />
-      <StatsBar />
-      <EventsShowcase />
-      <KeyFeatures />
-      <CommunitySection />
-      <DiscussionHighlight />
-      <MoreFeatures />
-      <AboutSection />
+      <PillarsAccordion />
+      <MeetKip />
       <CTASection />
       <Footer />
     </main>

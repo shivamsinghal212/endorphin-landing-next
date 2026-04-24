@@ -1,19 +1,11 @@
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
-import { Fraunces } from 'next/font/google';
+import Header from '@/components/Header';
+import Footer from '@/components/Footer';
 import { getClub, type Club, type ClubUpcomingRun, type ClubAdminPerson } from '@/lib/admin-api';
 import { ClubIcons } from './club-icons';
 import { LastRunReel } from './last-run-reel';
 import './club-page.css';
-
-// Fraunces loaded only on the club page — keeps it off the rest of the app.
-const fraunces = Fraunces({
-  subsets: ['latin'],
-  weight: ['400', '700'],
-  style: ['italic'],
-  variable: '--font-fraunces',
-  display: 'swap',
-});
 
 // Refresh the public page within 60s of any admin save.
 export const revalidate = 60;
@@ -139,11 +131,11 @@ export default async function ClubPage({ params }: PageProps) {
   if (!club || !club.publishedAt) notFound();
 
   return (
-    <div className={`${fraunces.variable} club-page`}>
+    <main id="main-content" className="overflow-x-hidden">
       <ClubIcons />
       <ClubJsonLd club={club} />
-      <main className="page">
-        <Masthead club={club} />
+      <Header />
+      <div className="club-page">
         <Hero club={club} />
         <Ribbon />
         <Stats club={club} />
@@ -152,9 +144,9 @@ export default async function ClubPage({ params }: PageProps) {
         {club.lastRun && <LastRun club={club} />}
         {club.admins.length > 0 && <LedBy admins={club.admins} />}
         <CtaFooter club={club} />
-        <MetaFooter slug={club.slug} />
-      </main>
-    </div>
+      </div>
+      <Footer />
+    </main>
   );
 }
 
@@ -200,28 +192,6 @@ function ClubJsonLd({ club }: { club: Club }) {
 }
 
 // ─── sections ────────────────────────────────────────
-
-function Masthead({ club }: { club: Club }) {
-  return (
-    <header className="masthead">
-      <div className="masthead-left">
-        {/* Red circle-mark + Clash Display "endorfin" — matches <Logo/>. */}
-        <a href="/" className="logo wordmark">
-          <span className="wordmark-mark">
-            <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" fill="none" aria-hidden="true">
-              <g fill="currentColor" fillRule="evenodd" clipRule="evenodd">
-                <path d="M8 1.5a6.48 6.48 0 00-4.707 2.017.75.75 0 11-1.086-1.034A7.98 7.98 0 018 0a7.98 7.98 0 015.793 2.483.75.75 0 11-1.086 1.034A6.48 6.48 0 008 1.5zM1.236 5.279a.75.75 0 01.514.927 6.503 6.503 0 004.727 8.115.75.75 0 11-.349 1.459 8.003 8.003 0 01-5.82-9.986.75.75 0 01.928-.515zm13.528 0a.75.75 0 01.928.515 8.003 8.003 0 01-5.82 9.986.75.75 0 01-.35-1.459 6.503 6.503 0 004.728-8.115.75.75 0 01.514-.927z" />
-                <path d="M8 4.5a3.5 3.5 0 100 7 3.5 3.5 0 000-7zM3 8a5 5 0 1110 0A5 5 0 013 8z" opacity=".25" />
-              </g>
-            </svg>
-          </span>
-          endorfin
-        </a>
-        <span className="kicker breadcrumb">clubs&nbsp;·&nbsp;{club.city}&nbsp;·&nbsp;{club.slug}</span>
-      </div>
-    </header>
-  );
-}
 
 function HeroName({ name, isVerified }: { name: string; isVerified: boolean }) {
   // Match the mockup: 2-word names break after word one with a trailing
@@ -570,11 +540,3 @@ function CtaFooter({ club }: { club: Club }) {
   );
 }
 
-function MetaFooter({ slug }: { slug: string }) {
-  return (
-    <footer className="meta-footer">
-      <span className="kicker">endorfin.run/clubs/{slug}</span>
-      <span className="kicker meta-right">© {new Date().getFullYear()} Endorfin</span>
-    </footer>
-  );
-}
