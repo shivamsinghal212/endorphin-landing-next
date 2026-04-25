@@ -14,6 +14,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${SITE}/races`,   lastModified: new Date(), changeFrequency: 'daily',   priority: 0.9 },
     { url: `${SITE}/clubs`,   lastModified: new Date(), changeFrequency: 'daily',   priority: 0.9 },
     { url: `${SITE}/runners`, lastModified: new Date(), changeFrequency: 'weekly',  priority: 0.85 },
+    { url: `${SITE}/coaches`, lastModified: new Date(), changeFrequency: 'weekly',  priority: 0.85 },
     { url: `${SITE}/workout-plan`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.7 },
     { url: `${SITE}/privacy`, lastModified: new Date('2026-04-01'), changeFrequency: 'yearly', priority: 0.3 },
     { url: `${SITE}/terms`,   lastModified: new Date('2026-04-01'), changeFrequency: 'yearly', priority: 0.3 },
