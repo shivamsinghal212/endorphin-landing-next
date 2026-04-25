@@ -254,7 +254,7 @@ function Hero({ club }: { club: Club }) {
           {club.description && <p className="hero-description">{club.description}</p>}
           <div className="hero-cta-stack">
             {club.joinUrl && (
-              <a className="btn btn-primary" href={club.joinUrl} target="_blank" rel="noopener">Join club</a>
+              <a className="btn btn-primary" href={club.joinUrl} target="_blank" rel="noopener noreferrer">Join club</a>
             )}
             <div className="socials-pill" aria-label="Share and follow">
               <a className="icon-dot" href={`https://www.endorfin.run/clubs/${club.slug}`} aria-label="Share">
@@ -264,17 +264,17 @@ function Hero({ club }: { club: Club }) {
                 <span className="pill-divider" aria-hidden="true" />
               )}
               {club.whatsappUrl && (
-                <a className="icon-dot" data-brand="whatsapp" href={club.whatsappUrl} target="_blank" rel="noopener" aria-label="WhatsApp group">
+                <a className="icon-dot" data-brand="whatsapp" href={club.whatsappUrl} target="_blank" rel="noopener noreferrer" aria-label="WhatsApp group">
                   <svg aria-hidden="true"><use href="#i-whatsapp" /></svg>
                 </a>
               )}
               {club.instagramUrl && (
-                <a className="icon-dot" data-brand="instagram" href={club.instagramUrl} target="_blank" rel="noopener" aria-label="Instagram">
+                <a className="icon-dot" data-brand="instagram" href={club.instagramUrl} target="_blank" rel="noopener noreferrer" aria-label="Instagram">
                   <svg aria-hidden="true"><use href="#i-instagram" /></svg>
                 </a>
               )}
               {club.stravaUrl && (
-                <a className="icon-dot" data-brand="strava" href={club.stravaUrl} target="_blank" rel="noopener" aria-label="Strava club">
+                <a className="icon-dot" data-brand="strava" href={club.stravaUrl} target="_blank" rel="noopener noreferrer" aria-label="Strava club">
                   <svg aria-hidden="true"><use href="#i-strava" /></svg>
                 </a>
               )}
@@ -357,7 +357,7 @@ function NextRun({ club }: { club: Club }) {
         <div className="next-run-cta">
           <span className="going-pill">{nr.goingCount} going</span>
           {nr.rsvpUrl ? (
-            <a className="btn btn-primary" href={nr.rsvpUrl} target="_blank" rel="noopener">RSVP</a>
+            <a className="btn btn-primary" href={nr.rsvpUrl} target="_blank" rel="noopener noreferrer">RSVP</a>
           ) : (
             <button className="btn btn-primary" type="button">RSVP</button>
           )}
@@ -412,7 +412,7 @@ function UpcomingRow({ run }: { run: ClubUpcomingRun }) {
       <span className="going-pill">{run.goingCount} going</span>
       <div className="row-cta">
         {run.rsvpUrl ? (
-          <a className="btn btn-ghost" href={run.rsvpUrl} target="_blank" rel="noopener">{ctaLabel}</a>
+          <a className="btn btn-ghost" href={run.rsvpUrl} target="_blank" rel="noopener noreferrer">{ctaLabel}</a>
         ) : (
           <button className="btn btn-ghost" type="button">{ctaLabel}</button>
         )}
@@ -495,17 +495,17 @@ function AdminCard({ admin, index }: { admin: ClubAdminPerson; index: number }) 
       </div>
       <div className="admin-socials">
         {admin.whatsappUrl && (
-          <a className="icon-btn sm" data-brand="whatsapp" href={admin.whatsappUrl} target="_blank" rel="noopener" aria-label={`${admin.name} on WhatsApp`}>
+          <a className="icon-btn sm" data-brand="whatsapp" href={admin.whatsappUrl} target="_blank" rel="noopener noreferrer" aria-label={`${admin.name} on WhatsApp`}>
             <svg aria-hidden="true"><use href="#i-whatsapp" /></svg>
           </a>
         )}
         {admin.instagramUrl && (
-          <a className="icon-btn sm" data-brand="instagram" href={admin.instagramUrl} target="_blank" rel="noopener" aria-label={`${admin.name} on Instagram`}>
+          <a className="icon-btn sm" data-brand="instagram" href={admin.instagramUrl} target="_blank" rel="noopener noreferrer" aria-label={`${admin.name} on Instagram`}>
             <svg aria-hidden="true"><use href="#i-instagram" /></svg>
           </a>
         )}
         {admin.stravaUrl && (
-          <a className="icon-btn sm" data-brand="strava" href={admin.stravaUrl} target="_blank" rel="noopener" aria-label={`${admin.name} on Strava`}>
+          <a className="icon-btn sm" data-brand="strava" href={admin.stravaUrl} target="_blank" rel="noopener noreferrer" aria-label={`${admin.name} on Strava`}>
             <svg aria-hidden="true"><use href="#i-strava" /></svg>
           </a>
         )}
@@ -526,11 +526,11 @@ function CtaFooter({ club }: { club: Club }) {
           <p className="cta-sub">Install Endorfin to RSVP to {club.name} runs, get reminders, and track your training.</p>
         </div>
         <div className="cta-buttons">
-          <a className="btn btn-ghost-light" href="https://apps.apple.com/app/endorfin/id6762107286" target="_blank" rel="noopener" aria-label="Download Endorfin on the App Store">
+          <a className="btn btn-ghost-light" href="https://apps.apple.com/app/endorfin/id6762107286" target="_blank" rel="noopener noreferrer" aria-label="Download Endorfin on the App Store">
             <svg className="btn-icon" aria-hidden="true"><use href="#i-apple" /></svg>
             App Store
           </a>
-          <a className="btn btn-primary" href="https://play.google.com/store/apps/details?id=com.endorfin.app" target="_blank" rel="noopener" aria-label="Get Endorfin on Google Play">
+          <a className="btn btn-primary" href="https://play.google.com/store/apps/details?id=com.endorfin.app" target="_blank" rel="noopener noreferrer" aria-label="Get Endorfin on Google Play">
             <svg className="btn-icon" aria-hidden="true"><use href="#i-google-play" /></svg>
             Google Play
           </a>

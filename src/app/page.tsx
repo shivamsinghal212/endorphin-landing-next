@@ -2,6 +2,7 @@ import Header from '@/components/Header';
 import HeroSection from '@/components/HeroSection';
 import PillarsAccordion from '@/components/PillarsAccordion';
 import MeetKip from '@/components/MeetKip';
+import AboutSection from '@/components/AboutSection';
 import CTASection from '@/components/CTASection';
 import Footer from '@/components/Footer';
 
@@ -87,6 +88,7 @@ export default async function Home() {
       <HeroSection />
       <PillarsAccordion />
       <MeetKip />
+      <AboutSection />
       <CTASection />
       <Footer />
     </main>

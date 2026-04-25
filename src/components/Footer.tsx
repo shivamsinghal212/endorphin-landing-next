@@ -11,7 +11,7 @@ const PRODUCT = [
 ];
 
 const COMPANY = [
-  { label: 'About', href: '#about' },
+  { label: 'About', href: '/#about' },
   { label: 'Support', href: '/support' },
   { label: 'Contact', href: 'mailto:hello@endorfin.run' },
 ];
@@ -20,6 +20,8 @@ const LEGAL = [
   { label: 'Privacy', href: '/privacy' },
   { label: 'Terms', href: '/terms' },
 ];
+
+const INSTAGRAM_URL = 'https://www.instagram.com/hacknflex/';
 
 const Footer = () => (
   <footer className="v1-footer">
@@ -63,7 +65,18 @@ const Footer = () => (
     </div>
     <div className="v1-footer-bottom">
       <span>&copy; {new Date().getFullYear()} Endorfin · Made in India</span>
-      <span>hello@endorfin.run</span>
+      <span className="v1-footer-bottom-right">
+        <a href={INSTAGRAM_URL} target="_blank" rel="noopener noreferrer" aria-label="Endorfin on Instagram">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <rect x="3" y="3" width="18" height="18" rx="5" />
+            <circle cx="12" cy="12" r="4" />
+            <circle cx="17.5" cy="6.5" r="0.6" fill="currentColor" stroke="none" />
+          </svg>
+          <span>@hacknflex</span>
+        </a>
+        <span aria-hidden="true">·</span>
+        <a href="mailto:hello@endorfin.run">hello@endorfin.run</a>
+      </span>
     </div>
   </footer>
 );

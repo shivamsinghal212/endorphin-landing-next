@@ -493,11 +493,15 @@ export default function WorkoutPlanView() {
           </form>
           <div className="v1w-waitlist-success" role="status" aria-live="polite">
             {submitted
-              ? `● You're in, ${successName}. We'll email ${submittedEmail} when Kip is ready.`
+              ? `● Thanks, ${successName}. The waitlist isn't live yet — follow @hacknflex on Instagram for the launch announcement.`
               : null}
           </div>
           <div className="v1w-waitlist-note">
-            We&apos;ll only email you when Kip is ready. No spam.
+            Heads up — waitlist isn&apos;t live yet.{' '}
+            <a href="https://www.instagram.com/hacknflex/" target="_blank" rel="noopener noreferrer" className="underline hover:text-bone">
+              Follow @hacknflex on Instagram
+            </a>{' '}
+            for launch updates.
           </div>
         </div>
       </section>

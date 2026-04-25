@@ -113,7 +113,7 @@ function FlagshipCard({ c }: { c: ApiClub }) {
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
                   src={c.logoUrl}
-                  alt=""
+                  alt={`${c.name} logo`}
                   onError={(e) => {
                     (e.currentTarget as HTMLImageElement).style.display = 'none';
                   }}
@@ -208,7 +208,7 @@ function ClubCard({ c }: { c: ApiClub }) {
           // eslint-disable-next-line @next/next/no-img-element
           <img
             src={c.headerImageUrl}
-            alt=""
+            alt={c.name}
             loading="lazy"
             onError={(e) => {
               (e.currentTarget as HTMLImageElement).style.display = 'none';
@@ -222,7 +222,7 @@ function ClubCard({ c }: { c: ApiClub }) {
             // eslint-disable-next-line @next/next/no-img-element
             <img
               src={c.logoUrl}
-              alt=""
+              alt={`${c.name} logo`}
               onError={(e) => {
                 (e.currentTarget as HTMLImageElement).style.display = 'none';
               }}
@@ -877,7 +877,7 @@ export default function ClubsView({ clubs: initialClubs }: { clubs: ApiClub[] })
             <Link
               href={APP_STORE_URL}
               target="_blank"
-              rel="noopener"
+              rel="noopener noreferrer"
               className="v1c-btn v1c-btn-ghost-light"
             >
               <svg className="v1c-btn-icon" viewBox="0 0 24 24" aria-hidden>
@@ -891,7 +891,7 @@ export default function ClubsView({ clubs: initialClubs }: { clubs: ApiClub[] })
             <Link
               href={PLAY_STORE_URL}
               target="_blank"
-              rel="noopener"
+              rel="noopener noreferrer"
               className="v1c-btn v1c-btn-primary"
             >
               <svg className="v1c-btn-icon" viewBox="0 0 24 24" aria-hidden>

@@ -149,7 +149,7 @@ function RaceCard({ r }: { r: ApiEvent }) {
           // eslint-disable-next-line @next/next/no-img-element
           <img
             src={r.imageUrl}
-            alt=""
+            alt={title}
             loading="lazy"
             onError={(e) => {
               (e.currentTarget as HTMLImageElement).style.display = 'none';
@@ -669,7 +669,7 @@ export default function RacesView({ races: initialRaces }: { races: ApiEvent[] }
             <Link
               href={APP_STORE_URL}
               target="_blank"
-              rel="noopener"
+              rel="noopener noreferrer"
               className="v1r-btn v1r-btn-ghost-light"
             >
               <svg className="v1r-btn-icon" viewBox="0 0 24 24" aria-hidden>
@@ -683,7 +683,7 @@ export default function RacesView({ races: initialRaces }: { races: ApiEvent[] }
             <Link
               href={PLAY_STORE_URL}
               target="_blank"
-              rel="noopener"
+              rel="noopener noreferrer"
               className="v1r-btn v1r-btn-primary"
             >
               <svg className="v1r-btn-icon" viewBox="0 0 24 24" aria-hidden>

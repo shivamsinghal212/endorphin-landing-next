@@ -85,11 +85,11 @@ const Header = () => {
             );
           })}
           <li>
-            <a href="#download" className="v1-nav-cta" onClick={closeMenu}>Download</a>
+            <a href="/#download" className="v1-nav-cta" onClick={closeMenu}>Download</a>
           </li>
         </ul>
 
-        <a href="#download" className="v1-nav-cta">Download</a>
+        <a href="/#download" className="v1-nav-cta">Download</a>
 
         <button
           type="button"

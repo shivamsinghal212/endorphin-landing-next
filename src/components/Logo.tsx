@@ -1,5 +1,7 @@
 'use client';
 
+import Link from 'next/link';
+
 const LogoMark = ({ className = "w-7 h-7" }: { className?: string }) => (
   <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" fill="none" className={className}>
     <g fill="currentColor" fillRule="evenodd" clipRule="evenodd">
@@ -13,14 +15,14 @@ export const Logo = ({ variant = "light" }: { variant?: "light" | "dark" }) => {
   const textColor = variant === "light" ? "text-bone" : "text-jet";
 
   return (
-    <a href="#" className="flex items-center gap-2.5 group">
+    <Link href="/" className="flex items-center gap-2.5 group">
       <span className="text-signal transition-transform duration-300 group-hover:rotate-[120deg]">
         <LogoMark />
       </span>
       <span className={`font-logo font-semibold text-[22px] ${textColor} tracking-tight`}>
         endorfin
       </span>
-    </a>
+    </Link>
   );
 };
 

@@ -240,11 +240,11 @@ function FlagshipCard({ r }: { r: Runner }) {
             ))}
           </div>
           <div className="v1ru-flagship-ctas">
-            <a className="v1ru-btn v1ru-btn-primary" href="#download">
+            <a className="v1ru-btn v1ru-btn-primary" href="/#download">
               Get the app
             </a>
-            <a className="v1ru-btn v1ru-btn-ghost-light" href="#download">
-              Follow →
+            <a className="v1ru-btn v1ru-btn-ghost-light" href="/#download">
+              Get the app to follow →
             </a>
           </div>
         </div>
@@ -754,7 +754,7 @@ export default function RunnersView() {
             <Link
               href={APP_STORE_URL}
               target="_blank"
-              rel="noopener"
+              rel="noopener noreferrer"
               className="v1ru-btn v1ru-btn-ghost-light"
             >
               <svg className="v1ru-btn-icon" viewBox="0 0 24 24" aria-hidden>
@@ -768,7 +768,7 @@ export default function RunnersView() {
             <Link
               href={PLAY_STORE_URL}
               target="_blank"
-              rel="noopener"
+              rel="noopener noreferrer"
               className="v1ru-btn v1ru-btn-primary"
             >
               <svg className="v1ru-btn-icon" viewBox="0 0 24 24" aria-hidden>

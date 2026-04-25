@@ -451,7 +451,13 @@ export default function CoachesView() {
                   </button>
                 </form>
               )}
-              <div className="v1co-dual-micro">No spam. 1-2 updates per quarter until launch.</div>
+              <div className="v1co-dual-micro">
+                Waitlist isn&rsquo;t live yet —{' '}
+                <a href="https://www.instagram.com/hacknflex/" target="_blank" rel="noopener noreferrer">
+                  follow @hacknflex on Instagram
+                </a>{' '}
+                for launch updates.
+              </div>
             </div>
 
             {/* Elite side */}
@@ -483,7 +489,11 @@ export default function CoachesView() {
                 </form>
               )}
               <div className="v1co-dual-micro">
-                Profile review takes 5–7 days. We verify your race history before listing.
+                Applications aren&rsquo;t open yet —{' '}
+                <a href="https://www.instagram.com/hacknflex/" target="_blank" rel="noopener noreferrer">
+                  DM @hacknflex on Instagram
+                </a>{' '}
+                if you&rsquo;d like to be a founding elite.
               </div>
             </div>
           </div>
