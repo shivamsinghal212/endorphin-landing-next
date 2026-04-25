@@ -11,7 +11,6 @@ const PRODUCT = [
 ];
 
 const COMPANY = [
-  { label: 'About', href: '/#about' },
   { label: 'Support', href: '/support' },
   { label: 'Contact', href: 'mailto:hello@endorfin.run' },
 ];
