@@ -3,24 +3,10 @@
 import Link from 'next/link';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { APP_STORE_URL, PLAY_STORE_URL } from '@/lib/store-links';
+import { TOP_CITIES, locationMatchesCity } from '@/lib/cities';
 import type { ApiClub } from './page';
 
-const TOP_CITIES = ['Delhi', 'Mumbai', 'Bengaluru', 'Hyderabad', 'Chennai'] as const;
-
-const CITY_ALIASES: Record<string, string[]> = {
-  Delhi: ['delhi', 'new delhi', 'delhi(ncr)', 'delhi (ncr)', 'ncr'],
-  Mumbai: ['mumbai', 'bombay', 'navi mumbai', 'thane'],
-  Bengaluru: ['bengaluru', 'bangalore'],
-  Hyderabad: ['hyderabad', 'secunderabad'],
-  Chennai: ['chennai', 'madras'],
-};
-
-function matchesCity(club: ApiClub, city: string) {
-  if (!city) return true;
-  const loc = (club.city || '').toLowerCase().trim();
-  const aliases = CITY_ALIASES[city] || [city.toLowerCase()];
-  return aliases.some((a) => loc === a);
-}
+const matchesCity = (club: ApiClub, city: string) => locationMatchesCity(club.city, city);
 
 function initials(name: string) {
   const w = (name || '').trim().split(/\s+/);

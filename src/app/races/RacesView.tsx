@@ -4,20 +4,11 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { APP_STORE_URL, PLAY_STORE_URL } from '@/lib/store-links';
+import { TOP_CITIES, locationMatchesCity, pickFeaturedOrFirst } from '@/lib/cities';
 import CouponTopStrip from '@/components/CouponTopStrip';
 import LoginModal from '@/components/LoginModal';
 import RaceCouponContext from '@/components/RaceCouponContext';
 import type { ApiEvent } from './page';
-
-const TOP_CITIES = ['Delhi', 'Mumbai', 'Bengaluru', 'Hyderabad', 'Chennai'] as const;
-
-const CITY_ALIASES: Record<string, string[]> = {
-  Delhi: ['delhi', 'new delhi', 'ncr'],
-  Mumbai: ['mumbai', 'bombay', 'navi mumbai', 'thane'],
-  Bengaluru: ['bengaluru', 'bangalore'],
-  Hyderabad: ['hyderabad', 'secunderabad'],
-  Chennai: ['chennai', 'madras'],
-};
 
 const SMALL_WORDS = new Set(['a', 'an', 'and', 'the', 'of', 'for', 'in', 'on', 'to', 'by', 'at', 'with']);
 function normalizeTitle(raw?: string) {
@@ -80,12 +71,7 @@ function popularitySignal(r: ApiEvent): Signal | null {
 }
 const isVirtual = (r: ApiEvent) => r.eventType === 'virtual' || (r.locationName || '').toLowerCase() === 'anywhere';
 const displayLocation = (r: ApiEvent) => (isVirtual(r) ? 'Virtual · India' : r.locationName || '—');
-function matchesCity(r: ApiEvent, city: string) {
-  if (!city) return true;
-  const loc = (r.locationName || '').toLowerCase();
-  const aliases = CITY_ALIASES[city] || [city.toLowerCase()];
-  return aliases.some((a) => loc === a);
-}
+const matchesCity = (r: ApiEvent, city: string) => locationMatchesCity(r.locationName, city);
 
 const fmtDay = (iso: string) => String(new Date(iso).getDate()).padStart(2, '0');
 const fmtMonth = (iso: string) => new Date(iso).toLocaleString('en-GB', { month: 'short' }).toUpperCase();
@@ -98,32 +84,18 @@ function initials(s: string) {
   return ((w[0] || '')[0] || '').toUpperCase() + ((w[1] || '')[0] || '').toUpperCase();
 }
 
-function scoreRace(r: ApiEvent) {
-  return (
-    (r.isFeatured ? 10000 : 0) +
-    (r.goingCount || 0) * 10 +
-    (r.totalTicketsSold || 0) +
-    (isVirtual(r) ? -50 : 0)
-  );
-}
-function topOne(pool: ApiEvent[]) {
-  if (!pool.length) return null;
-  return [...pool].sort(
-    (a, b) => scoreRace(b) - scoreRace(a) || new Date(a.startTime).getTime() - new Date(b.startTime).getTime()
-  )[0];
-}
-
 // Flagship selection:
-// - When a city is picked: top 1 race from that city.
-// - When "All India": top 1 race per top-5 city, clubbed together.
+// - Earliest-upcoming featured race (isFeatured = true) per scope.
+// - Falls back to earliest-upcoming race when no featured race exists.
+// - When a city is picked: 1 flagship from that city.
+// - When "All India": 1 flagship per top-5 city, clubbed together.
 function pickFlagships(allRaces: ApiEvent[], city: string, cities: readonly string[]): ApiEvent[] {
   if (city) {
-    const pool = allRaces.filter((r) => matchesCity(r, city));
-    const top = topOne(pool);
+    const top = pickFeaturedOrFirst(allRaces.filter((r) => matchesCity(r, city)));
     return top ? [top] : [];
   }
   return cities
-    .map((c) => topOne(allRaces.filter((r) => matchesCity(r, c))))
+    .map((c) => pickFeaturedOrFirst(allRaces.filter((r) => matchesCity(r, c))))
     .filter((r): r is ApiEvent => r !== null);
 }
 

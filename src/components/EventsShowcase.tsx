@@ -1,8 +1,9 @@
 'use client';
 
 import { motion, AnimatePresence } from "framer-motion";
-import { useState, useEffect } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { fadeUp, stagger } from "@/lib/animations";
+import { locationMatchesCity } from "@/lib/cities";
 import { AppStoreButtons } from "./AppStoreButtons";
 
 interface Event {
@@ -16,7 +17,10 @@ interface Event {
   distanceCategories?: { categoryName: string }[];
 }
 
-const CITIES = ["All", "Mumbai", "Delhi", "Bangalore", "Pune", "Hyderabad", "Chennai"];
+// Homepage chips intentionally a different list than /races (keeps Pune
+// + Bangalore wording for the homepage feel). Delhi/NCR groups Delhi
+// proper plus Noida/Faridabad/Gurgaon — see locationMatchesCity.
+const CITIES = ["All", "Mumbai", "Delhi/NCR", "Bangalore", "Pune", "Hyderabad", "Chennai"];
 import { PLAY_STORE_URL } from "@/lib/store-links";
 
 const API_BASE = "https://api.endorfin.run/api/v1";
@@ -107,24 +111,29 @@ function EventCard({ event, index }: { event: Event; index: number }) {
 
 export default function EventsShowcase() {
   const [city, setCity] = useState("All");
-  const [events, setEvents] = useState<Event[]>([]);
+  const [allEvents, setAllEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
   const [totalCount, setTotalCount] = useState(0);
 
+  // Fetch a healthy pool once and filter client-side, so the city chip
+  // can group multiple location names (e.g. Delhi/NCR matches Delhi,
+  // Noida, Gurgaon, Faridabad — not just exact "Delhi").
   useEffect(() => {
     setLoading(true);
-    const params = new URLSearchParams({ limit: "6" });
-    if (city !== "All") params.set("city", city);
-
-    fetch(`${API_BASE}/events?${params}`)
+    fetch(`${API_BASE}/events?limit=30`)
       .then((r) => r.json())
       .then((data) => {
-        setEvents(data.items ?? []);
+        setAllEvents(data.items ?? []);
         setTotalCount(data.total ?? 0);
       })
-      .catch(() => setEvents([]))
+      .catch(() => setAllEvents([]))
       .finally(() => setLoading(false));
-  }, [city]);
+  }, []);
+
+  const events = useMemo(() => {
+    if (city === "All") return allEvents.slice(0, 6);
+    return allEvents.filter((e) => locationMatchesCity(e.locationName, city)).slice(0, 6);
+  }, [allEvents, city]);
 
   return (
     <section className="relative py-24 lg:py-32 bg-bone overflow-hidden">
