@@ -1,8 +1,12 @@
 'use client';
 
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { APP_STORE_URL, PLAY_STORE_URL } from '@/lib/store-links';
+import CouponTopStrip from '@/components/CouponTopStrip';
+import LoginModal from '@/components/LoginModal';
+import RaceCouponContext from '@/components/RaceCouponContext';
 import type { ApiEvent } from './page';
 
 const TOP_CITIES = ['Delhi', 'Mumbai', 'Bengaluru', 'Hyderabad', 'Chennai'] as const;
@@ -133,73 +137,107 @@ function storySnippet(r: ApiEvent) {
 
 // ─── Cards ───────────────────────────────────
 
-function RaceCard({ r }: { r: ApiEvent }) {
+function RaceCard({ r, onCouponClick }: { r: ApiEvent; onCouponClick: (r: ApiEvent) => void }) {
   const title = normalizeTitle(r.title);
   const dist = primaryDistance(r);
   const sig = popularitySignal(r);
   const virtual = isVirtual(r);
   const priceStr = r.priceMin != null ? `₹${r.priceMin.toLocaleString('en-IN')}` : null;
-  const href = `https://endorfin.run/e/${r.slug || r.id}`;
+  const detailHref = `/races/${r.slug || r.id}`;
+  const showCoupon = !!r.hasCoupon && r.couponDiscountPercent != null;
+  const couponUnlocked = !!r.couponCode;
+
+  function handleCoupon(e: React.MouseEvent) {
+    e.preventDefault();
+    e.stopPropagation();
+    onCouponClick(r);
+  }
 
   return (
-    <Link href={href} className="v1r-race-card" target="_blank" rel="noopener noreferrer">
-      <div className="v1r-race-card-image">
-        <div className="v1r-race-card-image-fallback">{initials(title)}</div>
-        {r.imageUrl && (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={r.imageUrl}
-            alt={title}
-            loading="lazy"
-            onError={(e) => {
-              (e.currentTarget as HTMLImageElement).style.display = 'none';
-            }}
-          />
-        )}
-        <div className="v1r-race-card-badges">
-          {virtual && <span className="v1r-race-badge-virtual">Virtual</span>}
-        </div>
-      </div>
-      <div className="v1r-race-card-body">
-        <div className="v1r-race-top">
-          <div className="v1r-race-date">
-            <div className="v1r-race-date-day">{fmtDay(r.startTime)}</div>
-            <div className="v1r-race-date-sub">
-              {fmtMonth(r.startTime)} · {fmtWeekday(r.startTime)}
-            </div>
-          </div>
-          {dist && <span className="v1r-race-distance">{dist}</span>}
-        </div>
-        <h3 className="v1r-race-title">{title}</h3>
-        <div className="v1r-race-city">
-          {displayLocation(r)} · {fmtTime(r.startTime)}
-        </div>
-        <div className="v1r-race-foot">
-          {sig ? (
-            sig.kind === 'going' ? (
-              <span className="v1r-race-going">{sig.text}</span>
-            ) : (
-              <span className="v1r-race-signal">{sig.text}</span>
-            )
-          ) : (
-            <span />
+    <div className="v1r-race-card">
+      {showCoupon && (
+        <CouponTopStrip
+          couponCode={r.couponCode ?? null}
+          couponDiscountPercent={r.couponDiscountPercent ?? null}
+          hasCoupon={true}
+          size="sm"
+        />
+      )}
+      <Link href={detailHref} className="v1r-race-card-clickable">
+        <div className="v1r-race-card-image">
+          <div className="v1r-race-card-image-fallback">{initials(title)}</div>
+          {r.imageUrl && (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={r.imageUrl}
+              alt={title}
+              loading="lazy"
+              onError={(e) => {
+                (e.currentTarget as HTMLImageElement).style.display = 'none';
+              }}
+            />
           )}
-          <span className="v1r-race-price">
-            {priceStr ? (
-              <>
-                From <strong>{priceStr}</strong>
-              </>
-            ) : (
-              'Free'
-            )}
-          </span>
+          <div className="v1r-race-card-badges">
+            {virtual && <span className="v1r-race-badge-virtual">Virtual</span>}
+          </div>
         </div>
-      </div>
-    </Link>
+        <div className="v1r-race-card-body">
+          <div className="v1r-race-top">
+            <div className="v1r-race-date">
+              <div className="v1r-race-date-day">{fmtDay(r.startTime)}</div>
+              <div className="v1r-race-date-sub">
+                {fmtMonth(r.startTime)} · {fmtWeekday(r.startTime)}
+              </div>
+            </div>
+            {dist && <span className="v1r-race-distance">{dist}</span>}
+          </div>
+          <h3 className="v1r-race-title">{title}</h3>
+          <div className="v1r-race-city">
+            {displayLocation(r)} · {fmtTime(r.startTime)}
+          </div>
+          <div className="v1r-race-foot">
+            {sig ? (
+              sig.kind === 'going' ? (
+                <span className="v1r-race-going">{sig.text}</span>
+              ) : (
+                <span className="v1r-race-signal">{sig.text}</span>
+              )
+            ) : (
+              <span />
+            )}
+            <span className="v1r-race-price">
+              {priceStr ? (
+                <>
+                  From <strong>{priceStr}</strong>
+                </>
+              ) : (
+                'Free'
+              )}
+            </span>
+          </div>
+        </div>
+      </Link>
+      {showCoupon && (
+        <div className="v1r-race-actions">
+          <Link href={detailHref} className="v1r-race-action v1r-race-action-ghost">
+            Show details
+          </Link>
+          <button
+            type="button"
+            onClick={handleCoupon}
+            className={`v1r-race-action v1r-race-action-primary ${couponUnlocked ? 'is-success' : ''}`}
+          >
+            {couponUnlocked
+              ? `Copy ${r.couponCode}`
+              : `Get ${r.couponDiscountPercent}% off`}
+          </button>
+        </div>
+      )}
+    </div>
   );
 }
 
-function FlagshipCard({ r }: { r: ApiEvent }) {
+function FlagshipCard({ r, onCouponClick }: { r: ApiEvent; onCouponClick: (r: ApiEvent) => void }) {
   const dateStr = new Date(r.startTime).toLocaleString('en-GB', { day: 'numeric', month: 'long' });
   const dist = primaryDistance(r) || 'Run';
   const title = normalizeTitle(r.title);
@@ -213,68 +251,112 @@ function FlagshipCard({ r }: { r: ApiEvent }) {
       ? `By ${r.organizerName}`
       : 'Endorfin pick of the month';
   const story = storySnippet(r);
-  const href = `https://endorfin.run/e/${r.slug || r.id}`;
+  const detailHref = `/races/${r.slug || r.id}`;
+  const showCoupon = !!r.hasCoupon && r.couponDiscountPercent != null;
+  const couponUnlocked = !!r.couponCode;
+
+  function handleCoupon(e: React.MouseEvent) {
+    e.preventDefault();
+    onCouponClick(r);
+  }
 
   return (
-    <article className="v1r-featured-card">
-      <div
-        className="v1r-featured-card-bg"
-        style={r.imageUrl ? { backgroundImage: `url('${r.imageUrl}')` } : undefined}
-        aria-hidden
-      />
-      <div className="v1r-featured-main">
-        <div>
-          <div className="v1r-featured-kicker">
-            {dateStr} · {displayLocation(r)} · {dist}
+    <div className="v1r-featured-wrap">
+      {showCoupon && (
+        <CouponTopStrip
+          couponCode={r.couponCode ?? null}
+          couponDiscountPercent={r.couponDiscountPercent ?? null}
+          hasCoupon={true}
+          size="md"
+        />
+      )}
+      <article className="v1r-featured-card">
+        <div
+          className="v1r-featured-card-bg"
+          style={r.imageUrl ? { backgroundImage: `url('${r.imageUrl}')` } : undefined}
+          aria-hidden
+        />
+        <div className="v1r-featured-main">
+          <div>
+            <div className="v1r-featured-kicker">
+              {dateStr} · {displayLocation(r)} · {dist}
+            </div>
+            <h3 className="v1r-featured-title">{title}</h3>
           </div>
-          <h3 className="v1r-featured-title">{title}</h3>
+          <div className="v1r-featured-meta">
+            <div className="v1r-featured-meta-block">
+              <div className="v1r-featured-meta-label">Distance</div>
+              <div className="v1r-featured-meta-value">{dist}</div>
+            </div>
+            <div className="v1r-featured-meta-block">
+              <div className="v1r-featured-meta-label">Start time</div>
+              <div className="v1r-featured-meta-value">{fmtTime(r.startTime)}</div>
+            </div>
+            <div className="v1r-featured-meta-block">
+              <div className="v1r-featured-meta-label">Venue</div>
+              <div className="v1r-featured-meta-value">{r.venueName || r.locationName || '—'}</div>
+            </div>
+            <div className="v1r-featured-meta-block">
+              <div className="v1r-featured-meta-label">Price from</div>
+              <div className="v1r-featured-meta-value">{price}</div>
+            </div>
+          </div>
         </div>
-        <div className="v1r-featured-meta">
-          <div className="v1r-featured-meta-block">
-            <div className="v1r-featured-meta-label">Distance</div>
-            <div className="v1r-featured-meta-value">{dist}</div>
+        <div className="v1r-featured-side">
+          <div>
+            <span className="v1r-going-pill">{pillText}</span>
+            <p className="v1r-featured-story">{story}</p>
           </div>
-          <div className="v1r-featured-meta-block">
-            <div className="v1r-featured-meta-label">Start time</div>
-            <div className="v1r-featured-meta-value">{fmtTime(r.startTime)}</div>
-          </div>
-          <div className="v1r-featured-meta-block">
-            <div className="v1r-featured-meta-label">Venue</div>
-            <div className="v1r-featured-meta-value">{r.venueName || r.locationName || '—'}</div>
-          </div>
-          <div className="v1r-featured-meta-block">
-            <div className="v1r-featured-meta-label">Price from</div>
-            <div className="v1r-featured-meta-value">{price}</div>
+          <div className="v1r-featured-ctas">
+            {showCoupon && (
+              <button
+                type="button"
+                onClick={handleCoupon}
+                className={`v1r-btn v1r-btn-primary ${couponUnlocked ? 'is-success' : ''}`}
+              >
+                {couponUnlocked ? `Copy ${r.couponCode}` : `Get ${r.couponDiscountPercent}% off`}
+              </button>
+            )}
+            <Link href={detailHref} className="v1r-btn v1r-btn-ghost-light">
+              Show details →
+            </Link>
           </div>
         </div>
-      </div>
-      <div className="v1r-featured-side">
-        <div>
-          <span className="v1r-going-pill">{pillText}</span>
-          <p className="v1r-featured-story">{story}</p>
-        </div>
-        <div className="v1r-featured-ctas">
-          <Link href={href} target="_blank" rel="noopener noreferrer" className="v1r-btn v1r-btn-primary">
-            RSVP on Endorfin
-          </Link>
-          <Link href={href} target="_blank" rel="noopener noreferrer" className="v1r-btn v1r-btn-ghost-light">
-            View details →
-          </Link>
-        </div>
-      </div>
-    </article>
+      </article>
+    </div>
   );
 }
 
 // ─── Main view ─────────────────────────────
 
 export default function RacesView({ races: initialRaces }: { races: ApiEvent[] }) {
+  const router = useRouter();
   const [allRaces, setAllRaces] = useState<ApiEvent[]>(initialRaces);
   const [currentCity, setCurrentCity] = useState<string>('');
+  const [couponLoginRace, setCouponLoginRace] = useState<ApiEvent | null>(null);
 
-  // Client-side fetch — refresh on mount, also acts as fallback when
-  // server-side fetch failed during build/ISR (e.g. transient DNS).
+  const handleCouponClick = useCallback((r: ApiEvent) => {
+    // Authed: code is already populated server-side → copy directly.
+    if (r.couponCode) {
+      navigator.clipboard?.writeText(r.couponCode).catch(() => {});
+      return;
+    }
+    // Anon: open the contextual login modal.
+    setCouponLoginRace(r);
+  }, []);
+
+  const handleLoginSuccess = useCallback(() => {
+    setCouponLoginRace(null);
+    // Re-render the page with the cookie attached → server fetch returns coupon codes.
+    router.refresh();
+  }, [router]);
+
+  // Fallback: only fetch client-side when server-side fetch returned empty
+  // (e.g. transient DNS during build). Authed users get coupon codes from the
+  // server render — refetching client-side would lose them since the JWT
+  // lives in an HttpOnly cookie and isn't readable here.
   useEffect(() => {
+    if (initialRaces.length > 0) return;
     let cancelled = false;
     fetch('https://api.endorfin.run/api/v1/events?limit=30', { cache: 'no-store' })
       .then((r) => (r.ok ? r.json() : null))
@@ -291,7 +373,7 @@ export default function RacesView({ races: initialRaces }: { races: ApiEvent[] }
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [initialRaces.length]);
 
   const filtered = useMemo(
     () => (currentCity ? allRaces.filter((r) => matchesCity(r, currentCity)) : allRaces),
@@ -343,7 +425,7 @@ export default function RacesView({ races: initialRaces }: { races: ApiEvent[] }
   const flagStep = useCallback(() => {
     const el = flagRef.current;
     if (!el) return 0;
-    const first = el.querySelector('.v1r-featured-card') as HTMLElement | null;
+    const first = el.querySelector('.v1r-featured-wrap, .v1r-featured-card') as HTMLElement | null;
     if (!first) return el.clientWidth;
     const gap = parseFloat(getComputedStyle(el).columnGap || '18') || 18;
     return first.getBoundingClientRect().width + gap;
@@ -556,7 +638,7 @@ export default function RacesView({ races: initialRaces }: { races: ApiEvent[] }
                 aria-label="Flagship races"
               >
                 {flagships.map((r) => (
-                  <FlagshipCard key={r.id} r={r} />
+                  <FlagshipCard key={r.id} r={r} onCouponClick={handleCouponClick} />
                 ))}
               </div>
             </div>
@@ -630,7 +712,7 @@ export default function RacesView({ races: initialRaces }: { races: ApiEvent[] }
                   No upcoming races{currentCity ? ` in ${currentCity}` : ''}. Try another city.
                 </div>
               ) : (
-                grid.map((r) => <RaceCard key={r.id} r={r} />)
+                grid.map((r) => <RaceCard key={r.id} r={r} onCouponClick={handleCouponClick} />)
               )}
             </div>
           </div>
@@ -697,6 +779,19 @@ export default function RacesView({ races: initialRaces }: { races: ApiEvent[] }
           </div>
         </div>
       </section>
+
+      <LoginModal
+        open={!!couponLoginRace}
+        onClose={() => setCouponLoginRace(null)}
+        onSuccess={handleLoginSuccess}
+        context={couponLoginRace ? <RaceCouponContext race={couponLoginRace} /> : undefined}
+        title={
+          <>
+            One tap to your <span className="v1lm-red">code.</span>
+          </>
+        }
+        subtitle="Sign in to reveal coupon codes, save races, and sync with the Endorfin app."
+      />
     </>
   );
 }

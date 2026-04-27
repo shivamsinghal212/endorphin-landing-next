@@ -123,6 +123,16 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           crossOrigin=""
         />
         <meta property="og:logo" content="https://www.endorfin.run/logo.png" />
+        {/* Runtime config bridge — exposes server-only env to client components.
+            Google client IDs are public-by-design (sent in every OAuth flow), so
+            inlining is safe. Lets us reuse GOOGLE_CLIENT_ID without a NEXT_PUBLIC_ duplicate. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `window.__endorfinConfig = ${JSON.stringify({
+              googleClientId: process.env.GOOGLE_CLIENT_ID || '',
+            })};`,
+          }}
+        />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(appJsonLd) }} />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(orgJsonLd) }} />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }} />

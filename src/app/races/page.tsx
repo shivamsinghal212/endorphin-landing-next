@@ -2,6 +2,8 @@ import type { Metadata } from 'next';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import RacesView from './RacesView';
+import { API_BASE } from '@/lib/api';
+import { getSessionToken } from '@/lib/session';
 
 export const metadata: Metadata = {
   title: 'Races in India — every race, listed',
@@ -38,12 +40,17 @@ export interface ApiEvent {
   goingCount?: number;
   isFeatured?: boolean;
   distanceCategories?: Array<{ categoryName?: string }>;
+  couponCode?: string | null;
+  couponDiscountPercent?: number | null;
+  hasCoupon?: boolean;
 }
 
-async function getRaces(): Promise<ApiEvent[]> {
+async function getRaces(token: string | null): Promise<ApiEvent[]> {
   try {
-    const res = await fetch('https://api.endorfin.run/api/v1/events?limit=30', {
-      next: { revalidate: 3600 },
+    // When authed we can't use ISR (response varies by user), so go fresh.
+    const res = await fetch(`${API_BASE}/api/v1/events?limit=30`, {
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+      ...(token ? { cache: 'no-store' } : { next: { revalidate: 3600 } }),
     });
     if (!res.ok) return [];
     const data = await res.json();
@@ -107,7 +114,8 @@ function buildJsonLd(races: ApiEvent[]) {
 }
 
 export default async function RacesPage() {
-  const races = await getRaces();
+  const token = await getSessionToken();
+  const races = await getRaces(token);
   const jsonLd = buildJsonLd(races);
 
   return (
