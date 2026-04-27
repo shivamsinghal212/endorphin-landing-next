@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { APP_STORE_URL, PLAY_STORE_URL } from '@/lib/store-links';
-import { TOP_CITIES, locationMatchesCity, pickFeaturedOrFirst } from '@/lib/cities';
+import { TOP_CITIES, locationMatchesCity } from '@/lib/cities';
 import CouponTopStrip from '@/components/CouponTopStrip';
 import LoginModal from '@/components/LoginModal';
 import RaceCouponContext from '@/components/RaceCouponContext';
@@ -85,18 +85,17 @@ function initials(s: string) {
 }
 
 // Flagship selection:
-// - Earliest-upcoming featured race (isFeatured = true) per scope.
-// - Falls back to earliest-upcoming race when no featured race exists.
-// - When a city is picked: 1 flagship from that city.
-// - When "All India": 1 flagship per top-5 city, clubbed together.
-function pickFlagships(allRaces: ApiEvent[], city: string, cities: readonly string[]): ApiEvent[] {
-  if (city) {
-    const top = pickFeaturedOrFirst(allRaces.filter((r) => matchesCity(r, city)));
-    return top ? [top] : [];
-  }
-  return cities
-    .map((c) => pickFeaturedOrFirst(allRaces.filter((r) => matchesCity(r, c))))
-    .filter((r): r is ApiEvent => r !== null);
+// - Show ALL featured races (isFeatured = true) sorted by start_time, in scope.
+// - When zero featured races in scope, fall back to a single earliest-upcoming race.
+// - City scope applies first when one is selected.
+function pickFlagships(allRaces: ApiEvent[], city: string): ApiEvent[] {
+  const pool = city ? allRaces.filter((r) => matchesCity(r, city)) : allRaces;
+  if (!pool.length) return [];
+  const sortByDate = (a: ApiEvent, b: ApiEvent) =>
+    new Date(a.startTime).getTime() - new Date(b.startTime).getTime();
+  const featured = pool.filter((r) => r.isFeatured);
+  if (featured.length) return [...featured].sort(sortByDate);
+  return [[...pool].sort(sortByDate)[0]];
 }
 
 function storySnippet(r: ApiEvent) {
@@ -352,7 +351,7 @@ export default function RacesView({ races: initialRaces }: { races: ApiEvent[] }
     [allRaces, currentCity]
   );
   const flagships = useMemo(
-    () => pickFlagships(allRaces, currentCity, TOP_CITIES),
+    () => pickFlagships(allRaces, currentCity),
     [allRaces, currentCity]
   );
   const grid = useMemo(() => filtered.slice(0, 12), [filtered]);

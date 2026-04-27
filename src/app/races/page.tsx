@@ -50,7 +50,9 @@ async function getRaces(token: string | null): Promise<ApiEvent[]> {
     // When authed we can't use ISR (response varies by user), so go fresh.
     const res = await fetch(`${API_BASE}/api/v1/events?limit=30`, {
       headers: token ? { Authorization: `Bearer ${token}` } : {},
-      ...(token ? { cache: 'no-store' } : { next: { revalidate: 3600 } }),
+      // 60s revalidate so flipping is_featured / coupon fields in the DB
+      // shows up on the public page within a minute (was 1 hour).
+      ...(token ? { cache: 'no-store' } : { next: { revalidate: 60 } }),
     });
     if (!res.ok) return [];
     const data = await res.json();

@@ -1118,7 +1118,7 @@ body { padding-top: var(--nav-h, 68px); }
 .v1-races-page .v1r-featured-card > *:not(.v1r-featured-card-bg) { position: relative; z-index: 2; }
 
 .v1-races-page .v1r-featured-main {
-  padding: 56px 52px 48px;
+  padding: 56px 52px 64px;
   display: flex; flex-direction: column;
   justify-content: space-between;
   min-height: 460px;
@@ -1148,7 +1148,7 @@ body { padding-top: var(--nav-h, 68px); }
   color: var(--bone);
 }
 .v1-races-page .v1r-featured-side {
-  padding: 56px 52px;
+  padding: 56px 52px 64px;
   border-left: 0.5px solid rgba(245, 240, 235, 0.15);
   display: flex; flex-direction: column;
   justify-content: space-between;
