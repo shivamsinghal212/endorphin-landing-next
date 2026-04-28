@@ -1,10 +1,14 @@
 'use client';
 
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { useCallback, useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import ReactMarkdown from 'react-markdown';
 import CouponTopStrip from '@/components/CouponTopStrip';
+import LoginModal from '@/components/LoginModal';
+import RaceCouponContext from '@/components/RaceCouponContext';
+import { couponCta } from '@/lib/coupon-cta';
 import type { Event, DistanceCategory } from '@/lib/api';
 
 function fmtFullDate(iso: string) {
@@ -35,7 +39,9 @@ function hasAnyPrice(cats: DistanceCategory[]): boolean {
 }
 
 export default function RaceDetailView({ event }: { event: Event }) {
+  const router = useRouter();
   const [mounted, setMounted] = useState(false);
+  const [loginOpen, setLoginOpen] = useState(false);
   useEffect(() => setMounted(true), []);
   const showCoupon = event.hasCoupon && event.couponDiscountPercent != null;
   const dateStr = fmtFullDate(event.startTime);
@@ -46,6 +52,31 @@ export default function RaceDetailView({ event }: { event: Event }) {
     event.latitude != null && event.longitude != null
       ? `https://maps.google.com/?q=${event.latitude},${event.longitude}`
       : null;
+
+  const cta = couponCta(event);
+  const heroCtaLabel = showCoupon
+    ? cta.intent === 'login'
+      ? `Register at ${event.couponDiscountPercent}% off`
+      : event.couponCode
+        ? 'Register ↗'
+        : 'Register ↗'
+    : 'Register ↗';
+
+  const handleHeroCta = useCallback(
+    (e: React.MouseEvent) => {
+      // Anon + coupon → open login. Otherwise let the underlying anchor handle it.
+      if (cta.intent === 'login') {
+        e.preventDefault();
+        setLoginOpen(true);
+      }
+    },
+    [cta.intent],
+  );
+
+  const handleLoginSuccess = useCallback(() => {
+    setLoginOpen(false);
+    router.refresh();
+  }, [router]);
 
   return (
     <div className="v1rd-page">
@@ -59,14 +90,9 @@ export default function RaceDetailView({ event }: { event: Event }) {
         />
       )}
 
-      <div className="v1rd-crumb">
-        <div className="v1rd-container">
-          <Link href="/races">Races</Link>
-          {event.locationName && <> · <span>{event.locationName}</span></>}
-          {' · '}
-          <span className="v1rd-current">{event.title}</span>
-        </div>
-      </div>
+      {/* Crumb removed on detail page — the page title is right below and
+          the back/Races nav is in the header. Keeps the discount strip
+          flush with the page top. */}
 
       <section className="v1rd-hero">
         <div className="v1rd-container">
@@ -143,8 +169,9 @@ export default function RaceDetailView({ event }: { event: Event }) {
                 href={event.registrationUrl}
                 target="_blank"
                 rel="noopener noreferrer"
+                onClick={handleHeroCta}
               >
-                Register ↗
+                {heroCtaLabel}
               </a>
             ) : (
               <span className="v1rd-btn v1rd-btn-primary v1rd-disabled">Registration TBD</span>
@@ -339,8 +366,9 @@ export default function RaceDetailView({ event }: { event: Event }) {
                 href={event.registrationUrl}
                 target="_blank"
                 rel="noopener noreferrer"
+                onClick={handleHeroCta}
               >
-                Register ↗
+                {heroCtaLabel}
               </a>
             )}
           </div>
@@ -386,8 +414,9 @@ export default function RaceDetailView({ event }: { event: Event }) {
                   href={event.registrationUrl}
                   target="_blank"
                   rel="noopener noreferrer"
+                  onClick={handleHeroCta}
                 >
-                  Register ↗
+                  {heroCtaLabel}
                 </a>
               ) : (
                 <span className="v1rd-sticky-cta v1rd-sticky-cta-disabled">Registration TBD</span>
@@ -397,6 +426,18 @@ export default function RaceDetailView({ event }: { event: Event }) {
           document.body,
         )}
 
+      <LoginModal
+        open={loginOpen}
+        onClose={() => setLoginOpen(false)}
+        onSuccess={handleLoginSuccess}
+        context={<RaceCouponContext race={event} />}
+        title={
+          <>
+            One tap to your <span className="v1lm-red">discount.</span>
+          </>
+        }
+        subtitle="Sign in to unlock your member discount."
+      />
     </div>
   );
 }

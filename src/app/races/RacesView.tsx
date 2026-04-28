@@ -1,11 +1,15 @@
 'use client';
 
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { APP_STORE_URL, PLAY_STORE_URL } from '@/lib/store-links';
 import { useStoreLink } from '@/lib/use-store-link';
 import { TOP_CITIES, locationMatchesCity } from '@/lib/cities';
+import { couponCta, type CouponCta } from '@/lib/coupon-cta';
 import CouponTopStrip from '@/components/CouponTopStrip';
+import LoginModal from '@/components/LoginModal';
+import RaceCouponContext from '@/components/RaceCouponContext';
 import type { ApiEvent } from './page';
 
 const SMALL_WORDS = new Set(['a', 'an', 'and', 'the', 'of', 'for', 'in', 'on', 'to', 'by', 'at', 'with']);
@@ -86,7 +90,7 @@ function initials(s: string) {
 // - Show ALL featured races (isFeatured = true) sorted by start_time, in scope.
 // - When zero featured races in scope, fall back to a single earliest-upcoming race.
 // - City scope applies first when one is selected.
-function pickFlagships(allRaces: ApiEvent[], city: string): ApiEvent[] {
+function pickFeatured(allRaces: ApiEvent[], city: string): ApiEvent[] {
   const pool = city ? allRaces.filter((r) => matchesCity(r, city)) : allRaces;
   if (!pool.length) return [];
   const sortByDate = (a: ApiEvent, b: ApiEvent) =>
@@ -106,7 +110,65 @@ function storySnippet(r: ApiEvent) {
 
 // ─── Cards ───────────────────────────────────
 
-function RaceCard({ r }: { r: ApiEvent }) {
+/** Shared coupon-aware Register button for race + featured cards.
+ *  variant: 'race-action' = listing card bottom bar; 'btn' = featured card side panel. */
+function CtaButton({
+  cta,
+  onLoginNeeded,
+  shape = 'race-action',
+}: {
+  cta: CouponCta;
+  onLoginNeeded: () => void;
+  shape?: 'race-action' | 'btn';
+}) {
+  const baseClass = shape === 'race-action' ? 'v1r-race-action' : 'v1r-btn';
+  const variantClass =
+    cta.variant === 'green'
+      ? `${baseClass}-success`
+      : cta.variant === 'jet'
+        ? `${baseClass}-disabled`
+        : `${baseClass}-primary`;
+  const cls = `${baseClass} ${variantClass}`;
+
+  if (cta.intent === 'tbd') {
+    return <span className={cls}>{cta.label}</span>;
+  }
+  if (cta.intent === 'login') {
+    return (
+      <button
+        type="button"
+        className={cls}
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          onLoginNeeded();
+        }}
+      >
+        {cta.label}
+      </button>
+    );
+  }
+  if (cta.intent === 'detail' || cta.internal) {
+    return (
+      <Link href={cta.href} className={cls}>
+        {cta.label}
+      </Link>
+    );
+  }
+  return (
+    <a href={cta.href} target="_blank" rel="noopener noreferrer" className={cls}>
+      {cta.label}
+    </a>
+  );
+}
+
+function RaceCard({
+  r,
+  onLoginNeeded,
+}: {
+  r: ApiEvent;
+  onLoginNeeded: (r: ApiEvent) => void;
+}) {
   const title = normalizeTitle(r.title);
   const dist = primaryDistance(r);
   const sig = popularitySignal(r);
@@ -114,7 +176,8 @@ function RaceCard({ r }: { r: ApiEvent }) {
   const priceStr = r.priceMin != null ? `₹${r.priceMin.toLocaleString('en-IN')}` : null;
   const detailHref = `/races/${r.slug || r.id}`;
   const showCoupon = !!r.hasCoupon && r.couponDiscountPercent != null;
-  const showActions = !!r.registrationUrl || showCoupon;
+  const cta = couponCta(r);
+  const showActions = cta.intent !== 'tbd' || showCoupon;
 
   return (
     <div className="v1r-race-card">
@@ -185,27 +248,20 @@ function RaceCard({ r }: { r: ApiEvent }) {
           <Link href={detailHref} className="v1r-race-action v1r-race-action-ghost">
             Show details
           </Link>
-          {r.registrationUrl ? (
-            <a
-              href={r.registrationUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="v1r-race-action v1r-race-action-primary"
-            >
-              Register ↗
-            </a>
-          ) : (
-            <span className="v1r-race-action v1r-race-action-primary v1r-race-action-disabled">
-              Registration TBD
-            </span>
-          )}
+          <CtaButton cta={cta} onLoginNeeded={() => onLoginNeeded(r)} />
         </div>
       )}
     </div>
   );
 }
 
-function FlagshipCard({ r }: { r: ApiEvent }) {
+function FeaturedCard({
+  r,
+  onLoginNeeded,
+}: {
+  r: ApiEvent;
+  onLoginNeeded: (r: ApiEvent) => void;
+}) {
   const dateStr = new Date(r.startTime).toLocaleString('en-GB', { day: 'numeric', month: 'long' });
   const dist = primaryDistance(r) || 'Run';
   const title = normalizeTitle(r.title);
@@ -221,6 +277,7 @@ function FlagshipCard({ r }: { r: ApiEvent }) {
   const story = storySnippet(r);
   const detailHref = `/races/${r.slug || r.id}`;
   const showCoupon = !!r.hasCoupon && r.couponDiscountPercent != null;
+  const cta = couponCta(r);
 
   return (
     <div className="v1r-featured-wrap">
@@ -270,16 +327,7 @@ function FlagshipCard({ r }: { r: ApiEvent }) {
             <p className="v1r-featured-story">{story}</p>
           </div>
           <div className="v1r-featured-ctas">
-            {r.registrationUrl && (
-              <a
-                href={r.registrationUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="v1r-btn v1r-btn-primary"
-              >
-                Register ↗
-              </a>
-            )}
+            <CtaButton cta={cta} onLoginNeeded={() => onLoginNeeded(r)} shape="btn" />
             <Link href={detailHref} className="v1r-btn v1r-btn-ghost-light">
               Show details →
             </Link>
@@ -293,11 +341,23 @@ function FlagshipCard({ r }: { r: ApiEvent }) {
 // ─── Main view ─────────────────────────────
 
 export default function RacesView({ races: initialRaces }: { races: ApiEvent[] }) {
+  const router = useRouter();
   const [allRaces, setAllRaces] = useState<ApiEvent[]>(initialRaces);
   const [currentCity, setCurrentCity] = useState<string>('');
+  const [couponLoginRace, setCouponLoginRace] = useState<ApiEvent | null>(null);
   // Mobile: send "Get the app" CTAs straight to the right store.
   // Desktop / unknown UA: keep #download anchor → both store buttons inline.
   const downloadHref = useStoreLink('#download');
+
+  const handleLoginNeeded = useCallback((r: ApiEvent) => {
+    setCouponLoginRace(r);
+  }, []);
+
+  const handleLoginSuccess = useCallback(() => {
+    setCouponLoginRace(null);
+    // Re-render with cookie attached so server fetch returns coupon codes.
+    router.refresh();
+  }, [router]);
 
   // Sync state when the server re-renders with new props (e.g. after
   // router.refresh() following sign-in or sign-out — the cookie state
@@ -336,8 +396,8 @@ export default function RacesView({ races: initialRaces }: { races: ApiEvent[] }
     () => (currentCity ? allRaces.filter((r) => matchesCity(r, currentCity)) : allRaces),
     [allRaces, currentCity]
   );
-  const flagships = useMemo(
-    () => pickFlagships(allRaces, currentCity),
+  const featured = useMemo(
+    () => pickFeatured(allRaces, currentCity),
     [allRaces, currentCity]
   );
   const grid = useMemo(() => filtered.slice(0, 12), [filtered]);
@@ -365,13 +425,13 @@ export default function RacesView({ races: initialRaces }: { races: ApiEvent[] }
   );
 
   // Carousel refs + control state
-  const flagRef = useRef<HTMLDivElement | null>(null);
+  const featuredRef = useRef<HTMLDivElement | null>(null);
   const upRef = useRef<HTMLDivElement | null>(null);
 
-  const [flagPrev, setFlagPrev] = useState(true);
-  const [flagNext, setFlagNext] = useState(true);
-  const [flagCanScroll, setFlagCanScroll] = useState(false);
-  const [flagActive, setFlagActive] = useState(0);
+  const [featuredPrev, setFlagPrev] = useState(true);
+  const [featuredNext, setFlagNext] = useState(true);
+  const [featuredCanScroll, setFlagCanScroll] = useState(false);
+  const [featuredActive, setFlagActive] = useState(0);
 
   const [upPrev, setUpPrev] = useState(true);
   const [upNext, setUpNext] = useState(true);
@@ -379,8 +439,8 @@ export default function RacesView({ races: initialRaces }: { races: ApiEvent[] }
   const [progressLeft, setProgressLeft] = useState(0);
   const [progressWidth, setProgressWidth] = useState(100);
 
-  const flagStep = useCallback(() => {
-    const el = flagRef.current;
+  const featuredStep = useCallback(() => {
+    const el = featuredRef.current;
     if (!el) return 0;
     const first = el.querySelector('.v1r-featured-wrap, .v1r-featured-card') as HTMLElement | null;
     if (!first) return el.clientWidth;
@@ -397,17 +457,17 @@ export default function RacesView({ races: initialRaces }: { races: ApiEvent[] }
     return first.getBoundingClientRect().width + gap;
   }, []);
 
-  const updateFlag = useCallback(() => {
-    const el = flagRef.current;
+  const updateFeatured = useCallback(() => {
+    const el = featuredRef.current;
     if (!el) return;
     const max = el.scrollWidth - el.clientWidth;
     const x = el.scrollLeft;
     setFlagCanScroll(max > 2);
     setFlagPrev(x <= 2);
     setFlagNext(x >= max - 2 || max <= 0);
-    const step = flagStep();
+    const step = featuredStep();
     setFlagActive(step > 0 ? Math.round(x / step) : 0);
-  }, [flagStep]);
+  }, [featuredStep]);
 
   const updateUp = useCallback(() => {
     const el = upRef.current;
@@ -430,9 +490,9 @@ export default function RacesView({ races: initialRaces }: { races: ApiEvent[] }
   }, []);
 
   useEffect(() => {
-    if (flagRef.current) flagRef.current.scrollLeft = 0;
-    requestAnimationFrame(updateFlag);
-  }, [flagships, updateFlag]);
+    if (featuredRef.current) featuredRef.current.scrollLeft = 0;
+    requestAnimationFrame(updateFeatured);
+  }, [featured, updateFeatured]);
 
   useEffect(() => {
     if (upRef.current) upRef.current.scrollLeft = 0;
@@ -442,27 +502,27 @@ export default function RacesView({ races: initialRaces }: { races: ApiEvent[] }
   useEffect(() => {
     const onResize = () => {
       requestAnimationFrame(() => {
-        updateFlag();
+        updateFeatured();
         updateUp();
       });
     };
     window.addEventListener('resize', onResize);
     return () => window.removeEventListener('resize', onResize);
-  }, [updateFlag, updateUp]);
+  }, [updateFeatured, updateUp]);
 
-  const scrollFlag = (dir: 1 | -1) => flagRef.current?.scrollBy({ left: dir * flagStep(), behavior: 'smooth' });
+  const scrollFeatured = (dir: 1 | -1) => featuredRef.current?.scrollBy({ left: dir * featuredStep(), behavior: 'smooth' });
   const scrollUp = (dir: 1 | -1) => upRef.current?.scrollBy({ left: dir * upStep(), behavior: 'smooth' });
 
   const scope = currentCity || 'India';
   const singleUp = grid.length === 1;
 
-  const onFlagKey = (e: React.KeyboardEvent<HTMLDivElement>) => {
+  const onFeaturedKey = (e: React.KeyboardEvent<HTMLDivElement>) => {
     if (e.key === 'ArrowRight') {
       e.preventDefault();
-      scrollFlag(1);
+      scrollFeatured(1);
     } else if (e.key === 'ArrowLeft') {
       e.preventDefault();
-      scrollFlag(-1);
+      scrollFeatured(-1);
     }
   };
   const onUpKey = (e: React.KeyboardEvent<HTMLDivElement>) => {
@@ -547,24 +607,24 @@ export default function RacesView({ races: initialRaces }: { races: ApiEvent[] }
         </div>
       </section>
 
-      {/* Flagship */}
-      {flagships.length > 0 && (
+      {/* Featured */}
+      {featured.length > 0 && (
         <section className="v1r-featured">
           <div className="v1r-container">
             <div className="v1r-section-header">
               <h2 className="v1r-section-title">
-                This month&apos;s flagship in <b>{scope}</b>.
+                This month&apos;s featured in <b>{scope}</b>.
               </h2>
-              <div className="v1r-flagship-header-right">
+              <div className="v1r-featured-header-right">
                 <span className="v1r-section-count">
-                  {daysTo(flagships[0].startTime)} days to start line
+                  {daysTo(featured[0].startTime)} days to start line
                 </span>
-                <div className="v1r-carousel-controls" hidden={!flagCanScroll} role="group">
+                <div className="v1r-carousel-controls" hidden={!featuredCanScroll} role="group">
                   <button
                     className="v1r-carousel-btn"
-                    disabled={flagPrev}
-                    onClick={() => scrollFlag(-1)}
-                    aria-label="Previous flagship"
+                    disabled={featuredPrev}
+                    onClick={() => scrollFeatured(-1)}
+                    aria-label="Previous featured"
                   >
                     <svg viewBox="0 0 24 24" fill="none" aria-hidden>
                       <path d="M15 18l-6-6 6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
@@ -572,9 +632,9 @@ export default function RacesView({ races: initialRaces }: { races: ApiEvent[] }
                   </button>
                   <button
                     className="v1r-carousel-btn"
-                    disabled={flagNext}
-                    onClick={() => scrollFlag(1)}
-                    aria-label="Next flagship"
+                    disabled={featuredNext}
+                    onClick={() => scrollFeatured(1)}
+                    aria-label="Next featured"
                   >
                     <svg viewBox="0 0 24 24" fill="none" aria-hidden>
                       <path d="M9 6l6 6-6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
@@ -584,32 +644,32 @@ export default function RacesView({ races: initialRaces }: { races: ApiEvent[] }
               </div>
             </div>
 
-            <div className="v1r-flagship-carousel-wrap">
+            <div className="v1r-featured-carousel-wrap">
               <div
-                className="v1r-flagship-carousel"
-                ref={flagRef}
-                onScroll={() => requestAnimationFrame(updateFlag)}
-                onKeyDown={onFlagKey}
+                className="v1r-featured-carousel"
+                ref={featuredRef}
+                onScroll={() => requestAnimationFrame(updateFeatured)}
+                onKeyDown={onFeaturedKey}
                 tabIndex={0}
                 role="region"
-                aria-label="Flagship races"
+                aria-label="Featured races"
               >
-                {flagships.map((r) => (
-                  <FlagshipCard key={r.id} r={r} />
+                {featured.map((r) => (
+                  <FeaturedCard key={r.id} r={r} onLoginNeeded={handleLoginNeeded} />
                 ))}
               </div>
             </div>
 
-            {flagships.length > 1 && (
-              <div className="v1r-flagship-dots" role="tablist" aria-label="Flagship pagination">
-                {flagships.map((_, i) => (
+            {featured.length > 1 && (
+              <div className="v1r-featured-dots" role="tablist" aria-label="Featured pagination">
+                {featured.map((_, i) => (
                   <button
                     key={i}
-                    className={`v1r-flagship-dot ${i === flagActive ? 'is-active' : ''}`}
-                    aria-label={`Flagship ${i + 1} of ${flagships.length}`}
-                    aria-selected={i === flagActive}
+                    className={`v1r-featured-dot ${i === featuredActive ? 'is-active' : ''}`}
+                    aria-label={`Featured ${i + 1} of ${featured.length}`}
+                    aria-selected={i === featuredActive}
                     role="tab"
-                    onClick={() => flagRef.current?.scrollTo({ left: i * flagStep(), behavior: 'smooth' })}
+                    onClick={() => featuredRef.current?.scrollTo({ left: i * featuredStep(), behavior: 'smooth' })}
                   />
                 ))}
               </div>
@@ -669,7 +729,7 @@ export default function RacesView({ races: initialRaces }: { races: ApiEvent[] }
                   No upcoming races{currentCity ? ` in ${currentCity}` : ''}. Try another city.
                 </div>
               ) : (
-                grid.map((r) => <RaceCard key={r.id} r={r} />)
+                grid.map((r) => <RaceCard key={r.id} r={r} onLoginNeeded={handleLoginNeeded} />)
               )}
             </div>
           </div>
@@ -736,6 +796,22 @@ export default function RacesView({ races: initialRaces }: { races: ApiEvent[] }
           </div>
         </div>
       </section>
+
+      {/* Contextual login modal — opened by anon "Register at X% off" CTAs.
+          On success we router.refresh() so the cookie-based fetch returns
+          coupon codes and CTAs flip to the green "Coupon unlocked" variant. */}
+      <LoginModal
+        open={!!couponLoginRace}
+        onClose={() => setCouponLoginRace(null)}
+        onSuccess={handleLoginSuccess}
+        context={couponLoginRace ? <RaceCouponContext race={couponLoginRace} /> : undefined}
+        title={
+          <>
+            One tap to your <span className="v1lm-red">discount.</span>
+          </>
+        }
+        subtitle="Sign in to unlock the member discount and save races."
+      />
     </>
   );
 }

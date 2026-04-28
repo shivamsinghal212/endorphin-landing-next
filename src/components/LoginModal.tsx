@@ -203,6 +203,10 @@ export default function LoginModal({
         <Dialog.Content
           className="v1lm-modal"
           aria-describedby={undefined}
+          // Prevent auto-focusing the first input on open. Default behavior
+          // scrolls the page to bring the focused input into view, which
+          // looks like a "page jumps up" glitch.
+          onOpenAutoFocus={(e) => e.preventDefault()}
           onInteractOutside={(e) => {
             // Allow click-outside to close, but not while pending.
             if (pending) e.preventDefault();

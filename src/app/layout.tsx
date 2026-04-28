@@ -108,7 +108,11 @@ const websiteJsonLd = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${oswald.variable} ${poppins.variable} ${fraunces.variable}`}>
+    <html
+      lang="en"
+      className={`${oswald.variable} ${poppins.variable} ${fraunces.variable}`}
+      data-scroll-behavior="smooth"
+    >
       <head>
         {/* Clash Display — @font-face rules live in globals.css so we
             don't depend on Fontshare's CSS endpoint (which has returned
