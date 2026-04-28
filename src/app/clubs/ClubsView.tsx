@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { APP_STORE_URL, PLAY_STORE_URL } from '@/lib/store-links';
+import { useStoreLink } from '@/lib/use-store-link';
 import { TOP_CITIES, locationMatchesCity } from '@/lib/cities';
 import type { ApiClub } from './page';
 
@@ -427,6 +428,7 @@ export default function ClubsView({ clubs: initialClubs }: { clubs: ApiClub[] })
   const [allClubs, setAllClubs] = useState<ApiClub[]>(initialClubs);
   const [currentCity, setCurrentCity] = useState<string>('');
   const [activeTab, setActiveTab] = useState<AdminTab>('members');
+  const downloadHref = useStoreLink('#download');
 
   // Client-side refresh on mount — also a fallback when the server fetch
   // failed during build/ISR.
@@ -811,7 +813,7 @@ export default function ClubsView({ clubs: initialClubs }: { clubs: ApiClub[] })
               />
             </div>
             <div className="v1c-clubs-more">
-              <a href="#download" className="v1c-btn v1c-btn-ghost">
+              <a href={downloadHref} className="v1c-btn v1c-btn-ghost">
                 Browse all clubs in the app →
               </a>
             </div>

@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { APP_STORE_URL, PLAY_STORE_URL } from '@/lib/store-links';
+import { useStoreLink } from '@/lib/use-store-link';
 import { TOP_CITIES, locationMatchesCity } from '@/lib/cities';
 import CouponTopStrip from '@/components/CouponTopStrip';
 import type { ApiEvent } from './page';
@@ -294,6 +295,9 @@ function FlagshipCard({ r }: { r: ApiEvent }) {
 export default function RacesView({ races: initialRaces }: { races: ApiEvent[] }) {
   const [allRaces, setAllRaces] = useState<ApiEvent[]>(initialRaces);
   const [currentCity, setCurrentCity] = useState<string>('');
+  // Mobile: send "Get the app" CTAs straight to the right store.
+  // Desktop / unknown UA: keep #download anchor → both store buttons inline.
+  const downloadHref = useStoreLink('#download');
 
   // Sync state when the server re-renders with new props (e.g. after
   // router.refresh() following sign-in or sign-out — the cookie state
@@ -679,7 +683,7 @@ export default function RacesView({ races: initialRaces }: { races: ApiEvent[] }
             </div>
             {filtered.length > 12 && (
               <div className="v1r-races-more">
-                <a href="#download" className="v1r-btn v1r-btn-ghost">
+                <a href={downloadHref} className="v1r-btn v1r-btn-ghost">
                   Get the app for all races →
                 </a>
               </div>

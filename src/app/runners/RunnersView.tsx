@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { APP_STORE_URL, PLAY_STORE_URL } from '@/lib/store-links';
+import { useStoreLink } from '@/lib/use-store-link';
 
 // ─── Mock runners (shape loosely mirrors /api/v1/users/{id}) ────────
 interface RunnerStats {
@@ -166,6 +167,7 @@ function CheckIcon({ size = 14 }: { size?: number }) {
 
 // ─── Flagship runner card ──────────────────────────────────────
 function FlagshipCard({ r }: { r: Runner }) {
+  const downloadHref = useStoreLink('/#download');
   return (
     <article className="v1ru-flagship-card">
       <div className="v1ru-flagship-portrait">
@@ -240,10 +242,10 @@ function FlagshipCard({ r }: { r: Runner }) {
             ))}
           </div>
           <div className="v1ru-flagship-ctas">
-            <a className="v1ru-btn v1ru-btn-primary" href="/#download">
+            <a className="v1ru-btn v1ru-btn-primary" href={downloadHref}>
               Get the app
             </a>
-            <a className="v1ru-btn v1ru-btn-ghost-light" href="/#download">
+            <a className="v1ru-btn v1ru-btn-ghost-light" href={downloadHref}>
               Get the app to follow →
             </a>
           </div>
@@ -510,6 +512,7 @@ export default function RunnersView() {
   const allRunners = useMemo(() => MOCK_RUNNERS, []);
   const flagships = useMemo(() => pickFlagships(allRunners), [allRunners]);
   const ribbonNames = useMemo(() => allRunners.map((r) => r.name.toUpperCase()), [allRunners]);
+  const downloadHref = useStoreLink('/#download');
 
   const uniqueCities = useMemo(
     () => new Set(allRunners.map((r) => r.city).filter(Boolean)).size,
