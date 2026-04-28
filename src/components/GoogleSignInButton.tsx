@@ -26,15 +26,7 @@ declare global {
   interface Window {
     google?: { accounts: { id: GoogleAccountsId } };
     __endorfinGsiLoaded?: Promise<void>;
-    __endorfinConfig?: { googleClientId?: string };
   }
-}
-
-function readGoogleClientId(): string | undefined {
-  if (typeof window !== 'undefined' && window.__endorfinConfig?.googleClientId) {
-    return window.__endorfinConfig.googleClientId;
-  }
-  return process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
 }
 
 function loadGsiScript(): Promise<void> {
@@ -83,13 +75,7 @@ export default function GoogleSignInButton({
   const containerRef = useRef<HTMLDivElement>(null);
   const callbackRef = useRef(onCredential);
   const [error, setError] = useState<string | null>(null);
-  const [clientId, setClientId] = useState<string | undefined>(undefined);
-
-  // Read on mount — window.__endorfinConfig is populated by the root layout
-  // before client hydration, but the read needs to happen client-side.
-  useEffect(() => {
-    setClientId(readGoogleClientId());
-  }, []);
+  const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
 
   // Keep latest callback in a ref so we don't re-init the GSI button on every render.
   useEffect(() => {
@@ -125,15 +111,11 @@ export default function GoogleSignInButton({
     };
   }, [clientId, context, width]);
 
-  if (clientId === undefined) {
-    // Mounting — reserve space so layout doesn't shift once we read window config
-    return <div className="v1lm-google-wrap" />;
-  }
   if (!clientId) {
     if (process.env.NODE_ENV !== 'production') {
       return (
         <div className="v1lm-google-missing">
-          Set <code>GOOGLE_CLIENT_ID</code> server env to enable Google sign-in.
+          Set <code>NEXT_PUBLIC_GOOGLE_CLIENT_ID</code> to enable Google sign-in.
         </div>
       );
     }
