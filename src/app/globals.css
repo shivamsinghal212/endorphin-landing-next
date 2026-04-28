@@ -5050,7 +5050,9 @@ body { padding-top: var(--nav-h, 68px); }
   gap: 8px; margin: 8px 0 4px;
 }
 .v1lm-otp-cell {
+  width: 100%; min-width: 0;
   height: 50px;
+  padding: 0;
   background: #fff;
   border: 1px solid rgba(10, 10, 10, 0.24);
   font-family: 'JetBrains Mono', ui-monospace, monospace;
