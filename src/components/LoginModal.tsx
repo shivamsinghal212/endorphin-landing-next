@@ -12,7 +12,6 @@ import {
   googleSignInAction,
 } from '@/app/actions/auth';
 import type { User } from '@/lib/api';
-import { APP_STORE_URL, PLAY_STORE_URL } from '@/lib/store-links';
 import GoogleSignInButton from '@/components/GoogleSignInButton';
 
 type Screen = 'signin' | 'signup' | 'otp' | 'forgot' | 'reset';
@@ -315,8 +314,6 @@ export default function LoginModal({
                 pending={pending}
               />
             )}
-
-            <AppFooter />
           </div>
         </Dialog.Content>
       </Dialog.Portal>
@@ -766,25 +763,6 @@ function OrLine() {
   return <div className="v1lm-or">or with email</div>;
 }
 
-function AppFooter() {
-  return (
-    <div className="v1lm-app-row">
-      <div className="v1lm-app-copy">
-        <strong>Or get the app</strong>
-        <span>Save races, sync with crew</span>
-      </div>
-      <div className="v1lm-stores">
-        <a className="v1lm-store-btn" href={APP_STORE_URL} target="_blank" rel="noopener noreferrer" aria-label="Download on the App Store">
-          <AppleIcon />
-        </a>
-        <a className="v1lm-store-btn" href={PLAY_STORE_URL} target="_blank" rel="noopener noreferrer" aria-label="Get it on Google Play">
-          <PlayIcon />
-        </a>
-      </div>
-    </div>
-  );
-}
-
 // ─── Icons ───────────────────────────────────────────────────────────────
 
 function CloseIcon() {
@@ -822,20 +800,6 @@ function EyeOffIcon() {
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
       <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" />
       <line x1="1" y1="1" x2="23" y2="23" />
-    </svg>
-  );
-}
-function AppleIcon() {
-  return (
-    <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true">
-      <path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09l.01-.01zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z" />
-    </svg>
-  );
-}
-function PlayIcon() {
-  return (
-    <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true">
-      <path d="M3.609 1.814 13.792 12 3.61 22.186a.996.996 0 0 1-.61-.92V2.734a1 1 0 0 1 .609-.92zm10.89 10.893 2.302 2.302-10.937 6.333 8.635-8.635zm3.199-3.198 2.807 1.626a1 1 0 0 1 0 1.73l-2.808 1.626L15.119 12l2.579-2.491zM5.864 2.658 16.802 8.99l-2.302 2.302-8.636-8.634z" />
     </svg>
   );
 }

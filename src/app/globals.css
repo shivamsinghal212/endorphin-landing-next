@@ -4907,6 +4907,7 @@ body { padding-top: var(--nav-h, 68px); }
 .v1lm-close:disabled { opacity: 0.4; cursor: not-allowed; }
 
 .v1lm-context { background: #EDE7E0; border-bottom: 1px solid rgba(10, 10, 10, 0.12); }
+.v1lm-context .v1rcc-strip { padding-right: 50px; }
 
 .v1lm-body { padding: 28px 28px 22px; }
 
@@ -5152,7 +5153,7 @@ body { padding-top: var(--nav-h, 68px); }
 .v1rcc-title {
   font-family: 'Oswald', sans-serif;
   font-weight: 600; font-size: 13px;
-  letter-spacing: 0.04em; color: #0A0A0A;
+  color: #0A0A0A;
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 .v1rcc-sub {
