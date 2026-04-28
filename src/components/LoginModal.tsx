@@ -27,6 +27,12 @@ interface LoginModalProps {
   /** Subtitle override. */
   subtitle?: ReactNode;
   initialScreen?: Screen;
+  /**
+   * When true, replace the form with a centered loader (e.g. while the parent
+   * is awaiting router.refresh after a successful auth). Close affordances
+   * are suppressed so the user can't dismiss mid-finalize.
+   */
+  finalizing?: boolean;
 }
 
 export default function LoginModal({
@@ -37,6 +43,7 @@ export default function LoginModal({
   title,
   subtitle,
   initialScreen = 'signin',
+  finalizing = false,
 }: LoginModalProps) {
   const [screen, setScreen] = useState<Screen>(initialScreen);
   const [email, setEmail] = useState('');
@@ -79,7 +86,6 @@ export default function LoginModal({
       const r = await loginAction(email.trim().toLowerCase(), password);
       if (r.ok && r.user) {
         onSuccess?.(r.user);
-        onClose();
       } else if (!r.ok && r.code === 'EMAIL_NOT_VERIFIED') {
         // Backend already resent OTP — go straight to OTP screen
         setResendCountdown(60);
@@ -121,7 +127,6 @@ export default function LoginModal({
       const r = await verifyOtpAction(email.trim().toLowerCase(), otp);
       if (r.ok && r.user) {
         onSuccess?.(r.user);
-        onClose();
       } else if (!r.ok) {
         setError(r.error);
       }
@@ -188,7 +193,6 @@ export default function LoginModal({
       const r = await googleSignInAction(idToken);
       if (r.ok && r.user) {
         onSuccess?.(r.user);
-        onClose();
       } else if (!r.ok) {
         setError(r.error);
       }
@@ -196,7 +200,7 @@ export default function LoginModal({
   }
 
   return (
-    <Dialog.Root open={open} onOpenChange={(o) => !o && onClose()}>
+    <Dialog.Root open={open} onOpenChange={(o) => !o && !finalizing && onClose()}>
       <Dialog.Portal>
         <Dialog.Overlay className="v1lm-overlay" />
         <Dialog.Content
@@ -207,25 +211,37 @@ export default function LoginModal({
           // looks like a "page jumps up" glitch.
           onOpenAutoFocus={(e) => e.preventDefault()}
           onInteractOutside={(e) => {
-            // Allow click-outside to close, but not while pending.
-            if (pending) e.preventDefault();
+            // Allow click-outside to close, but not while pending or finalizing.
+            if (pending || finalizing) e.preventDefault();
+          }}
+          onEscapeKeyDown={(e) => {
+            if (finalizing) e.preventDefault();
           }}
         >
           <Dialog.Title className="sr-only">Sign in to Endorfin</Dialog.Title>
 
-          <button
-            type="button"
-            className="v1lm-close"
-            aria-label="Close"
-            onClick={() => onClose()}
-            disabled={pending}
-          >
-            <CloseIcon />
-          </button>
+          {!finalizing && (
+            <button
+              type="button"
+              className="v1lm-close"
+              aria-label="Close"
+              onClick={() => onClose()}
+              disabled={pending}
+            >
+              <CloseIcon />
+            </button>
+          )}
 
-          {context && <div className="v1lm-context">{context}</div>}
+          {finalizing ? (
+            <div className="v1lm-finalizing" role="status" aria-live="polite">
+              <div className="v1lm-spinner" aria-hidden="true" />
+              <p className="v1lm-finalizing-msg">Signing you in&hellip;</p>
+            </div>
+          ) : (
+            <>
+              {context && <div className="v1lm-context">{context}</div>}
 
-          <div className="v1lm-body">
+              <div className="v1lm-body">
             {screen === 'signin' && (
               <SignInScreen
                 email={email}
@@ -314,7 +330,9 @@ export default function LoginModal({
                 pending={pending}
               />
             )}
-          </div>
+              </div>
+            </>
+          )}
         </Dialog.Content>
       </Dialog.Portal>
     </Dialog.Root>

@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, useTransition } from 'react';
 import { APP_STORE_URL, PLAY_STORE_URL } from '@/lib/store-links';
 import { useStoreLink } from '@/lib/use-store-link';
 import { TOP_CITIES, locationMatchesCity } from '@/lib/cities';
@@ -345,6 +345,8 @@ export default function RacesView({ races: initialRaces }: { races: ApiEvent[] }
   const [allRaces, setAllRaces] = useState<ApiEvent[]>(initialRaces);
   const [currentCity, setCurrentCity] = useState<string>('');
   const [couponLoginRace, setCouponLoginRace] = useState<ApiEvent | null>(null);
+  const [isFinalizingLogin, startLoginRefresh] = useTransition();
+  const postLoginRef = useRef(false);
   // Mobile: send "Get the app" CTAs straight to the right store.
   // Desktop / unknown UA: keep #download anchor → both store buttons inline.
   const downloadHref = useStoreLink('#download');
@@ -354,10 +356,23 @@ export default function RacesView({ races: initialRaces }: { races: ApiEvent[] }
   }, []);
 
   const handleLoginSuccess = useCallback(() => {
-    setCouponLoginRace(null);
+    postLoginRef.current = true;
     // Re-render with cookie attached so server fetch returns coupon codes.
-    router.refresh();
+    // Wrapped in startTransition so the pending flag stays true until the
+    // new server data has rendered — that lets the modal show a loader
+    // until the listing actually reflects the signed-in state.
+    startLoginRefresh(() => {
+      router.refresh();
+    });
   }, [router]);
+
+  // Close the login modal once the post-login refresh commits.
+  useEffect(() => {
+    if (!isFinalizingLogin && postLoginRef.current) {
+      postLoginRef.current = false;
+      setCouponLoginRace(null);
+    }
+  }, [isFinalizingLogin]);
 
   // Sync state when the server re-renders with new props (e.g. after
   // router.refresh() following sign-in or sign-out — the cookie state
@@ -801,9 +816,10 @@ export default function RacesView({ races: initialRaces }: { races: ApiEvent[] }
           On success we router.refresh() so the cookie-based fetch returns
           coupon codes and CTAs flip to the green "Coupon unlocked" variant. */}
       <LoginModal
-        open={!!couponLoginRace}
+        open={!!couponLoginRace || isFinalizingLogin}
         onClose={() => setCouponLoginRace(null)}
         onSuccess={handleLoginSuccess}
+        finalizing={isFinalizingLogin}
         context={couponLoginRace ? <RaceCouponContext race={couponLoginRace} /> : undefined}
         title={
           <>

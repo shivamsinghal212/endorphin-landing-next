@@ -35,6 +35,10 @@ const HeaderClient = ({ isAuthed }: { isAuthed: boolean }) => {
   const [open, setOpen] = useState(false);
   const [loginOpen, setLoginOpen] = useState(false);
   const [isLoggingOut, startTransition] = useTransition();
+  // Tracks the post-login server refresh so the modal can show a loader
+  // until the new render (with auth state) actually commits.
+  const [isFinalizingLogin, startLoginRefresh] = useTransition();
+  const postLoginRef = useRef(false);
   const pathname = usePathname();
   const router = useRouter();
   // On mobile, send the visitor straight to App Store / Play Store. On
@@ -68,9 +72,21 @@ const HeaderClient = ({ isAuthed }: { isAuthed: boolean }) => {
   };
 
   const handleLoginSuccess = () => {
-    setLoginOpen(false);
-    router.refresh();
+    postLoginRef.current = true;
+    startLoginRefresh(() => {
+      router.refresh();
+    });
   };
+
+  // Close the modal once the server re-render commits (transition flips
+  // back to idle). The post-login ref guards against closing the modal on
+  // unrelated transitions.
+  useEffect(() => {
+    if (!isFinalizingLogin && postLoginRef.current) {
+      postLoginRef.current = false;
+      setLoginOpen(false);
+    }
+  }, [isFinalizingLogin]);
 
   const handleLogout = () => {
     setOpen(false);
@@ -150,6 +166,7 @@ const HeaderClient = ({ isAuthed }: { isAuthed: boolean }) => {
         open={loginOpen}
         onClose={() => setLoginOpen(false)}
         onSuccess={handleLoginSuccess}
+        finalizing={isFinalizingLogin}
       />
     </nav>
   );

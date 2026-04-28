@@ -4909,6 +4909,30 @@ body { padding-top: var(--nav-h, 68px); }
 .v1lm-context { background: #EDE7E0; border-bottom: 1px solid rgba(10, 10, 10, 0.12); }
 .v1lm-context .v1rcc-strip { padding-right: 50px; }
 
+.v1lm-finalizing {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 18px;
+  padding: 64px 28px;
+  min-height: 240px;
+}
+.v1lm-spinner {
+  width: 40px; height: 40px;
+  border: 3px solid rgba(10, 10, 10, 0.12);
+  border-top-color: #E6232A;
+  border-radius: 50%;
+  animation: v1lm-spin 0.9s linear infinite;
+}
+.v1lm-finalizing-msg {
+  font-family: 'Oswald', sans-serif;
+  font-size: 13px; letter-spacing: 0.18em;
+  text-transform: uppercase; color: #0A0A0A;
+  margin: 0;
+}
+@keyframes v1lm-spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) {
+  .v1lm-spinner { animation-duration: 2.4s; }
+}
+
 .v1lm-body { padding: 28px 28px 22px; }
 
 .v1lm-h2 {
