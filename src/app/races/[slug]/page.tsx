@@ -132,7 +132,12 @@ export default async function RaceDetailPage({ params }: PageProps) {
 
   return (
     <main id="main-content" className="overflow-x-hidden">
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c'),
+        }}
+      />
       <Header />
       <RaceDetailView event={event} />
       <Footer />

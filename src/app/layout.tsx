@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Script from 'next/script';
 import { Oswald, Poppins, Fraunces } from 'next/font/google';
 import './globals.css';
 
@@ -123,19 +124,46 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           crossOrigin=""
         />
         <meta property="og:logo" content="https://www.endorfin.run/logo.png" />
-        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(appJsonLd) }} />
-        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(orgJsonLd) }} />
-        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }} />
-        {/* Google Analytics */}
-        <script async src="https://www.googletagmanager.com/gtag/js?id=G-P6TL1FG85X" />
-        <script dangerouslySetInnerHTML={{ __html: `
-          window.dataLayer = window.dataLayer || [];
-          function gtag(){dataLayer.push(arguments);}
-          gtag('js', new Date());
-          gtag('config', 'G-P6TL1FG85X');
-        `}} />
+        {/* JSON-LD: native <script type="application/ld+json"> per Next 16 docs.
+            type="application/ld+json" is non-executable so React doesn't try to
+            run it (no "script tag in component" warning). next/script is for
+            executable JS only. The \\u003c escape sanitizes any embedded `<`
+            against XSS. */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(appJsonLd).replace(/</g, '\\u003c'),
+          }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(orgJsonLd).replace(/</g, '\\u003c'),
+          }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(websiteJsonLd).replace(/</g, '\\u003c'),
+          }}
+        />
       </head>
-      <body className="antialiased">
+      {/* suppressHydrationWarning silences false positives from browser
+          extensions (ColorZilla cz-shortcut-listen, Grammarly data-* attrs)
+          that mutate <body> before React hydrates. Scoped to this element
+          only; child mismatches still warn normally. */}
+      <body className="antialiased" suppressHydrationWarning>
+        {/* Google Analytics — executable JS, so next/script is correct here.
+            afterInteractive defers loading until after page hydration. */}
+        <Script src="https://www.googletagmanager.com/gtag/js?id=G-P6TL1FG85X" strategy="afterInteractive" />
+        <Script id="ga-init" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-P6TL1FG85X');
+          `}
+        </Script>
         {children}
       </body>
     </html>
