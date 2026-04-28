@@ -5,6 +5,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useRef, useState, useTransition } from 'react';
 import LoginModal from '@/components/LoginModal';
 import { logoutAction } from '@/app/actions/auth';
+import { useStoreLink } from '@/lib/use-store-link';
 
 const NAV_LINKS = [
   { label: 'Races', href: '/races', soon: false },
@@ -36,6 +37,9 @@ const HeaderClient = ({ isAuthed }: { isAuthed: boolean }) => {
   const [isLoggingOut, startTransition] = useTransition();
   const pathname = usePathname();
   const router = useRouter();
+  // On mobile, send the visitor straight to App Store / Play Store. On
+  // desktop, fall back to /#download (the homepage section with both buttons).
+  const downloadHref = useStoreLink('/#download');
 
   // Measure real nav height → --nav-h so body padding matches
   useEffect(() => {
@@ -119,13 +123,15 @@ const HeaderClient = ({ isAuthed }: { isAuthed: boolean }) => {
           })}
           <li className="v1-nav-auth-mobile-li">{authButton}</li>
           <li>
-            <a href="/#download" className="v1-nav-cta" onClick={closeMenu}>Download</a>
+            <a href={downloadHref} className="v1-nav-cta" onClick={closeMenu}>
+              Download
+            </a>
           </li>
         </ul>
 
         <div className="v1-nav-actions-desktop">
           {authButton}
-          <a href="/#download" className="v1-nav-cta">Download</a>
+          <a href={downloadHref} className="v1-nav-cta">Download</a>
         </div>
 
         <button
