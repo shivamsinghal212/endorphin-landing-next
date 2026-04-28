@@ -39,6 +39,7 @@ export interface ApiEvent {
   soldOut?: boolean;
   goingCount?: number;
   isFeatured?: boolean;
+  registrationUrl?: string | null;
   distanceCategories?: Array<{ categoryName?: string }>;
   couponCode?: string | null;
   couponDiscountPercent?: number | null;

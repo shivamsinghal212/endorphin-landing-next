@@ -1,13 +1,10 @@
 'use client';
 
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { APP_STORE_URL, PLAY_STORE_URL } from '@/lib/store-links';
 import { TOP_CITIES, locationMatchesCity } from '@/lib/cities';
 import CouponTopStrip from '@/components/CouponTopStrip';
-import LoginModal from '@/components/LoginModal';
-import RaceCouponContext from '@/components/RaceCouponContext';
 import type { ApiEvent } from './page';
 
 const SMALL_WORDS = new Set(['a', 'an', 'and', 'the', 'of', 'for', 'in', 'on', 'to', 'by', 'at', 'with']);
@@ -108,7 +105,7 @@ function storySnippet(r: ApiEvent) {
 
 // ─── Cards ───────────────────────────────────
 
-function RaceCard({ r, onCouponClick }: { r: ApiEvent; onCouponClick: (r: ApiEvent) => void }) {
+function RaceCard({ r }: { r: ApiEvent }) {
   const title = normalizeTitle(r.title);
   const dist = primaryDistance(r);
   const sig = popularitySignal(r);
@@ -116,13 +113,7 @@ function RaceCard({ r, onCouponClick }: { r: ApiEvent; onCouponClick: (r: ApiEve
   const priceStr = r.priceMin != null ? `₹${r.priceMin.toLocaleString('en-IN')}` : null;
   const detailHref = `/races/${r.slug || r.id}`;
   const showCoupon = !!r.hasCoupon && r.couponDiscountPercent != null;
-  const couponUnlocked = !!r.couponCode;
-
-  function handleCoupon(e: React.MouseEvent) {
-    e.preventDefault();
-    e.stopPropagation();
-    onCouponClick(r);
-  }
+  const showActions = !!r.registrationUrl || showCoupon;
 
   return (
     <div className="v1r-race-card">
@@ -188,27 +179,32 @@ function RaceCard({ r, onCouponClick }: { r: ApiEvent; onCouponClick: (r: ApiEve
           </div>
         </div>
       </Link>
-      {showCoupon && (
+      {showActions && (
         <div className="v1r-race-actions">
           <Link href={detailHref} className="v1r-race-action v1r-race-action-ghost">
             Show details
           </Link>
-          <button
-            type="button"
-            onClick={handleCoupon}
-            className={`v1r-race-action v1r-race-action-primary ${couponUnlocked ? 'is-success' : ''}`}
-          >
-            {couponUnlocked
-              ? `Copy ${r.couponCode}`
-              : `Get ${r.couponDiscountPercent}% off`}
-          </button>
+          {r.registrationUrl ? (
+            <a
+              href={r.registrationUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="v1r-race-action v1r-race-action-primary"
+            >
+              Register ↗
+            </a>
+          ) : (
+            <span className="v1r-race-action v1r-race-action-primary v1r-race-action-disabled">
+              Registration TBD
+            </span>
+          )}
         </div>
       )}
     </div>
   );
 }
 
-function FlagshipCard({ r, onCouponClick }: { r: ApiEvent; onCouponClick: (r: ApiEvent) => void }) {
+function FlagshipCard({ r }: { r: ApiEvent }) {
   const dateStr = new Date(r.startTime).toLocaleString('en-GB', { day: 'numeric', month: 'long' });
   const dist = primaryDistance(r) || 'Run';
   const title = normalizeTitle(r.title);
@@ -224,12 +220,6 @@ function FlagshipCard({ r, onCouponClick }: { r: ApiEvent; onCouponClick: (r: Ap
   const story = storySnippet(r);
   const detailHref = `/races/${r.slug || r.id}`;
   const showCoupon = !!r.hasCoupon && r.couponDiscountPercent != null;
-  const couponUnlocked = !!r.couponCode;
-
-  function handleCoupon(e: React.MouseEvent) {
-    e.preventDefault();
-    onCouponClick(r);
-  }
 
   return (
     <div className="v1r-featured-wrap">
@@ -279,14 +269,15 @@ function FlagshipCard({ r, onCouponClick }: { r: ApiEvent; onCouponClick: (r: Ap
             <p className="v1r-featured-story">{story}</p>
           </div>
           <div className="v1r-featured-ctas">
-            {showCoupon && (
-              <button
-                type="button"
-                onClick={handleCoupon}
-                className={`v1r-btn v1r-btn-primary ${couponUnlocked ? 'is-success' : ''}`}
+            {r.registrationUrl && (
+              <a
+                href={r.registrationUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="v1r-btn v1r-btn-primary"
               >
-                {couponUnlocked ? `Copy ${r.couponCode}` : `Get ${r.couponDiscountPercent}% off`}
-              </button>
+                Register ↗
+              </a>
             )}
             <Link href={detailHref} className="v1r-btn v1r-btn-ghost-light">
               Show details →
@@ -301,26 +292,17 @@ function FlagshipCard({ r, onCouponClick }: { r: ApiEvent; onCouponClick: (r: Ap
 // ─── Main view ─────────────────────────────
 
 export default function RacesView({ races: initialRaces }: { races: ApiEvent[] }) {
-  const router = useRouter();
   const [allRaces, setAllRaces] = useState<ApiEvent[]>(initialRaces);
   const [currentCity, setCurrentCity] = useState<string>('');
-  const [couponLoginRace, setCouponLoginRace] = useState<ApiEvent | null>(null);
 
-  const handleCouponClick = useCallback((r: ApiEvent) => {
-    // Authed: code is already populated server-side → copy directly.
-    if (r.couponCode) {
-      navigator.clipboard?.writeText(r.couponCode).catch(() => {});
-      return;
-    }
-    // Anon: open the contextual login modal.
-    setCouponLoginRace(r);
-  }, []);
-
-  const handleLoginSuccess = useCallback(() => {
-    setCouponLoginRace(null);
-    // Re-render the page with the cookie attached → server fetch returns coupon codes.
-    router.refresh();
-  }, [router]);
+  // Sync state when the server re-renders with new props (e.g. after
+  // router.refresh() following sign-in or sign-out — the cookie state
+  // changes server-side and initialRaces comes back with/without coupon
+  // codes populated). Without this, useState(initialRaces) seeds once
+  // and ignores subsequent prop changes, leaving the listing stale.
+  useEffect(() => {
+    setAllRaces(initialRaces);
+  }, [initialRaces]);
 
   // Fallback: only fetch client-side when server-side fetch returned empty
   // (e.g. transient DNS during build). Authed users get coupon codes from the
@@ -609,7 +591,7 @@ export default function RacesView({ races: initialRaces }: { races: ApiEvent[] }
                 aria-label="Flagship races"
               >
                 {flagships.map((r) => (
-                  <FlagshipCard key={r.id} r={r} onCouponClick={handleCouponClick} />
+                  <FlagshipCard key={r.id} r={r} />
                 ))}
               </div>
             </div>
@@ -683,7 +665,7 @@ export default function RacesView({ races: initialRaces }: { races: ApiEvent[] }
                   No upcoming races{currentCity ? ` in ${currentCity}` : ''}. Try another city.
                 </div>
               ) : (
-                grid.map((r) => <RaceCard key={r.id} r={r} onCouponClick={handleCouponClick} />)
+                grid.map((r) => <RaceCard key={r.id} r={r} />)
               )}
             </div>
           </div>
@@ -750,19 +732,6 @@ export default function RacesView({ races: initialRaces }: { races: ApiEvent[] }
           </div>
         </div>
       </section>
-
-      <LoginModal
-        open={!!couponLoginRace}
-        onClose={() => setCouponLoginRace(null)}
-        onSuccess={handleLoginSuccess}
-        context={couponLoginRace ? <RaceCouponContext race={couponLoginRace} /> : undefined}
-        title={
-          <>
-            One tap to your <span className="v1lm-red">code.</span>
-          </>
-        }
-        subtitle="Sign in to reveal coupon codes, save races, and sync with the Endorfin app."
-      />
     </>
   );
 }

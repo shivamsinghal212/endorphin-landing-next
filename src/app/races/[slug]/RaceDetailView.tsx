@@ -1,13 +1,10 @@
 'use client';
 
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import ReactMarkdown from 'react-markdown';
 import CouponTopStrip from '@/components/CouponTopStrip';
-import LoginModal from '@/components/LoginModal';
-import RaceCouponContext from '@/components/RaceCouponContext';
 import type { Event, DistanceCategory } from '@/lib/api';
 
 function fmtFullDate(iso: string) {
@@ -38,12 +35,9 @@ function hasAnyPrice(cats: DistanceCategory[]): boolean {
 }
 
 export default function RaceDetailView({ event }: { event: Event }) {
-  const router = useRouter();
-  const [loginOpen, setLoginOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
   const showCoupon = event.hasCoupon && event.couponDiscountPercent != null;
-  const couponUnlocked = !!event.couponCode;
   const dateStr = fmtFullDate(event.startTime);
   const timeStr = fmtTime(event.startTime);
   const priceStr = fmtPrice(event.priceMin, event.currency) || 'Free';
@@ -53,19 +47,6 @@ export default function RaceDetailView({ event }: { event: Event }) {
       ? `https://maps.google.com/?q=${event.latitude},${event.longitude}`
       : null;
 
-  const handleCoupon = useCallback(() => {
-    if (event.couponCode) {
-      navigator.clipboard?.writeText(event.couponCode).catch(() => {});
-      return;
-    }
-    setLoginOpen(true);
-  }, [event.couponCode]);
-
-  const handleLoginSuccess = useCallback(() => {
-    setLoginOpen(false);
-    router.refresh();
-  }, [router]);
-
   return (
     <div className="v1rd-page">
       {showCoupon && (
@@ -74,6 +55,7 @@ export default function RaceDetailView({ event }: { event: Event }) {
           couponDiscountPercent={event.couponDiscountPercent ?? null}
           hasCoupon={true}
           size="md"
+          className="v1rd-top-strip"
         />
       )}
 
@@ -166,15 +148,6 @@ export default function RaceDetailView({ event }: { event: Event }) {
               </a>
             ) : (
               <span className="v1rd-btn v1rd-btn-primary v1rd-disabled">Registration TBD</span>
-            )}
-            {showCoupon && (
-              <button
-                type="button"
-                onClick={handleCoupon}
-                className={`v1rd-btn ${couponUnlocked ? 'v1rd-btn-success' : 'v1rd-btn-jet'}`}
-              >
-                {couponUnlocked ? `Copy ${event.couponCode}` : `Get ${event.couponDiscountPercent}% off`}
-              </button>
             )}
             {event.registrationEndDate && (
               <span className="v1rd-cta-meta">
@@ -370,69 +343,60 @@ export default function RaceDetailView({ event }: { event: Event }) {
                 Register ↗
               </a>
             )}
-            {showCoupon && (
-              <button
-                type="button"
-                onClick={handleCoupon}
-                className={`v1rd-btn ${couponUnlocked ? 'v1rd-btn-success' : 'v1rd-btn-jet'}`}
-              >
-                {couponUnlocked ? `Copy ${event.couponCode}` : `Get ${event.couponDiscountPercent}% off`}
-              </button>
-            )}
           </div>
         </div>
       </section>
 
-      {/* Mobile sticky register bar — portaled to <body> so no ancestor
-          containing block (transform/filter/overflow) can trap position:fixed */}
+      {/* Mobile bottom stack — portaled to <body> so no ancestor containing
+          block (transform/filter/overflow) can trap position:fixed.
+          Order: coupon strip on top of register bar (visually). */}
       {mounted &&
         createPortal(
-          <div className="v1rd-sticky-bar">
-            <div className="v1rd-sticky-info">
-              <div className="v1rd-sticky-price">
-                {priceStr}
-                <small> onwards</small>
-              </div>
-              {event.registrationEndDate ? (
-                <div className="v1rd-sticky-deadline">
-                  Closes{' '}
-                  {new Date(event.registrationEndDate).toLocaleString('en-GB', {
-                    day: 'numeric',
-                    month: 'short',
-                  })}
-                </div>
-              ) : event.locationName ? (
-                <div className="v1rd-sticky-deadline">{event.locationName}</div>
-              ) : null}
-            </div>
-            {event.registrationUrl ? (
-              <a
-                className="v1rd-sticky-cta"
-                href={event.registrationUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Register ↗
-              </a>
-            ) : (
-              <span className="v1rd-sticky-cta v1rd-sticky-cta-disabled">Registration TBD</span>
+          <>
+            {showCoupon && (
+              <CouponTopStrip
+                couponCode={event.couponCode ?? null}
+                couponDiscountPercent={event.couponDiscountPercent ?? null}
+                hasCoupon={true}
+                size="md"
+                className="v1rd-sticky-coupon"
+              />
             )}
-          </div>,
+            <div className="v1rd-sticky-bar">
+              <div className="v1rd-sticky-info">
+                <div className="v1rd-sticky-price">
+                  {priceStr}
+                  <small> onwards</small>
+                </div>
+                {event.registrationEndDate ? (
+                  <div className="v1rd-sticky-deadline">
+                    Closes{' '}
+                    {new Date(event.registrationEndDate).toLocaleString('en-GB', {
+                      day: 'numeric',
+                      month: 'short',
+                    })}
+                  </div>
+                ) : event.locationName ? (
+                  <div className="v1rd-sticky-deadline">{event.locationName}</div>
+                ) : null}
+              </div>
+              {event.registrationUrl ? (
+                <a
+                  className="v1rd-sticky-cta"
+                  href={event.registrationUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Register ↗
+                </a>
+              ) : (
+                <span className="v1rd-sticky-cta v1rd-sticky-cta-disabled">Registration TBD</span>
+              )}
+            </div>
+          </>,
           document.body,
         )}
 
-      <LoginModal
-        open={loginOpen}
-        onClose={() => setLoginOpen(false)}
-        onSuccess={handleLoginSuccess}
-        context={<RaceCouponContext race={event} />}
-        title={
-          <>
-            One tap to your <span className="v1lm-red">code.</span>
-          </>
-        }
-        subtitle="Sign in to reveal coupon codes, save races, and sync with the Endorfin app."
-      />
     </div>
   );
 }

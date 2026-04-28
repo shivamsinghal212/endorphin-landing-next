@@ -4727,14 +4727,32 @@ body { padding-top: var(--nav-h, 68px); }
 
 @media (max-width: 640px) {
   .v1r-coupon-strip {
-    grid-template-columns: auto 1fr;
-    gap: 10px;
+    grid-template-columns: auto 1fr auto;
+    gap: 8px;
     padding: 8px 12px;
     font-size: 10px;
-    letter-spacing: 0.12em;
+    letter-spacing: 0.08em;
   }
-  .v1r-coupon-strip .v1r-coupon-label { justify-self: start; }
-  .v1r-coupon-strip .v1r-coupon-copy { grid-column: 1 / -1; justify-self: stretch; justify-content: center; padding: 6px 11px; }
+  .v1r-coupon-strip .v1r-coupon-pct {
+    font-size: 11px;
+    padding: 2px 7px;
+  }
+  .v1r-coupon-strip .v1r-coupon-label {
+    gap: 6px;
+    letter-spacing: 0.06em;
+  }
+  .v1r-coupon-strip .v1r-coupon-code-chip {
+    font-size: 11px;
+    padding: 1px 5px;
+  }
+  .v1r-coupon-strip .v1r-coupon-copy {
+    padding: 5px 7px;
+    gap: 0;
+  }
+  /* Hide the "Copy"/"Copied" text on mobile — keep just the icon to
+     prevent the button from wrapping onto a second row. aria-label on
+     the button still reads "Copy code <CODE>" for screen readers. */
+  .v1r-coupon-strip .v1r-coupon-copy span { display: none; }
 }
 
 /* ─── Race card dual-CTA bar + clickable wrapper ─── */
