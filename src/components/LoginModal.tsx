@@ -202,9 +202,13 @@ export default function LoginModal({
   return (
     <Dialog.Root open={open} onOpenChange={(o) => !o && !finalizing && onClose()}>
       <Dialog.Portal>
-        <Dialog.Overlay className="v1lm-overlay" />
+        <Dialog.Overlay
+          className="v1lm-overlay"
+          data-finalizing={finalizing ? '' : undefined}
+        />
         <Dialog.Content
           className="v1lm-modal"
+          data-finalizing={finalizing ? '' : undefined}
           aria-describedby={undefined}
           // Prevent auto-focusing the first input on open. Default behavior
           // scrolls the page to bring the focused input into view, which
