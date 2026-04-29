@@ -136,8 +136,8 @@ export const EventScreen = () => (
     }}>
       <div style={{ position: "absolute", inset: 0, background: `linear-gradient(to top, ${bone} 0%, transparent 50%)` }} />
       <div style={{ position: "absolute", top: 44, left: 14, right: 14, display: "flex", justifyContent: "space-between", zIndex: 3 }}>
-        <div style={{ width: 30, height: 30, background: "rgba(255,255,255,0.85)", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, color: jet }}>&#8249;</div>
-        <div style={{ width: 30, height: 30, background: "rgba(255,255,255,0.85)", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, color: jet }}>&#9829;</div>
+        <div style={{ width: 30, height: 30, background: "rgba(255,255,255,0.85)", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, color: jet }}>&#8249;&#xFE0E;</div>
+        <div style={{ width: 30, height: 30, background: "rgba(255,255,255,0.85)", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, color: jet }}>&#9829;&#xFE0E;</div>
       </div>
     </div>
     <div style={{ padding: "0 18px 60px" }}>
@@ -150,14 +150,14 @@ export const EventScreen = () => (
       <div style={{ fontSize: 10, color: dim, marginBottom: 14 }}>by <strong style={{ color: jet }}>Procam International</strong></div>
       <div style={{ display: "flex", gap: 8, marginBottom: 18 }}>
         <div style={{ flex: 1, fontFamily: "'Clash Display', sans-serif", fontWeight: 600, fontSize: 12, textTransform: "uppercase", padding: 10, background: jet, color: "white", borderRadius: 10, textAlign: "center" }}>&#10003; I'm Going</div>
-        <div style={{ width: 40, height: 40, border: `1px solid ${divider}`, borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14 }}>&#8599;</div>
+        <div style={{ width: 40, height: 40, border: `1px solid ${divider}`, borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14 }}>&#8599;&#xFE0E;</div>
       </div>
       {/* Info rows */}
       <div style={{ background: card, borderRadius: 10, marginBottom: 14 }}>
         {[
-          { icon: "&#9716;", label: "Date & Time", value: "Sun, Jan 19 · 5:30 AM" },
-          { icon: "&#9906;", label: "Location", value: "CST, Mumbai" },
-          { icon: "&#8987;", label: "Reg. Ends", value: "Jan 10, 2026" },
+          { icon: "&#9716;&#xFE0E;", label: "Date & Time", value: "Sun, Jan 19 · 5:30 AM" },
+          { icon: "&#9906;&#xFE0E;", label: "Location", value: "CST, Mumbai" },
+          { icon: "&#8987;&#xFE0E;", label: "Reg. Ends", value: "Jan 10, 2026" },
         ].map((r, i) => (
           <div key={r.label} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", borderTop: i > 0 ? `1px solid ${divider}` : "none" }}>
             <div style={{ width: 28, height: 28, borderRadius: 7, background: tagBg, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, color: signal }} dangerouslySetInnerHTML={{ __html: r.icon }} />
