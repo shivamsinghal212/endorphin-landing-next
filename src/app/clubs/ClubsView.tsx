@@ -684,7 +684,7 @@ export default function ClubsView({ clubs: initialClubs }: { clubs: ApiClub[] })
           <div className="v1c-container">
             <div className="v1c-section-header">
               <h2 className="v1c-section-title">
-                The flagship club in <b>{scope}</b>.
+                Featured Clubs in <b>{scope}</b>
               </h2>
               <div className="v1c-flagship-header-right">
                 <span className="v1c-section-count">
