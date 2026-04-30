@@ -27,7 +27,7 @@ const MOCK_ELITES: Elite[] = [
     creds:
       '2:43 marathon PB. Former national 10K representative (2014). Podium at TCS Mumbai 2022 & 2023. 3× Delhi Half podium finisher.',
     rateLine: '1-on-1 · in-person',
-    portraitUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=900&q=80',
+    portraitUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=900&q=80&auto=format&fit=crop',
     imgAlt: 'Portrait of Arjun Bhatia',
   },
   {
@@ -40,7 +40,7 @@ const MOCK_ELITES: Elite[] = [
     creds:
       '3:17 marathon PB. Two-time Bengaluru Marathon podium. Satara Hill Half finisher 2023. Specialises in post-injury comeback and threshold work.',
     rateLine: 'Hybrid · monthly plans',
-    portraitUrl: 'https://images.unsplash.com/photo-1594381898411-846e7d193883?w=900&q=80',
+    portraitUrl: 'https://images.unsplash.com/photo-1594381898411-846e7d193883?w=900&q=80&auto=format&fit=crop',
     imgAlt: 'Portrait of Meera Krishnan',
   },
   {
@@ -53,7 +53,7 @@ const MOCK_ELITES: Elite[] = [
     creds:
       'UTMB CCC finisher. Himalayan Crossing 100K (3rd OA 2023). La Ultra 222K finisher. Active Sahyadri trail competitor. Still racing.',
     rateLine: 'Video · full-programme',
-    portraitUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=900&q=80',
+    portraitUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=900&q=80&auto=format&fit=crop',
     imgAlt: 'Portrait of Karan Shetty',
   },
 ];

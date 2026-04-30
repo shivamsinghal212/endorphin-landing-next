@@ -329,7 +329,7 @@ body.nav-open { overflow: hidden; }
   content: '';
   position: absolute;
   inset: -30px;
-  background-image: url('/images/hero-race.jpg');
+  background-image: image-set(url('/images/hero-race.avif') type('image/avif'), url('/images/hero-race.webp') type('image/webp'));
   background-size: cover;
   background-position: center 30%;
   filter: grayscale(1) contrast(1.15) brightness(0.42) blur(3px);
@@ -854,7 +854,7 @@ body { padding-top: var(--nav-h, 68px); }
 }
 .v1-races-page .v1r-hero-bg::before {
   content: ''; position: absolute; inset: -30px;
-  background-image: url('/images/hero-monuments.png');
+  background-image: image-set(url('/images/hero-monuments.avif') type('image/avif'), url('/images/hero-monuments.webp') type('image/webp'));
   background-size: cover; background-position: center center;
   filter: grayscale(1) contrast(1.08) brightness(0.42) blur(3px);
   transform: scale(1.06);
@@ -1570,7 +1570,7 @@ body { padding-top: var(--nav-h, 68px); }
 }
 .v1-clubs-page .v1c-hero-bg::before {
   content: ''; position: absolute; inset: -30px;
-  background-image: url('/images/hero-clubs.png');
+  background-image: image-set(url('/images/hero-clubs.avif') type('image/avif'), url('/images/hero-clubs.webp') type('image/webp'));
   background-size: cover; background-position: center center;
   filter: grayscale(1) contrast(1.08) brightness(0.42) blur(3px);
   transform: scale(1.06);
@@ -2490,7 +2490,7 @@ body { padding-top: var(--nav-h, 68px); }
 }
 .v1-workout-page .v1w-hero-bg::before {
   content: ''; position: absolute; inset: -30px;
-  background-image: url('https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=2000&q=80');
+  background-image: image-set(url('/images/ext/workout-hero-bg.avif') type('image/avif'), url('/images/ext/workout-hero-bg.webp') type('image/webp'));
   background-size: cover; background-position: center 38%;
   filter: grayscale(1) contrast(1.1) brightness(0.38) blur(2px);
   transform: scale(1.06);
@@ -3322,7 +3322,7 @@ body { padding-top: var(--nav-h, 68px); }
 }
 .v1-runners-page .v1ru-hero-bg::before {
   content: ''; position: absolute; inset: -30px;
-  background-image: url('https://images.unsplash.com/photo-1552674605-db6ffd4facb5?w=2000&q=80');
+  background-image: image-set(url('/images/ext/runners-hero-bg.avif') type('image/avif'), url('/images/ext/runners-hero-bg.webp') type('image/webp'));
   background-size: cover; background-position: center center;
   filter: grayscale(1) contrast(1.08) brightness(0.42) blur(3px);
   transform: scale(1.06);
@@ -4028,7 +4028,7 @@ body { padding-top: var(--nav-h, 68px); }
 }
 .v1-coaches-page .v1co-hero-bg::before {
   content: ''; position: absolute; inset: -30px;
-  background-image: url('https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=2000&q=80');
+  background-image: image-set(url('/images/ext/coaches-hero-bg.avif') type('image/avif'), url('/images/ext/coaches-hero-bg.webp') type('image/webp'));
   background-size: cover; background-position: center center;
   filter: grayscale(1) contrast(1.08) brightness(0.42) blur(3px);
   transform: scale(1.06);

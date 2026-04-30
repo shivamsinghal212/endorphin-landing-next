@@ -63,7 +63,7 @@ export const HomeScreen = () => (
     {/* Featured */}
     <div style={{
       margin: "0 18px 14px", borderRadius: 12, height: 180, position: "relative", overflow: "hidden",
-      background: `url('https://images.unsplash.com/photo-1513593771513-7b58b6c4af38?w=400&q=80&auto=format&fit=crop') center/cover`,
+      background: `image-set(url('/images/ext/phone-hero.avif') type('image/avif'), url('/images/ext/phone-hero.webp') type('image/webp')) center/cover`,
     }}>
       <div style={{ position: "absolute", inset: 0, borderRadius: 12, background: "linear-gradient(to top, rgba(10,10,10,0.9) 0%, rgba(10,10,10,0.15) 55%, transparent)" }} />
       <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, zIndex: 2, padding: 14 }}>
@@ -92,11 +92,11 @@ export const HomeScreen = () => (
     </div>
     <div style={{ display: "flex", gap: 10, padding: "0 18px 16px", overflowX: "auto" }}>
       {[
-        { t: "Bangalore 10K", m: "Feb 8", img: "https://images.unsplash.com/photo-1476480862126-209bfaa8edc8?w=200&q=80&auto=format&fit=crop", tag: "10K" },
-        { t: "Delhi Half", m: "Feb 9", img: "https://images.unsplash.com/photo-1530549387789-4c1017266635?w=200&q=80&auto=format&fit=crop", tag: "HM" },
+        { t: "Bangalore 10K", m: "Feb 8", img: "image-set(url('/images/ext/phone-thumb-bangalore.avif') type('image/avif'), url('/images/ext/phone-thumb-bangalore.webp') type('image/webp'))", tag: "10K" },
+        { t: "Delhi Half", m: "Feb 9", img: "image-set(url('/images/ext/phone-thumb-delhi.avif') type('image/avif'), url('/images/ext/phone-thumb-delhi.webp') type('image/webp'))", tag: "HM" },
       ].map(c => (
         <div key={c.t} style={{ flexShrink: 0, width: 120, borderRadius: 10, overflow: "hidden", background: card }}>
-          <div style={{ width: "100%", height: 72, background: `url('${c.img}') center/cover` }} />
+          <div style={{ width: "100%", height: 72, background: `${c.img} center/cover` }} />
           <div style={{ padding: 8 }}>
             <div style={{ fontFamily: "'Clash Display', sans-serif", fontWeight: 500, fontSize: 11, color: jet, textTransform: "uppercase" }}>{c.t}</div>
             <div style={{ fontSize: 9, color: dim, marginTop: 2 }}>{c.m}</div>
@@ -132,7 +132,7 @@ export const EventScreen = () => (
   <PhoneFrame label="Event">
     <div style={{
       height: 220, position: "relative", overflow: "hidden",
-      background: `url('/images/mumbai-marathon.png') center/cover`,
+      background: `image-set(url('/images/mumbai-marathon.avif') type('image/avif'), url('/images/mumbai-marathon.webp') type('image/webp')) center/cover`,
     }}>
       <div style={{ position: "absolute", inset: 0, background: `linear-gradient(to top, ${bone} 0%, transparent 50%)` }} />
       <div style={{ position: "absolute", top: 44, left: 14, right: 14, display: "flex", justifyContent: "space-between", zIndex: 3 }}>
