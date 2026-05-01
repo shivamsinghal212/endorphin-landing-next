@@ -4,6 +4,7 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { getClub, type Club, type ClubUpcomingRun, type ClubAdminPerson } from '@/lib/admin-api';
 import { ClubIcons } from './club-icons';
+import { JoinClubButton } from './join-club-button';
 import { LastRunReel } from './last-run-reel';
 import './club-page.css';
 
@@ -253,9 +254,7 @@ function Hero({ club }: { club: Club }) {
         <aside className="hero-right">
           {club.description && <p className="hero-description">{club.description}</p>}
           <div className="hero-cta-stack">
-            {club.joinUrl && (
-              <a className="btn btn-primary" href={club.joinUrl} target="_blank" rel="noopener noreferrer">Join club</a>
-            )}
+            <JoinClubButton />
             <div className="socials-pill" aria-label="Share and follow">
               <a className="icon-dot" href={`https://www.endorfin.run/clubs/${club.slug}`} aria-label="Share">
                 <svg aria-hidden="true"><use href="#i-share" /></svg>
