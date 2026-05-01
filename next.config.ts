@@ -16,6 +16,12 @@ const nextConfig: NextConfig = {
           '/races/7th_edition_gurugram_grand_half_marathon_2026_36780?utm_source=instagram&utm_medium=social&utm_campaign=gurugram_half_2026',
         permanent: false,
       },
+      {
+        source: '/mbe-ig',
+        destination:
+          '/clubs/mberunclub?utm_source=instagram&utm_medium=social&utm_campaign=mbe_run_club',
+        permanent: false,
+      },
     ];
   },
 };
