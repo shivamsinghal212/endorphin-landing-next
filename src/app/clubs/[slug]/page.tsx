@@ -3,9 +3,12 @@ import type { Metadata } from 'next';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { getClub, type Club, type ClubAdminPerson } from '@/lib/admin-api';
+import { clubsApi, type MyMembership } from '@/lib/api';
+import { getSessionToken } from '@/lib/session';
 import type { ClubEvent } from '../page';
 import { ClubIcons } from './club-icons';
 import { JoinClubButton } from './join-club-button';
+import { RsvpButton } from './rsvp-button';
 import { LastRunReel } from './last-run-reel';
 import './club-page.css';
 
@@ -168,13 +171,18 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function ClubPage({ params }: PageProps) {
   const { slug } = await params;
-  const [club, events] = await Promise.all([
+  const token = await getSessionToken();
+  const [club, events, myMembership] = await Promise.all([
     getClub(slug).catch(() => null),
     getClubEvents(slug),
+    token
+      ? clubsApi.getMyMembership(slug, token).catch(() => null)
+      : Promise.resolve(null as MyMembership | null),
   ]);
   if (!club || !club.publishedAt) notFound();
 
   const { nextEvent, upcomingEvents, lastEvent } = splitEvents(events);
+  const isAuthed = !!token;
 
   return (
     <main id="main-content" className="overflow-x-hidden">
@@ -182,11 +190,35 @@ export default async function ClubPage({ params }: PageProps) {
       <ClubJsonLd club={club} />
       <Header />
       <div className="club-page">
-        <Hero club={club} />
+        <Hero
+          club={club}
+          isAuthed={isAuthed}
+          myMembership={myMembership}
+        />
         <Ribbon />
         <Stats club={club} />
-        {nextEvent && <NextRun event={nextEvent} />}
-        {upcomingEvents.length > 0 && <Upcoming events={upcomingEvents} />}
+        {nextEvent && (
+          <NextRun
+            event={nextEvent}
+            slug={club.slug}
+            clubName={club.name}
+            joinForm={club.joinForm}
+            requiresApproval={club.requiresApproval}
+            isAuthed={isAuthed}
+            myMembership={myMembership}
+          />
+        )}
+        {upcomingEvents.length > 0 && (
+          <Upcoming
+            events={upcomingEvents}
+            slug={club.slug}
+            clubName={club.name}
+            joinForm={club.joinForm}
+            requiresApproval={club.requiresApproval}
+            isAuthed={isAuthed}
+            myMembership={myMembership}
+          />
+        )}
         {lastEvent && <LastRun event={lastEvent} />}
         {club.admins.length > 0 && <LedBy admins={club.admins} />}
         <CtaFooter club={club} />
@@ -272,7 +304,15 @@ function HeroName({ name, isVerified }: { name: string; isVerified: boolean }) {
   );
 }
 
-function Hero({ club }: { club: Club }) {
+function Hero({
+  club,
+  isAuthed,
+  myMembership,
+}: {
+  club: Club;
+  isAuthed: boolean;
+  myMembership: MyMembership | null;
+}) {
   return (
     <section className="hero">
       <div className="hero-grid">
@@ -299,7 +339,14 @@ function Hero({ club }: { club: Club }) {
         <aside className="hero-right">
           {club.description && <p className="hero-description">{club.description}</p>}
           <div className="hero-cta-stack">
-            <JoinClubButton />
+            <JoinClubButton
+              slug={club.slug}
+              clubName={club.name}
+              joinForm={club.joinForm}
+              requiresApproval={club.requiresApproval}
+              isAuthed={isAuthed}
+              myMembership={myMembership}
+            />
             <div className="socials-pill" aria-label="Share and follow">
               <a className="icon-dot" href={`https://www.endorfin.run/clubs/${club.slug}`} aria-label="Share">
                 <svg aria-hidden="true"><use href="#i-share" /></svg>
@@ -369,13 +416,30 @@ function Stats({ club }: { club: Club }) {
   );
 }
 
-function NextRun({ event }: { event: ClubEvent }) {
+function NextRun({
+  event,
+  slug,
+  clubName,
+  joinForm,
+  requiresApproval,
+  isAuthed,
+  myMembership,
+}: {
+  event: ClubEvent;
+  slug: string;
+  clubName: string;
+  joinForm: Club['joinForm'];
+  requiresApproval: boolean;
+  isAuthed: boolean;
+  myMembership: MyMembership | null;
+}) {
   const bgStyle = event.coverImageUrl
     ? ({ ['--bg-image' as string]: `url('${event.coverImageUrl}')` } as React.CSSProperties)
     : undefined;
   const hasImage = !!event.coverImageUrl;
   const location = event.locationName;
   const time = fmtTime12hFromIso(event.startTime);
+  const isRace = event.eventType === 'race_event';
 
   return (
     <section className={`next-run on-jet ${hasImage ? 'has-image' : ''}`} style={bgStyle}>
@@ -399,15 +463,41 @@ function NextRun({ event }: { event: ClubEvent }) {
         </div>
         <div className="next-run-cta">
           <span className="going-pill">{event.goingCount} going</span>
-          <button className="btn btn-primary" type="button">RSVP</button>
-          <button className="btn btn-ghost-light" type="button">View details</button>
+          {!isRace && (
+            <RsvpButton
+              slug={slug}
+              clubName={clubName}
+              eventId={event.id}
+              joinForm={joinForm}
+              requiresApproval={requiresApproval}
+              isAuthed={isAuthed}
+              myMembership={myMembership}
+              variant="primary"
+            />
+          )}
         </div>
       </div>
     </section>
   );
 }
 
-function Upcoming({ events }: { events: ClubEvent[] }) {
+function Upcoming({
+  events,
+  slug,
+  clubName,
+  joinForm,
+  requiresApproval,
+  isAuthed,
+  myMembership,
+}: {
+  events: ClubEvent[];
+  slug: string;
+  clubName: string;
+  joinForm: Club['joinForm'];
+  requiresApproval: boolean;
+  isAuthed: boolean;
+  myMembership: MyMembership | null;
+}) {
   return (
     <section className="upcoming">
       <div className="upcoming-header">
@@ -415,7 +505,18 @@ function Upcoming({ events }: { events: ClubEvent[] }) {
         <span className="kicker upcoming-count">{events.length} {events.length === 1 ? 'run' : 'runs'} scheduled</span>
       </div>
 
-      {events.map((event) => <UpcomingRow key={event.id} event={event} />)}
+      {events.map((event) => (
+        <UpcomingRow
+          key={event.id}
+          event={event}
+          slug={slug}
+          clubName={clubName}
+          joinForm={joinForm}
+          requiresApproval={requiresApproval}
+          isAuthed={isAuthed}
+          myMembership={myMembership}
+        />
+      ))}
 
       {events.length > 3 && (
         <div className="upcoming-more">
@@ -426,10 +527,25 @@ function Upcoming({ events }: { events: ClubEvent[] }) {
   );
 }
 
-function UpcomingRow({ event }: { event: ClubEvent }) {
+function UpcomingRow({
+  event,
+  slug,
+  clubName,
+  joinForm,
+  requiresApproval,
+  isAuthed,
+  myMembership,
+}: {
+  event: ClubEvent;
+  slug: string;
+  clubName: string;
+  joinForm: Club['joinForm'];
+  requiresApproval: boolean;
+  isAuthed: boolean;
+  myMembership: MyMembership | null;
+}) {
   const isRace = event.eventType === 'race_event';
   const tagLabel = isRace ? 'Race event' : 'Club run';
-  const ctaLabel = isRace ? 'Details' : 'RSVP';
   const meta = [event.locationName, fmtTime12hFromIso(event.startTime)].filter(Boolean).join(' · ');
 
   return (
@@ -447,7 +563,19 @@ function UpcomingRow({ event }: { event: ClubEvent }) {
       </div>
       <span className="going-pill">{event.goingCount} going</span>
       <div className="row-cta">
-        <button className="btn btn-ghost" type="button">{ctaLabel}</button>
+        {isRace ? (
+          <button className="btn btn-ghost" type="button">Details</button>
+        ) : (
+          <RsvpButton
+            slug={slug}
+            clubName={clubName}
+            eventId={event.id}
+            joinForm={joinForm}
+            requiresApproval={requiresApproval}
+            isAuthed={isAuthed}
+            myMembership={myMembership}
+          />
+        )}
       </div>
     </div>
   );

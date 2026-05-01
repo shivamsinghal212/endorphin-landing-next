@@ -2392,6 +2392,11 @@ body { padding-top: var(--nav-h, 68px); }
 .v1-clubs-page .v1c-btn-ghost-light:hover {
   background: var(--bone); color: var(--jet); border-color: var(--bone);
 }
+.v1-clubs-page .v1c-btn-success {
+  background: #07A039; color: #fff;
+  cursor: not-allowed; pointer-events: none;
+  opacity: 0.95;
+}
 .v1-clubs-page .v1c-btn-icon { width: 16px; height: 16px; margin-right: 10px; flex-shrink: 0; }
 
 /* ─── CTA (bone, matches home) ─────────── */

@@ -181,3 +181,94 @@ export const eventsApi = {
   getById: (id: string, token?: string) =>
     api<Event>(`/events/${id}`, { token }),
 };
+
+// ─── Clubs (membership + RSVP) ────────────────────────────────────────────
+
+export type MyMembershipStatus =
+  | 'none'
+  | 'pending'
+  | 'active'
+  | 'removed'
+  | 'rejected';
+
+export type ClubRole = 'owner' | 'admin' | 'member';
+
+export interface MyMembership {
+  status: MyMembershipStatus;
+  role: ClubRole | null;
+  requestId: string | null;
+  joinedAt: string | null;
+}
+
+export interface JoinClubResponse {
+  status: 'pending' | 'active';
+  requestId: string | null;
+}
+
+export interface RsvpToggleResponse {
+  rsvp: {
+    id: string;
+    clubEventId: string;
+    userId: string;
+    status: string;
+    createdAt: string;
+    updatedAt: string;
+  };
+  goingCount: number;
+}
+
+export interface ClubSummary {
+  slug: string;
+  name: string;
+  city: string;
+}
+
+export const clubsApi = {
+  getMyMembership: (slug: string, token: string) =>
+    api<MyMembership>(`/clubs/${encodeURIComponent(slug)}/my-membership`, {
+      token,
+    }),
+
+  /**
+   * Returns clubs the user is an active member of. `role=all` includes
+   * regular members; `role=admin` (default on the backend) only returns
+   * clubs the user can manage.
+   */
+  listMyClubs: (token: string, role: 'all' | 'admin' = 'all') =>
+    api<ClubSummary[]>(`/clubs/mine?role=${role}`, { token }),
+
+  joinClub: (
+    slug: string,
+    formData: Record<string, unknown> | null,
+    token: string,
+  ) =>
+    api<JoinClubResponse>(`/clubs/${encodeURIComponent(slug)}/join`, {
+      method: 'POST',
+      body: JSON.stringify({ formData }),
+      token,
+    }),
+
+  leaveClub: (slug: string, token: string) =>
+    api<void>(`/clubs/${encodeURIComponent(slug)}/leave`, {
+      method: 'DELETE',
+      token,
+    }),
+
+  cancelJoinRequest: (slug: string, token: string) =>
+    api<void>(`/clubs/${encodeURIComponent(slug)}/join-request`, {
+      method: 'DELETE',
+      token,
+    }),
+
+  rsvp: (slug: string, eventId: string, token: string) =>
+    api<RsvpToggleResponse>(
+      `/clubs/${encodeURIComponent(slug)}/events/${encodeURIComponent(eventId)}/rsvp`,
+      { method: 'POST', token },
+    ),
+
+  cancelRsvp: (slug: string, eventId: string, token: string) =>
+    api<void>(
+      `/clubs/${encodeURIComponent(slug)}/events/${encodeURIComponent(eventId)}/rsvp`,
+      { method: 'DELETE', token },
+    ),
+};

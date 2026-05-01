@@ -339,6 +339,17 @@ export interface ClubAdminPerson {
   stravaUrl?: string | null;
 }
 
+export type JoinFormFieldType = 'text' | 'textarea' | 'select' | 'number';
+
+export interface JoinFormField {
+  id: string;
+  label: string;
+  type: JoinFormFieldType;
+  required: boolean;
+  options?: string[] | null;
+  placeholder?: string | null;
+}
+
 export interface Club {
   id: string;
   slug: string;
@@ -356,6 +367,8 @@ export interface Club {
   instagramUrl: string | null;
   stravaUrl: string | null;
   joinUrl: string | null;
+  joinForm: JoinFormField[] | null;
+  requiresApproval: boolean;
   stats: ClubStats;
   nextRun: ClubNextRun | null;
   upcomingRuns: ClubUpcomingRun[];

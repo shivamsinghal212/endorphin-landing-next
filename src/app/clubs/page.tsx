@@ -2,6 +2,8 @@ import type { Metadata } from 'next';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import ClubsView from './ClubsView';
+import { clubsApi } from '@/lib/api';
+import { getSessionToken } from '@/lib/session';
 
 export const metadata: Metadata = {
   title: 'Run clubs in India — every crew, listed',
@@ -154,7 +156,12 @@ function buildJsonLd(clubs: ApiClub[]) {
 }
 
 export default async function ClubsPage() {
-  const clubs = await getClubs();
+  const token = await getSessionToken();
+  const [clubs, myClubs] = await Promise.all([
+    getClubs(),
+    token ? clubsApi.listMyClubs(token, 'all').catch(() => []) : Promise.resolve([]),
+  ]);
+  const memberSlugs = myClubs.map((c) => c.slug);
   const jsonLd = buildJsonLd(clubs);
 
   return (
@@ -167,7 +174,7 @@ export default async function ClubsPage() {
       )}
       <Header />
       <div className="v1-clubs-page">
-        <ClubsView clubs={clubs} />
+        <ClubsView clubs={clubs} memberSlugs={memberSlugs} />
       </div>
       <Footer />
     </main>

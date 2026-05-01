@@ -75,7 +75,7 @@ const VerifiedTick = ({ className }: { className?: string }) => (
 
 // ─── Flagship card ──────────────────────────
 
-function FlagshipCard({ c }: { c: ApiClub }) {
+function FlagshipCard({ c, isMember }: { c: ApiClub; isMember: boolean }) {
   const stats = c.stats || {};
   const nr = pickNextEvent(c.events);
   const href = `/clubs/${c.slug}`;
@@ -172,9 +172,19 @@ function FlagshipCard({ c }: { c: ApiClub }) {
           )}
         </div>
         <div className="v1c-flagship-ctas">
-          <Link href={href} className="v1c-btn v1c-btn-primary">
-            Join club
-          </Link>
+          {isMember ? (
+            <span
+              className="v1c-btn v1c-btn-success"
+              role="status"
+              aria-label={`Already a member of ${c.name}`}
+            >
+              Already a member
+            </span>
+          ) : (
+            <Link href={href} className="v1c-btn v1c-btn-primary">
+              Join club
+            </Link>
+          )}
           <Link href={href} className="v1c-btn v1c-btn-ghost-light">
             View details →
           </Link>
@@ -428,7 +438,14 @@ function AdminPanel({ data }: { data: AdminPanelData }) {
 
 // ─── Main view ──────────────────────────────
 
-export default function ClubsView({ clubs: initialClubs }: { clubs: ApiClub[] }) {
+export default function ClubsView({
+  clubs: initialClubs,
+  memberSlugs = [],
+}: {
+  clubs: ApiClub[];
+  memberSlugs?: string[];
+}) {
+  const memberSet = useMemo(() => new Set(memberSlugs), [memberSlugs]);
   const [allClubs, setAllClubs] = useState<ApiClub[]>(initialClubs);
   const [currentCity, setCurrentCity] = useState<string>('');
   const [activeTab, setActiveTab] = useState<AdminTab>('members');
@@ -737,7 +754,11 @@ export default function ClubsView({ clubs: initialClubs }: { clubs: ApiClub[] })
                 aria-label="Flagship clubs"
               >
                 {flagships.map((c) => (
-                  <FlagshipCard key={c.slug} c={c} />
+                  <FlagshipCard
+                    key={c.slug}
+                    c={c}
+                    isMember={memberSet.has(c.slug)}
+                  />
                 ))}
               </div>
             </div>
