@@ -14,29 +14,14 @@ function initials(name: string) {
   return ((w[0] || '')[0] || '').toUpperCase() + ((w[1] || '')[0] || '').toUpperCase();
 }
 
-function scoreClub(c: ApiClub) {
-  const s = c.stats || {};
-  return (
-    (c.isVerified ? 5000 : 0) +
-    (s.members || 0) +
-    (s.runsThisMonth || 0) * 50
-  );
-}
-
-function topOne(pool: ApiClub[]) {
-  if (!pool.length) return null;
-  return [...pool].sort((a, b) => scoreClub(b) - scoreClub(a))[0];
-}
-
-function pickFlagships(all: ApiClub[], city: string, cities: readonly string[]): ApiClub[] {
-  if (city) {
-    const pool = all.filter((c) => matchesCity(c, city));
-    const t = topOne(pool);
-    return t ? [t] : [];
-  }
-  return cities
-    .map((c) => topOne(all.filter((cl) => matchesCity(cl, c))))
-    .filter((c): c is ApiClub => c !== null);
+function pickFlagships(all: ApiClub[], city: string, _cities: readonly string[]): ApiClub[] {
+  const pool = all.filter((c) => c.isFeatured);
+  const scoped = city ? pool.filter((c) => matchesCity(c, city)) : pool;
+  return scoped.sort((a, b) => {
+    const ta = a.updatedAt ? Date.parse(a.updatedAt) : 0;
+    const tb = b.updatedAt ? Date.parse(b.updatedAt) : 0;
+    return tb - ta;
+  });
 }
 
 function fmtDayShort(iso?: string) {

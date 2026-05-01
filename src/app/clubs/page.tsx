@@ -47,6 +47,7 @@ export interface ApiClub {
   description?: string | null;
   tags?: string[];
   isVerified?: boolean;
+  isFeatured?: boolean;
   stats?: ApiClubStats;
   nextRun?: ApiClubNextRun | null;
   updatedAt?: string | null;
