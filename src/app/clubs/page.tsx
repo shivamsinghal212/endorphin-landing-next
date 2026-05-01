@@ -26,13 +26,40 @@ export interface ApiClubStats {
   yearsRunning?: number;
 }
 
-export interface ApiClubNextRun {
-  date?: string;
-  time?: string | null;
-  title?: string;
-  location?: string | null;
-  distanceKm?: number | null;
-  goingCount?: number | null;
+export interface ClubEventRecapPhoto {
+  url: string;
+  captionTitle: string | null;
+  captionMeta: string | null;
+}
+
+export interface ClubEventRecap {
+  summary: string | null;
+  showedUp: number | null;
+  paceGroups: string | null;
+  after: string | null;
+  photos: ClubEventRecapPhoto[];
+}
+
+export interface ClubEvent {
+  id: string;
+  clubId: string;
+  title: string;
+  description: string | null;
+  locationName: string | null;
+  locationAddress: string | null;
+  lat: number | null;
+  lng: number | null;
+  startTime: string;
+  endTime: string | null;
+  maxParticipants: number | null;
+  coverImageUrl: string | null;
+  distanceKm: number | null;
+  eventType: 'club_run' | 'race_event';
+  recap: ClubEventRecap | null;
+  createdBy: string;
+  createdAt: string;
+  updatedAt: string;
+  goingCount: number;
 }
 
 export interface ApiClub {
@@ -49,7 +76,7 @@ export interface ApiClub {
   isVerified?: boolean;
   isFeatured?: boolean;
   stats?: ApiClubStats;
-  nextRun?: ApiClubNextRun | null;
+  events?: ClubEvent[];
   updatedAt?: string | null;
 }
 
@@ -70,14 +97,20 @@ async function getClubs(): Promise<ApiClub[]> {
     if (!Array.isArray(listed) || listed.length === 0) return [];
 
     const settled = await Promise.all(
-      listed.map(async (c) => {
+      listed.map(async (c): Promise<ApiClub | null> => {
         try {
-          const r = await fetch(`https://api.endorfin.run/api/v1/clubs/${c.slug}`, {
-            next: { revalidate: 3600 },
-          });
-          if (!r.ok) return null;
-          const d = (await r.json()) as ApiClub;
-          return d;
+          const [detailRes, eventsRes] = await Promise.all([
+            fetch(`https://api.endorfin.run/api/v1/clubs/${c.slug}`, {
+              next: { revalidate: 3600 },
+            }),
+            fetch(`https://api.endorfin.run/api/v1/clubs/${c.slug}/events`, {
+              next: { revalidate: 3600 },
+            }),
+          ]);
+          if (!detailRes.ok) return null;
+          const d = (await detailRes.json()) as ApiClub;
+          const events = eventsRes.ok ? ((await eventsRes.json()) as ClubEvent[]) : [];
+          return { ...d, events: Array.isArray(events) ? events : [] };
         } catch {
           return null;
         }

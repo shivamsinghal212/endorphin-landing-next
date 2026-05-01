@@ -5,7 +5,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { APP_STORE_URL, PLAY_STORE_URL } from '@/lib/store-links';
 import { useStoreLink } from '@/lib/use-store-link';
 import { TOP_CITIES, locationMatchesCity } from '@/lib/cities';
-import type { ApiClub } from './page';
+import type { ApiClub, ClubEvent } from './page';
 
 const matchesCity = (club: ApiClub, city: string) => locationMatchesCity(club.city, city);
 
@@ -38,6 +38,25 @@ function fmtDateFull(iso?: string) {
   return d.toLocaleString('en-GB', { day: 'numeric', month: 'long' });
 }
 
+function fmtTimeShort(iso?: string) {
+  if (!iso) return '';
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return '';
+  return d.toLocaleString('en-GB', { hour: 'numeric', minute: '2-digit', hour12: true });
+}
+
+function pickNextEvent(events: ClubEvent[] | undefined): ClubEvent | null {
+  if (!events || events.length === 0) return null;
+  const now = Date.now();
+  const future = events
+    .filter((e) => {
+      const t = Date.parse(e.startTime);
+      return Number.isFinite(t) && t >= now;
+    })
+    .sort((a, b) => Date.parse(a.startTime) - Date.parse(b.startTime));
+  return future[0] || null;
+}
+
 // ─── Verified tick (inline svg) ─────────────
 const VerifiedTick = ({ className }: { className?: string }) => (
   <svg
@@ -58,7 +77,7 @@ const VerifiedTick = ({ className }: { className?: string }) => (
 
 function FlagshipCard({ c }: { c: ApiClub }) {
   const stats = c.stats || {};
-  const nr = c.nextRun || null;
+  const nr = pickNextEvent(c.events);
   const href = `/clubs/${c.slug}`;
 
   return (
@@ -133,12 +152,12 @@ function FlagshipCard({ c }: { c: ApiClub }) {
           {nr && (
             <div className="v1c-flagship-nextrun">
               <div className="v1c-flagship-nextrun-kicker">
-                Next run · {fmtDateFull(nr.date)}
-                {nr.time ? ` · ${nr.time}` : ''}
+                Next run · {fmtDateFull(nr.startTime)}
+                {fmtTimeShort(nr.startTime) ? ` · ${fmtTimeShort(nr.startTime)}` : ''}
               </div>
               <div className="v1c-flagship-nextrun-title">{nr.title || 'Next run'}</div>
               <div className="v1c-flagship-nextrun-meta">
-                {nr.location || '—'}
+                {nr.locationName || '—'}
                 {nr.distanceKm != null && (
                   <>
                     <span className="v1c-dot">·</span>
@@ -169,7 +188,7 @@ function FlagshipCard({ c }: { c: ApiClub }) {
 
 function ClubCard({ c }: { c: ApiClub }) {
   const stats = c.stats || {};
-  const nr = c.nextRun || null;
+  const nr = pickNextEvent(c.events);
   const href = `/clubs/${c.slug}`;
 
   return (
@@ -230,7 +249,7 @@ function ClubCard({ c }: { c: ApiClub }) {
           </span>
           {nr && (
             <span className="v1c-club-card-nextrun">
-              {fmtDayShort(nr.date)} · {nr.distanceKm != null ? `${nr.distanceKm}K` : '—'}
+              {fmtDayShort(nr.startTime)} · {nr.distanceKm != null ? `${nr.distanceKm}K` : '—'}
             </span>
           )}
         </div>
@@ -426,13 +445,20 @@ export default function ClubsView({ clubs: initialClubs }: { clubs: ApiClub[] })
         const listed = (await res.json()) as { slug: string }[];
         if (!Array.isArray(listed) || !listed.length) return;
         const details = await Promise.all(
-          listed.map(async (c) => {
+          listed.map(async (c): Promise<ApiClub | null> => {
             try {
-              const r = await fetch(`https://api.endorfin.run/api/v1/clubs/${c.slug}`, {
-                cache: 'no-store',
-              });
-              if (!r.ok) return null;
-              return (await r.json()) as ApiClub;
+              const [detailRes, eventsRes] = await Promise.all([
+                fetch(`https://api.endorfin.run/api/v1/clubs/${c.slug}`, {
+                  cache: 'no-store',
+                }),
+                fetch(`https://api.endorfin.run/api/v1/clubs/${c.slug}/events`, {
+                  cache: 'no-store',
+                }),
+              ]);
+              if (!detailRes.ok) return null;
+              const d = (await detailRes.json()) as ApiClub;
+              const events = eventsRes.ok ? ((await eventsRes.json()) as ClubEvent[]) : [];
+              return { ...d, events: Array.isArray(events) ? events : [] };
             } catch {
               return null;
             }

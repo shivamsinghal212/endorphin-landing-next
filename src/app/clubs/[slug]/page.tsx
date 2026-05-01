@@ -2,11 +2,52 @@ import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-import { getClub, type Club, type ClubUpcomingRun, type ClubAdminPerson } from '@/lib/admin-api';
+import { getClub, type Club, type ClubAdminPerson } from '@/lib/admin-api';
+import type { ClubEvent } from '../page';
 import { ClubIcons } from './club-icons';
 import { JoinClubButton } from './join-club-button';
 import { LastRunReel } from './last-run-reel';
 import './club-page.css';
+
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE || 'https://api.endorfin.run';
+
+async function getClubEvents(slug: string): Promise<ClubEvent[]> {
+  try {
+    const res = await fetch(
+      `${API_BASE}/api/v1/clubs/${encodeURIComponent(slug)}/events`,
+      { next: { revalidate: 60 } },
+    );
+    if (!res.ok) return [];
+    const data = (await res.json()) as ClubEvent[];
+    return Array.isArray(data) ? data : [];
+  } catch {
+    return [];
+  }
+}
+
+function splitEvents(events: ClubEvent[]): {
+  nextEvent: ClubEvent | null;
+  upcomingEvents: ClubEvent[];
+  lastEvent: ClubEvent | null;
+} {
+  const now = Date.now();
+  const future: ClubEvent[] = [];
+  const past: ClubEvent[] = [];
+  for (const e of events) {
+    const t = Date.parse(e.startTime);
+    if (!Number.isFinite(t)) continue;
+    if (t >= now) future.push(e);
+    else past.push(e);
+  }
+  future.sort((a, b) => Date.parse(a.startTime) - Date.parse(b.startTime));
+  past.sort((a, b) => Date.parse(b.startTime) - Date.parse(a.startTime));
+  const [nextEvent, ...upcomingEvents] = future;
+  return {
+    nextEvent: nextEvent || null,
+    upcomingEvents,
+    lastEvent: past[0] || null,
+  };
+}
 
 // Refresh the public page within 60s of any admin save.
 export const revalidate = 60;
@@ -40,12 +81,11 @@ function fmtDayDotMonth(iso: string | null | undefined) {
   return `${String(d.getDate()).padStart(2, '0')}·${String(d.getMonth() + 1).padStart(2, '0')}`;
 }
 
-function fmtTime12h(hhmm: string | null | undefined) {
-  if (!hhmm) return '';
-  const [hStr, mStr] = hhmm.split(':');
-  let h = parseInt(hStr, 10);
-  const m = mStr ?? '00';
-  if (!Number.isFinite(h)) return hhmm;
+function fmtTime12hFromIso(iso: string | null | undefined) {
+  const d = parseDate(iso);
+  if (!d) return '';
+  let h = d.getHours();
+  const m = String(d.getMinutes()).padStart(2, '0');
   const ampm = h >= 12 ? 'pm' : 'am';
   h = h % 12 || 12;
   return `${h}:${m} ${ampm}`;
@@ -128,8 +168,13 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function ClubPage({ params }: PageProps) {
   const { slug } = await params;
-  const club = await getClub(slug).catch(() => null);
+  const [club, events] = await Promise.all([
+    getClub(slug).catch(() => null),
+    getClubEvents(slug),
+  ]);
   if (!club || !club.publishedAt) notFound();
+
+  const { nextEvent, upcomingEvents, lastEvent } = splitEvents(events);
 
   return (
     <main id="main-content" className="overflow-x-hidden">
@@ -140,9 +185,9 @@ export default async function ClubPage({ params }: PageProps) {
         <Hero club={club} />
         <Ribbon />
         <Stats club={club} />
-        <NextRun club={club} />
-        <Upcoming club={club} />
-        {club.lastRun && <LastRun club={club} />}
+        {nextEvent && <NextRun event={nextEvent} />}
+        {upcomingEvents.length > 0 && <Upcoming events={upcomingEvents} />}
+        {lastEvent && <LastRun event={lastEvent} />}
         {club.admins.length > 0 && <LedBy admins={club.admins} />}
         <CtaFooter club={club} />
       </div>
@@ -324,14 +369,13 @@ function Stats({ club }: { club: Club }) {
   );
 }
 
-function NextRun({ club }: { club: Club }) {
-  const nr = club.nextRun;
-  if (!nr) return null;
-
-  const bgStyle = nr.bgImageUrl
-    ? ({ ['--bg-image' as string]: `url('${nr.bgImageUrl}')` } as React.CSSProperties)
+function NextRun({ event }: { event: ClubEvent }) {
+  const bgStyle = event.coverImageUrl
+    ? ({ ['--bg-image' as string]: `url('${event.coverImageUrl}')` } as React.CSSProperties)
     : undefined;
-  const hasImage = !!nr.bgImageUrl;
+  const hasImage = !!event.coverImageUrl;
+  const location = event.locationName;
+  const time = fmtTime12hFromIso(event.startTime);
 
   return (
     <section className={`next-run on-jet ${hasImage ? 'has-image' : ''}`} style={bgStyle}>
@@ -339,27 +383,23 @@ function NextRun({ club }: { club: Club }) {
       <div className="next-run-grid">
         <div className="date-block">
           <div className="date-block-title">
-            <div className="date-block-day">{fmtDay(nr.date)}</div>
-            <div className="date-block-date">{fmtDayDotMonth(nr.date)}</div>
+            <div className="date-block-day">{fmtDay(event.startTime)}</div>
+            <div className="date-block-date">{fmtDayDotMonth(event.startTime)}</div>
           </div>
           <div className="date-block-sub">
-            {[fmtTime12h(nr.time), nr.location].filter(Boolean).join(' · ')}
+            {[time, location].filter(Boolean).join(' · ')}
           </div>
         </div>
         <div className="run-info">
           <h2 className="run-title">
-            {nr.title}
-            {nr.distanceKm != null && <> — <span className="distance">{fmtDistance(nr.distanceKm)}</span></>}
+            {event.title}
+            {event.distanceKm != null && <> — <span className="distance">{fmtDistance(event.distanceKm)}</span></>}
           </h2>
-          {nr.description && <p className="run-description">{nr.description}</p>}
+          {event.description && <p className="run-description">{event.description}</p>}
         </div>
         <div className="next-run-cta">
-          <span className="going-pill">{nr.goingCount} going</span>
-          {nr.rsvpUrl ? (
-            <a className="btn btn-primary" href={nr.rsvpUrl} target="_blank" rel="noopener noreferrer">RSVP</a>
-          ) : (
-            <button className="btn btn-primary" type="button">RSVP</button>
-          )}
+          <span className="going-pill">{event.goingCount} going</span>
+          <button className="btn btn-primary" type="button">RSVP</button>
           <button className="btn btn-ghost-light" type="button">View details</button>
         </div>
       </div>
@@ -367,99 +407,95 @@ function NextRun({ club }: { club: Club }) {
   );
 }
 
-function Upcoming({ club }: { club: Club }) {
-  const runs = club.upcomingRuns;
-  if (runs.length === 0) return null;
-
+function Upcoming({ events }: { events: ClubEvent[] }) {
   return (
     <section className="upcoming">
       <div className="upcoming-header">
         <h2 className="upcoming-title">Upcoming</h2>
-        <span className="kicker upcoming-count">{runs.length} {runs.length === 1 ? 'run' : 'runs'} scheduled</span>
+        <span className="kicker upcoming-count">{events.length} {events.length === 1 ? 'run' : 'runs'} scheduled</span>
       </div>
 
-      {runs.map((run, i) => <UpcomingRow key={run.id || i} run={run} />)}
+      {events.map((event) => <UpcomingRow key={event.id} event={event} />)}
 
-      {runs.length > 3 && (
+      {events.length > 3 && (
         <div className="upcoming-more">
-          <button className="btn btn-ghost" type="button">See all {runs.length} runs</button>
+          <button className="btn btn-ghost" type="button">See all {events.length} runs</button>
         </div>
       )}
     </section>
   );
 }
 
-function UpcomingRow({ run }: { run: ClubUpcomingRun }) {
-  const isRace = run.type === 'race_event';
+function UpcomingRow({ event }: { event: ClubEvent }) {
+  const isRace = event.eventType === 'race_event';
   const tagLabel = isRace ? 'Race event' : 'Club run';
   const ctaLabel = isRace ? 'Details' : 'RSVP';
-  const meta = [run.location, fmtTime12h(run.time)].filter(Boolean).join(' · ');
+  const meta = [event.locationName, fmtTime12hFromIso(event.startTime)].filter(Boolean).join(' · ');
 
   return (
     <div className="upcoming-row">
       <div>
-        <div className="row-date">{fmtDayNum(run.date)}</div>
+        <div className="row-date">{fmtDayNum(event.startTime)}</div>
         <div className="kicker row-date-sub">
-          {fmtDay(run.date)} · {fmtMonth(run.date)}
+          {fmtDay(event.startTime)} · {fmtMonth(event.startTime)}
         </div>
       </div>
       <div>
         <span className={`row-type ${isRace ? 'row-type-race' : 'row-type-club'}`}>{tagLabel}</span>
-        <div className="row-title">{run.title}</div>
-        <div className="row-meta" data-going={run.goingCount}>{meta}</div>
+        <div className="row-title">{event.title}</div>
+        <div className="row-meta" data-going={event.goingCount}>{meta}</div>
       </div>
-      <span className="going-pill">{run.goingCount} going</span>
+      <span className="going-pill">{event.goingCount} going</span>
       <div className="row-cta">
-        {run.rsvpUrl ? (
-          <a className="btn btn-ghost" href={run.rsvpUrl} target="_blank" rel="noopener noreferrer">{ctaLabel}</a>
-        ) : (
-          <button className="btn btn-ghost" type="button">{ctaLabel}</button>
-        )}
+        <button className="btn btn-ghost" type="button">{ctaLabel}</button>
       </div>
     </div>
   );
 }
 
-function LastRun({ club }: { club: Club }) {
-  const lr = club.lastRun!;
-  const isRace = lr.type === 'race_event';
+function LastRun({ event }: { event: ClubEvent }) {
+  const isRace = event.eventType === 'race_event';
+  const recap = event.recap;
+  const photos = recap?.photos ?? [];
 
   return (
     <section className="last-run">
       <div className="last-run-head">
         <div>
-          <div className="kicker last-run-kicker">Last run · {fmtLastRunKickerDate(lr.date)}</div>
+          <div className="kicker last-run-kicker">Last run · {fmtLastRunKickerDate(event.startTime)}</div>
           <span className={`last-run-tag ${isRace ? 'race' : ''}`}>{isRace ? 'Race event' : 'Club run'}</span>
-          <h2 className="last-run-title">{lr.title}</h2>
-          {lr.summary && <p className="last-run-summary">{lr.summary}</p>}
+          <h2 className="last-run-title">{event.title}</h2>
+          {recap?.summary && <p className="last-run-summary">{recap.summary}</p>}
         </div>
         <div className="last-run-meta" aria-label="Run summary">
-          <div className="row">
-            <span className="row-label">Showed up</span>
-            <span className="row-value">{lr.stats.showedUp}</span>
-          </div>
-          {lr.stats.distanceKm != null && (
+          {recap?.showedUp != null && (
+            <div className="row">
+              <span className="row-label">Showed up</span>
+              <span className="row-value">{recap.showedUp}</span>
+            </div>
+          )}
+          {event.distanceKm != null && (
             <div className="row">
               <span className="row-label">Distance</span>
-              <span className="row-value">{lr.stats.distanceKm}<span className="unit">km</span></span>
+              <span className="row-value">{event.distanceKm}<span className="unit">km</span></span>
             </div>
           )}
-          {lr.stats.paceGroups && (
+          {recap?.paceGroups && (
             <div className="row">
               <span className="row-label">Pace</span>
-              <span className="row-value">{lr.stats.paceGroups}</span>
+              <span className="row-value">{recap.paceGroups}</span>
             </div>
           )}
-          {lr.stats.after && (
+          {recap?.after && (
             <div className="row">
               <span className="row-label">After</span>
-              <span className="row-value">{lr.stats.after}</span>
+              <span className="row-value">{recap.after}</span>
             </div>
           )}
         </div>
       </div>
 
-      {lr.photos.length > 0 && <LastRunReel photos={lr.photos} />}
+      {photos.length > 0 && <LastRunReel photos={photos} />}
     </section>
   );
 }

@@ -10,8 +10,6 @@ import {
   upsertClub,
   AdminApiError,
   type Club,
-  type ClubNextRun,
-  type ClubRunType,
 } from '@/lib/admin-api';
 
 // ─── form state shape (mirrors ClubIn on the server) ───
@@ -39,30 +37,6 @@ type FormState = {
   statsRunsThisMonth: string;
   statsKmThisMonth: string;
   statsYearsRunning: string;
-
-  // next_run flattened (empty title = "no next run")
-  nrDate: string;
-  nrTime: string;
-  nrLocation: string;
-  nrTitle: string;
-  nrDistanceKm: string;
-  nrDescription: string;
-  nrGoingCount: string;
-  nrBgImageUrl: string;
-  nrRsvpUrl: string;
-  nrType: ClubRunType;
-
-  // last_run flattened (empty title = "no last run")
-  lrDate: string;
-  lrTitle: string;
-  lrDistanceKm: string;
-  lrType: ClubRunType;
-  lrSummary: string;
-  lrShowedUp: string;
-  lrDistance: string;
-  lrLocation: string;
-  lrPaceGroups: string;
-  lrAfter: string;
 };
 
 const EMPTY: FormState = {
@@ -71,20 +45,12 @@ const EMPTY: FormState = {
   isVerified: false, publishedAt: '',
   whatsappUrl: '', instagramUrl: '', stravaUrl: '', joinUrl: '',
   statsMembers: '0', statsRunsThisMonth: '0', statsKmThisMonth: '0', statsYearsRunning: '0',
-  nrDate: '', nrTime: '', nrLocation: '', nrTitle: '', nrDistanceKm: '', nrDescription: '',
-  nrGoingCount: '0', nrBgImageUrl: '', nrRsvpUrl: '', nrType: 'club_run',
-  lrDate: '', lrTitle: '', lrDistanceKm: '', lrType: 'club_run', lrSummary: '',
-  lrShowedUp: '0', lrDistance: '', lrLocation: '', lrPaceGroups: '', lrAfter: '',
 };
 
 function fromClub(club: Club): {
   form: FormState;
-  upcomingRunsJson: string;
-  lastRunPhotosJson: string;
   adminsJson: string;
 } {
-  const nr = club.nextRun;
-  const lr = club.lastRun;
   return {
     form: {
       slug: club.slug,
@@ -106,40 +72,13 @@ function fromClub(club: Club): {
       statsRunsThisMonth: String(club.stats?.runsThisMonth ?? 0),
       statsKmThisMonth: String(club.stats?.kmThisMonth ?? 0),
       statsYearsRunning: String(club.stats?.yearsRunning ?? 0),
-      nrDate: nr?.date ?? '',
-      nrTime: nr?.time ?? '',
-      nrLocation: nr?.location ?? '',
-      nrTitle: nr?.title ?? '',
-      nrDistanceKm: nr?.distanceKm?.toString() ?? '',
-      nrDescription: nr?.description ?? '',
-      nrGoingCount: String(nr?.goingCount ?? 0),
-      nrBgImageUrl: nr?.bgImageUrl ?? '',
-      nrRsvpUrl: nr?.rsvpUrl ?? '',
-      nrType: nr?.type ?? 'club_run',
-      lrDate: lr?.date ?? '',
-      lrTitle: lr?.title ?? '',
-      lrDistanceKm: lr?.distanceKm?.toString() ?? '',
-      lrType: lr?.type ?? 'club_run',
-      lrSummary: lr?.summary ?? '',
-      lrShowedUp: String(lr?.stats?.showedUp ?? 0),
-      lrDistance: lr?.stats?.distanceKm?.toString() ?? '',
-      lrLocation: lr?.stats?.location ?? '',
-      lrPaceGroups: lr?.stats?.paceGroups ?? '',
-      lrAfter: lr?.stats?.after ?? '',
     },
-    upcomingRunsJson: JSON.stringify(club.upcomingRuns ?? [], null, 2),
-    lastRunPhotosJson: JSON.stringify(lr?.photos ?? [], null, 2),
     adminsJson: JSON.stringify(club.admins ?? [], null, 2),
   };
 }
 
 function intOrNull(s: string): number | null {
   const n = parseInt(s, 10);
-  return Number.isFinite(n) ? n : null;
-}
-function floatOrNull(s: string): number | null {
-  if (!s.trim()) return null;
-  const n = parseFloat(s);
   return Number.isFinite(n) ? n : null;
 }
 function strOrNull(s: string): string | null {
@@ -149,50 +88,10 @@ function strOrNull(s: string): string | null {
 
 function buildPayload(
   form: FormState,
-  upcomingRunsJson: string,
-  lastRunPhotosJson: string,
   adminsJson: string,
 ): Record<string, unknown> {
   const tags = form.tagsCsv.split(',').map((t) => t.trim()).filter(Boolean);
-
-  const upcomingRuns = JSON.parse(upcomingRunsJson);
-  const photos = JSON.parse(lastRunPhotosJson);
   const admins = JSON.parse(adminsJson);
-
-  const hasNextRun = form.nrTitle.trim() && form.nrDate.trim();
-  const nextRun: ClubNextRun | null = hasNextRun
-    ? {
-        date: form.nrDate,
-        time: strOrNull(form.nrTime),
-        location: strOrNull(form.nrLocation),
-        title: form.nrTitle.trim(),
-        distanceKm: floatOrNull(form.nrDistanceKm),
-        description: strOrNull(form.nrDescription),
-        goingCount: intOrNull(form.nrGoingCount) ?? 0,
-        bgImageUrl: strOrNull(form.nrBgImageUrl),
-        rsvpUrl: strOrNull(form.nrRsvpUrl),
-        type: form.nrType,
-      }
-    : null;
-
-  const hasLastRun = form.lrTitle.trim() && form.lrDate.trim();
-  const lastRun = hasLastRun
-    ? {
-        date: form.lrDate,
-        title: form.lrTitle.trim(),
-        distanceKm: floatOrNull(form.lrDistanceKm),
-        type: form.lrType,
-        summary: strOrNull(form.lrSummary),
-        stats: {
-          showedUp: intOrNull(form.lrShowedUp) ?? 0,
-          distanceKm: floatOrNull(form.lrDistance),
-          location: strOrNull(form.lrLocation),
-          paceGroups: strOrNull(form.lrPaceGroups),
-          after: strOrNull(form.lrAfter),
-        },
-        photos,
-      }
-    : null;
 
   return {
     slug: form.slug.trim(),
@@ -216,9 +115,6 @@ function buildPayload(
       kmThisMonth: intOrNull(form.statsKmThisMonth) ?? 0,
       yearsRunning: intOrNull(form.statsYearsRunning) ?? 0,
     },
-    nextRun,
-    upcomingRuns,
-    lastRun,
     admins,
   };
 }
@@ -230,8 +126,6 @@ export function ClubsAdminContent({ initialSlug }: { initialSlug: string }) {
   const router = useRouter();
 
   const [form, setForm] = useState<FormState>({ ...EMPTY, slug: initialSlug });
-  const [upcomingRunsJson, setUpcomingRunsJson] = useState('[]');
-  const [lastRunPhotosJson, setLastRunPhotosJson] = useState('[]');
   const [adminsJson, setAdminsJson] = useState('[]');
 
   const [loading, setLoading] = useState(false);
@@ -247,14 +141,10 @@ export function ClubsAdminContent({ initialSlug }: { initialSlug: string }) {
       if (club) {
         const parts = fromClub(club);
         setForm(parts.form);
-        setUpcomingRunsJson(parts.upcomingRunsJson);
-        setLastRunPhotosJson(parts.lastRunPhotosJson);
         setAdminsJson(parts.adminsJson);
         setBanner({ tone: 'ok', msg: `Loaded existing club "${club.name}".` });
       } else {
         setForm({ ...EMPTY, slug: slug.trim() });
-        setUpcomingRunsJson('[]');
-        setLastRunPhotosJson('[]');
         setAdminsJson('[]');
         setBanner({ tone: 'ok', msg: `No club with slug "${slug}" yet — fill in the form to create it.` });
       }
@@ -276,7 +166,7 @@ export function ClubsAdminContent({ initialSlug }: { initialSlug: string }) {
     setSaving(true);
     setBanner(null);
     try {
-      const payload = buildPayload(form, upcomingRunsJson, lastRunPhotosJson, adminsJson);
+      const payload = buildPayload(form, adminsJson);
       const saved = await upsertClub(token, payload);
       // Ping the revalidation endpoint so /clubs/{slug} refreshes immediately
       // instead of waiting for the 60s ISR window. Failure is non-fatal.
@@ -289,7 +179,7 @@ export function ClubsAdminContent({ initialSlug }: { initialSlug: string }) {
       router.replace(`/admin/clubs?slug=${encodeURIComponent(saved.slug)}`);
     } catch (e) {
       let msg = 'Save failed.';
-      if (e instanceof SyntaxError) msg = 'Invalid JSON in upcoming runs / photos / admins.';
+      if (e instanceof SyntaxError) msg = 'Invalid JSON in admins.';
       else if (e instanceof AdminApiError) msg = `Save failed: ${e.status} — ${e.message}`;
       else if (e instanceof Error) msg = `Save failed: ${e.message}`;
       setBanner({ tone: 'err', msg });
@@ -355,7 +245,7 @@ export function ClubsAdminContent({ initialSlug }: { initialSlug: string }) {
       )}
 
       <div className="grid lg:grid-cols-3 gap-6">
-        {/* Left: basics + hero + social + stats + next/last run */}
+        {/* Left: basics + hero + social */}
         <div className="lg:col-span-2 space-y-6">
           <Card title="Basics">
             <div className="grid grid-cols-2 gap-4">
@@ -396,62 +286,18 @@ export function ClubsAdminContent({ initialSlug }: { initialSlug: string }) {
             </div>
           </Card>
 
-          <Card title="Next run (leave title blank to clear)">
-            <div className="grid grid-cols-2 gap-4">
-              <Field label="Title" value={form.nrTitle} onChange={(v) => updateField('nrTitle', v)} placeholder="Sunday Long Run" />
-              <Field label="Type" value={form.nrType} onChange={(v) => updateField('nrType', v as ClubRunType)} as="select" options={[{ value: 'club_run', label: 'Club run' }, { value: 'race_event', label: 'Race event' }]} />
-              <Field label="Date (YYYY-MM-DD)" value={form.nrDate} onChange={(v) => updateField('nrDate', v)} type="date" />
-              <Field label="Time (HH:MM)" value={form.nrTime} onChange={(v) => updateField('nrTime', v)} type="time" />
-              <Field label="Location" value={form.nrLocation} onChange={(v) => updateField('nrLocation', v)} />
-              <Field label="Distance (km)" value={form.nrDistanceKm} onChange={(v) => updateField('nrDistanceKm', v)} type="number" />
-              <Field label="Going count" value={form.nrGoingCount} onChange={(v) => updateField('nrGoingCount', v)} type="number" />
-              <Field label="RSVP URL" value={form.nrRsvpUrl} onChange={(v) => updateField('nrRsvpUrl', v)} />
-            </div>
-            <Field label="Background image URL" value={form.nrBgImageUrl} onChange={(v) => updateField('nrBgImageUrl', v)} />
-            <Field label="Description" value={form.nrDescription} onChange={(v) => updateField('nrDescription', v)} textarea />
-          </Card>
-
-          <Card title="Last run — recap (leave title blank to clear)">
-            <div className="grid grid-cols-2 gap-4">
-              <Field label="Title" value={form.lrTitle} onChange={(v) => updateField('lrTitle', v)} />
-              <Field label="Type" value={form.lrType} onChange={(v) => updateField('lrType', v as ClubRunType)} as="select" options={[{ value: 'club_run', label: 'Club run' }, { value: 'race_event', label: 'Race event' }]} />
-              <Field label="Date (YYYY-MM-DD)" value={form.lrDate} onChange={(v) => updateField('lrDate', v)} type="date" />
-              <Field label="Distance (km)" value={form.lrDistanceKm} onChange={(v) => updateField('lrDistanceKm', v)} type="number" />
-            </div>
-            <Field label="Summary" value={form.lrSummary} onChange={(v) => updateField('lrSummary', v)} textarea />
-            <div className="grid grid-cols-2 gap-4">
-              <Field label="Showed up" value={form.lrShowedUp} onChange={(v) => updateField('lrShowedUp', v)} type="number" />
-              <Field label="Distance (km, stat)" value={form.lrDistance} onChange={(v) => updateField('lrDistance', v)} type="number" />
-              <Field label="Location (stat)" value={form.lrLocation} onChange={(v) => updateField('lrLocation', v)} />
-              <Field label="Pace groups" value={form.lrPaceGroups} onChange={(v) => updateField('lrPaceGroups', v)} placeholder="5:30 / 6:00" />
-              <Field label="After" value={form.lrAfter} onChange={(v) => updateField('lrAfter', v)} placeholder="Blue Tokai" />
-            </div>
-            <JsonField
-              label="Photos (JSON array)"
-              value={lastRunPhotosJson}
-              onChange={setLastRunPhotosJson}
-              hint='[{ "url": "...", "captionTitle": "...", "captionMeta": "..." }]'
-            />
-          </Card>
+          <p className="font-body text-sm text-jet/60">
+            Manage runs and events on the mobile club admin screen.
+          </p>
         </div>
 
-        {/* Right: stats, upcoming runs, admins */}
+        {/* Right: stats, admins */}
         <div className="space-y-6">
           <Card title="Stats (hero strip)">
             <Field label="Members" value={form.statsMembers} onChange={(v) => updateField('statsMembers', v)} type="number" />
             <Field label="Runs this month" value={form.statsRunsThisMonth} onChange={(v) => updateField('statsRunsThisMonth', v)} type="number" />
             <Field label="KM this month" value={form.statsKmThisMonth} onChange={(v) => updateField('statsKmThisMonth', v)} type="number" />
             <Field label="Years running" value={form.statsYearsRunning} onChange={(v) => updateField('statsYearsRunning', v)} type="number" />
-          </Card>
-
-          <Card title="Upcoming runs (JSON array)">
-            <JsonField
-              label=""
-              value={upcomingRunsJson}
-              onChange={setUpcomingRunsJson}
-              hint='[{ "date": "2026-04-29", "time": "06:15", "location": "JLN Stadium", "title": "Wednesday Intervals", "type": "club_run", "goingCount": 28 }]'
-              rows={12}
-            />
           </Card>
 
           <Card title="Admins — 'Led by' (JSON array)">
