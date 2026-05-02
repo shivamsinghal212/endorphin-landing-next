@@ -9,7 +9,9 @@ const ALLOWED_MIME = new Set([
   'image/heif',
   'image/gif',
 ]);
-const MAX_BYTES = 10 * 1024 * 1024;
+// Stay under Vercel's ~4.5 MB serverless function body limit. The client
+// compresses images above ~700 KB before sending, so this is a safety net.
+const MAX_BYTES = 4 * 1024 * 1024;
 const ALLOWED_BUCKETS = new Set(['media', 'avatars']);
 
 function extFromMime(mime: string): string {

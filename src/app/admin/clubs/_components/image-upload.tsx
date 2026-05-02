@@ -3,16 +3,70 @@
 import { useRef, useState } from 'react';
 
 const MIME_ACCEPT = 'image/jpeg,image/png,image/webp,image/heic,image/heif,image/gif';
+const MAX_DIMENSION = 2400;
+const JPEG_QUALITY = 0.85;
+// Stay comfortably under Vercel's serverless body limit (~4.5 MB) plus
+// multipart overhead.
+const SKIP_COMPRESS_BELOW_BYTES = 700_000;
+
+// Resize + recompress to JPEG so server upload stays well under platform
+// body limits. Skips small files. GIFs are passed through (animation).
+async function compressIfNeeded(file: File): Promise<File> {
+  if (file.size < SKIP_COMPRESS_BELOW_BYTES) return file;
+  if (file.type === 'image/gif') return file;
+  if (typeof window === 'undefined') return file;
+
+  try {
+    const bitmap = await createImageBitmap(file);
+    const { width, height } = bitmap;
+    const scale = Math.min(1, MAX_DIMENSION / Math.max(width, height));
+    const targetW = Math.round(width * scale);
+    const targetH = Math.round(height * scale);
+    const canvas = document.createElement('canvas');
+    canvas.width = targetW;
+    canvas.height = targetH;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return file;
+    ctx.drawImage(bitmap, 0, 0, targetW, targetH);
+    bitmap.close?.();
+    const blob: Blob | null = await new Promise((resolve) =>
+      canvas.toBlob(resolve, 'image/jpeg', JPEG_QUALITY),
+    );
+    if (!blob || blob.size > file.size) return file;
+    const newName = file.name.replace(/\.\w+$/, '') + '.jpg';
+    return new File([blob], newName, { type: 'image/jpeg', lastModified: Date.now() });
+  } catch {
+    return file;
+  }
+}
 
 async function uploadFile(file: File, folder: string): Promise<string> {
+  const prepared = await compressIfNeeded(file);
   const fd = new FormData();
-  fd.append('file', file);
+  fd.append('file', prepared);
   fd.append('folder', folder);
   fd.append('bucket', 'media');
   const res = await fetch('/api/admin/upload', { method: 'POST', body: fd });
-  const data = (await res.json()) as { ok?: boolean; url?: string; error?: string };
+
+  // Robust parse — server may return non-JSON (413 from edge, HTML error page).
+  let data: { ok?: boolean; url?: string; error?: string } = {};
+  let raw = '';
+  try {
+    raw = await res.text();
+    data = raw ? JSON.parse(raw) : {};
+  } catch {
+    data = {};
+  }
+
   if (!res.ok || !data.ok || !data.url) {
-    throw new Error(data.error || `upload failed (${res.status})`);
+    if (res.status === 413 || /too large/i.test(raw)) {
+      throw new Error(
+        'File too large for upload (server limit ~4 MB). Try a smaller image — large PNGs work better as JPEG.',
+      );
+    }
+    throw new Error(
+      data.error || (raw && raw.length < 200 ? raw : `upload failed (${res.status})`),
+    );
   }
   return data.url;
 }
