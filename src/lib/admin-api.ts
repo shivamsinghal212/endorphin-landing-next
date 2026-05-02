@@ -357,6 +357,7 @@ export interface Club {
   city: string;
   establishedYear: number | null;
   logoUrl: string | null;
+  headerImageUrl: string | null;
   kicker: string | null;
   subtitle: string | null;
   description: string | null;
