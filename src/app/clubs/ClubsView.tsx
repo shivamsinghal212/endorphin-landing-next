@@ -80,11 +80,14 @@ function FlagshipCard({ c, isMember }: { c: ApiClub; isMember: boolean }) {
   const nr = pickNextEvent(c.events);
   const href = `/clubs/${c.slug}`;
 
+  const bgImageUrl = c.headerImageUrl || c.logoUrl || null;
+  const bgIsLogoFallback = !c.headerImageUrl && !!c.logoUrl;
+
   return (
     <article className="v1c-flagship-card">
       <div
-        className="v1c-flagship-card-bg"
-        style={c.headerImageUrl ? { backgroundImage: `url('${c.headerImageUrl}')` } : undefined}
+        className={`v1c-flagship-card-bg${bgIsLogoFallback ? ' is-logo-fallback' : ''}`}
+        style={bgImageUrl ? { backgroundImage: `url('${bgImageUrl}')` } : undefined}
         aria-hidden
       />
       <div className="v1c-flagship-main">
@@ -201,16 +204,20 @@ function ClubCard({ c }: { c: ApiClub }) {
   const nr = pickNextEvent(c.events);
   const href = `/clubs/${c.slug}`;
 
+  const headerImg = c.headerImageUrl || c.logoUrl || null;
+  const headerIsLogoFallback = !c.headerImageUrl && !!c.logoUrl;
+
   return (
     <Link href={href} className="v1c-club-card">
       <div className="v1c-club-card-header">
         <div className="v1c-club-card-header-fallback">{initials(c.name)}</div>
-        {c.headerImageUrl && (
+        {headerImg && (
           // eslint-disable-next-line @next/next/no-img-element
           <img
-            src={c.headerImageUrl}
+            src={headerImg}
             alt={c.name}
             loading="lazy"
+            className={headerIsLogoFallback ? 'is-logo-fallback' : ''}
             onError={(e) => {
               (e.currentTarget as HTMLImageElement).style.display = 'none';
             }}

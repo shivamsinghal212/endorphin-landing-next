@@ -1810,6 +1810,10 @@ body { padding-top: var(--nav-h, 68px); }
   background-size: cover; background-position: center;
   filter: grayscale(1) contrast(1.1) brightness(0.38);
 }
+.v1-clubs-page .v1c-flagship-card-bg.is-logo-fallback {
+  background-size: 150% auto;
+  filter: grayscale(1) contrast(1.05) brightness(0.28) blur(2px);
+}
 .v1-clubs-page .v1c-flagship-card::after {
   content: ''; position: absolute; inset: 0; z-index: 1;
   background:
@@ -2087,6 +2091,12 @@ body { padding-top: var(--nav-h, 68px); }
   width: 100%; height: 100%; object-fit: cover;
   transition: transform 400ms ease-out; z-index: 1;
   filter: brightness(0.6) contrast(1.05) saturate(0.92);
+}
+.v1-clubs-page .v1c-club-card-header img.is-logo-fallback {
+  filter: brightness(0.42) contrast(1) saturate(0.85) blur(3px);
+}
+.v1-clubs-page .v1c-club-card:hover .v1c-club-card-header img.is-logo-fallback {
+  transform: scale(1.55);
 }
 .v1-clubs-page .v1c-club-card-header::after {
   content: ''; position: absolute; inset: 0; z-index: 2;
