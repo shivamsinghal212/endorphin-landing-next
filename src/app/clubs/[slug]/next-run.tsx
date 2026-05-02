@@ -6,51 +6,42 @@ import { RsvpButton } from './rsvp-button';
 
 // ─── helpers ────────────────────────────────────────
 
+// Render dates/times in IST regardless of where the page renders (Vercel
+// serverless runs in UTC, which would otherwise show the wrong hour).
+const TZ = 'Asia/Kolkata';
+
 function parseDate(iso: string | null | undefined): Date | null {
   if (!iso) return null;
   const d = new Date(iso.includes('T') ? iso : `${iso}T00:00:00`);
   return Number.isNaN(d.getTime()) ? null : d;
 }
 
-function fmtWeekdayShort(iso: string | null | undefined) {
-  const d = parseDate(iso);
-  return d ? d.toLocaleString('en', { weekday: 'short' }) : '';
-}
-
-function fmtDayMonth(iso: string | null | undefined) {
+function fmtIn(iso: string | null | undefined, opts: Intl.DateTimeFormatOptions): string {
   const d = parseDate(iso);
   if (!d) return '';
-  return `${d.getDate()} ${d.toLocaleString('en', { month: 'short' })}`;
+  return new Intl.DateTimeFormat('en-IN', { timeZone: TZ, ...opts }).format(d);
+}
+
+function fmtWeekdayShort(iso: string | null | undefined) {
+  return fmtIn(iso, { weekday: 'short' });
 }
 
 function fmtTime12h(iso: string | null | undefined) {
-  const d = parseDate(iso);
-  if (!d) return '';
-  let h = d.getHours();
-  const m = String(d.getMinutes()).padStart(2, '0');
-  const ampm = h >= 12 ? 'pm' : 'am';
-  h = h % 12 || 12;
-  return `${h}:${m} ${ampm}`;
+  return fmtIn(iso, { hour: 'numeric', minute: '2-digit', hour12: true })
+    .toLowerCase()
+    .replace(/\s+/g, ' ');
 }
 
 function fmtDayNum(iso: string | null | undefined) {
-  const d = parseDate(iso);
-  return d ? String(d.getDate()) : '';
+  return fmtIn(iso, { day: 'numeric' });
 }
 
 function fmtMonthLong(iso: string | null | undefined) {
-  const d = parseDate(iso);
-  return d ? d.toLocaleString('en', { month: 'long' }) : '';
+  return fmtIn(iso, { month: 'long' });
 }
 
 function fmtFullDate(iso: string | null | undefined) {
-  const d = parseDate(iso);
-  if (!d) return '';
-  return d.toLocaleString('en', {
-    weekday: 'long',
-    day: 'numeric',
-    month: 'long',
-  });
+  return fmtIn(iso, { weekday: 'long', day: 'numeric', month: 'long' });
 }
 
 function fmtDistance(km: number | null | undefined) {
@@ -60,12 +51,6 @@ function fmtDistance(km: number | null | undefined) {
 
 function stripTitleEnd(title: string) {
   return title.trim().replace(/[.!?…]+$/, '');
-}
-
-// Stencil pill text in the photo footer / empty state.
-function buildPhotoTag(clubName: string, iso: string) {
-  const dm = fmtDayMonth(iso);
-  return [`${clubName} flyer`, dm].filter(Boolean).join(' · ');
 }
 
 // ─── component ──────────────────────────────────────
@@ -87,13 +72,14 @@ export function NextRun({
   const isRace = event.eventType === 'race_event';
   const time = fmtTime12h(event.startTime);
   const titleClean = stripTitleEnd(event.title);
-  const kickerBits = [club.name, time].filter(Boolean);
+  const kickerBits = ['Next run', club.name, time].filter(Boolean);
   const kicker = kickerBits.join(' · ');
   const headerEyebrow = fmtFullDate(event.startTime);
   const summary = event.description || '';
 
   const distance = event.distanceKm != null ? fmtDistance(event.distanceKm) : '—';
   const where = event.locationName || '—';
+  const after = event.recap?.after?.trim() || '';
 
   const fgStyle: CSSProperties | undefined = hasImage
     ? ({
@@ -103,54 +89,24 @@ export function NextRun({
 
   return (
     <section className="nr-section" aria-label="Next run">
-      <div className="nr-section-rule">
-        <h2 className="nr-section-title">Next run.</h2>
-        <span className="nr-rule" aria-hidden="true" />
-        {headerEyebrow && (
-          <span className="nr-section-eyebrow">{headerEyebrow}</span>
-        )}
-      </div>
-
-      <article className="nr-card">
+      <div className="nr-inner">
         {hasImage ? (
           <div className="nr-photo" style={fgStyle}>
             <div className="nr-photo-bg" aria-hidden="true" />
             <div className="nr-photo-fg" aria-hidden="true" />
             <div className="nr-photo-scrim" aria-hidden="true" />
-            <span className="nr-photo-tag" aria-hidden="true">
-              {buildPhotoTag(club.name, event.startTime)}
-            </span>
           </div>
         ) : (
           <div className="nr-empty">
-            <span className="nr-empty-eyebrow">{titleClean || 'Next run'}</span>
-            <span className="nr-empty-num" aria-hidden="true">
-              {fmtDayNum(event.startTime)}
-            </span>
-            <span className="sr-only">{headerEyebrow}</span>
-            <div className="nr-empty-foot">
-              <div className="nr-empty-runner" aria-hidden="true">
-                <svg
-                  width="20"
-                  height="20"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <circle cx="13" cy="4" r="2" />
-                  <path d="m4 22 4-7-2-3 2-5 4 1 1 4 4 2-2 4 1 4" />
-                </svg>
-              </div>
-              <span className="nr-empty-month">
-                {fmtWeekdayShort(event.startTime)} · {fmtMonthLong(event.startTime)}
-              </span>
-              <span className="nr-empty-stencil">
-                {[event.locationName, time].filter(Boolean).join(' · ')}
-              </span>
+            <div className="nr-empty-date" aria-hidden="true">
+              <span className="nr-empty-weekday">{fmtWeekdayShort(event.startTime)}</span>
+              <span className="nr-empty-num">{fmtDayNum(event.startTime)}</span>
+              <span className="nr-empty-month">{fmtMonthLong(event.startTime)}</span>
             </div>
+            <span className="sr-only">{headerEyebrow}</span>
+            <span className="nr-empty-stencil">
+              {[event.locationName, time].filter(Boolean).join(' · ')}
+            </span>
           </div>
         )}
 
@@ -177,10 +133,12 @@ export function NextRun({
               <dt>Where</dt>
               <dd>{where}</dd>
             </div>
-            <div>
-              <dt>After</dt>
-              <dd>—</dd>
-            </div>
+            {after && (
+              <div>
+                <dt>After</dt>
+                <dd>{after}</dd>
+              </div>
+            )}
           </dl>
 
           <div className="nr-cta">
@@ -201,7 +159,7 @@ export function NextRun({
             </span>
           </div>
         </div>
-      </article>
+      </div>
     </section>
   );
 }

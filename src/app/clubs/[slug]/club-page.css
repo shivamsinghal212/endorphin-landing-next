@@ -930,6 +930,14 @@
   padding-left: max(28px, calc((100% - var(--container-max)) / 2));
   padding-right: max(28px, calc((100% - var(--container-max)) / 2));
 }
+/* Next run is a full-bleed dark section; only the right column has the
+   gutter so the flyer can bleed all the way to the left edge. */
+.club-page .nr-empty {
+  padding-left: max(28px, calc((100% - var(--container-max)) / 2));
+}
+.club-page .nr-content {
+  padding-right: max(28px, calc((100% - var(--container-max)) / 2));
+}
 .club-page .stats {
   max-width: var(--container-max);
   margin-inline: auto;
@@ -938,7 +946,6 @@
 @media (max-width: 640px) {
   .club-page .hero,
   .club-page .next-run,
-  .club-page .nr-section,
   .club-page .upcoming,
   .club-page .last-run,
   .club-page .led-by,
@@ -946,45 +953,22 @@
     padding-left: max(20px, calc((100% - var(--container-max)) / 2));
     padding-right: max(20px, calc((100% - var(--container-max)) / 2));
   }
+  .club-page .nr-empty {
+    padding-left: max(20px, calc((100% - var(--container-max)) / 2));
+  }
+  .club-page .nr-content {
+    padding-right: max(20px, calc((100% - var(--container-max)) / 2));
+  }
 }
 
 /* ─── Next Run editorial ─────────────────────────── */
 
 .club-page .nr-section {
-  padding: 56px 0 16px;
-}
-.club-page .nr-section-rule {
-  display: flex; align-items: baseline; gap: 16px;
-  margin-bottom: 24px;
-}
-.club-page .nr-section-title {
-  font-family: var(--font-fraunces), Georgia, "Times New Roman", serif;
-  font-style: italic;
-  font-weight: 700;
-  font-size: 36px;
-  line-height: 1;
-  letter-spacing: -0.015em;
-  color: var(--jet);
-}
-.club-page .nr-rule {
-  flex: 1;
-  height: 0.5px;
-  background: var(--hairline-strong);
-}
-.club-page .nr-section-eyebrow {
-  font-family: var(--font-oswald), sans-serif;
-  font-size: 11px;
-  font-weight: 500;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: var(--text-secondary);
-}
-
-.club-page .nr-card {
   background: var(--jet);
   color: var(--bone);
-  border-radius: 4px;
-  overflow: hidden;
+  padding: 0;
+}
+.club-page .nr-inner {
   display: grid;
   grid-template-columns: 0.92fr 1.08fr;
   min-height: 540px;
@@ -1047,59 +1031,54 @@
     #161616;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  padding: 36px 32px;
-  gap: 16px;
+  justify-content: center;
+  padding: 48px 44px;
+  gap: 24px;
   position: relative;
   min-height: 540px;
 }
-.club-page .nr-empty-eyebrow {
-  font-family: var(--font-oswald), sans-serif;
-  font-weight: 600;
-  font-size: 12px;
-  letter-spacing: 0.32em;
-  text-transform: uppercase;
-  color: var(--red);
+.club-page .nr-empty-date {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0;
+  line-height: 0.85;
 }
-.club-page .nr-empty-num {
+.club-page .nr-empty-weekday,
+.club-page .nr-empty-num,
+.club-page .nr-empty-month {
   font-family: var(--font-fraunces), Georgia, "Times New Roman", serif;
   font-style: italic;
   font-weight: 700;
-  font-size: 240px;
+  letter-spacing: -0.025em;
+  display: block;
+}
+.club-page .nr-empty-weekday {
+  font-size: 56px;
+  color: var(--bone);
+  opacity: 0.78;
+  margin-bottom: 4px;
+}
+.club-page .nr-empty-num {
+  font-size: 220px;
+  color: var(--bone);
+  letter-spacing: -0.045em;
   line-height: 0.82;
-  letter-spacing: -0.04em;
-  color: var(--bone);
-}
-.club-page .nr-empty-foot {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-  gap: 16px;
-}
-.club-page .nr-empty-runner {
-  width: 52px; height: 52px;
-  border-radius: 50%;
-  border: 0.5px solid rgba(245, 240, 235, 0.25);
-  display: flex; align-items: center; justify-content: center;
-  color: var(--bone);
-  flex-shrink: 0;
 }
 .club-page .nr-empty-month {
-  font-family: var(--font-oswald), sans-serif;
-  font-weight: 600;
-  font-size: 12px;
-  letter-spacing: 0.32em;
-  text-transform: uppercase;
-  color: var(--bone);
+  font-size: 56px;
+  color: var(--red);
+  margin-top: 4px;
 }
 .club-page .nr-empty-stencil {
   font-family: var(--font-oswald), sans-serif;
-  font-size: 10px;
-  letter-spacing: 0.3em;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.28em;
   text-transform: uppercase;
-  color: rgba(245, 240, 235, 0.6);
-  max-width: 14ch;
-  text-align: right;
+  color: rgba(245, 240, 235, 0.55);
+  align-self: flex-start;
+  margin-top: auto;
 }
 
 /* Right column */
@@ -1142,7 +1121,7 @@
 }
 .club-page .nr-meta {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
   gap: 22px;
   padding: 22px 0;
   border-top: 0.5px solid rgba(245, 240, 235, 0.12);
@@ -1167,11 +1146,20 @@
 .club-page .nr-cta {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 14px;
   flex-wrap: wrap;
 }
 .club-page .nr-cta .btn {
   height: 46px;
+}
+.club-page .nr-cta .btn,
+.club-page .nr-cta .next-run-rsvp {
+  margin-left: auto;
+  order: 2;
+}
+.club-page .nr-going {
+  order: 1;
 }
 .club-page .nr-going {
   font-family: var(--font-poppins), sans-serif;
@@ -1196,11 +1184,9 @@
 
 /* Stack at <880px — same breakpoint as the mockup. */
 @media (max-width: 880px) {
-  .club-page .nr-section { padding: 32px 0 12px; }
-  .club-page .nr-section-title { font-size: 26px; }
-  .club-page .nr-section-rule { gap: 10px; margin-bottom: 16px; }
+  .club-page .nr-section { margin-top: 24px; }
 
-  .club-page .nr-card {
+  .club-page .nr-inner {
     grid-template-columns: 1fr;
     min-height: 0;
   }
