@@ -271,63 +271,11 @@ export const getQueueStatus = (token: string) =>
 // GET is public; POST upserts and requires the admin JWT.
 // Routes live at /api/v1/clubs/* (not under /admin), so we hit them directly.
 
-export type ClubRunType = 'club_run' | 'race_event';
-
 export interface ClubStats {
   members: number;
   runsThisMonth: number;
   kmThisMonth: number;
   yearsRunning: number;
-}
-
-export interface ClubNextRun {
-  id?: string | null;
-  date: string;
-  time?: string | null;
-  location?: string | null;
-  title: string;
-  distanceKm?: number | null;
-  description?: string | null;
-  goingCount: number;
-  bgImageUrl?: string | null;
-  rsvpUrl?: string | null;
-  type: ClubRunType;
-}
-
-export interface ClubUpcomingRun {
-  id?: string | null;
-  date: string;
-  time?: string | null;
-  location?: string | null;
-  title: string;
-  distanceKm?: number | null;
-  goingCount: number;
-  rsvpUrl?: string | null;
-  type: ClubRunType;
-}
-
-export interface ClubLastRunStats {
-  showedUp: number;
-  distanceKm?: number | null;
-  location?: string | null;
-  paceGroups?: string | null;
-  after?: string | null;
-}
-
-export interface ClubLastRunPhoto {
-  url: string;
-  captionTitle?: string | null;
-  captionMeta?: string | null;
-}
-
-export interface ClubLastRun {
-  date: string;
-  title: string;
-  distanceKm?: number | null;
-  type: ClubRunType;
-  summary?: string | null;
-  stats: ClubLastRunStats;
-  photos: ClubLastRunPhoto[];
 }
 
 export interface ClubAdminPerson {
@@ -363,6 +311,7 @@ export interface Club {
   description: string | null;
   tags: string[];
   isVerified: boolean;
+  isFeatured: boolean;
   publishedAt: string | null;
   whatsappUrl: string | null;
   instagramUrl: string | null;
@@ -371,12 +320,47 @@ export interface Club {
   joinForm: JoinFormField[] | null;
   requiresApproval: boolean;
   stats: ClubStats;
-  nextRun: ClubNextRun | null;
-  upcomingRuns: ClubUpcomingRun[];
-  lastRun: ClubLastRun | null;
   admins: ClubAdminPerson[];
   createdAt: string;
   updatedAt: string;
+}
+
+export interface ClubEventRecapPhoto {
+  url: string;
+  captionTitle?: string | null;
+  captionMeta?: string | null;
+}
+
+export interface ClubEventRecap {
+  summary?: string | null;
+  showedUp?: number | null;
+  paceGroups?: string | null;
+  after?: string | null;
+  photos: ClubEventRecapPhoto[];
+}
+
+export type ClubEventType = 'club_run' | 'race_event';
+
+export interface ClubEvent {
+  id: string;
+  clubId: string;
+  title: string;
+  description: string | null;
+  locationName: string | null;
+  locationAddress: string | null;
+  lat: number | null;
+  lng: number | null;
+  startTime: string;
+  endTime: string | null;
+  maxParticipants: number | null;
+  coverImageUrl: string | null;
+  distanceKm: number | null;
+  eventType: ClubEventType;
+  recap: ClubEventRecap | null;
+  createdBy: string;
+  createdAt: string;
+  updatedAt: string;
+  goingCount: number;
 }
 
 export const getClub = async (slug: string): Promise<Club | null> => {
@@ -401,3 +385,74 @@ export const upsertClub = async (
   if (!res.ok) throw new AdminApiError(res.status, await res.text());
   return res.json();
 };
+
+// All clubs incl. unpublished drafts (admin-only).
+export const listAdminClubs = (token: string) =>
+  adminFetch<Club[]>('/clubs', token);
+
+export const setClubFeatured = (token: string, slug: string, isFeatured: boolean) =>
+  adminFetch<Club>(`/clubs/${encodeURIComponent(slug)}/featured`, token, {
+    method: 'PATCH',
+    body: JSON.stringify({ isFeatured }),
+  });
+
+// ── Club events ────────────────────────────────────────────────────────────
+// These hit /api/v1/clubs/{slug}/events directly. Platform admins (whitelisted
+// emails) are accepted by require_club_admin even without club membership.
+
+const clubFetch = async <T = unknown>(
+  path: string,
+  token: string,
+  options: RequestInit = {},
+): Promise<T> => {
+  const res = await fetch(`${API_BASE}/api/v1${path}`, {
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+      ...options.headers,
+    },
+  });
+  if (!res.ok) throw new AdminApiError(res.status, await res.text());
+  if (res.status === 204) return undefined as T;
+  return res.json();
+};
+
+export const listClubEvents = (token: string, slug: string, params: { upcoming?: boolean } = {}) => {
+  const qs = new URLSearchParams();
+  if (params.upcoming !== undefined) qs.set('upcoming', String(params.upcoming));
+  const suffix = qs.toString() ? `?${qs}` : '';
+  return clubFetch<ClubEvent[]>(`/clubs/${encodeURIComponent(slug)}/events${suffix}`, token);
+};
+
+export const getClubEvent = async (
+  token: string,
+  slug: string,
+  eventId: string,
+): Promise<ClubEvent | null> => {
+  const events = await listClubEvents(token, slug);
+  return events.find((e) => e.id === eventId) ?? null;
+};
+
+export const createClubEvent = (token: string, slug: string, body: Record<string, unknown>) =>
+  clubFetch<ClubEvent>(`/clubs/${encodeURIComponent(slug)}/events`, token, {
+    method: 'POST',
+    body: JSON.stringify(body),
+  });
+
+export const patchClubEvent = (
+  token: string,
+  slug: string,
+  eventId: string,
+  body: Record<string, unknown>,
+) =>
+  clubFetch<ClubEvent>(
+    `/clubs/${encodeURIComponent(slug)}/events/${encodeURIComponent(eventId)}`,
+    token,
+    { method: 'PATCH', body: JSON.stringify(body) },
+  );
+
+export const deleteClubEvent = (token: string, slug: string, eventId: string) =>
+  clubFetch(`/clubs/${encodeURIComponent(slug)}/events/${encodeURIComponent(eventId)}`, token, {
+    method: 'DELETE',
+  });

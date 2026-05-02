@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation';
 import { auth } from '@/lib/auth';
-import { ClubsAdminContent } from './clubs-form';
+import { ClubsListContent } from './_components/clubs-list';
 
 export default async function AdminClubsPage({
   searchParams,
@@ -9,6 +9,10 @@ export default async function AdminClubsPage({
 }) {
   const session = await auth();
   if (!session) redirect('/admin/login');
+
+  // Backwards-compat: old links used /admin/clubs?slug=… for the editor.
   const { slug } = await searchParams;
-  return <ClubsAdminContent initialSlug={slug ?? ''} />;
+  if (slug) redirect(`/admin/clubs/${encodeURIComponent(slug)}`);
+
+  return <ClubsListContent />;
 }

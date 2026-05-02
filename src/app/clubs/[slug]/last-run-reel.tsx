@@ -1,7 +1,9 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import type { ClubLastRunPhoto } from '@/lib/admin-api';
+import type { ClubEventRecapPhoto } from '@/lib/admin-api';
+
+type ClubLastRunPhoto = ClubEventRecapPhoto;
 
 // Client-side reel: scroll-snap with progress segments, arrow buttons,
 // and a live "01 / 06" counter. Mirrors the mockup's inline script 1:1.
