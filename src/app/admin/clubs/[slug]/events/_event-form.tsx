@@ -11,11 +11,13 @@ import {
   deleteClubEvent,
   AdminApiError,
   type ClubEvent,
+  type ClubEventRecapVideo,
   type ClubEventType,
 } from '@/lib/admin-api';
 import { Card } from '../../_components/card';
 import { CheckboxField, Field } from '../../_components/field';
 import { ImageUploadField, ImageGalleryField } from '../../_components/image-upload';
+import { VideoUploadField } from '../../_components/video-upload';
 
 interface EventFormState {
   title: string;
@@ -35,6 +37,7 @@ interface EventFormState {
   recapPaceGroups: string;
   recapAfter: string;
   recapPhotos: string[];
+  recapVideos: ClubEventRecapVideo[];
 }
 
 function emptyState(): EventFormState {
@@ -55,6 +58,7 @@ function emptyState(): EventFormState {
     recapPaceGroups: '',
     recapAfter: '',
     recapPhotos: [],
+    recapVideos: [],
   };
 }
 
@@ -76,6 +80,13 @@ function fromEvent(e: ClubEvent): EventFormState {
     recapPaceGroups: e.recap?.paceGroups ?? '',
     recapAfter: e.recap?.after ?? '',
     recapPhotos: (e.recap?.photos ?? []).map((p) => p.url),
+    recapVideos: (e.recap?.videos ?? []).map((v) => ({
+      url: v.url,
+      posterUrl: v.posterUrl ?? null,
+      durationSec: v.durationSec ?? null,
+      captionTitle: v.captionTitle ?? null,
+      captionMeta: v.captionMeta ?? null,
+    })),
   };
 }
 
@@ -97,6 +108,13 @@ function buildPayload(form: EventFormState): Record<string, unknown> {
           url,
           captionTitle: null,
           captionMeta: null,
+        })),
+        videos: form.recapVideos.map((v) => ({
+          url: v.url,
+          posterUrl: v.posterUrl ?? null,
+          durationSec: v.durationSec ?? null,
+          captionTitle: v.captionTitle ?? null,
+          captionMeta: v.captionMeta ?? null,
         })),
       }
     : null;
@@ -344,6 +362,13 @@ export function EventFormContent({
                   onChange={(urls) => update('recapPhotos', urls)}
                   folder={`${folderBase}/recap`}
                   hint="Photos shown on the club detail page reel."
+                />
+                <VideoUploadField
+                  label="Recap videos"
+                  videos={form.recapVideos}
+                  onChange={(videos) => update('recapVideos', videos)}
+                  folder={`${folderBase}/recap-videos`}
+                  hint="MP4, MOV, or WebM up to 100 MB. Uploads direct to storage."
                 />
               </>
             )}

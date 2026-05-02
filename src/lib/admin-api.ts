@@ -331,12 +331,21 @@ export interface ClubEventRecapPhoto {
   captionMeta?: string | null;
 }
 
+export interface ClubEventRecapVideo {
+  url: string;
+  posterUrl?: string | null;
+  durationSec?: number | null;
+  captionTitle?: string | null;
+  captionMeta?: string | null;
+}
+
 export interface ClubEventRecap {
   summary?: string | null;
   showedUp?: number | null;
   paceGroups?: string | null;
   after?: string | null;
   photos: ClubEventRecapPhoto[];
+  videos: ClubEventRecapVideo[];
 }
 
 export type ClubEventType = 'club_run' | 'race_event';

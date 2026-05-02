@@ -10,7 +10,9 @@ import { ClubIcons } from './club-icons';
 import { JoinClubButton } from './join-club-button';
 import { RsvpButton } from './rsvp-button';
 import { LastRunReel } from './last-run-reel';
+import { RecapVideoReel } from './recap-video-reel';
 import { ExpandableDescription } from './expandable-description';
+import { NextRun } from './next-run';
 import './club-page.css';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE || 'https://api.endorfin.run';
@@ -79,12 +81,6 @@ function fmtMonth(iso: string | null | undefined) {
   return d ? d.toLocaleString('en', { month: 'short' }) : '';
 }
 
-function fmtDayDotMonth(iso: string | null | undefined) {
-  const d = parseDate(iso);
-  if (!d) return '';
-  return `${String(d.getDate()).padStart(2, '0')}·${String(d.getMonth() + 1).padStart(2, '0')}`;
-}
-
 function fmtTime12hFromIso(iso: string | null | undefined) {
   const d = parseDate(iso);
   if (!d) return '';
@@ -93,11 +89,6 @@ function fmtTime12hFromIso(iso: string | null | undefined) {
   const ampm = h >= 12 ? 'pm' : 'am';
   h = h % 12 || 12;
   return `${h}:${m} ${ampm}`;
-}
-
-function fmtDistance(km: number | null | undefined) {
-  if (km == null) return '';
-  return Number.isInteger(km) ? `${km}K` : `${km}K`;
 }
 
 function fmtLastRunKickerDate(iso: string | null | undefined) {
@@ -198,17 +189,12 @@ export default async function ClubPage({ params }: PageProps) {
         />
         <Ribbon />
         <Stats club={club} />
-        {nextEvent && (
-          <NextRun
-            event={nextEvent}
-            slug={club.slug}
-            clubName={club.name}
-            joinForm={club.joinForm}
-            requiresApproval={club.requiresApproval}
-            isAuthed={isAuthed}
-            myMembership={myMembership}
-          />
-        )}
+        <NextRun
+          event={nextEvent}
+          club={club}
+          isAuthed={isAuthed}
+          myMembership={myMembership}
+        />
         {upcomingEvents.length > 0 && (
           <Upcoming
             events={upcomingEvents}
@@ -417,71 +403,6 @@ function Stats({ club }: { club: Club }) {
   );
 }
 
-function NextRun({
-  event,
-  slug,
-  clubName,
-  joinForm,
-  requiresApproval,
-  isAuthed,
-  myMembership,
-}: {
-  event: ClubEvent;
-  slug: string;
-  clubName: string;
-  joinForm: Club['joinForm'];
-  requiresApproval: boolean;
-  isAuthed: boolean;
-  myMembership: MyMembership | null;
-}) {
-  const bgStyle = event.coverImageUrl
-    ? ({ ['--bg-image' as string]: `url('${event.coverImageUrl}')` } as React.CSSProperties)
-    : undefined;
-  const hasImage = !!event.coverImageUrl;
-  const location = event.locationName;
-  const time = fmtTime12hFromIso(event.startTime);
-  const isRace = event.eventType === 'race_event';
-
-  return (
-    <section className={`next-run on-jet ${hasImage ? 'has-image' : ''}`} style={bgStyle}>
-      <div className="kicker next-run-kicker" style={{ color: 'var(--text-muted)' }}>This week · Next run</div>
-      <div className="next-run-grid">
-        <div className="date-block">
-          <div className="date-block-title">
-            <div className="date-block-day">{fmtDay(event.startTime)}</div>
-            <div className="date-block-date">{fmtDayDotMonth(event.startTime)}</div>
-          </div>
-          <div className="date-block-sub">
-            {[time, location].filter(Boolean).join(' · ')}
-          </div>
-        </div>
-        <div className="run-info">
-          <h2 className="run-title">
-            {event.title}
-            {event.distanceKm != null && <> — <span className="distance">{fmtDistance(event.distanceKm)}</span></>}
-          </h2>
-          {event.description && <p className="run-description">{event.description}</p>}
-        </div>
-        <div className="next-run-cta">
-          <span className="going-pill">{event.goingCount} going</span>
-          {!isRace && (
-            <RsvpButton
-              slug={slug}
-              clubName={clubName}
-              eventId={event.id}
-              joinForm={joinForm}
-              requiresApproval={requiresApproval}
-              isAuthed={isAuthed}
-              myMembership={myMembership}
-              variant="primary"
-            />
-          )}
-        </div>
-      </div>
-    </section>
-  );
-}
-
 function Upcoming({
   events,
   slug,
@@ -586,6 +507,7 @@ function LastRun({ event }: { event: ClubEvent }) {
   const isRace = event.eventType === 'race_event';
   const recap = event.recap;
   const photos = recap?.photos ?? [];
+  const videos = recap?.videos ?? [];
 
   return (
     <section className="last-run">
@@ -625,6 +547,7 @@ function LastRun({ event }: { event: ClubEvent }) {
       </div>
 
       {photos.length > 0 && <LastRunReel photos={photos} />}
+      {videos.length > 0 && <RecapVideoReel videos={videos} />}
     </section>
   );
 }

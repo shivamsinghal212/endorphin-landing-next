@@ -938,6 +938,7 @@
 @media (max-width: 640px) {
   .club-page .hero,
   .club-page .next-run,
+  .club-page .nr-section,
   .club-page .upcoming,
   .club-page .last-run,
   .club-page .led-by,
@@ -945,4 +946,293 @@
     padding-left: max(20px, calc((100% - var(--container-max)) / 2));
     padding-right: max(20px, calc((100% - var(--container-max)) / 2));
   }
+}
+
+/* ─── Next Run editorial ─────────────────────────── */
+
+.club-page .nr-section {
+  padding: 56px 0 16px;
+}
+.club-page .nr-section-rule {
+  display: flex; align-items: baseline; gap: 16px;
+  margin-bottom: 24px;
+}
+.club-page .nr-section-title {
+  font-family: var(--font-fraunces), Georgia, "Times New Roman", serif;
+  font-style: italic;
+  font-weight: 700;
+  font-size: 36px;
+  line-height: 1;
+  letter-spacing: -0.015em;
+  color: var(--jet);
+}
+.club-page .nr-rule {
+  flex: 1;
+  height: 0.5px;
+  background: var(--hairline-strong);
+}
+.club-page .nr-section-eyebrow {
+  font-family: var(--font-oswald), sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+.club-page .nr-card {
+  background: var(--jet);
+  color: var(--bone);
+  border-radius: 4px;
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: 0.92fr 1.08fr;
+  min-height: 540px;
+}
+
+/* Photo column — 4 layers: blurred bg, contained fg, scrim, tag pill. */
+.club-page .nr-photo {
+  position: relative;
+  background: #1a1a1a;
+  overflow: hidden;
+  min-height: 540px;
+}
+.club-page .nr-photo-bg {
+  position: absolute; inset: 0;
+  background-image: var(--nr-flyer);
+  background-size: cover;
+  background-position: center;
+  filter: blur(28px) brightness(0.55) saturate(1.1);
+  transform: scale(1.15);
+}
+.club-page .nr-photo-fg {
+  position: absolute; inset: 0;
+  background-image: var(--nr-flyer);
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+.club-page .nr-photo-scrim {
+  position: absolute; inset: 0;
+  pointer-events: none;
+  background: linear-gradient(180deg, rgba(0,0,0,0) 60%, rgba(0,0,0,0.35) 100%);
+}
+.club-page .nr-photo-tag {
+  position: absolute;
+  bottom: 22px; left: 22px;
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 7px 13px 6px;
+  border-radius: 999px;
+  font-family: var(--font-oswald), sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  background: rgba(245, 240, 235, 0.92);
+  color: var(--jet);
+  backdrop-filter: blur(6px);
+}
+.club-page .nr-photo-tag::before {
+  content: '';
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--red);
+}
+
+/* Empty state */
+.club-page .nr-empty {
+  background:
+    radial-gradient(ellipse at 30% 25%, rgba(230, 35, 42, 0.16), transparent 60%),
+    repeating-linear-gradient(45deg, rgba(245, 240, 235, 0.04) 0 1px, transparent 1px 14px),
+    #161616;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 36px 32px;
+  gap: 16px;
+  position: relative;
+  min-height: 540px;
+}
+.club-page .nr-empty-eyebrow {
+  font-family: var(--font-oswald), sans-serif;
+  font-weight: 600;
+  font-size: 12px;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: var(--red);
+}
+.club-page .nr-empty-num {
+  font-family: var(--font-fraunces), Georgia, "Times New Roman", serif;
+  font-style: italic;
+  font-weight: 700;
+  font-size: 240px;
+  line-height: 0.82;
+  letter-spacing: -0.04em;
+  color: var(--bone);
+}
+.club-page .nr-empty-foot {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 16px;
+}
+.club-page .nr-empty-runner {
+  width: 52px; height: 52px;
+  border-radius: 50%;
+  border: 0.5px solid rgba(245, 240, 235, 0.25);
+  display: flex; align-items: center; justify-content: center;
+  color: var(--bone);
+  flex-shrink: 0;
+}
+.club-page .nr-empty-month {
+  font-family: var(--font-oswald), sans-serif;
+  font-weight: 600;
+  font-size: 12px;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: var(--bone);
+}
+.club-page .nr-empty-stencil {
+  font-family: var(--font-oswald), sans-serif;
+  font-size: 10px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: rgba(245, 240, 235, 0.6);
+  max-width: 14ch;
+  text-align: right;
+}
+
+/* Right column */
+.club-page .nr-content {
+  padding: 48px 48px 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  justify-content: space-between;
+}
+.club-page .nr-content-top {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.club-page .nr-kicker {
+  font-family: var(--font-oswald), sans-serif;
+  font-weight: 600;
+  font-size: 11px;
+  letter-spacing: 0.32em;
+  color: var(--red);
+  text-transform: uppercase;
+}
+.club-page .nr-title {
+  font-family: var(--font-fraunces), Georgia, "Times New Roman", serif;
+  font-style: italic;
+  font-weight: 700;
+  font-size: 64px;
+  line-height: 0.98;
+  letter-spacing: -0.025em;
+  color: var(--bone);
+}
+.club-page .nr-summary {
+  font-family: var(--font-poppins), sans-serif;
+  font-size: 15px;
+  line-height: 1.6;
+  color: rgba(245, 240, 235, 0.6);
+  max-width: 52ch;
+  margin-top: -2px;
+}
+.club-page .nr-meta {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 22px;
+  padding: 22px 0;
+  border-top: 0.5px solid rgba(245, 240, 235, 0.12);
+  border-bottom: 0.5px solid rgba(245, 240, 235, 0.12);
+}
+.club-page .nr-meta dt {
+  font-family: var(--font-oswald), sans-serif;
+  font-size: 10px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: rgba(245, 240, 235, 0.6);
+  margin-bottom: 6px;
+}
+.club-page .nr-meta dd {
+  font-family: var(--font-oswald), sans-serif;
+  font-size: 19px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--bone);
+  font-variant-numeric: tabular-nums;
+}
+.club-page .nr-cta {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+.club-page .nr-cta .btn {
+  height: 46px;
+}
+.club-page .nr-going {
+  font-family: var(--font-poppins), sans-serif;
+  font-size: 13px;
+  color: rgba(245, 240, 235, 0.6);
+}
+.club-page .nr-going strong {
+  color: var(--bone);
+  font-weight: 600;
+}
+
+/* Visually-hidden, screen-reader-only companion text. */
+.club-page .nr-empty .sr-only {
+  position: absolute;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Stack at <880px — same breakpoint as the mockup. */
+@media (max-width: 880px) {
+  .club-page .nr-section { padding: 32px 0 12px; }
+  .club-page .nr-section-title { font-size: 26px; }
+  .club-page .nr-section-rule { gap: 10px; margin-bottom: 16px; }
+
+  .club-page .nr-card {
+    grid-template-columns: 1fr;
+    min-height: 0;
+  }
+  .club-page .nr-photo {
+    min-height: 0;
+    aspect-ratio: 4 / 5;
+  }
+  .club-page .nr-empty {
+    min-height: 0;
+    aspect-ratio: 4 / 5;
+    padding: 28px 24px;
+    gap: 10px;
+  }
+  .club-page .nr-empty-num { font-size: 168px; }
+  .club-page .nr-photo-tag {
+    bottom: 14px; left: 14px;
+    font-size: 9px;
+    padding: 5px 10px 4px;
+  }
+  .club-page .nr-content {
+    padding: 28px 24px 26px;
+    gap: 16px;
+  }
+  .club-page .nr-title { font-size: 40px; }
+  .club-page .nr-kicker { font-size: 10px; letter-spacing: 0.28em; }
+  .club-page .nr-summary { font-size: 13.5px; line-height: 1.55; }
+  .club-page .nr-meta {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px 22px;
+    padding: 16px 0;
+  }
+  .club-page .nr-meta dt { font-size: 9px; letter-spacing: 0.2em; margin-bottom: 4px; }
+  .club-page .nr-meta dd { font-size: 16px; }
+  .club-page .nr-cta { gap: 12px; }
 }
