@@ -231,6 +231,19 @@
   color: var(--jet);
   text-align: right;
 }
+.club-page .hero-description-toggle {
+  background: none;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  font: inherit;
+  color: var(--red);
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.club-page .hero-description-toggle:hover { opacity: 0.85; }
 .club-page .hero-cta-stack {
   display: flex;
   flex-direction: column;

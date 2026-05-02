@@ -10,6 +10,7 @@ import { ClubIcons } from './club-icons';
 import { JoinClubButton } from './join-club-button';
 import { RsvpButton } from './rsvp-button';
 import { LastRunReel } from './last-run-reel';
+import { ExpandableDescription } from './expandable-description';
 import './club-page.css';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE || 'https://api.endorfin.run';
@@ -337,7 +338,7 @@ function Hero({
           )}
         </div>
         <aside className="hero-right">
-          {club.description && <p className="hero-description">{club.description}</p>}
+          {club.description && <ExpandableDescription text={club.description} />}
           <div className="hero-cta-stack">
             <JoinClubButton
               slug={club.slug}
