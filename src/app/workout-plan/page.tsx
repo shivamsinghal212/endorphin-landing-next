@@ -12,7 +12,9 @@ import {
 import { getSessionToken } from '@/lib/session';
 
 const PAGE_URL = 'https://www.endorfin.run/workout-plan';
-const OG_IMAGE = 'https://www.endorfin.run/og-image.png';
+
+// og:image + twitter:image are auto-wired by src/app/workout-plan/opengraph-image.png
+// (Next.js file-convention) — don't set them explicitly here or tags will duplicate.
 
 const PAGE_TITLE =
   'Personalised Running Training Plan for India · Kip by Endorfin';
@@ -44,21 +46,12 @@ export const metadata: Metadata = {
     description: PAGE_DESCRIPTION,
     siteName: 'Endorfin',
     locale: 'en_IN',
-    images: [
-      {
-        url: OG_IMAGE,
-        width: 1200,
-        height: 630,
-        alt: 'Kip — running coach app by Endorfin',
-      },
-    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Kip — personalised running training plan, written for India',
     description:
       'A running coach in your pocket. Two weeks at a time, calibrated to the air in your city. Waitlist open — launching soon.',
-    images: [OG_IMAGE],
     site: '@endorfinapp',
   },
   other: {
