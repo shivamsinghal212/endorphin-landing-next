@@ -38,7 +38,7 @@ const RIBBON_PHRASES = [
   'Knows the air in your city',
   'First 5K · half-marathon · full',
   'Easy days, hard days, long days',
-  'Launching 16 May 2026',
+  'Launching soon',
   'Made for runners in India',
 ];
 
@@ -187,7 +187,7 @@ export default function WorkoutPlanView({
         <div className="v1w-container v1w-hero-grid">
           <div className="v1w-hero-left">
             <span className="v1w-hero-badge">
-              Waitlist open · launching 16 May 2026
+              Waitlist open · launching soon
             </span>
             <h1 className="v1w-hero-title">
               Kip writes your
@@ -228,7 +228,7 @@ export default function WorkoutPlanView({
             <div className="v1w-phone-stage">
               <div className="v1w-phone-float v1w-phone-float-tl">
                 <span className="v1w-phone-float-dot" />
-                Built <b>for you</b>
+                Plan <b>your runs</b>
               </div>
               <div className="v1w-phone-float v1w-phone-float-br">
                 <span className="v1w-phone-float-dot" />
@@ -485,7 +485,7 @@ export default function WorkoutPlanView({
         id="waitlist"
       >
         <div className="v1w-container">
-          <div className="v1w-waitlist-kicker">Launching 16 May 2026</div>
+          <div className="v1w-waitlist-kicker">Launching soon</div>
           <h2 className="v1w-waitlist-title">
             {joined ? (
               <>
@@ -532,10 +532,10 @@ export default function WorkoutPlanView({
 
           <p className="v1w-waitlist-sub">
             {joined
-              ? "We'll email you on 16 May with your invite link. Until then — keep running."
+              ? "We'll email you the moment we go live with your invite link. Until then — keep running."
               : isFull
                 ? "First 100 spots are taken — but you can still request a spot. We'll get you in as soon as we can."
-                : 'Kip opens to the first 100 runners on 16 May 2026. Sign in to join the waitlist — confirmation lands in your inbox right after.'}
+                : 'Kip opens to the first 100 runners — launching soon. Sign in to join the waitlist — confirmation lands in your inbox right after.'}
           </p>
 
           <div className="v1w-waitlist-cta-row">
@@ -551,7 +551,7 @@ export default function WorkoutPlanView({
 
           {joined && (
             <div className="v1w-waitlist-success" role="status" aria-live="polite">
-              ● Confirmation email sent. We&apos;ll be in touch on 16 May.
+              ● Confirmation email sent. We&apos;ll be in touch when we go live.
             </div>
           )}
 

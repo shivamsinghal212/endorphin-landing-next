@@ -23,6 +23,6 @@ export const FAQS: FAQ[] = [
   },
   {
     q: 'When does it launch?',
-    a: "We open Kip to the first 100 runners on 16 May 2026. Sign in to join the waitlist — we'll email your invite the moment we launch.",
+    a: "We open Kip to the first 100 runners — launching soon. Sign in to join the waitlist and we'll email your invite the moment we launch.",
   },
 ];

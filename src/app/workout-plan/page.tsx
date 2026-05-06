@@ -17,7 +17,7 @@ const OG_IMAGE = 'https://www.endorfin.run/og-image.png';
 const PAGE_TITLE =
   'Personalised Running Training Plan for India · Kip by Endorfin';
 const PAGE_DESCRIPTION =
-  'Kip writes a personalised running training plan, calibrated to the air and heat in your city — Delhi, Bengaluru, Mumbai. First 5K, half marathon, getting faster. Works with or without a watch. Waitlist open — launching 16 May 2026.';
+  'Kip writes a personalised running training plan, calibrated to the air and heat in your city — Delhi, Bengaluru, Mumbai. First 5K, half marathon, getting faster. Works with or without a watch. Waitlist open — launching soon.';
 
 export const metadata: Metadata = {
   title: PAGE_TITLE,
@@ -57,7 +57,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Kip — personalised running training plan, written for India',
     description:
-      'A running coach in your pocket. Two weeks at a time, calibrated to the air in your city. Waitlist open — launching 16 May 2026.',
+      'A running coach in your pocket. Two weeks at a time, calibrated to the air in your city. Waitlist open — launching soon.',
     images: [OG_IMAGE],
     site: '@endorfinapp',
   },
@@ -89,7 +89,7 @@ const softwareJsonLd = {
     price: '0',
     priceCurrency: 'INR',
     availability: 'https://schema.org/PreOrder',
-    availabilityStarts: '2026-05-16',
+    // availabilityStarts intentionally omitted — date TBD ("launching soon").
   },
   featureList: [
     'Plans for first 5K, half-marathon, and getting faster',
