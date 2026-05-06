@@ -272,3 +272,32 @@ export const clubsApi = {
       { method: 'DELETE', token },
     ),
 };
+
+// ─── Kip founding-100 waitlist ────────────────────────────────────────────
+
+export interface WaitlistStats {
+  total: number;
+  capacity: number;
+  isOpen: boolean;
+}
+
+export interface WaitlistMe {
+  joined: boolean;
+  joinedAt: string | null;
+}
+
+export interface WaitlistJoinResponse {
+  joined: boolean;
+  total: number;
+  capacity: number;
+}
+
+export const kipWaitlistApi = {
+  getStats: () => api<WaitlistStats>('/kip-waitlist/stats'),
+  getMe: (token: string) => api<WaitlistMe>('/kip-waitlist/me', { token }),
+  join: (token: string) =>
+    api<WaitlistJoinResponse>('/kip-waitlist/join', {
+      method: 'POST',
+      token,
+    }),
+};

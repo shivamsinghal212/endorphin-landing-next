@@ -1,0 +1,1063 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Workout Plan · v2 design preview · Endorfin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@1,9..144,700&family=Oswald:wght@400;500;600;700&family=Poppins:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --jet:#0A0A0A;
+    --slate:#1A1A1A;
+    --bone:#F5F0EB;
+    --signal:#E6232A;
+    --dim:#666;
+    --bone-dim:rgba(245,240,235,0.7);
+    --bone-faint:rgba(245,240,235,0.4);
+    --jet-hairline:rgba(10,10,10,0.10);
+    --jet-soft:rgba(10,10,10,0.6);
+    --bone-hairline:rgba(245,240,235,0.16);
+    --container:1280px;
+    --gutter: clamp(28px, 5vw, 80px);
+    --section-pad-y: clamp(72px, 9vw, 128px);
+    --ease: cubic-bezier(.2,.8,.2,1);
+  }
+  *,*::before,*::after { box-sizing: border-box; }
+  html, body { margin:0; padding:0; }
+  body {
+    font-family: 'Poppins', sans-serif;
+    color: var(--jet);
+    background: var(--bone);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  a { color: inherit; text-decoration: none; }
+  button { font-family: inherit; cursor: pointer; }
+
+  .container { max-width: var(--container); margin: 0 auto; padding: 0 var(--gutter); }
+  .section { padding-top: var(--section-pad-y); padding-bottom: var(--section-pad-y); }
+
+  .bg-bone { background: var(--bone); color: var(--jet); }
+  .bg-jet  { background: var(--jet);  color: var(--bone); }
+
+  /* type primitives */
+  .kicker {
+    font-family: 'Oswald', sans-serif;
+    font-weight: 500;
+    font-size: 12px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: currentColor;
+    opacity: 0.7;
+    display: inline-flex; align-items: center; gap: 12px;
+  }
+  .kicker::before {
+    content: ''; width: 28px; height: 1px; background: currentColor; opacity: 0.5;
+  }
+  .h-display {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-weight: 700;
+    font-size: clamp(48px, 9vw, 110px);
+    line-height: 0.96;
+    letter-spacing: -0.025em;
+    margin: 0;
+  }
+  .h1 {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-weight: 700;
+    font-size: clamp(40px, 6vw, 72px);
+    line-height: 1.02;
+    letter-spacing: -0.02em;
+    margin: 0;
+  }
+  .h2 {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-weight: 700;
+    font-size: clamp(32px, 4.4vw, 56px);
+    line-height: 1.04;
+    letter-spacing: -0.02em;
+    margin: 0;
+  }
+  .red { color: var(--signal); }
+
+  .lead { font-size: 18px; line-height: 1.6; max-width: 60ch; margin: 0; }
+
+  /* btn */
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+    height: 56px; padding: 0 28px;
+    border: 0; border-radius: 12px;
+    background: var(--signal); color: #fff;
+    font-family: 'Oswald', sans-serif; font-weight: 600;
+    font-size: 13px; letter-spacing: 0.16em; text-transform: uppercase;
+    transition: transform 220ms var(--ease), background 220ms var(--ease);
+    cursor: pointer;
+    text-decoration: none;
+  }
+  .btn:hover { transform: translateY(-1px); background: #c81920; }
+  .btn-bone { background: var(--bone); color: var(--jet); }
+  .btn-bone:hover { background: #fff; }
+  .btn-sm { height: 40px; padding: 0 18px; font-size: 11px; letter-spacing: 0.14em; }
+
+  /* HEADER */
+  .topbar {
+    position: sticky; top: 0; z-index: 50;
+    background: rgba(245,240,235,0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--jet-hairline);
+  }
+  .topbar-inner {
+    display: flex; align-items: center; justify-content: space-between;
+    height: 64px;
+  }
+  .brand {
+    font-family: 'Fraunces', serif; font-style: italic; font-weight: 700;
+    font-size: 22px; letter-spacing: -0.02em;
+    display: inline-flex; align-items: baseline; gap: 2px;
+  }
+  .brand .red-mark { color: var(--signal); }
+
+  /* ─── HERO ─── */
+  .hero {
+    position: relative; overflow: hidden;
+    padding-top: clamp(48px, 6vw, 96px);
+    padding-bottom: clamp(72px, 7vw, 120px);
+  }
+  .hero::before {
+    content: ''; position: absolute; right: -15%; top: -10%;
+    width: 60vw; height: 60vw; max-width: 900px; max-height: 900px;
+    background: radial-gradient(circle at 30% 30%, rgba(230,35,42,0.13), transparent 60%);
+    pointer-events: none;
+    z-index: 0;
+  }
+  .hero-grid {
+    position: relative; z-index: 1;
+    display: grid; grid-template-columns: 1fr; gap: 56px;
+    align-items: center;
+  }
+  @media (min-width: 1024px) {
+    .hero-grid { grid-template-columns: 1.05fr 1fr; gap: 80px; }
+  }
+  .hero-meta {
+    display: grid; gap: 10px; margin: 36px 0 36px;
+  }
+  .hero-meta-row {
+    display: flex; align-items: center; gap: 12px;
+    font-size: 14px; color: rgba(10,10,10,0.7);
+  }
+  .hero-meta-row::before {
+    content: ''; width: 6px; height: 6px; background: var(--signal); border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  /* PHONE — base */
+  .phone-stage {
+    position: relative; display: flex; justify-content: center;
+  }
+  .phone {
+    width: 100%; max-width: 320px;
+    background: var(--slate);
+    border-radius: 38px;
+    padding: 12px;
+    box-shadow:
+      0 30px 80px -20px rgba(0,0,0,0.35),
+      0 8px 24px -8px rgba(0,0,0,0.2),
+      inset 0 0 0 1px rgba(255,255,255,0.04);
+  }
+  .phone-screen {
+    background: var(--bone);
+    border-radius: 28px;
+    padding: 22px 18px 18px;
+    color: var(--jet);
+    aspect-ratio: 9 / 19;
+    display: flex; flex-direction: column;
+    overflow: hidden;
+  }
+  .phone-status {
+    display: flex; align-items: center; justify-content: space-between;
+    font-family: 'JetBrains Mono', monospace; font-size: 11px;
+    color: rgba(10,10,10,0.55);
+    margin-bottom: 16px;
+  }
+  .phone-status-bars { letter-spacing: 1px; }
+  .phone-h-kicker {
+    font-family: 'Oswald', sans-serif; font-size: 10px; font-weight: 500;
+    letter-spacing: 0.2em; text-transform: uppercase; color: var(--signal);
+    margin-bottom: 4px;
+  }
+  .phone-h-title {
+    font-family: 'Fraunces', serif; font-style: italic; font-weight: 700;
+    font-size: 26px; letter-spacing: -0.02em; line-height: 1; margin-bottom: 6px;
+  }
+  .phone-h-sub {
+    font-size: 11px; color: rgba(10,10,10,0.55); margin-bottom: 16px;
+  }
+  /* week strip */
+  .phone-week {
+    display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px;
+    padding: 12px 0; border-top: 1px solid var(--jet-hairline);
+    border-bottom: 1px solid var(--jet-hairline);
+    margin-bottom: 14px;
+  }
+  .phone-day {
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+    padding: 6px 0; border-radius: 8px;
+  }
+  .phone-day-name {
+    font-family: 'Oswald', sans-serif; font-size: 9px; letter-spacing: 0.14em;
+    text-transform: uppercase; color: rgba(10,10,10,0.5);
+  }
+  .phone-day-dist {
+    font-family: 'Oswald', sans-serif; font-weight: 600; font-size: 13px;
+    color: rgba(10,10,10,0.85);
+  }
+  .phone-day.is-rest .phone-day-dist { color: rgba(10,10,10,0.25); }
+  .phone-day.is-today {
+    background: var(--jet);
+  }
+  .phone-day.is-today .phone-day-name { color: var(--bone-faint); }
+  .phone-day.is-today .phone-day-dist { color: var(--bone); }
+
+  .phone-run-card {
+    background: var(--jet); color: var(--bone);
+    border-radius: 14px; padding: 14px 14px 12px;
+    margin-top: auto;
+  }
+  .phone-run-type {
+    font-family: 'Oswald', sans-serif; font-size: 10px; letter-spacing: 0.18em;
+    text-transform: uppercase; color: var(--signal);
+    margin-bottom: 6px;
+  }
+  .phone-run-title {
+    font-family: 'Fraunces', serif; font-style: italic; font-weight: 700;
+    font-size: 18px; letter-spacing: -0.02em; line-height: 1.15;
+    margin-bottom: 8px;
+  }
+  .phone-run-stats {
+    font-size: 11px; color: var(--bone-dim);
+  }
+  .phone-contingency {
+    margin-top: 10px;
+    padding: 8px 10px;
+    border-radius: 8px;
+    background: rgba(230,35,42,0.18);
+    color: var(--signal);
+    font-family: 'Oswald', sans-serif; font-size: 10px; letter-spacing: 0.14em;
+    text-transform: uppercase; font-weight: 600;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .phone-contingency::before {
+    content: ''; width: 6px; height: 6px; background: var(--signal); border-radius: 50%;
+  }
+
+  /* ─── HOW IT WORKS + DAY DETAIL ─── */
+  .how { background: var(--bone); }
+  .section-header { display: grid; gap: 16px; max-width: 56ch; }
+  .section-header .h2 { margin: 0; }
+  .how-grid {
+    display: grid; grid-template-columns: 1fr; gap: 64px; margin-top: 64px;
+    align-items: start;
+  }
+  @media (min-width: 1024px) {
+    .how-grid { grid-template-columns: 1.1fr 1fr; gap: 96px; }
+  }
+  .steps { position: relative; padding-left: 64px; }
+  .steps::before {
+    content: '';
+    position: absolute; left: 19px; top: 32px; bottom: 32px;
+    width: 1px; background: var(--signal); opacity: 0.4;
+  }
+  .step {
+    position: relative; padding-bottom: 48px;
+  }
+  .step:last-child { padding-bottom: 0; }
+  .step-num {
+    position: absolute; left: -64px; top: 0;
+    width: 40px; height: 40px;
+    background: var(--jet); color: var(--bone);
+    border-radius: 50%;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-family: 'Oswald', sans-serif; font-weight: 600; font-size: 13px;
+    letter-spacing: 0.04em;
+  }
+  .step-title {
+    font-family: 'Poppins', sans-serif; font-weight: 600; font-size: 22px;
+    margin: 4px 0 8px;
+    letter-spacing: -0.005em;
+  }
+  .step-desc { font-size: 16px; line-height: 1.55; color: rgba(10,10,10,0.7); max-width: 38ch; margin: 0; }
+
+  /* day-detail phone variant */
+  .phone.day-variant .phone-screen { padding: 22px 16px 18px; }
+  .phone.day-variant .phone-h-title { font-size: 22px; }
+  .day-blocks {
+    display: grid; gap: 8px;
+    margin-bottom: 12px;
+    padding-top: 14px;
+    border-top: 1px solid var(--jet-hairline);
+  }
+  .day-block {
+    border: 1px solid var(--jet-hairline); border-radius: 12px;
+    padding: 12px 14px;
+    background: rgba(245,240,235,0.6);
+  }
+  .day-block-label {
+    display: flex; justify-content: space-between; align-items: baseline;
+    font-family: 'Oswald', sans-serif; font-size: 10px; letter-spacing: 0.18em;
+    text-transform: uppercase; color: var(--signal); margin-bottom: 4px;
+    font-weight: 600;
+  }
+  .day-block-label .meta { color: rgba(10,10,10,0.45); font-weight: 500; }
+  .day-block-title {
+    font-family: 'Fraunces', serif; font-style: italic; font-weight: 700;
+    font-size: 16px; line-height: 1.2; margin-bottom: 4px;
+  }
+  .day-block-desc { font-size: 11px; color: rgba(10,10,10,0.55); line-height: 1.4; }
+
+  .rpe-prompt {
+    margin-top: auto;
+    padding: 14px 0 0;
+    border-top: 1px solid var(--jet-hairline);
+  }
+  .rpe-prompt-text {
+    font-family: 'Oswald', sans-serif; font-size: 10px; letter-spacing: 0.18em;
+    text-transform: uppercase; color: rgba(10,10,10,0.55); margin-bottom: 10px;
+    font-weight: 500;
+  }
+  .rpe-pills { display: flex; gap: 4px; }
+  .rpe-pill {
+    flex: 1;
+    min-width: 0;
+    aspect-ratio: 1;
+    display: flex; align-items: center; justify-content: center;
+    border: 1px solid var(--jet-hairline);
+    border-radius: 6px;
+    font-family: 'Oswald', sans-serif; font-size: 11px; font-weight: 500;
+    color: rgba(10,10,10,0.55);
+    background: rgba(245,240,235,0.4);
+  }
+  .rpe-pill.is-active {
+    background: var(--jet); color: var(--bone); border-color: var(--jet);
+    transform: scale(1.06);
+  }
+
+  /* ─── WEATHER (jet) ─── */
+  .weather { background: var(--jet); color: var(--bone); }
+  .weather .kicker { color: var(--bone-dim); opacity: 1; }
+  .weather .h2 { color: var(--bone); }
+  .weather .lead { color: var(--bone-dim); }
+  .weather-cards {
+    display: grid; grid-template-columns: 1fr; gap: 24px; margin-top: 56px;
+  }
+  @media (min-width: 768px) {
+    .weather-cards { grid-template-columns: 1fr 1fr; gap: 32px; }
+  }
+  .weather-card {
+    background: var(--slate);
+    border: 1px solid var(--bone-hairline);
+    border-radius: 20px;
+    padding: 32px;
+    min-height: 360px;
+    display: flex; flex-direction: column;
+  }
+  .weather-loc {
+    font-family: 'Oswald', sans-serif; font-size: 11px; letter-spacing: 0.22em;
+    text-transform: uppercase; color: var(--bone-dim);
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--bone-hairline);
+    margin-bottom: 24px;
+    font-weight: 500;
+  }
+  .weather-glyph {
+    width: 72px; height: 72px; margin: 4px 0 28px;
+    color: var(--bone-dim);
+  }
+  .weather-rows {
+    display: grid; gap: 14px; padding-bottom: 22px;
+    border-bottom: 1px solid var(--bone-hairline);
+    margin-bottom: 22px;
+  }
+  .weather-row {
+    display: flex; justify-content: space-between; align-items: baseline;
+    font-size: 14px;
+  }
+  .weather-row-label { color: var(--bone-dim); }
+  .weather-row-value {
+    font-family: 'Oswald', sans-serif; font-weight: 600; font-size: 12px;
+    letter-spacing: 0.14em; text-transform: uppercase;
+  }
+  .weather-row-value.bad { color: var(--signal); }
+  .weather-row-value.good { color: #5fb47a; }
+  .weather-action {
+    display: flex; gap: 14px; align-items: flex-start; margin-top: auto;
+  }
+  .weather-action::before {
+    content: ''; flex-shrink: 0; width: 8px; height: 8px;
+    background: var(--signal); border-radius: 50%; margin-top: 9px;
+  }
+  .weather-action-title {
+    font-family: 'Fraunces', serif; font-style: italic; font-weight: 700;
+    font-size: 22px; line-height: 1.2; margin-bottom: 6px;
+    color: var(--bone);
+  }
+  .weather-action-desc { font-size: 13px; color: var(--bone-dim); }
+
+  .weather-closing {
+    text-align: center;
+    margin-top: 64px;
+    font-family: 'Fraunces', serif; font-style: italic; font-weight: 700;
+    font-size: clamp(20px, 2.4vw, 28px);
+    color: var(--bone-dim);
+    letter-spacing: -0.01em;
+  }
+
+  /* ─── COMPARISON (bone) ─── */
+  .compare-table {
+    margin-top: 56px;
+    border-top: 1px solid var(--jet-hairline);
+  }
+  .compare-row {
+    display: grid; grid-template-columns: 1fr;
+    border-bottom: 1px solid var(--jet-hairline);
+    padding: 28px 0;
+    gap: 16px;
+  }
+  @media (min-width: 768px) {
+    .compare-row {
+      grid-template-columns: 200px 1fr 1fr;
+      gap: 40px;
+      align-items: start;
+    }
+  }
+  .compare-label {
+    font-family: 'Oswald', sans-serif; font-size: 11px; letter-spacing: 0.18em;
+    text-transform: uppercase; color: rgba(10,10,10,0.5);
+    padding-top: 4px;
+    font-weight: 500;
+  }
+  .compare-cell {
+    font-size: 16px; line-height: 1.5;
+  }
+  .compare-cell.gpt { color: var(--dim); }
+  .compare-cell.kip {
+    color: var(--jet);
+    position: relative; padding-left: 18px;
+  }
+  .compare-cell.kip::before {
+    content: ''; position: absolute; left: 0; top: 9px;
+    width: 6px; height: 6px; background: var(--signal); border-radius: 50%;
+  }
+  .compare-cell-head {
+    font-family: 'Oswald', sans-serif; font-size: 10px; letter-spacing: 0.18em;
+    text-transform: uppercase; color: rgba(10,10,10,0.45); margin-bottom: 6px;
+    font-weight: 500;
+  }
+  @media (min-width: 768px) {
+    .compare-cell-head { display: none; }
+  }
+  .compare-closing {
+    margin: 64px auto 0;
+    text-align: center;
+    font-family: 'Fraunces', serif; font-style: italic; font-weight: 700;
+    font-size: clamp(20px, 2.4vw, 28px);
+    color: var(--dim);
+    max-width: 56ch;
+    line-height: 1.3;
+  }
+
+  /* ─── FEATURES (jet) ─── */
+  .features { background: var(--jet); color: var(--bone); }
+  .features .h2 { color: var(--bone); }
+  .features .kicker { color: var(--bone-dim); opacity: 1; }
+  .features-grid {
+    display: grid; grid-template-columns: 1fr; gap: 32px; margin-top: 64px;
+  }
+  @media (min-width: 768px) {
+    .features-grid { grid-template-columns: repeat(3, 1fr); gap: 48px; }
+  }
+  .feature {
+    border-top: 1px solid var(--bone-hairline); padding-top: 28px;
+  }
+  .feature-icon {
+    width: 36px; height: 36px; color: var(--signal);
+    margin-bottom: 28px;
+  }
+  .feature-title {
+    font-family: 'Poppins', sans-serif; font-weight: 600;
+    font-size: 22px; color: var(--bone);
+    margin: 0 0 10px;
+    letter-spacing: -0.005em;
+  }
+  .feature-desc { font-size: 15px; line-height: 1.55; color: var(--bone-dim); margin: 0; max-width: 32ch; }
+
+  /* ─── METHODOLOGY (bone) ─── */
+  .methodology {
+    text-align: center;
+  }
+  .methodology .kicker { justify-content: center; }
+  .methodology-body {
+    max-width: 60ch; margin: 32px auto 0;
+    font-size: 18px; line-height: 1.7; color: rgba(10,10,10,0.78);
+  }
+  .methodology-author {
+    font-family: 'JetBrains Mono', monospace; font-size: 12px;
+    color: var(--dim);
+    margin: 36px 0 28px;
+    letter-spacing: 0.04em;
+  }
+  .methodology .h2 { margin-top: 18px; }
+
+  /* ─── FAQ (bone) ─── */
+  .faq-grid {
+    display: grid; grid-template-columns: 1fr; gap: 48px;
+    margin-top: 32px;
+  }
+  @media (min-width: 1024px) {
+    .faq-grid { grid-template-columns: 1fr 1.4fr; gap: 96px; align-items: start; }
+  }
+  .faq-list { border-top: 1px solid var(--jet-hairline); }
+  .faq-item { border-bottom: 1px solid var(--jet-hairline); position: relative; }
+  .faq-q-btn {
+    width: 100%;
+    background: transparent; border: 0;
+    text-align: left;
+    padding: 24px 8px 24px 0;
+    display: flex; justify-content: space-between; align-items: center; gap: 16px;
+    font-family: 'Poppins', sans-serif; font-weight: 500; font-size: 17px;
+    color: var(--jet);
+    transition: color 220ms var(--ease);
+  }
+  .faq-q-btn:hover { color: var(--signal); }
+  .faq-q-toggle {
+    width: 22px; height: 22px; flex-shrink: 0; position: relative;
+  }
+  .faq-q-toggle::before, .faq-q-toggle::after {
+    content: ''; position: absolute; background: var(--signal);
+    transition: transform 220ms var(--ease), opacity 220ms var(--ease);
+  }
+  .faq-q-toggle::before { left: 0; right: 0; top: 50%; height: 1.5px; transform: translateY(-50%); }
+  .faq-q-toggle::after { top: 0; bottom: 0; left: 50%; width: 1.5px; transform: translateX(-50%); }
+  .faq-item.open .faq-q-toggle::after { transform: translateX(-50%) rotate(90deg); opacity: 0; }
+  .faq-item.open .faq-q-btn { color: var(--signal); }
+  .faq-a {
+    max-height: 0; overflow: hidden;
+    transition: max-height 320ms var(--ease);
+  }
+  .faq-item.open .faq-a { max-height: 400px; }
+  .faq-a-inner {
+    padding: 0 8px 28px 0;
+    font-size: 16px; line-height: 1.6; color: rgba(10,10,10,0.7);
+    max-width: 60ch;
+  }
+
+  /* ─── WAITLIST (jet) ─── */
+  .waitlist { background: var(--jet); color: var(--bone); text-align: center; }
+  .waitlist .kicker { justify-content: center; color: var(--bone-dim); opacity: 1; }
+  .waitlist .h-display {
+    margin: 24px 0 24px;
+    color: var(--bone);
+  }
+  .waitlist-sub {
+    max-width: 50ch; margin: 0 auto 32px;
+    color: var(--bone-dim);
+    font-size: 17px; line-height: 1.5;
+  }
+  .waitlist-form {
+    display: flex; gap: 12px; max-width: 560px; margin: 0 auto;
+    flex-wrap: wrap;
+  }
+  .waitlist-input {
+    flex: 1; min-width: 200px; height: 56px;
+    background: var(--slate); color: var(--bone);
+    border: 1px solid var(--bone-hairline);
+    border-radius: 12px;
+    padding: 0 18px;
+    font-family: inherit; font-size: 16px;
+    transition: border-color 220ms var(--ease);
+  }
+  .waitlist-input::placeholder { color: var(--bone-faint); }
+  .waitlist-input:focus { outline: 2px solid var(--signal); outline-offset: 2px; border-color: var(--signal); }
+  .waitlist-note {
+    margin-top: 24px; font-size: 13px; color: var(--bone-faint);
+    max-width: 60ch; margin-left: auto; margin-right: auto;
+  }
+  .waitlist-note a { color: var(--bone-dim); border-bottom: 1px dotted var(--bone-faint); }
+
+  /* ─── FOOTER ─── */
+  .foot {
+    padding: 32px 0;
+    background: var(--jet); color: var(--bone-faint);
+    font-size: 12px; text-align: center;
+    border-top: 1px solid var(--bone-hairline);
+  }
+
+  /* a11y */
+  @media (prefers-reduced-motion: reduce){
+    *, *::before, *::after { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+  }
+
+  /* mockup banner (preview only) */
+  .preview-banner {
+    background: var(--signal); color: #fff;
+    padding: 6px 16px; text-align: center;
+    font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.04em;
+  }
+</style>
+</head>
+<body>
+
+<div class="preview-banner">design preview · workout-plan v2 · 2026-05-06</div>
+
+<!-- HEADER -->
+<header class="topbar">
+  <div class="container topbar-inner">
+    <span class="brand">endorfin<span class="red-mark">.</span></span>
+    <a href="#waitlist" class="btn btn-sm">Join waitlist</a>
+  </div>
+</header>
+
+<!-- ─── 1. HERO ─── -->
+<section class="hero bg-bone">
+  <div class="container">
+    <div class="hero-grid">
+      <div>
+        <span class="kicker">Coming soon · Beta July 2026</span>
+        <h1 class="h-display" style="margin-top:24px;">
+          Two weeks at a time.<br>
+          <span class="red">Adjusts</span> when life does.
+        </h1>
+        <p class="lead" style="margin-top:28px; color: rgba(10,10,10,0.72);">
+          Meet Kip — a running coach that writes your week, listens when you tell it how each run felt, and rewrites everything every Sunday.
+        </p>
+        <div class="hero-meta">
+          <div class="hero-meta-row">Plans for first 5K, half-marathon, getting faster</div>
+          <div class="hero-meta-row">Knows the air outside your door</div>
+          <div class="hero-meta-row">Free during beta</div>
+        </div>
+        <a href="#waitlist" class="btn">Join waitlist <span aria-hidden="true">→</span></a>
+      </div>
+
+      <!-- phone: WEEK -->
+      <div class="phone-stage">
+        <div class="phone">
+          <div class="phone-screen">
+            <div class="phone-status">
+              <span>6:42</span>
+              <span class="phone-status-bars">●●● ▮</span>
+            </div>
+            <div class="phone-h-kicker">Week 4 · Half-marathon</div>
+            <div class="phone-h-title">This week</div>
+            <div class="phone-h-sub">42 km · 4 runs · 3 rest</div>
+            <div class="phone-week">
+              <div class="phone-day"><div class="phone-day-name">Mon</div><div class="phone-day-dist">6K</div></div>
+              <div class="phone-day is-rest"><div class="phone-day-name">Tue</div><div class="phone-day-dist">—</div></div>
+              <div class="phone-day is-today"><div class="phone-day-name">Wed</div><div class="phone-day-dist">8K</div></div>
+              <div class="phone-day is-rest"><div class="phone-day-name">Thu</div><div class="phone-day-dist">—</div></div>
+              <div class="phone-day"><div class="phone-day-name">Fri</div><div class="phone-day-dist">5K</div></div>
+              <div class="phone-day is-rest"><div class="phone-day-name">Sat</div><div class="phone-day-dist">—</div></div>
+              <div class="phone-day"><div class="phone-day-name">Sun</div><div class="phone-day-dist">18K</div></div>
+            </div>
+            <div class="phone-run-card">
+              <div class="phone-run-type">Today · Hard day</div>
+              <div class="phone-run-title">8 km — hard but talkable</div>
+              <div class="phone-run-stats">21 min warm-up · run · cool-down</div>
+              <div class="phone-contingency">Air's bad — moved indoors</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── 2. HOW IT WORKS + DAY DETAIL ─── -->
+<section class="section how bg-bone">
+  <div class="container">
+    <div class="section-header">
+      <span class="kicker">How it works</span>
+      <h2 class="h2">Three steps. Then it just runs.</h2>
+    </div>
+
+    <div class="how-grid">
+      <div class="steps">
+        <div class="step">
+          <div class="step-num">01</div>
+          <h3 class="step-title">Tell Kip about you</h3>
+          <p class="step-desc">Goal, age, how many days you can run, where you live. Three minutes. No watch needed.</p>
+        </div>
+        <div class="step">
+          <div class="step-num">02</div>
+          <h3 class="step-title">Get your two weeks</h3>
+          <p class="step-desc">A real plan — easy days, hard days, a long one. Each run with a warm-up and cool-down written out.</p>
+        </div>
+        <div class="step">
+          <div class="step-num">03</div>
+          <h3 class="step-title">Tell it how each run felt</h3>
+          <p class="step-desc">A number from 1 to 10, after the run. Sunday night, Kip rewrites the next two weeks based on what you said.</p>
+        </div>
+      </div>
+
+      <!-- phone: DAY DETAIL -->
+      <div class="phone-stage">
+        <div class="phone day-variant">
+          <div class="phone-screen">
+            <div class="phone-status">
+              <span>6:42</span>
+              <span class="phone-status-bars">●●● ▮</span>
+            </div>
+            <div class="phone-h-kicker">Wednesday · today</div>
+            <div class="phone-h-title">Hard day</div>
+            <div class="phone-h-sub">8 km · 21 min total work</div>
+
+            <div class="day-blocks">
+              <div class="day-block">
+                <div class="day-block-label">Warm up <span class="meta">8 min</span></div>
+                <div class="day-block-title">Wake the legs up</div>
+                <div class="day-block-desc">Ankle rolls, leg swings, easy walk into a slow jog.</div>
+              </div>
+              <div class="day-block">
+                <div class="day-block-label">Main <span class="meta">8 km</span></div>
+                <div class="day-block-title">Hard but talkable</div>
+                <div class="day-block-desc">A pace you could hold a short sentence at. Not a full conversation.</div>
+              </div>
+              <div class="day-block">
+                <div class="day-block-label">Cool down <span class="meta">5 min</span></div>
+                <div class="day-block-title">Walk it off</div>
+                <div class="day-block-desc">Slow walk until your breath's back. Quad and calf stretches.</div>
+              </div>
+            </div>
+
+            <div class="rpe-prompt">
+              <div class="rpe-prompt-text">How did it feel?</div>
+              <div class="rpe-pills">
+                <div class="rpe-pill">1</div>
+                <div class="rpe-pill">2</div>
+                <div class="rpe-pill">3</div>
+                <div class="rpe-pill">4</div>
+                <div class="rpe-pill">5</div>
+                <div class="rpe-pill">6</div>
+                <div class="rpe-pill">7</div>
+                <div class="rpe-pill is-active">8</div>
+                <div class="rpe-pill">9</div>
+                <div class="rpe-pill">10</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── 3. WEATHER ─── -->
+<section class="section weather bg-jet">
+  <div class="container">
+    <div class="section-header">
+      <span class="kicker">Weather-aware</span>
+      <h2 class="h2">Kip looks outside before<br>it plans your run.</h2>
+      <p class="lead" style="margin-top:8px;">
+        Not every morning is a running morning. Kip checks the air and the heat in your city — and changes today's run when it has to.
+      </p>
+    </div>
+
+    <div class="weather-cards">
+      <!-- Delhi -->
+      <div class="weather-card">
+        <div class="weather-loc">Delhi · Tue 6:00 am</div>
+        <svg class="weather-glyph" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <!-- haze: layered horizontal lines + faint sun -->
+          <circle cx="44" cy="22" r="6" opacity="0.4"/>
+          <line x1="8" y1="32" x2="56" y2="32"/>
+          <line x1="14" y1="40" x2="50" y2="40"/>
+          <line x1="6" y1="48" x2="40" y2="48"/>
+          <line x1="22" y1="56" x2="58" y2="56"/>
+        </svg>
+        <div class="weather-rows">
+          <div class="weather-row">
+            <span class="weather-row-label">Air today</span>
+            <span class="weather-row-value bad">Bad</span>
+          </div>
+          <div class="weather-row">
+            <span class="weather-row-label">Heat today</span>
+            <span class="weather-row-value">Warming</span>
+          </div>
+        </div>
+        <div class="weather-action">
+          <div>
+            <div class="weather-action-title">Moved indoors</div>
+            <div class="weather-action-desc">Bodyweight session — no equipment.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bengaluru -->
+      <div class="weather-card">
+        <div class="weather-loc">Bengaluru · Tue 6:00 am</div>
+        <svg class="weather-glyph" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <!-- clear sun -->
+          <circle cx="32" cy="32" r="10"/>
+          <line x1="32" y1="6" x2="32" y2="14"/>
+          <line x1="32" y1="50" x2="32" y2="58"/>
+          <line x1="6" y1="32" x2="14" y2="32"/>
+          <line x1="50" y1="32" x2="58" y2="32"/>
+          <line x1="14" y1="14" x2="20" y2="20"/>
+          <line x1="44" y1="44" x2="50" y2="50"/>
+          <line x1="14" y1="50" x2="20" y2="44"/>
+          <line x1="44" y1="20" x2="50" y2="14"/>
+        </svg>
+        <div class="weather-rows">
+          <div class="weather-row">
+            <span class="weather-row-label">Air today</span>
+            <span class="weather-row-value good">Clean</span>
+          </div>
+          <div class="weather-row">
+            <span class="weather-row-label">Heat today</span>
+            <span class="weather-row-value">Cool</span>
+          </div>
+        </div>
+        <div class="weather-action">
+          <div>
+            <div class="weather-action-title">Outdoors, 8 km</div>
+            <div class="weather-action-desc">Easy pace through the park.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <p class="weather-closing">Same week. Different city. Different morning. Different run.</p>
+  </div>
+</section>
+
+<!-- ─── 4. WHY NOT JUST CHATGPT ─── -->
+<section class="section bg-bone">
+  <div class="container">
+    <div class="section-header">
+      <span class="kicker">Why Kip</span>
+      <h2 class="h2">Why not just ask ChatGPT?</h2>
+    </div>
+
+    <div class="compare-table">
+      <div class="compare-row">
+        <div class="compare-label">Where the plan<br>comes from</div>
+        <div class="compare-cell gpt">
+          <div class="compare-cell-head">ChatGPT</div>
+          Written fresh each time you ask.
+        </div>
+        <div class="compare-cell kip">
+          <div class="compare-cell-head">Kip</div>
+          Built on plans coaches have used for decades.
+        </div>
+      </div>
+      <div class="compare-row">
+        <div class="compare-label">Last week</div>
+        <div class="compare-cell gpt">
+          <div class="compare-cell-head">ChatGPT</div>
+          It forgets between chats.
+        </div>
+        <div class="compare-cell kip">
+          <div class="compare-cell-head">Kip</div>
+          It remembers every run you've logged.
+        </div>
+      </div>
+      <div class="compare-row">
+        <div class="compare-label">Where you live</div>
+        <div class="compare-cell gpt">
+          <div class="compare-cell-head">ChatGPT</div>
+          Doesn't know it's Delhi vs Bengaluru.
+        </div>
+        <div class="compare-cell kip">
+          <div class="compare-cell-head">Kip</div>
+          Checks the air and heat in your city, every day.
+        </div>
+      </div>
+      <div class="compare-row">
+        <div class="compare-label">If you skip Tuesday</div>
+        <div class="compare-cell gpt">
+          <div class="compare-cell-head">ChatGPT</div>
+          The plan rolls on without you.
+        </div>
+        <div class="compare-cell kip">
+          <div class="compare-cell-head">Kip</div>
+          Sunday's rewrite absorbs it. Nothing's wasted.
+        </div>
+      </div>
+      <div class="compare-row">
+        <div class="compare-label">The math underneath</div>
+        <div class="compare-cell gpt">
+          <div class="compare-cell-head">ChatGPT</div>
+          Looks right. Drifts.
+        </div>
+        <div class="compare-cell kip">
+          <div class="compare-cell-head">Kip</div>
+          Same method, every week, written down in our paper.
+        </div>
+      </div>
+    </div>
+
+    <p class="compare-closing">
+      ChatGPT is brilliant at most things.<br>Coaching a runner isn't one of them — yet.
+    </p>
+  </div>
+</section>
+
+<!-- ─── 5. WHAT YOU GET ─── -->
+<section class="section features bg-jet">
+  <div class="container">
+    <div class="section-header">
+      <span class="kicker">What you get</span>
+      <h2 class="h2">Everything a coach gives you.<br>Every Sunday.</h2>
+    </div>
+
+    <div class="features-grid">
+      <div class="feature">
+        <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="12" cy="12" r="10"/>
+          <circle cx="12" cy="12" r="6"/>
+          <circle cx="12" cy="12" r="2"/>
+        </svg>
+        <h3 class="feature-title">A plan for what you're working on</h3>
+        <p class="feature-desc">First 5K. Half marathon. Getting faster. The right plan picks itself.</p>
+      </div>
+      <div class="feature">
+        <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <rect x="3" y="5" width="18" height="16" rx="2"/>
+          <line x1="3" y1="10" x2="21" y2="10"/>
+          <line x1="8" y1="3" x2="8" y2="7"/>
+          <line x1="16" y1="3" x2="16" y2="7"/>
+          <circle cx="8" cy="15" r="1" fill="currentColor"/>
+          <circle cx="12" cy="15" r="1" fill="currentColor"/>
+          <circle cx="16" cy="15" r="1" fill="currentColor"/>
+        </svg>
+        <h3 class="feature-title">Runs that fit your week</h3>
+        <p class="feature-desc">Three days, four, five — Kip works with what you have.</p>
+      </div>
+      <div class="feature">
+        <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M12 20h9"/>
+          <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/>
+        </svg>
+        <h3 class="feature-title">Works without a watch</h3>
+        <p class="feature-desc">No wearable, no problem. You log how each run felt. That's enough.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── 6. METHODOLOGY ─── -->
+<section class="section bg-bone">
+  <div class="container methodology">
+    <span class="kicker">Methodology</span>
+    <h2 class="h2">We've written down exactly<br>how Kip thinks.</h2>
+    <p class="methodology-body">
+      Kip doesn't make plans up. It uses running methods coaches and runners have been refining for decades, calibrated for the air, the heat, and the body of the runner in front of it. We've put all of it in a paper — every choice we made, every line of evidence behind it. If you want to see how it works under the hood, it's all there.
+    </p>
+    <div class="methodology-author">
+      Endorfin Working Paper No. 1 · Shivam Singhal · May 2026
+    </div>
+    <a href="#" class="btn">Read the paper <span aria-hidden="true">→</span></a>
+  </div>
+</section>
+
+<!-- ─── 7. FAQ ─── -->
+<section class="section bg-bone" style="padding-top: 0;">
+  <div class="container">
+    <div class="faq-grid">
+      <div class="section-header">
+        <span class="kicker">FAQ</span>
+        <h2 class="h2">Things you might be wondering.</h2>
+      </div>
+      <div class="faq-list" id="faq-list">
+        <div class="faq-item">
+          <button class="faq-q-btn" type="button">
+            <span>Do I need a watch?</span>
+            <span class="faq-q-toggle" aria-hidden="true"></span>
+          </button>
+          <div class="faq-a"><div class="faq-a-inner">No. You'll tell Kip how each run felt — a number from 1 to 10. That's everything Kip needs to write the next week.</div></div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-q-btn" type="button">
+            <span>What if I miss a run?</span>
+            <span class="faq-q-toggle" aria-hidden="true"></span>
+          </button>
+          <div class="faq-a"><div class="faq-a-inner">It's fine. Sunday's rewrite absorbs it. Distance gets redistributed. No guilt-trip notifications.</div></div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-q-btn" type="button">
+            <span>Is Kip a real coach?</span>
+            <span class="faq-q-toggle" aria-hidden="true"></span>
+          </button>
+          <div class="faq-a"><div class="faq-a-inner">Kip is software. It's built on the same running methods serious coaches use, but it's not a person. If you already work with a human coach, keep them — a good coach reads training better than any software can.</div></div>
+        </div>
+        <div class="faq-item open">
+          <button class="faq-q-btn" type="button">
+            <span>What does it cost?</span>
+            <span class="faq-q-toggle" aria-hidden="true"></span>
+          </button>
+          <div class="faq-a"><div class="faq-a-inner">Free during beta. After that, much less than a month of coaching. Waitlist members get founding pricing, locked in forever.</div></div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-q-btn" type="button">
+            <span>What do you do with my data?</span>
+            <span class="faq-q-toggle" aria-hidden="true"></span>
+          </button>
+          <div class="faq-a"><div class="faq-a-inner">It's yours. We use it to write your plan and to make Kip a better coach. We don't sell it. Ever.</div></div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-q-btn" type="button">
+            <span>When does it launch?</span>
+            <span class="faq-q-toggle" aria-hidden="true"></span>
+          </button>
+          <div class="faq-a"><div class="faq-a-inner">Beta in July 2026. Drop your email below — we'll send an invite the moment your city is live.</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── 8. WAITLIST ─── -->
+<section class="section waitlist bg-jet" id="waitlist">
+  <div class="container">
+    <span class="kicker">Beta · July 2026</span>
+    <h2 class="h-display">
+      Get early<br>
+      <span class="red">access.</span>
+    </h2>
+    <p class="waitlist-sub">
+      Drop your email — we'll send you an invite the moment your city is live.
+    </p>
+    <form class="waitlist-form" onsubmit="event.preventDefault();">
+      <input class="waitlist-input" type="email" placeholder="you@running.in" aria-label="Email" />
+      <button class="btn btn-bone" type="submit">Join waitlist</button>
+    </form>
+    <p class="waitlist-note">
+      Heads up — waitlist isn't live yet. <a href="https://www.instagram.com/hacknflex/" target="_blank" rel="noopener noreferrer">Follow @hacknflex on Instagram</a> for launch updates.
+    </p>
+  </div>
+</section>
+
+<!-- ─── FOOTER ─── -->
+<footer class="foot">
+  © 2026 Endorfin · Ultragon Ventures (OPC) Private Limited
+</footer>
+
+<script>
+  // FAQ accordion
+  document.querySelectorAll('.faq-q-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const item = btn.closest('.faq-item');
+      const wasOpen = item.classList.contains('open');
+      // optional: collapse all others for tighter list behavior
+      document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
+      if (!wasOpen) item.classList.add('open');
+    });
+  });
+</script>
+
+</body>
+</html>
