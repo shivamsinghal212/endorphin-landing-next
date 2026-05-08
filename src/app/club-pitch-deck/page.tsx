@@ -762,8 +762,8 @@ export default function ClubPitchDeckPage() {
               on <em className="accent">Endorfin.</em>
             </h2>
             <p className="lead" style={{ margin: '32px auto 0', fontSize: 19 }}>
-              Onboarding takes 15 minutes. We do the heavy lifting if you want — or hand it over and we&rsquo;ll
-              set up your page, write your first recap, and import your last run.
+              Onboarding takes 30 seconds — we already have all the details about your club. Or hand it over and
+              we&rsquo;ll set up your page, write your first recap, and import your last run.
             </p>
 
             <div className="cta-actions">
