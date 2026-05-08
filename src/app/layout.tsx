@@ -109,7 +109,7 @@ const websiteJsonLd = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html
-      lang="en"
+      lang="en-IN"
       className={`${oswald.variable} ${poppins.variable} ${fraunces.variable}`}
       data-scroll-behavior="smooth"
     >

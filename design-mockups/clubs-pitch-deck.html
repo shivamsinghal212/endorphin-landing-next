@@ -1,0 +1,1410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Endorfin · For Run Clubs · Pitch Deck</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@1,9..144,600;1,9..144,700&family=Oswald:wght@400;500;600;700&family=Poppins:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --jet:#0A0A0A;
+    --slate:#141414;
+    --bone:#F5F0EB;
+    --signal:#E6232A;
+    --signal-dim:#c81920;
+    --bone-dim:rgba(245,240,235,0.72);
+    --bone-faint:rgba(245,240,235,0.45);
+    --bone-hairline:rgba(245,240,235,0.14);
+    --bone-hair-strong:rgba(245,240,235,0.22);
+    --container:1240px;
+    --gutter: clamp(28px, 5vw, 88px);
+    --ease: cubic-bezier(.2,.8,.2,1);
+  }
+  *,*::before,*::after { box-sizing: border-box; }
+  html, body { margin:0; padding:0; }
+  html { scroll-behavior: smooth; scroll-snap-type: y mandatory; }
+  body {
+    font-family: 'Poppins', sans-serif;
+    color: var(--bone);
+    background: var(--jet);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  a { color: inherit; text-decoration: none; }
+  button { font-family: inherit; cursor: pointer; }
+
+  /* ── Layout primitives ───────────────────────────────────────── */
+  .slide {
+    min-height: 100vh;
+    scroll-snap-align: start;
+    padding: clamp(64px, 8vw, 120px) var(--gutter);
+    display: flex;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .slide-inner {
+    width: 100%;
+    max-width: var(--container);
+    margin: 0 auto;
+    position: relative;
+    z-index: 2;
+  }
+  .slide-bone { background: var(--bone); color: var(--jet); }
+  .slide-bone .kicker, .slide-bone .meta { color: rgba(10,10,10,0.6); }
+  .slide-bone .lead { color: rgba(10,10,10,0.72); }
+  .slide-bone .hairline { border-color: rgba(10,10,10,0.12) !important; }
+
+  /* slide chrome */
+  .slide-num {
+    position: absolute;
+    top: clamp(28px, 4vw, 56px);
+    right: clamp(28px, 5vw, 88px);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    color: var(--bone-faint);
+    z-index: 3;
+  }
+  .slide-bone .slide-num { color: rgba(10,10,10,0.45); }
+  .slide-corner-brand {
+    position: absolute;
+    top: clamp(28px, 4vw, 56px);
+    left: clamp(28px, 5vw, 88px);
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-weight: 700;
+    font-size: 22px;
+    letter-spacing: -0.01em;
+    z-index: 3;
+  }
+  .slide-corner-brand .dot { color: var(--signal); }
+
+  /* ── Type ────────────────────────────────────────────────────── */
+  .kicker {
+    font-family: 'Oswald', sans-serif;
+    font-weight: 500;
+    font-size: 12px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--bone-faint);
+    display: inline-flex; align-items: center; gap: 14px;
+    margin-bottom: 22px;
+  }
+  .kicker::before {
+    content: ''; width: 32px; height: 1px;
+    background: currentColor; opacity: 0.7;
+  }
+  .kicker.red { color: var(--signal); }
+
+  .h-mega {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-weight: 700;
+    font-size: clamp(56px, 11vw, 148px);
+    line-height: 0.92;
+    letter-spacing: -0.03em;
+    margin: 0;
+  }
+  .h-display {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-weight: 700;
+    font-size: clamp(48px, 8vw, 96px);
+    line-height: 0.98;
+    letter-spacing: -0.025em;
+    margin: 0;
+  }
+  .h1 {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-weight: 700;
+    font-size: clamp(40px, 6vw, 72px);
+    line-height: 1.02;
+    letter-spacing: -0.02em;
+    margin: 0;
+  }
+  .h2 {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-weight: 700;
+    font-size: clamp(28px, 3.6vw, 44px);
+    line-height: 1.08;
+    letter-spacing: -0.02em;
+    margin: 0;
+  }
+  .h3 {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-weight: 600;
+    font-size: clamp(22px, 2.4vw, 30px);
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+    margin: 0;
+  }
+  .red { color: var(--signal); }
+  .accent { font-style: italic; color: var(--signal); }
+
+  .lead {
+    font-size: clamp(16px, 1.4vw, 19px);
+    line-height: 1.6;
+    max-width: 62ch;
+    margin: 0;
+    color: var(--bone-dim);
+  }
+  .meta {
+    font-family: 'Oswald', sans-serif;
+    font-weight: 500;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--bone-faint);
+  }
+  .mono {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.04em;
+  }
+
+  /* ── Buttons ─────────────────────────────────────────────────── */
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 12px;
+    height: 56px; padding: 0 30px;
+    border: 0; border-radius: 12px;
+    background: var(--signal); color: #fff;
+    font-family: 'Oswald', sans-serif; font-weight: 600;
+    font-size: 13px; letter-spacing: 0.18em; text-transform: uppercase;
+    transition: transform 220ms var(--ease), background 220ms var(--ease);
+    cursor: pointer;
+  }
+  .btn:hover { transform: translateY(-1px); background: var(--signal-dim); }
+  .btn-bone { background: var(--bone); color: var(--jet); }
+  .btn-bone:hover { background: #fff; }
+  .btn-ghost {
+    background: transparent;
+    color: var(--bone);
+    border: 1px solid var(--bone-hair-strong);
+  }
+  .btn-ghost:hover { background: rgba(245,240,235,0.06); }
+
+  /* ── Helpers ─────────────────────────────────────────────────── */
+  .hairline { border-top: 1px solid var(--bone-hairline); }
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: clamp(40px, 6vw, 96px);
+    align-items: center;
+  }
+  .grid-3 {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 28px;
+  }
+  .grid-4 {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+  }
+  @media (max-width: 880px){
+    .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; gap: 32px; }
+    .h-mega { font-size: clamp(48px, 14vw, 84px); }
+  }
+
+  /* ── Slide 01 — cover ────────────────────────────────────────── */
+  .cover-bg {
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(60% 80% at 80% 20%, rgba(230,35,42,0.18), transparent 70%),
+      radial-gradient(40% 60% at 10% 90%, rgba(230,35,42,0.10), transparent 70%);
+    z-index: 1;
+  }
+  .cover-eyebrow {
+    display: inline-block;
+    font-family: 'Oswald', sans-serif;
+    font-weight: 500;
+    font-size: 12px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--bone-dim);
+    padding: 8px 14px;
+    border: 1px solid var(--bone-hair-strong);
+    border-radius: 999px;
+    margin-bottom: 32px;
+  }
+  .cover-meta {
+    margin-top: 56px;
+    display: flex;
+    gap: clamp(24px, 4vw, 48px);
+    flex-wrap: wrap;
+    align-items: center;
+    color: var(--bone-faint);
+  }
+  .cover-meta > div { display: flex; flex-direction: column; gap: 4px; }
+  .cover-meta strong { color: var(--bone); font-weight: 500; font-family: 'Poppins', sans-serif; font-size: 14px; }
+
+  /* ── Pain slide ──────────────────────────────────────────────── */
+  .pain-list {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    margin-top: 56px;
+    border-top: 1px solid var(--bone-hairline);
+  }
+  .pain-row {
+    padding: 28px 0;
+    border-bottom: 1px solid var(--bone-hairline);
+    padding-right: 32px;
+    display: flex; gap: 20px; align-items: flex-start;
+  }
+  .pain-row:nth-child(odd){ padding-right: 32px; padding-left: 0; }
+  .pain-row:nth-child(even){ padding-left: 32px; border-left: 1px solid var(--bone-hairline); }
+  .pain-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--signal);
+    margin-top: 4px;
+    min-width: 28px;
+  }
+  .pain-text strong {
+    display: block;
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-weight: 700;
+    font-size: 22px;
+    line-height: 1.2;
+    margin-bottom: 8px;
+  }
+  .pain-text span {
+    font-size: 14.5px;
+    line-height: 1.55;
+    color: var(--bone-dim);
+  }
+  @media (max-width: 880px){
+    .pain-list { grid-template-columns: 1fr; }
+    .pain-row, .pain-row:nth-child(even), .pain-row:nth-child(odd) { padding: 22px 0; border-left: 0; }
+  }
+
+  /* ── Cost slide ──────────────────────────────────────────────── */
+  .cost-stat {
+    display: flex; flex-direction: column; gap: 8px;
+    padding: 32px 28px;
+    border: 1px solid var(--bone-hairline);
+    border-radius: 16px;
+    background: rgba(245,240,235,0.02);
+  }
+  .cost-stat .num {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-weight: 700;
+    font-size: clamp(48px, 6vw, 72px);
+    line-height: 1;
+    color: var(--signal);
+    letter-spacing: -0.02em;
+  }
+  .cost-stat .label {
+    font-family: 'Oswald', sans-serif;
+    font-weight: 500;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--bone-faint);
+  }
+  .cost-stat p {
+    margin: 12px 0 0;
+    font-size: 14.5px;
+    line-height: 1.55;
+    color: var(--bone-dim);
+  }
+
+  /* ── Solution overview ──────────────────────────────────────── */
+  .pillars {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    margin-top: 64px;
+  }
+  .pillar {
+    padding: 36px 28px;
+    border: 1px solid var(--bone-hairline);
+    border-radius: 18px;
+    background: linear-gradient(180deg, rgba(245,240,235,0.04), rgba(245,240,235,0));
+    display: flex; flex-direction: column; gap: 18px;
+    min-height: 280px;
+    position: relative;
+  }
+  .pillar .tag {
+    font-family: 'Oswald', sans-serif;
+    font-weight: 600;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--signal);
+  }
+  .pillar h3 { color: var(--bone); }
+  .pillar p {
+    margin: 0;
+    color: var(--bone-dim);
+    font-size: 15px;
+    line-height: 1.55;
+  }
+  @media (max-width: 880px){ .pillars { grid-template-columns: 1fr; } }
+
+  /* ── Browser frame (discoverability slide) ──────────────────── */
+  .browser {
+    border: 1px solid var(--bone-hairline);
+    border-radius: 14px;
+    overflow: hidden;
+    background: #1a1a1a;
+    box-shadow: 0 24px 60px rgba(0,0,0,0.5);
+  }
+  .browser-bar {
+    display: flex; align-items: center; gap: 8px;
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--bone-hairline);
+    background: #0f0f0f;
+  }
+  .dot { width: 12px; height: 12px; border-radius: 50%; background: #2a2a2a; }
+  .url {
+    margin-left: 16px;
+    flex: 1;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--bone-faint);
+    background: #1a1a1a;
+    padding: 6px 12px;
+    border-radius: 6px;
+    border: 1px solid var(--bone-hairline);
+  }
+  .url .lock { color: #4ade80; margin-right: 6px; }
+  .url .path { color: var(--bone); }
+  .serp {
+    padding: 28px 32px;
+    background: #0f0f0f;
+  }
+  .serp-q {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 16px;
+    border: 1px solid var(--bone-hairline);
+    border-radius: 999px;
+    background: #161616;
+    margin-bottom: 24px;
+    font-size: 14px;
+    color: var(--bone);
+  }
+  .serp-q .magnify { opacity: 0.5; }
+  .serp-result {
+    padding: 16px 0;
+    border-bottom: 1px solid var(--bone-hairline);
+  }
+  .serp-result:last-child { border: 0; }
+  .serp-result.featured {
+    background: rgba(230,35,42,0.06);
+    margin: 0 -32px;
+    padding: 18px 32px;
+    border-left: 3px solid var(--signal);
+  }
+  .serp-bread {
+    font-size: 12px;
+    color: var(--bone-faint);
+    margin-bottom: 4px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .serp-title {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-weight: 600;
+    font-size: 20px;
+    color: #8eb6ff;
+    margin-bottom: 4px;
+  }
+  .serp-snippet {
+    font-size: 13.5px;
+    line-height: 1.5;
+    color: var(--bone-dim);
+  }
+  .serp-rank {
+    display: inline-block;
+    font-family: 'Oswald', sans-serif;
+    font-weight: 600;
+    font-size: 10px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--signal);
+    margin-bottom: 6px;
+  }
+
+  /* ── Phone frame (privacy slide) ────────────────────────────── */
+  .phone {
+    width: 320px;
+    border: 1px solid var(--bone-hair-strong);
+    border-radius: 36px;
+    overflow: hidden;
+    background: #0a0a0a;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.6);
+    margin: 0 auto;
+  }
+  .phone-screen {
+    aspect-ratio: 9/19;
+    padding: 28px 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    background: linear-gradient(180deg, #0f0f0f 0%, #060606 100%);
+  }
+  .phone-bar {
+    display: flex; justify-content: space-between; align-items: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--bone-faint);
+    margin-bottom: 8px;
+  }
+  .phone-h {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-weight: 600;
+    font-size: 22px;
+    color: var(--bone);
+  }
+  .phone-sub {
+    font-size: 11px;
+    color: var(--bone-faint);
+    font-family: 'Oswald', sans-serif;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+  }
+  .msg {
+    padding: 12px 14px;
+    border-radius: 14px;
+    background: rgba(245,240,235,0.06);
+    border: 1px solid var(--bone-hairline);
+    font-size: 12.5px;
+    line-height: 1.45;
+    color: var(--bone);
+    max-width: 80%;
+  }
+  .msg.me {
+    background: var(--signal);
+    color: #fff;
+    margin-left: auto;
+    border: 0;
+  }
+  .msg-author {
+    font-family: 'Oswald', sans-serif;
+    font-size: 9px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--signal);
+    margin-bottom: 4px;
+  }
+  .msg.me .msg-author { color: rgba(255,255,255,0.85); }
+
+  .privacy-badges {
+    display: flex; flex-direction: column; gap: 14px;
+    margin-top: 32px;
+  }
+  .privacy-badge {
+    display: flex; gap: 14px; align-items: flex-start;
+    padding: 18px 22px;
+    border: 1px solid var(--bone-hairline);
+    border-radius: 14px;
+    background: rgba(245,240,235,0.02);
+  }
+  .privacy-badge .check {
+    width: 28px; height: 28px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    background: rgba(74,222,128,0.12);
+    color: #4ade80;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px;
+  }
+  .privacy-badge strong {
+    display: block;
+    font-weight: 500;
+    color: var(--bone);
+    margin-bottom: 4px;
+    font-size: 15px;
+  }
+  .privacy-badge span {
+    font-size: 13.5px;
+    line-height: 1.5;
+    color: var(--bone-dim);
+  }
+
+  /* ── Manage slide ───────────────────────────────────────────── */
+  .manage-grid {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    gap: 56px;
+    align-items: stretch;
+  }
+  .feature-list {
+    display: flex; flex-direction: column;
+    border-top: 1px solid var(--bone-hairline);
+  }
+  .feature-row {
+    display: grid;
+    grid-template-columns: 56px 1fr auto;
+    gap: 20px;
+    align-items: center;
+    padding: 22px 0;
+    border-bottom: 1px solid var(--bone-hairline);
+  }
+  .feature-row .icon {
+    width: 44px; height: 44px;
+    border-radius: 10px;
+    background: rgba(230,35,42,0.10);
+    color: var(--signal);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-weight: 700;
+    font-size: 16px;
+  }
+  .feature-row strong {
+    display: block;
+    font-weight: 500;
+    color: var(--bone);
+    margin-bottom: 3px;
+    font-size: 15.5px;
+  }
+  .feature-row span {
+    font-size: 13.5px;
+    line-height: 1.5;
+    color: var(--bone-dim);
+  }
+  .feature-row .pill {
+    font-family: 'Oswald', sans-serif;
+    font-weight: 600;
+    font-size: 10px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--bone-faint);
+    border: 1px solid var(--bone-hairline);
+    padding: 5px 10px;
+    border-radius: 999px;
+  }
+  .pill.live { color: #4ade80; border-color: rgba(74,222,128,0.3); }
+
+  .free-card {
+    padding: 36px 32px;
+    border: 1px solid rgba(230,35,42,0.4);
+    border-radius: 20px;
+    background: linear-gradient(180deg, rgba(230,35,42,0.10), rgba(230,35,42,0.02));
+    display: flex; flex-direction: column; justify-content: space-between;
+    gap: 24px;
+  }
+  .free-card .tag {
+    font-family: 'Oswald', sans-serif;
+    font-weight: 600;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--signal);
+  }
+  .free-card h3 { color: var(--bone); margin: 0; }
+  .free-card p { margin: 0; color: var(--bone-dim); font-size: 14.5px; line-height: 1.55; }
+  @media (max-width: 980px){ .manage-grid { grid-template-columns: 1fr; } }
+
+  /* ── Member XP slide ────────────────────────────────────────── */
+  .xp-card {
+    border: 1px solid var(--bone-hairline);
+    border-radius: 18px;
+    background: rgba(245,240,235,0.02);
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .xp-card .label {
+    font-family: 'Oswald', sans-serif;
+    font-weight: 500;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--signal);
+  }
+  .xp-card .title {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-weight: 700;
+    font-size: 24px;
+    line-height: 1.1;
+    color: var(--bone);
+  }
+  .xp-card .meta-line {
+    font-size: 12.5px;
+    color: var(--bone-faint);
+    font-family: 'Poppins', sans-serif;
+  }
+  .xp-card .cta {
+    margin-top: 8px;
+    height: 44px;
+    border-radius: 10px;
+    background: var(--signal);
+    color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Oswald', sans-serif; font-weight: 600;
+    font-size: 12px; letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
+  .xp-stats {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    padding-top: 12px;
+    border-top: 1px solid var(--bone-hairline);
+  }
+  .xp-stats div { font-size: 12px; color: var(--bone-faint); display: flex; flex-direction: column; }
+  .xp-stats strong {
+    color: var(--bone);
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-weight: 600;
+    font-size: 22px;
+  }
+
+  /* ── Founder slide ──────────────────────────────────────────── */
+  .logos {
+    display: flex;
+    flex-wrap: wrap;
+    gap: clamp(24px, 4vw, 48px);
+    align-items: center;
+    margin-top: 36px;
+  }
+  .logo-tile {
+    font-family: 'Oswald', sans-serif;
+    font-weight: 600;
+    font-size: 18px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--bone-dim);
+    padding: 18px 24px;
+    border: 1px solid var(--bone-hairline);
+    border-radius: 12px;
+    background: rgba(245,240,235,0.02);
+  }
+  .logo-tile em {
+    display: block;
+    font-family: 'JetBrains Mono', monospace;
+    font-style: normal;
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    color: var(--bone-faint);
+    margin-top: 4px;
+  }
+
+  /* ── Pricing slide ──────────────────────────────────────────── */
+  .free-hero {
+    text-align: center;
+    padding: clamp(48px, 8vw, 96px) 0 0;
+  }
+  .free-hero .price {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-weight: 700;
+    font-size: clamp(120px, 22vw, 280px);
+    line-height: 0.9;
+    letter-spacing: -0.04em;
+    color: var(--bone);
+    margin: 0;
+  }
+  .free-hero .price em { color: var(--signal); font-style: italic; }
+  .free-hero .sub {
+    margin-top: 24px;
+    font-size: 18px;
+    color: var(--bone-dim);
+    max-width: 60ch;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .why-free {
+    margin-top: 64px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    text-align: left;
+    max-width: 880px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .why-free div {
+    padding: 22px 24px;
+    border: 1px solid var(--bone-hairline);
+    border-radius: 14px;
+  }
+  .why-free strong {
+    font-family: 'Oswald', sans-serif;
+    font-weight: 600;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--signal);
+    display: block;
+    margin-bottom: 10px;
+  }
+  .why-free p {
+    margin: 0;
+    font-size: 13.5px;
+    line-height: 1.55;
+    color: var(--bone-dim);
+  }
+  @media (max-width: 880px){ .why-free { grid-template-columns: 1fr; } }
+
+  /* ── CTA slide ──────────────────────────────────────────────── */
+  .cta-final {
+    text-align: center;
+    max-width: 920px;
+    margin: 0 auto;
+  }
+  .cta-actions {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 48px;
+  }
+  .cta-meta {
+    margin-top: 64px;
+    padding-top: 32px;
+    border-top: 1px solid var(--bone-hairline);
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 24px;
+    color: var(--bone-faint);
+    font-size: 13.5px;
+  }
+  .cta-meta strong { color: var(--bone); font-weight: 500; }
+
+  /* ── Misc ────────────────────────────────────────────────────── */
+  .deck-progress {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 6px;
+    z-index: 100;
+    padding: 10px 16px;
+    background: rgba(10,10,10,0.7);
+    border: 1px solid var(--bone-hairline);
+    border-radius: 999px;
+    backdrop-filter: blur(10px);
+  }
+  .deck-progress a {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--bone-hairline);
+    transition: background 200ms var(--ease);
+  }
+  .deck-progress a:hover { background: var(--signal); }
+
+  /* hide scrollbar for cleaner deck feel */
+  body::-webkit-scrollbar { width: 0; background: transparent; }
+
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- 01 · COVER                                                       -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<section class="slide" id="s1">
+  <div class="cover-bg"></div>
+  <div class="slide-corner-brand">Endorfin<span class="dot">.</span></div>
+  <div class="slide-num">01 / 12</div>
+  <div class="slide-inner">
+    <span class="cover-eyebrow">For Run Club Founders · India</span>
+    <h1 class="h-mega">
+      Run your club.<br/>
+      We'll run<br/>
+      <em class="accent">the internet.</em>
+    </h1>
+    <div class="cover-meta">
+      <div>
+        <span class="meta">Pitch</span>
+        <strong>Endorfin Clubs</strong>
+      </div>
+      <div>
+        <span class="meta">Audience</span>
+        <strong>Club founders &amp; admins</strong>
+      </div>
+      <div>
+        <span class="meta">Built by</span>
+        <strong>Shivam Singhal · CTO</strong>
+      </div>
+      <div>
+        <span class="meta">Year</span>
+        <strong>2026</strong>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- 02 · THE REALITY (PAIN)                                          -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<section class="slide" id="s2">
+  <div class="slide-corner-brand">Endorfin<span class="dot">.</span></div>
+  <div class="slide-num">02 / 12</div>
+  <div class="slide-inner">
+    <span class="kicker red">The Reality</span>
+    <h2 class="h-display">
+      You built a club.<br/>
+      The internet doesn't<br/>
+      <em class="accent">know it exists.</em>
+    </h2>
+
+    <div class="pain-list">
+      <div class="pain-row">
+        <span class="pain-num">01</span>
+        <div class="pain-text">
+          <strong>"Run clubs in Noida" → 0 results for you</strong>
+          <span>Hundreds of clubs, thousands of new runners — but Google can't find your group. New runners join whichever club shows up first. That's almost never yours.</span>
+        </div>
+      </div>
+      <div class="pain-row">
+        <span class="pain-num">02</span>
+        <div class="pain-text">
+          <strong>Instagram DMs, where messages go to die</strong>
+          <span>"Hey, can I join?" lands in your Requests folder. By the time you see it, they've already joined someone else. No CTA, no funnel, no follow-up.</span>
+        </div>
+      </div>
+      <div class="pain-row">
+        <span class="pain-num">03</span>
+        <div class="pain-text">
+          <strong>WhatsApp = your number is now public</strong>
+          <span>Members hand over their phone numbers to join a group. Spam, creeps, unsolicited DMs. Female runners drop out before the first run.</span>
+        </div>
+      </div>
+      <div class="pain-row">
+        <span class="pain-num">04</span>
+        <div class="pain-text">
+          <strong>Manual everything — RSVPs, headcounts, recaps</strong>
+          <span>Polls in WhatsApp. Spreadsheets nobody reads. Recap photos lost in 600-message threads. Founder fatigue is the #1 reason clubs die.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- 03 · COST OF THE PROBLEM                                         -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<section class="slide" id="s3">
+  <div class="slide-corner-brand">Endorfin<span class="dot">.</span></div>
+  <div class="slide-num">03 / 12</div>
+  <div class="slide-inner">
+    <span class="kicker">The Cost</span>
+    <h2 class="h-display">
+      Invisible clubs<br/>
+      <em class="accent">don't grow.</em>
+    </h2>
+    <p class="lead" style="margin-top: 24px;">Every Sunday morning, runners are searching for a community in your city. They never find you.</p>
+
+    <div class="grid-3" style="margin-top: 56px;">
+      <div class="cost-stat">
+        <span class="num">~80%</span>
+        <span class="label">of new runners</span>
+        <p>Find their first club via Google or Instagram search — not word of mouth. If you don't rank, you don't exist.</p>
+      </div>
+      <div class="cost-stat">
+        <span class="num">10+</span>
+        <span class="label">hours / week</span>
+        <p>Founders spend on admin: replying to DMs, managing RSVPs, chasing photos, copy-pasting Strava splits. All unpaid.</p>
+      </div>
+      <div class="cost-stat">
+        <span class="num">3 in 5</span>
+        <span class="label">drop off in 30 days</span>
+        <p>New members never make it past the first WhatsApp group ping. No structured intro. No second-touch. Gone.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- 04 · THE SHIFT                                                   -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<section class="slide slide-bone" id="s4">
+  <div class="slide-corner-brand">Endorfin<span class="dot">.</span></div>
+  <div class="slide-num">04 / 12</div>
+  <div class="slide-inner">
+    <span class="kicker red">The Shift</span>
+    <h2 class="h-display">
+      India is running.<br/>
+      The tools <em class="accent">aren't keeping up.</em>
+    </h2>
+
+    <div class="grid-2" style="margin-top: 64px;">
+      <div>
+        <p class="lead" style="color: rgba(10,10,10,0.72); font-size: 18px;">
+          Marathons sold out in minutes. Sub-3 hour finishers everywhere. Brunch runs, sunrise runs, Sunday long runs — every neighbourhood has a group now.
+        </p>
+        <p class="lead" style="color: rgba(10,10,10,0.72); font-size: 18px; margin-top: 20px;">
+          But the infrastructure is <strong>WhatsApp + Instagram</strong>. Built for memes, not communities. Built for chats, not clubs.
+        </p>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 20px;">
+        <div style="padding: 28px; border: 1px solid rgba(10,10,10,0.12); border-radius: 16px;">
+          <div style="font-family: 'Fraunces', serif; font-style: italic; font-weight: 700; font-size: 56px; line-height: 1; color: var(--signal);">2.1M+</div>
+          <div style="font-family: 'Oswald', sans-serif; font-weight: 500; font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(10,10,10,0.55); margin-top: 8px;">Marathon registrations · India · 2025</div>
+        </div>
+        <div style="padding: 28px; border: 1px solid rgba(10,10,10,0.12); border-radius: 16px;">
+          <div style="font-family: 'Fraunces', serif; font-style: italic; font-weight: 700; font-size: 56px; line-height: 1; color: var(--signal);">600+</div>
+          <div style="font-family: 'Oswald', sans-serif; font-weight: 500; font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(10,10,10,0.55); margin-top: 8px;">Run clubs in major Indian metros</div>
+        </div>
+        <div style="padding: 28px; border: 1px solid rgba(10,10,10,0.12); border-radius: 16px;">
+          <div style="font-family: 'Fraunces', serif; font-style: italic; font-weight: 700; font-size: 56px; line-height: 1; color: var(--signal);">0</div>
+          <div style="font-family: 'Oswald', sans-serif; font-weight: 500; font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(10,10,10,0.55); margin-top: 8px;">Built specifically for them. Until now.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- 05 · ENDORFIN — THREE PILLARS                                    -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<section class="slide" id="s5">
+  <div class="slide-corner-brand">Endorfin<span class="dot">.</span></div>
+  <div class="slide-num">05 / 12</div>
+  <div class="slide-inner">
+    <span class="kicker red">Endorfin for Clubs</span>
+    <h2 class="h-display">
+      A real home<br/>
+      for your <em class="accent">running community.</em>
+    </h2>
+    <p class="lead" style="margin-top: 24px;">Three things you need. Three things WhatsApp + Instagram can't give you.</p>
+
+    <div class="pillars">
+      <div class="pillar">
+        <span class="tag">01 · Discoverability</span>
+        <h3 class="h3">Show up first when runners search.</h3>
+        <p>A dedicated club page that ranks on Google. Schema-tagged for "Run clubs in Noida". Share-ready. Bot-friendly.</p>
+      </div>
+      <div class="pillar">
+        <span class="tag">02 · Privacy</span>
+        <h3 class="h3">Talk to your club without handing out your number.</h3>
+        <p>Every conversation lives in-app. No phone, no email, no DM creeps. Members reach you through structured channels.</p>
+      </div>
+      <div class="pillar">
+        <span class="tag">03 · Manageability</span>
+        <h3 class="h3">Run the club from one screen.</h3>
+        <p>Approvals, RSVPs, recaps, logos, descriptions — all in-app. Or hand it to us, and we'll manage your runs for free.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- 06 · DISCOVERABILITY (DEEP DIVE)                                 -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<section class="slide" id="s6">
+  <div class="slide-corner-brand">Endorfin<span class="dot">.</span></div>
+  <div class="slide-num">06 / 12</div>
+  <div class="slide-inner">
+    <span class="kicker red">01 · Discoverability</span>
+    <h2 class="h2" style="max-width: 18ch;">
+      Your club, on page one.
+    </h2>
+    <p class="lead" style="margin-top: 20px;">Server-rendered, schema-marked, and structured for Google. Every club page is a long-lived SEO asset working for you 24/7.</p>
+
+    <div style="margin-top: 56px;">
+      <div class="browser">
+        <div class="browser-bar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="url"><span class="lock">🔒</span>google.com<span class="path">/search?q=run+clubs+in+noida</span></span>
+        </div>
+        <div class="serp">
+          <div class="serp-q">
+            <span class="magnify">🔍</span>
+            run clubs in noida
+          </div>
+
+          <div class="serp-result featured">
+            <span class="serp-rank">▸ Rank #1 · with Endorfin</span>
+            <div class="serp-bread">endorfin.run › clubs › uprun-club</div>
+            <div class="serp-title">UpRun Club — Noida's Sunday morning running community</div>
+            <div class="serp-snippet">42 members · 8 runs this month · 312 km · Est. 2022. Join the next run, RSVP, see the last run recap. Verified club on Endorfin.</div>
+          </div>
+
+          <div class="serp-result">
+            <div class="serp-bread">instagram.com › someclub</div>
+            <div class="serp-title">@someclub_run • Instagram profile</div>
+            <div class="serp-snippet">A page with no posts in the last 6 months. No address. No CTA. No structure.</div>
+          </div>
+
+          <div class="serp-result">
+            <div class="serp-bread">reddit.com › r/IndiaRunning</div>
+            <div class="serp-title">Best run clubs in Noida? : IndiaRunning</div>
+            <div class="serp-snippet">"Idk anyone tried xyz?" — 3 comments, 2 years ago.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid-3" style="margin-top: 40px;">
+        <div>
+          <div class="meta">SEO mechanics</div>
+          <p style="margin: 8px 0 0; font-size: 14.5px; color: var(--bone-dim); line-height: 1.55;">Server-rendered Next.js. JSON-LD <code class="mono" style="color: var(--bone);">SportsClub</code> schema. Sitemap inclusion. OG images per club.</p>
+        </div>
+        <div>
+          <div class="meta">Built-in CTAs</div>
+          <p style="margin: 8px 0 0; font-size: 14.5px; color: var(--bone-dim); line-height: 1.55;">Join button. RSVP button. Pinned next run. App download. Every visitor has a clear next step.</p>
+        </div>
+        <div>
+          <div class="meta">Always on</div>
+          <p style="margin: 8px 0 0; font-size: 14.5px; color: var(--bone-dim); line-height: 1.55;">Stats refresh automatically. Recap videos auto-pinned. Your page never goes stale, even if you do.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- 07 · PRIVACY (DEEP DIVE)                                         -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<section class="slide" id="s7">
+  <div class="slide-corner-brand">Endorfin<span class="dot">.</span></div>
+  <div class="slide-num">07 / 12</div>
+  <div class="slide-inner">
+    <span class="kicker red">02 · Privacy</span>
+    <div class="grid-2" style="gap: 80px;">
+      <div>
+        <h2 class="h2" style="max-width: 16ch;">
+          No phone.<br/>
+          No email.<br/>
+          <em class="accent">No creeps.</em>
+        </h2>
+        <p class="lead" style="margin-top: 24px;">Every member-to-member and member-to-founder conversation lives inside Endorfin. Phone numbers stay yours. Emails stay yours. Discussions stay structured.</p>
+
+        <div class="privacy-badges">
+          <div class="privacy-badge">
+            <div class="check">✓</div>
+            <div>
+              <strong>Founders are reachable, not exposed</strong>
+              <span>Members can DM you in-app, RSVP your runs, and post in club discussions — without ever getting your number.</span>
+            </div>
+          </div>
+          <div class="privacy-badge">
+            <div class="check">✓</div>
+            <div>
+              <strong>Members-only club discussions</strong>
+              <span>Threads gated to approved members. Read &amp; write access tied to membership. Leave the club, lose the access.</span>
+            </div>
+          </div>
+          <div class="privacy-badge">
+            <div class="check">✓</div>
+            <div>
+              <strong>Structured join requests</strong>
+              <span>Custom join form per club. You decide what you want to know. You approve or reject — same as Strava clubs, but without giving up your number.</span>
+            </div>
+          </div>
+          <div class="privacy-badge">
+            <div class="check">✓</div>
+            <div>
+              <strong>Female-runner-friendly by default</strong>
+              <span>The single biggest blocker to joining a WhatsApp group is gone. More women join. More women stay.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="phone">
+          <div class="phone-screen">
+            <div class="phone-bar">
+              <span>9:41</span>
+              <span>UpRun · Discussion</span>
+              <span>●●●</span>
+            </div>
+            <div class="phone-h">UpRun Club</div>
+            <div class="phone-sub">Members-only discussion · 42 members</div>
+
+            <div class="msg" style="margin-top: 12px;">
+              <div class="msg-author">Aisha · Founder</div>
+              Sunday's run is moved to 6:30 AM. Bring your reflective gear, kids — pre-dawn vibes ☀️
+            </div>
+            <div class="msg me">
+              <div class="msg-author">Me</div>
+              Counted in! 5K or 10K loop?
+            </div>
+            <div class="msg">
+              <div class="msg-author">Aisha · Founder</div>
+              Both. RSVP in the event card 👇
+            </div>
+            <div style="margin-top: auto; padding-top: 16px; display: flex; gap: 8px;">
+              <div style="flex: 1; height: 38px; border: 1px solid var(--bone-hairline); border-radius: 10px; padding: 0 14px; display: flex; align-items: center; font-size: 12px; color: var(--bone-faint); font-family: 'Poppins', sans-serif;">Type a message…</div>
+              <div style="width: 38px; height: 38px; background: var(--signal); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 14px;">↑</div>
+            </div>
+          </div>
+        </div>
+        <p style="text-align: center; margin-top: 20px; font-size: 12px; color: var(--bone-faint); font-family: 'JetBrains Mono', monospace; letter-spacing: 0.06em;">In-app discussion · no phone numbers exchanged</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- 08 · MANAGEABILITY                                               -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<section class="slide" id="s8">
+  <div class="slide-corner-brand">Endorfin<span class="dot">.</span></div>
+  <div class="slide-num">08 / 12</div>
+  <div class="slide-inner">
+    <span class="kicker red">03 · Manageability</span>
+    <h2 class="h-display" style="max-width: 18ch;">
+      Run the club.<br/>
+      Or let <em class="accent">us run it for you.</em>
+    </h2>
+
+    <div class="manage-grid" style="margin-top: 64px;">
+      <div class="feature-list">
+        <div class="feature-row">
+          <div class="icon">A</div>
+          <div>
+            <strong>Approve or reject join requests</strong>
+            <span>Custom join form. In-app + email approvals. One tap.</span>
+          </div>
+          <div class="pill live">Live</div>
+        </div>
+        <div class="feature-row">
+          <div class="icon">B</div>
+          <div>
+            <strong>Create runs, races &amp; community events</strong>
+            <span>Set distance, route, time. Members RSVP. Headcount auto-tracked.</span>
+          </div>
+          <div class="pill live">Live</div>
+        </div>
+        <div class="feature-row">
+          <div class="icon">C</div>
+          <div>
+            <strong>Last run recap — photos &amp; video reel</strong>
+            <span>Post-run, drop your clips. Recap auto-pins on the public club page.</span>
+          </div>
+          <div class="pill live">Live</div>
+        </div>
+        <div class="feature-row">
+          <div class="icon">D</div>
+          <div>
+            <strong>Edit everything — logo, niche, description</strong>
+            <span>Serious / chill / community-building. Tag your vibe. Refresh anytime.</span>
+          </div>
+          <div class="pill live">Live</div>
+        </div>
+        <div class="feature-row">
+          <div class="icon">E</div>
+          <div>
+            <strong>Member directory &amp; admin roles</strong>
+            <span>Promote co-admins. Remove inactive members. Member counts live.</span>
+          </div>
+          <div class="pill live">Live</div>
+        </div>
+        <div class="feature-row">
+          <div class="icon">F</div>
+          <div>
+            <strong>Push notifications when stuff happens</strong>
+            <span>New join request, new RSVP, new discussion message — all routed.</span>
+          </div>
+          <div class="pill live">Live</div>
+        </div>
+      </div>
+
+      <div class="free-card">
+        <span class="tag">Concierge option</span>
+        <h3 class="h2" style="font-size: 36px; line-height: 1.05;">Don't want to manage it?<br/><em class="accent">We will. For free.</em></h3>
+        <p>Our team can run your club page end-to-end — pull your last runs, write the recaps, format the events, post the photos. You keep showing up to the run.</p>
+        <p style="font-size: 12.5px; color: var(--bone-faint);">Limited capacity. First 50 clubs onboarded.</p>
+        <a href="#s12" class="btn">Apply for managed setup →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- 09 · MEMBER EXPERIENCE                                           -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<section class="slide" id="s9">
+  <div class="slide-corner-brand">Endorfin<span class="dot">.</span></div>
+  <div class="slide-num">09 / 12</div>
+  <div class="slide-inner">
+    <span class="kicker red">For your members</span>
+    <h2 class="h-display" style="max-width: 22ch;">
+      A real club page.<br/>
+      Not a <em class="accent">link in bio.</em>
+    </h2>
+    <p class="lead" style="margin-top: 24px;">When someone discovers your club, they don't land on a profile picture and a DM button. They land on this:</p>
+
+    <div class="grid-3" style="margin-top: 56px;">
+      <div class="xp-card">
+        <span class="label">Next Run</span>
+        <span class="title">All Women Mother's Day Run.</span>
+        <span class="meta-line">Sun, 10 May · 8:00 AM · Habidade, Sector 104</span>
+        <div class="xp-stats">
+          <div><strong>5K</strong>Distance</div>
+          <div><strong>+1 free</strong>Mom entry</div>
+        </div>
+        <div class="cta">RSVP — I'm in</div>
+      </div>
+      <div class="xp-card">
+        <span class="label">Club</span>
+        <span class="title">UpRun Club — verified.</span>
+        <span class="meta-line">Sunday morning crew · Noida · since 2022</span>
+        <div class="xp-stats">
+          <div><strong>42</strong>Members</div>
+          <div><strong>312</strong>KM this month</div>
+          <div><strong>8</strong>Runs / month</div>
+          <div><strong>3 yrs</strong>Running</div>
+        </div>
+        <div class="cta">Request to join</div>
+      </div>
+      <div class="xp-card">
+        <span class="label">Last Run · Recap</span>
+        <span class="title">Sunrise loop, Sector 56.</span>
+        <span class="meta-line">38 went · 6:00 AM · 10K · brunch after</span>
+        <div style="aspect-ratio: 1; border-radius: 12px; background: linear-gradient(135deg, rgba(230,35,42,0.15), rgba(245,240,235,0.04)); display: flex; align-items: center; justify-content: center; color: var(--bone-faint); font-size: 11px; letter-spacing: 0.16em; font-family: 'Oswald', sans-serif; text-transform: uppercase;">▶ Recap reel</div>
+        <div class="cta">See full recap</div>
+      </div>
+    </div>
+
+    <p class="lead" style="margin-top: 56px; max-width: 64ch; color: var(--bone-faint); font-size: 15px;">Same club. Same Sunday run. But now: <strong style="color: var(--bone);">discoverable, joinable, RSVP-able, recap-able</strong> — without you doing extra work.</p>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- 10 · FOUNDER / CREDIBILITY                                       -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<section class="slide slide-bone" id="s10">
+  <div class="slide-corner-brand">Endorfin<span class="dot">.</span></div>
+  <div class="slide-num">10 / 12</div>
+  <div class="slide-inner">
+    <span class="kicker red">Built by a runner who ships</span>
+    <h2 class="h-display">
+      Endorfin is built by<br/>
+      <em class="accent">someone who's actually shipped</em><br/>
+      production stacks at scale.
+    </h2>
+
+    <div class="grid-2" style="margin-top: 64px;">
+      <div>
+        <p class="lead" style="color: rgba(10,10,10,0.72); font-size: 18px;">
+          I'm Shivam. 10+ years of engineering, 4 production stacks built from zero. I've shipped to crores of users — at <strong>Nykaa</strong>, <strong>INDmoney</strong>, and <strong>Virgin Hyperloop</strong>. Currently CTO at a US-based startup.
+        </p>
+        <p class="lead" style="color: rgba(10,10,10,0.72); font-size: 18px; margin-top: 20px;">
+          I'm also a runner. I built Endorfin because nothing in the market actually solves what runners and run clubs need. So I built it. Properly.
+        </p>
+        <p style="margin-top: 32px; padding: 24px; border-left: 3px solid var(--signal); color: rgba(10,10,10,0.85); font-family: 'Fraunces', serif; font-style: italic; font-size: 22px; line-height: 1.4;">
+          "This isn't a side project on Bubble. It's a real product, on a real stack, built to last."
+        </p>
+      </div>
+      <div>
+        <div style="display: flex; flex-direction: column; gap: 14px;">
+          <div class="logo-tile" style="color: rgba(10,10,10,0.85); border-color: rgba(10,10,10,0.12); background: rgba(10,10,10,0.02);">
+            Nykaa
+            <em>Built core stack from scratch · Prev.</em>
+          </div>
+          <div class="logo-tile" style="color: rgba(10,10,10,0.85); border-color: rgba(10,10,10,0.12); background: rgba(10,10,10,0.02);">
+            INDmoney
+            <em>Foundational engineering · Prev.</em>
+          </div>
+          <div class="logo-tile" style="color: rgba(10,10,10,0.85); border-color: rgba(10,10,10,0.12); background: rgba(10,10,10,0.02);">
+            Virgin Hyperloop
+            <em>Engineering · Prev.</em>
+          </div>
+          <div class="logo-tile" style="color: rgba(10,10,10,0.85); border-color: rgba(10,10,10,0.12); background: rgba(10,10,10,0.02);">
+            CTO · US-based startup
+            <em>Current</em>
+          </div>
+          <div class="logo-tile" style="color: var(--signal); border-color: rgba(230,35,42,0.3); background: rgba(230,35,42,0.05);">
+            Endorfin
+            <em>Founder · 2025–</em>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- 11 · PRICING — FREE                                              -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<section class="slide" id="s11">
+  <div class="slide-corner-brand">Endorfin<span class="dot">.</span></div>
+  <div class="slide-num">11 / 12</div>
+  <div class="slide-inner">
+    <span class="kicker red" style="justify-content: center; display: flex;">Pricing</span>
+    <div class="free-hero">
+      <h2 class="h-mega" style="font-size: clamp(80px, 16vw, 200px);">It's <em>free.</em></h2>
+      <p class="sub">Forever, for clubs. We don't charge admins. We don't charge members. We don't charge per run.</p>
+    </div>
+
+    <div class="why-free">
+      <div>
+        <strong>Why free for you</strong>
+        <p>Clubs are the heartbeat of running in India. Charging founders to organise their own community would be insane.</p>
+      </div>
+      <div>
+        <strong>How we make money</strong>
+        <p>We monetise through races (registrations, ticketing) and brand partnerships — not by taxing communities.</p>
+      </div>
+      <div>
+        <strong>What you commit</strong>
+        <p>Show up. Run with your club. Keep the page alive. That's it. No contract. No exclusivity.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- 12 · CTA / NEXT STEPS                                            -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<section class="slide" id="s12">
+  <div class="cover-bg"></div>
+  <div class="slide-corner-brand">Endorfin<span class="dot">.</span></div>
+  <div class="slide-num">12 / 12</div>
+  <div class="slide-inner">
+    <div class="cta-final">
+      <span class="kicker red" style="justify-content: center; display: inline-flex;">Get started</span>
+      <h2 class="h-mega" style="font-size: clamp(64px, 12vw, 160px);">
+        Get your club<br/>
+        on <em class="accent">Endorfin.</em>
+      </h2>
+      <p class="lead" style="margin: 32px auto 0; font-size: 19px;">
+        Onboarding takes 15 minutes. We do the heavy lifting if you want — or hand it over and we'll set up your page, write your first recap, and import your last run.
+      </p>
+
+      <div class="cta-actions">
+        <a href="https://endorfin.run/clubs" class="btn">Start free → onboard your club</a>
+        <a href="mailto:hello@endorfin.run" class="btn btn-ghost">Talk to founder</a>
+      </div>
+
+      <div class="cta-meta">
+        <div><span class="meta">Web</span><br/><strong>endorfin.run/clubs</strong></div>
+        <div><span class="meta">Email</span><br/><strong>hello@endorfin.run</strong></div>
+        <div><span class="meta">Founder</span><br/><strong>Shivam Singhal</strong></div>
+        <div><span class="meta">App</span><br/><strong>iOS · Android</strong></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- floating slide indicator -->
+<nav class="deck-progress" aria-label="Slide nav">
+  <a href="#s1"  title="01 · Cover"></a>
+  <a href="#s2"  title="02 · Reality"></a>
+  <a href="#s3"  title="03 · Cost"></a>
+  <a href="#s4"  title="04 · Shift"></a>
+  <a href="#s5"  title="05 · Pillars"></a>
+  <a href="#s6"  title="06 · Discoverability"></a>
+  <a href="#s7"  title="07 · Privacy"></a>
+  <a href="#s8"  title="08 · Manageability"></a>
+  <a href="#s9"  title="09 · Member XP"></a>
+  <a href="#s10" title="10 · Founder"></a>
+  <a href="#s11" title="11 · Pricing"></a>
+  <a href="#s12" title="12 · CTA"></a>
+</nav>
+
+</body>
+</html>
