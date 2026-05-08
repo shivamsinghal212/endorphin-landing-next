@@ -861,75 +861,73 @@
 }
 .pd .deck-progress a:hover { background: var(--pd-signal); }
 
-/* ── Per-slide Next button ──────────────────────────────────── */
-.pd .next-slide {
-  position: absolute;
-  bottom: clamp(20px, 3vw, 40px);
-  right: clamp(28px, 5vw, 88px);
-  display: inline-flex;
-  align-items: center;
-  gap: 12px;
-  padding: 14px 22px;
-  border-radius: 999px;
-  border: 1px solid var(--pd-bone-hair-strong);
-  background: rgba(10, 10, 10, 0.55);
-  -webkit-backdrop-filter: blur(10px);
-  backdrop-filter: blur(10px);
-  font-family: var(--font-oswald), 'Oswald', sans-serif;
-  font-weight: 600;
-  font-size: 11px;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: var(--pd-bone);
-  z-index: 4;
-  transition:
-    background 220ms var(--pd-ease),
-    border-color 220ms var(--pd-ease),
-    transform 220ms var(--pd-ease);
-}
-.pd .next-slide .arrow {
+/* ── Floating Next button ───────────────────────────────────── */
+/* Single fixed button. Translucent so it stays subtle over both the
+   jet and bone slides; backdrop blur gives just enough contrast for
+   the SVG arrow to read on either. */
+.pd .next-button {
+  position: fixed;
+  bottom: 84px;
+  right: clamp(20px, 3vw, 40px);
+  width: 48px;
+  height: 48px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 22px;
-  height: 22px;
   border-radius: 50%;
-  background: var(--pd-signal);
-  color: #fff;
-  font-size: 13px;
-  line-height: 1;
+  background: rgba(10, 10, 10, 0.32);
+  border: 1px solid rgba(245, 240, 235, 0.20);
+  color: var(--pd-bone);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  z-index: 50;
+  text-decoration: none;
+  transition:
+    background 220ms var(--pd-ease),
+    border-color 220ms var(--pd-ease),
+    transform 220ms var(--pd-ease),
+    color 220ms var(--pd-ease);
 }
-.pd .next-slide:hover {
+.pd .next-button svg { display: block; }
+.pd .next-button:hover {
   background: var(--pd-signal);
   border-color: var(--pd-signal);
+  color: #fff;
   transform: translateY(-2px);
 }
-.pd .next-slide:hover .arrow {
-  background: #fff;
-  color: var(--pd-signal);
-}
-.pd .slide-bone .next-slide {
-  background: rgba(245, 240, 235, 0.8);
-  border-color: rgba(10, 10, 10, 0.16);
-  color: var(--pd-jet);
-}
-.pd .slide-bone .next-slide:hover {
-  background: var(--pd-signal);
-  border-color: var(--pd-signal);
-  color: #fff;
-}
 @media (max-width: 640px) {
-  .pd .next-slide {
-    bottom: 80px; /* clear deck-progress dots on small screens */
-    padding: 10px 16px;
-    font-size: 10px;
-    letter-spacing: 0.16em;
+  .pd .next-button {
+    bottom: 76px;
+    width: 44px;
+    height: 44px;
   }
+}
+
+/* ── Mobile heading + spacing tightening ────────────────────── */
+/* Default clamp() floors are tuned for desktop; on phones the headlines
+   were eating the viewport and pushing supporting elements offscreen. */
+@media (max-width: 640px) {
+  .pd .slide {
+    padding: clamp(40px, 12vw, 72px) var(--pd-gutter);
+  }
+  .pd .h-mega { font-size: clamp(38px, 11vw, 60px) !important; line-height: 0.96; }
+  .pd .h-display { font-size: clamp(32px, 8.5vw, 50px); line-height: 1.0; }
+  .pd .h2 { font-size: clamp(22px, 5.6vw, 32px); }
+  .pd .h3 { font-size: clamp(18px, 4.8vw, 24px); }
+  .pd .lead { font-size: 14.5px; line-height: 1.55; }
+  .pd .free-hero .price { font-size: clamp(72px, 22vw, 130px) !important; }
+  .pd .free-hero .sub { font-size: 15px; }
+  .pd .cover-eyebrow { margin-bottom: 20px; padding: 6px 12px; font-size: 10.5px; }
+  .pd .cover-meta { margin-top: 28px; gap: 18px 28px; }
+  .pd .pain-text strong { font-size: 18px; }
+  .pd .cost-stat .num { font-size: clamp(40px, 11vw, 56px) !important; }
+  .pd .xp-card .title { font-size: 19px; }
+  .pd .slide-num { top: 14px; right: 18px; font-size: 10px; }
 }
 
 /* ── Print / export ─────────────────────────────────────────── */
 @media print {
   .pd .deck-progress,
-  .pd .next-slide { display: none; }
+  .pd .next-button { display: none; }
   .pd .slide { page-break-after: always; min-height: 100vh; }
 }

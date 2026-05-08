@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import NextButton from './NextButton';
 import './club-pitch-deck.css';
 
 const PAGE_URL = 'https://www.endorfin.run/club-pitch-deck';
@@ -228,7 +229,6 @@ export default function ClubPitchDeckPage() {
             </div>
           </div>
         </div>
-              <NextSlide to={2} />
       </section>
 
       {/* 02 · THE REALITY */}
@@ -285,7 +285,6 @@ export default function ClubPitchDeckPage() {
             </div>
           </div>
         </div>
-              <NextSlide to={3} />
       </section>
 
       {/* 03 · THE COST */}
@@ -319,7 +318,6 @@ export default function ClubPitchDeckPage() {
             </div>
           </div>
         </div>
-              <NextSlide to={4} />
       </section>
 
       {/* 04 · THE SHIFT */}
@@ -350,7 +348,6 @@ export default function ClubPitchDeckPage() {
             </div>
           </div>
         </div>
-              <NextSlide to={5} />
       </section>
 
       {/* 05 · THREE PILLARS */}
@@ -393,7 +390,6 @@ export default function ClubPitchDeckPage() {
             </div>
           </div>
         </div>
-              <NextSlide to={6} />
       </section>
 
       {/* 06 · DISCOVERABILITY */}
@@ -468,7 +464,6 @@ export default function ClubPitchDeckPage() {
             </div>
           </div>
         </div>
-              <NextSlide to={7} />
       </section>
 
       {/* 07 · PRIVACY */}
@@ -545,7 +540,6 @@ export default function ClubPitchDeckPage() {
             </div>
           </div>
         </div>
-              <NextSlide to={8} />
       </section>
 
       {/* 08 · MANAGEABILITY */}
@@ -585,7 +579,6 @@ export default function ClubPitchDeckPage() {
             </div>
           </div>
         </div>
-              <NextSlide to={9} />
       </section>
 
       {/* 09 · MEMBER XP */}
@@ -640,7 +633,6 @@ export default function ClubPitchDeckPage() {
             Same club. Same Sunday run. But now: <strong style={{ color: 'var(--pd-bone)' }}>discoverable, joinable, RSVP-able, recap-able</strong> — without you doing extra work.
           </p>
         </div>
-              <NextSlide to={10} />
       </section>
 
       {/* 10 · FOUNDER */}
@@ -713,7 +705,6 @@ export default function ClubPitchDeckPage() {
             </div>
           </div>
         </div>
-              <NextSlide to={11} />
       </section>
 
       {/* 11 · PRICING */}
@@ -722,7 +713,7 @@ export default function ClubPitchDeckPage() {
         <div className="slide-inner">
           <span className="kicker red" style={{ display: 'flex', justifyContent: 'center' }}>Pricing</span>
           <div className="free-hero">
-            <h2 className="h-mega" style={{ fontSize: 'clamp(80px, 16vw, 200px)' }}>
+            <h2 className="price">
               It&rsquo;s <em>free.</em>
             </h2>
             <p className="sub">
@@ -746,7 +737,6 @@ export default function ClubPitchDeckPage() {
             </div>
           </div>
         </div>
-              <NextSlide to={12} />
       </section>
 
       {/* 12 · CTA */}
@@ -794,7 +784,6 @@ export default function ClubPitchDeckPage() {
             </nav>
           </div>
         </div>
-              <BackToTop />
       </section>
 
         <nav className="deck-progress" aria-label="Slide navigation">
@@ -802,27 +791,11 @@ export default function ClubPitchDeckPage() {
             <a key={n} href={`#s${n}`} title={`Slide ${n}`} aria-label={`Go to slide ${n}`} />
           ))}
         </nav>
+
+        <NextButton />
       </main>
       <Footer />
     </>
-  );
-}
-
-function NextSlide({ to }: { to: number }) {
-  return (
-    <a href={`#s${to}`} className="next-slide" aria-label={`Next slide (${to})`}>
-      <span>Next</span>
-      <span className="arrow" aria-hidden="true">↓</span>
-    </a>
-  );
-}
-
-function BackToTop() {
-  return (
-    <a href="#s1" className="next-slide back" aria-label="Back to top">
-      <span className="arrow" aria-hidden="true">↑</span>
-      <span>Back to top</span>
-    </a>
   );
 }
 
