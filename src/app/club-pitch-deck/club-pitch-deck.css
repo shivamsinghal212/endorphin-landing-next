@@ -27,8 +27,8 @@
 
 /* ── Layout primitives ───────────────────────────────────────── */
 .pd .slide {
-  min-height: 100vh;
-  scroll-snap-align: start;
+  min-height: calc(100vh - var(--nav-h, 68px));
+  scroll-margin-top: var(--nav-h, 68px);
   padding: clamp(64px, 8vw, 120px) var(--pd-gutter);
   display: flex;
   align-items: center;
@@ -48,7 +48,7 @@
 
 .pd .slide-num {
   position: absolute;
-  top: clamp(28px, 4vw, 56px);
+  top: clamp(20px, 2.5vw, 36px);
   right: clamp(28px, 5vw, 88px);
   font-family: var(--font-jetbrains-mono), 'JetBrains Mono', monospace;
   font-size: 11px;
@@ -57,18 +57,6 @@
   z-index: 3;
 }
 .pd .slide-bone .slide-num { color: rgba(10,10,10,0.45); }
-.pd .slide-corner-brand {
-  position: absolute;
-  top: clamp(28px, 4vw, 56px);
-  left: clamp(28px, 5vw, 88px);
-  font-family: var(--font-fraunces), 'Fraunces', serif;
-  font-style: italic;
-  font-weight: 700;
-  font-size: 22px;
-  letter-spacing: -0.01em;
-  z-index: 3;
-}
-.pd .slide-corner-brand .dot { color: var(--pd-signal); }
 
 /* ── Type ────────────────────────────────────────────────────── */
 .pd .kicker {
@@ -873,8 +861,75 @@
 }
 .pd .deck-progress a:hover { background: var(--pd-signal); }
 
+/* ── Per-slide Next button ──────────────────────────────────── */
+.pd .next-slide {
+  position: absolute;
+  bottom: clamp(20px, 3vw, 40px);
+  right: clamp(28px, 5vw, 88px);
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 22px;
+  border-radius: 999px;
+  border: 1px solid var(--pd-bone-hair-strong);
+  background: rgba(10, 10, 10, 0.55);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  font-family: var(--font-oswald), 'Oswald', sans-serif;
+  font-weight: 600;
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--pd-bone);
+  z-index: 4;
+  transition:
+    background 220ms var(--pd-ease),
+    border-color 220ms var(--pd-ease),
+    transform 220ms var(--pd-ease);
+}
+.pd .next-slide .arrow {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--pd-signal);
+  color: #fff;
+  font-size: 13px;
+  line-height: 1;
+}
+.pd .next-slide:hover {
+  background: var(--pd-signal);
+  border-color: var(--pd-signal);
+  transform: translateY(-2px);
+}
+.pd .next-slide:hover .arrow {
+  background: #fff;
+  color: var(--pd-signal);
+}
+.pd .slide-bone .next-slide {
+  background: rgba(245, 240, 235, 0.8);
+  border-color: rgba(10, 10, 10, 0.16);
+  color: var(--pd-jet);
+}
+.pd .slide-bone .next-slide:hover {
+  background: var(--pd-signal);
+  border-color: var(--pd-signal);
+  color: #fff;
+}
+@media (max-width: 640px) {
+  .pd .next-slide {
+    bottom: 80px; /* clear deck-progress dots on small screens */
+    padding: 10px 16px;
+    font-size: 10px;
+    letter-spacing: 0.16em;
+  }
+}
+
 /* ── Print / export ─────────────────────────────────────────── */
 @media print {
-  .pd .deck-progress { display: none; }
+  .pd .deck-progress,
+  .pd .next-slide { display: none; }
   .pd .slide { page-break-after: always; min-height: 100vh; }
 }

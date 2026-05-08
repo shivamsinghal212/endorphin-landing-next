@@ -1,4 +1,6 @@
 import type { Metadata } from 'next';
+import Header from '@/components/Header';
+import Footer from '@/components/Footer';
 import './club-pitch-deck.css';
 
 const PAGE_URL = 'https://www.endorfin.run/club-pitch-deck';
@@ -171,7 +173,9 @@ const breadcrumbJsonLd = {
 
 export default function ClubPitchDeckPage() {
   return (
-    <main id="main-content" className="pd">
+    <>
+      <Header />
+      <main id="main-content" className="pd">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -194,9 +198,6 @@ export default function ClubPitchDeckPage() {
       {/* 01 · COVER */}
       <section className="slide" id="s1" aria-label="Cover">
         <div className="cover-bg" aria-hidden="true" />
-        <a className="slide-corner-brand" href="/" aria-label="Endorfin home">
-          Endorfin<span className="dot">.</span>
-        </a>
         <div className="slide-num">01 / {SLIDES_TOTAL}</div>
         <div className="slide-inner">
           <span className="cover-eyebrow">For Run Club Founders · India</span>
@@ -227,11 +228,11 @@ export default function ClubPitchDeckPage() {
             </div>
           </div>
         </div>
+              <NextSlide to={2} />
       </section>
 
       {/* 02 · THE REALITY */}
       <section className="slide" id="s2" aria-label="The reality of running a club today">
-        <a className="slide-corner-brand" href="/">Endorfin<span className="dot">.</span></a>
         <div className="slide-num">02 / {SLIDES_TOTAL}</div>
         <div className="slide-inner">
           <span className="kicker red">The Reality</span>
@@ -284,11 +285,11 @@ export default function ClubPitchDeckPage() {
             </div>
           </div>
         </div>
+              <NextSlide to={3} />
       </section>
 
       {/* 03 · THE COST */}
       <section className="slide" id="s3" aria-label="What invisibility costs">
-        <a className="slide-corner-brand" href="/">Endorfin<span className="dot">.</span></a>
         <div className="slide-num">03 / {SLIDES_TOTAL}</div>
         <div className="slide-inner">
           <span className="kicker">The Cost</span>
@@ -318,11 +319,11 @@ export default function ClubPitchDeckPage() {
             </div>
           </div>
         </div>
+              <NextSlide to={4} />
       </section>
 
       {/* 04 · THE SHIFT */}
       <section className="slide slide-bone" id="s4" aria-label="The shift in Indian running">
-        <a className="slide-corner-brand" href="/">Endorfin<span className="dot">.</span></a>
         <div className="slide-num">04 / {SLIDES_TOTAL}</div>
         <div className="slide-inner">
           <span className="kicker red">The Shift</span>
@@ -349,11 +350,11 @@ export default function ClubPitchDeckPage() {
             </div>
           </div>
         </div>
+              <NextSlide to={5} />
       </section>
 
       {/* 05 · THREE PILLARS */}
       <section className="slide" id="s5" aria-label="Three pillars: discoverability, privacy, manageability">
-        <a className="slide-corner-brand" href="/">Endorfin<span className="dot">.</span></a>
         <div className="slide-num">05 / {SLIDES_TOTAL}</div>
         <div className="slide-inner">
           <span className="kicker red">Endorfin for Clubs</span>
@@ -392,11 +393,11 @@ export default function ClubPitchDeckPage() {
             </div>
           </div>
         </div>
+              <NextSlide to={6} />
       </section>
 
       {/* 06 · DISCOVERABILITY */}
       <section className="slide" id="s6" aria-label="Discoverability deep dive">
-        <a className="slide-corner-brand" href="/">Endorfin<span className="dot">.</span></a>
         <div className="slide-num">06 / {SLIDES_TOTAL}</div>
         <div className="slide-inner">
           <span className="kicker red">01 · Discoverability</span>
@@ -467,11 +468,11 @@ export default function ClubPitchDeckPage() {
             </div>
           </div>
         </div>
+              <NextSlide to={7} />
       </section>
 
       {/* 07 · PRIVACY */}
       <section className="slide" id="s7" aria-label="Privacy deep dive">
-        <a className="slide-corner-brand" href="/">Endorfin<span className="dot">.</span></a>
         <div className="slide-num">07 / {SLIDES_TOTAL}</div>
         <div className="slide-inner">
           <span className="kicker red">02 · Privacy</span>
@@ -544,11 +545,11 @@ export default function ClubPitchDeckPage() {
             </div>
           </div>
         </div>
+              <NextSlide to={8} />
       </section>
 
       {/* 08 · MANAGEABILITY */}
       <section className="slide" id="s8" aria-label="Manageability deep dive">
-        <a className="slide-corner-brand" href="/">Endorfin<span className="dot">.</span></a>
         <div className="slide-num">08 / {SLIDES_TOTAL}</div>
         <div className="slide-inner">
           <span className="kicker red">03 · Manageability</span>
@@ -584,11 +585,11 @@ export default function ClubPitchDeckPage() {
             </div>
           </div>
         </div>
+              <NextSlide to={9} />
       </section>
 
       {/* 09 · MEMBER XP */}
       <section className="slide" id="s9" aria-label="What members see">
-        <a className="slide-corner-brand" href="/">Endorfin<span className="dot">.</span></a>
         <div className="slide-num">09 / {SLIDES_TOTAL}</div>
         <div className="slide-inner">
           <span className="kicker red">For your members</span>
@@ -639,11 +640,11 @@ export default function ClubPitchDeckPage() {
             Same club. Same Sunday run. But now: <strong style={{ color: 'var(--pd-bone)' }}>discoverable, joinable, RSVP-able, recap-able</strong> — without you doing extra work.
           </p>
         </div>
+              <NextSlide to={10} />
       </section>
 
       {/* 10 · FOUNDER */}
       <section className="slide slide-bone" id="s10" aria-label="About the founder">
-        <a className="slide-corner-brand" href="/">Endorfin<span className="dot">.</span></a>
         <div className="slide-num">10 / {SLIDES_TOTAL}</div>
         <div className="slide-inner">
           <span className="kicker red">Built by a runner who ships</span>
@@ -712,11 +713,11 @@ export default function ClubPitchDeckPage() {
             </div>
           </div>
         </div>
+              <NextSlide to={11} />
       </section>
 
       {/* 11 · PRICING */}
       <section className="slide" id="s11" aria-label="Pricing">
-        <a className="slide-corner-brand" href="/">Endorfin<span className="dot">.</span></a>
         <div className="slide-num">11 / {SLIDES_TOTAL}</div>
         <div className="slide-inner">
           <span className="kicker red" style={{ display: 'flex', justifyContent: 'center' }}>Pricing</span>
@@ -745,12 +746,12 @@ export default function ClubPitchDeckPage() {
             </div>
           </div>
         </div>
+              <NextSlide to={12} />
       </section>
 
       {/* 12 · CTA */}
       <section className="slide" id="s12" aria-label="Get started">
         <div className="cover-bg" aria-hidden="true" />
-        <a className="slide-corner-brand" href="/">Endorfin<span className="dot">.</span></a>
         <div className="slide-num">12 / {SLIDES_TOTAL}</div>
         <div className="slide-inner">
           <div className="cta-final">
@@ -793,14 +794,35 @@ export default function ClubPitchDeckPage() {
             </nav>
           </div>
         </div>
+              <BackToTop />
       </section>
 
-      <nav className="deck-progress" aria-label="Slide navigation">
-        {Array.from({ length: SLIDES_TOTAL }, (_, i) => i + 1).map((n) => (
-          <a key={n} href={`#s${n}`} title={`Slide ${n}`} aria-label={`Go to slide ${n}`} />
-        ))}
-      </nav>
-    </main>
+        <nav className="deck-progress" aria-label="Slide navigation">
+          {Array.from({ length: SLIDES_TOTAL }, (_, i) => i + 1).map((n) => (
+            <a key={n} href={`#s${n}`} title={`Slide ${n}`} aria-label={`Go to slide ${n}`} />
+          ))}
+        </nav>
+      </main>
+      <Footer />
+    </>
+  );
+}
+
+function NextSlide({ to }: { to: number }) {
+  return (
+    <a href={`#s${to}`} className="next-slide" aria-label={`Next slide (${to})`}>
+      <span>Next</span>
+      <span className="arrow" aria-hidden="true">↓</span>
+    </a>
+  );
+}
+
+function BackToTop() {
+  return (
+    <a href="#s1" className="next-slide back" aria-label="Back to top">
+      <span className="arrow" aria-hidden="true">↑</span>
+      <span>Back to top</span>
+    </a>
   );
 }
 
