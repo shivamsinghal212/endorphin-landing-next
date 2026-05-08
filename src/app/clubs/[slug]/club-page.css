@@ -230,6 +230,7 @@
   line-height: 1.65;
   color: var(--jet);
   text-align: right;
+  white-space: pre-line;
 }
 .club-page .hero-description-toggle {
   background: none;
@@ -1118,6 +1119,7 @@
   color: rgba(245, 240, 235, 0.6);
   max-width: 52ch;
   margin-top: -2px;
+  white-space: pre-line;
 }
 .club-page .nr-meta {
   display: grid;
