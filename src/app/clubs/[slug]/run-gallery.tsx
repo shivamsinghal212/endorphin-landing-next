@@ -1,12 +1,15 @@
 'use client';
 
-// Sibling reel for recap videos. Mirrors the visual rhythm of `last-run-reel.tsx`
-// but renders <video> tiles. Each tile preloads metadata only and gates the
-// real `src` via IntersectionObserver to avoid burning cellular bandwidth on
-// off-screen tiles. Tap → native fullscreen.
-
 import { useEffect, useRef, useState } from 'react';
-import type { ClubEventRecapVideo } from '@/lib/admin-api';
+import type { ClubEventRecapPhoto, ClubEventRecapVideo } from '@/lib/admin-api';
+
+// Unified gallery reel: merges photos and videos into a single horizontal
+// scroller with shared progress segments, counter, and arrow controls.
+// Videos render first (motion content draws attention up-front), then photos.
+
+type GalleryItem =
+  | { kind: 'video'; data: ClubEventRecapVideo }
+  | { kind: 'photo'; data: ClubEventRecapPhoto };
 
 function formatDuration(sec: number | null | undefined): string | null {
   if (sec == null || !Number.isFinite(sec) || sec <= 0) return null;
@@ -20,7 +23,29 @@ interface FullscreenableVideo extends HTMLVideoElement {
   webkitEnterFullscreen?: () => void;
 }
 
-function VideoTile({
+function PhotoCard({ photo, index }: { photo: ClubEventRecapPhoto; index: number }) {
+  return (
+    <figure className="last-run-card">
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={photo.url}
+        alt={photo.captionTitle || `Photo ${index + 1}`}
+        loading="lazy"
+        width={900}
+        height={1125}
+      />
+      <div className="last-run-card-scrim" />
+      {(photo.captionTitle || photo.captionMeta) && (
+        <figcaption className="last-run-card-cap">
+          {photo.captionTitle && <div className="t">{photo.captionTitle}</div>}
+          {photo.captionMeta && <div className="m">{photo.captionMeta}</div>}
+        </figcaption>
+      )}
+    </figure>
+  );
+}
+
+function VideoCard({
   video,
   index,
   reduceMotion,
@@ -32,9 +57,8 @@ function VideoTile({
   const ref = useRef<HTMLVideoElement>(null);
   const [armed, setArmed] = useState(false);
 
-  // Only assign src when the tile is near the viewport. preload="metadata"
-  // means even after we set src, the browser only fetches the moov atom
-  // (small) — the body is fetched on play.
+  // Lazy-load video src only when the tile nears the viewport. preload="metadata"
+  // keeps the initial fetch tiny even after src is assigned.
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
@@ -62,10 +86,7 @@ function VideoTile({
     const el = ref.current as FullscreenableVideo | null;
     if (!el) return;
     if (typeof el.requestFullscreen === 'function') {
-      el.requestFullscreen().catch(() => {
-        // Fallback: iOS Safari uses webkitEnterFullscreen.
-        el.webkitEnterFullscreen?.();
-      });
+      el.requestFullscreen().catch(() => el.webkitEnterFullscreen?.());
     } else {
       el.webkitEnterFullscreen?.();
     }
@@ -93,7 +114,6 @@ function VideoTile({
           height: '100%',
           objectFit: 'cover',
           background: '#000',
-          // Honor user motion preference — disable any implicit transitions.
           transition: reduceMotion ? 'none' : undefined,
         }}
         aria-label={video.captionTitle || `Video ${index + 1}`}
@@ -113,7 +133,13 @@ function VideoTile({
   );
 }
 
-export function RecapVideoReel({ videos }: { videos: ClubEventRecapVideo[] }) {
+export function RunGallery({
+  photos,
+  videos,
+}: {
+  photos: ClubEventRecapPhoto[];
+  videos: ClubEventRecapVideo[];
+}) {
   const reelRef = useRef<HTMLDivElement>(null);
   const [idx, setIdx] = useState(0);
   const [atStart, setAtStart] = useState(true);
@@ -129,7 +155,11 @@ export function RecapVideoReel({ videos }: { videos: ClubEventRecapVideo[] }) {
     return () => mq.removeEventListener('change', onChange);
   }, []);
 
-  const total = videos.length;
+  const items: GalleryItem[] = [
+    ...videos.map((v) => ({ kind: 'video' as const, data: v })),
+    ...photos.map((p) => ({ kind: 'photo' as const, data: p })),
+  ];
+  const total = items.length;
 
   const step = () => {
     const reel = reelRef.current;
@@ -159,9 +189,9 @@ export function RecapVideoReel({ videos }: { videos: ClubEventRecapVideo[] }) {
     window.addEventListener('resize', onResize);
     return () => window.removeEventListener('resize', onResize);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [total]);
 
-  const scrollBy = (delta: number) => {
+  const scrollByAmount = (delta: number) => {
     reelRef.current?.scrollBy({
       left: delta,
       behavior: reduceMotion ? 'auto' : 'smooth',
@@ -179,14 +209,14 @@ export function RecapVideoReel({ videos }: { videos: ClubEventRecapVideo[] }) {
 
   return (
     <>
-      <div className="last-run-progress" role="tablist" aria-label="Video progress">
-        {videos.map((_, i) => (
+      <div className="last-run-progress" role="tablist" aria-label="Gallery progress">
+        {items.map((_, i) => (
           <button
             key={i}
             className="last-run-seg"
             data-idx={i}
             data-active={i <= idx ? true : undefined}
-            aria-label={`Video ${i + 1}`}
+            aria-label={`Item ${i + 1}`}
             onClick={() => scrollTo(i)}
           />
         ))}
@@ -196,17 +226,21 @@ export function RecapVideoReel({ videos }: { videos: ClubEventRecapVideo[] }) {
         ref={reelRef}
         className="last-run-reel"
         tabIndex={0}
-        aria-label="Video reel"
+        aria-label="Gallery"
         onScroll={update}
       >
-        {videos.map((v, i) => (
-          <VideoTile
-            key={`${v.url}-${i}`}
-            video={v}
-            index={i}
-            reduceMotion={reduceMotion}
-          />
-        ))}
+        {items.map((item, i) =>
+          item.kind === 'video' ? (
+            <VideoCard
+              key={`v-${item.data.url}-${i}`}
+              video={item.data}
+              index={i}
+              reduceMotion={reduceMotion}
+            />
+          ) : (
+            <PhotoCard key={`p-${item.data.url}-${i}`} photo={item.data} index={i} />
+          ),
+        )}
       </div>
 
       <div className="last-run-footer">
@@ -214,24 +248,24 @@ export function RecapVideoReel({ videos }: { videos: ClubEventRecapVideo[] }) {
           <span className="now">{String(idx + 1).padStart(2, '0')}</span>
           {' / '}
           {String(total).padStart(2, '0')}
-          {' · Videos'}
+          {' · Gallery'}
         </div>
         <div className="last-run-arrows">
           <button
             className="last-run-arrow"
             type="button"
-            aria-label="Previous video"
+            aria-label="Previous"
             disabled={atStart}
-            onClick={() => scrollBy(-step())}
+            onClick={() => scrollByAmount(-step())}
           >
             <svg aria-hidden="true"><use href="#i-chev-left" /></svg>
           </button>
           <button
             className="last-run-arrow"
             type="button"
-            aria-label="Next video"
+            aria-label="Next"
             disabled={atEnd}
-            onClick={() => scrollBy(step())}
+            onClick={() => scrollByAmount(step())}
           >
             <svg aria-hidden="true"><use href="#i-chev-right" /></svg>
           </button>

@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Club History · V3 Cinematic Timeline · Endorfin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@1,9..144,600;1,9..144,700&family=Oswald:wght@400;500;600;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --jet:#0A0A0A;
+    --slate:#1A1A1A;
+    --bone:#F5F0EB;
+    --signal:#E6232A;
+    --dim:#666;
+    --hair:rgba(10,10,10,0.10);
+    --bone-hair:rgba(245,240,235,.16);
+    --gutter:clamp(20px,4vw,72px);
+    --container:1240px;
+    --rail-w:120px;
+  }
+  *,*::before,*::after{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:'Poppins',sans-serif;
+    background:var(--jet);color:var(--bone);
+    -webkit-font-smoothing:antialiased;
+  }
+  a{color:inherit;text-decoration:none}
+  img{display:block;max-width:100%}
+
+  .wrap{max-width:var(--container);margin:0 auto;padding:0 var(--gutter)}
+
+  .variant-banner{
+    background:var(--bone);color:var(--jet);
+    padding:14px var(--gutter);display:flex;justify-content:space-between;align-items:center;
+    font-family:'Poppins',sans-serif;font-size:12px;letter-spacing:.12em;text-transform:uppercase;
+  }
+  .variant-banner b{font-family:'Oswald';font-weight:600;letter-spacing:.05em;font-size:14px}
+  .variant-banner span{color:rgba(10,10,10,.55)}
+
+  .kicker{font-family:'Oswald';font-weight:500;text-transform:uppercase;letter-spacing:.14em;font-size:11px;color:rgba(245,240,235,.55)}
+
+  /* Hero compressed (on dark) */
+  .hero{padding:80px 0 56px;border-bottom:1px solid var(--bone-hair)}
+  .hero-grid{display:grid;grid-template-columns:1fr 380px;gap:64px;align-items:end}
+  .hero-logo{
+    width:88px;height:88px;border-radius:50%;
+    background:linear-gradient(135deg,#E6232A,#8a0f15);
+    display:flex;align-items:center;justify-content:center;
+    color:var(--bone);font-family:'Oswald';font-weight:700;font-size:36px;margin-bottom:24px;
+  }
+  .hero-name{font-family:'Oswald';font-weight:700;font-size:clamp(64px,9vw,128px);line-height:.92;letter-spacing:-.01em;text-transform:uppercase;margin:0;color:var(--bone)}
+  .hero-name .red{color:var(--signal)}
+  .hero-tags{margin-top:24px;display:flex;gap:8px;flex-wrap:wrap}
+  .tag{font-family:'Oswald';font-size:11px;text-transform:uppercase;letter-spacing:.1em;padding:6px 14px;border:1px solid var(--bone-hair);border-radius:999px;color:var(--bone)}
+  .tag-filled{background:var(--bone);color:var(--jet);border-color:var(--bone)}
+  .hero-right p{font-size:15px;line-height:1.6;color:rgba(245,240,235,.72);margin:0 0 24px}
+  .hero-right .kicker{margin-bottom:8px;display:block}
+
+  /* Intro for history */
+  .history-intro{padding:96px 0 72px;text-align:center;border-bottom:1px solid var(--bone-hair)}
+  .history-intro .eyebrow{display:block;margin-bottom:24px;color:rgba(245,240,235,.5)}
+  .history-intro h2{
+    font-family:'Oswald';font-weight:700;font-size:clamp(56px,9vw,144px);
+    line-height:.9;letter-spacing:-.02em;text-transform:uppercase;margin:0;color:var(--bone);
+  }
+  .history-intro h2 .red{color:var(--signal)}
+  .history-intro .lede{
+    font-family:'Fraunces',serif;font-style:italic;font-weight:600;font-size:22px;
+    color:rgba(245,240,235,.7);margin:24px auto 0;max-width:580px;
+  }
+  .scroll-cue{
+    margin-top:48px;font-family:'Oswald';font-size:11px;letter-spacing:.18em;text-transform:uppercase;
+    color:rgba(245,240,235,.4);
+  }
+  .scroll-cue span{display:inline-block;margin-left:6px;animation:bob 1.6s ease-in-out infinite}
+  @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(6px)}}
+
+  /* ── Cinematic layout ── */
+  .timeline{
+    display:grid;
+    grid-template-columns:var(--rail-w) 1fr;
+    position:relative;
+  }
+  /* Left sticky rail */
+  .rail{
+    position:sticky;top:0;height:100vh;
+    border-right:1px solid var(--bone-hair);
+    padding:48px 0;display:flex;flex-direction:column;justify-content:space-between;
+    align-self:start;
+  }
+  .rail-top{display:flex;flex-direction:column;gap:48px;align-items:center}
+  .rail-year{
+    font-family:'Oswald';font-weight:700;font-size:22px;letter-spacing:.04em;
+    writing-mode:vertical-rl;transform:rotate(180deg);color:var(--bone);
+  }
+  .rail-dots{display:flex;flex-direction:column;gap:36px;align-items:center;position:relative}
+  .rail-dots::before{
+    content:'';position:absolute;left:50%;top:0;bottom:0;width:1px;
+    background:var(--bone-hair);transform:translateX(-50%);
+  }
+  .rail-dot{
+    width:10px;height:10px;border-radius:50%;background:rgba(245,240,235,.25);position:relative;z-index:1;
+    transition:all .3s;
+  }
+  .rail-dot.active{background:var(--signal);transform:scale(1.4);box-shadow:0 0 0 6px rgba(230,35,42,.18)}
+  .rail-dot::after{
+    content:attr(data-label);position:absolute;left:18px;top:50%;transform:translateY(-50%);
+    font-family:'Oswald';font-size:10px;letter-spacing:.14em;text-transform:uppercase;
+    color:rgba(245,240,235,.4);white-space:nowrap;
+  }
+  .rail-dot.active::after{color:var(--bone)}
+  .rail-progress{
+    font-family:'Oswald';font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+    color:rgba(245,240,235,.4);text-align:center;line-height:1.8;
+  }
+  .rail-progress .num{color:var(--signal);font-weight:700;font-size:18px;display:block}
+
+  /* Panels */
+  .panels{display:flex;flex-direction:column}
+  .panel{
+    min-height:100vh;position:relative;display:flex;align-items:center;
+    padding:80px var(--gutter);overflow:hidden;
+    border-bottom:1px solid var(--bone-hair);
+  }
+  .panel-bg{
+    position:absolute;inset:0;z-index:0;
+  }
+  .panel-bg img{width:100%;height:100%;object-fit:cover;opacity:.55;transform:scale(1.02)}
+  .panel-bg::after{
+    content:'';position:absolute;inset:0;
+    background:
+      linear-gradient(90deg,rgba(10,10,10,.85) 0%,rgba(10,10,10,.3) 60%,rgba(10,10,10,.55) 100%),
+      linear-gradient(to top,rgba(10,10,10,.9) 0%,rgba(10,10,10,.15) 50%);
+  }
+  .panel-content{position:relative;z-index:1;max-width:780px}
+  .panel-eyebrow{
+    display:inline-flex;align-items:center;gap:14px;margin-bottom:32px;
+  }
+  .panel-eyebrow .pill{
+    background:var(--signal);color:var(--bone);
+    font-family:'Oswald';font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+    padding:5px 12px;border-radius:2px;
+  }
+  .panel-eyebrow .pill.dark{background:rgba(245,240,235,.12);color:var(--bone)}
+  .panel-eyebrow .date{
+    font-family:'Oswald';font-size:13px;letter-spacing:.18em;text-transform:uppercase;color:rgba(245,240,235,.72);
+  }
+  .panel-title{
+    font-family:'Oswald';font-weight:700;font-size:clamp(72px,11vw,180px);
+    line-height:.88;letter-spacing:-.02em;text-transform:uppercase;margin:0;color:var(--bone);
+  }
+  .panel-title .red{color:var(--signal)}
+  .panel-quote{
+    font-family:'Fraunces',serif;font-style:italic;font-weight:600;font-size:22px;
+    line-height:1.4;color:rgba(245,240,235,.85);margin:32px 0 0;max-width:560px;
+  }
+  .panel-meta{
+    display:grid;grid-template-columns:repeat(4,auto);gap:48px;margin-top:48px;
+    padding-top:32px;border-top:1px solid var(--bone-hair);max-width:680px;
+  }
+  .panel-meta .lbl{font-family:'Oswald';font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:rgba(245,240,235,.55);display:block;margin-bottom:6px}
+  .panel-meta .val{font-family:'Oswald';font-weight:700;font-size:32px;letter-spacing:-.01em;color:var(--bone)}
+  .panel-meta .val .unit{font-size:14px;color:rgba(245,240,235,.55);margin-left:3px;font-weight:400}
+
+  .panel-foot{
+    position:absolute;bottom:32px;left:var(--gutter);right:var(--gutter);
+    display:flex;justify-content:space-between;align-items:center;z-index:1;
+  }
+  .panel-mini-reel{display:flex;gap:6px}
+  .panel-mini-reel img{width:48px;height:64px;object-fit:cover;border-radius:2px;border:1px solid var(--bone-hair)}
+  .panel-link{
+    font-family:'Oswald';font-size:12px;letter-spacing:.18em;text-transform:uppercase;
+    color:var(--bone);border-bottom:1px solid var(--bone);padding-bottom:2px;
+  }
+  .panel-num{
+    font-family:'Oswald';font-weight:700;font-size:90px;line-height:1;letter-spacing:-.02em;
+    color:rgba(245,240,235,.06);position:absolute;top:32px;right:var(--gutter);
+  }
+
+  /* Footer cap */
+  .end-cap{
+    padding:120px var(--gutter);text-align:center;
+    border-top:1px solid var(--bone-hair);
+  }
+  .end-cap h3{font-family:'Oswald';font-weight:700;font-size:clamp(40px,5vw,72px);letter-spacing:-.01em;text-transform:uppercase;margin:0 0 16px;color:var(--bone)}
+  .end-cap p{color:rgba(245,240,235,.6);max-width:480px;margin:0 auto 32px}
+  .btn-light{
+    font-family:'Oswald';font-weight:600;font-size:14px;letter-spacing:.14em;text-transform:uppercase;
+    padding:16px 40px;background:var(--bone);color:var(--jet);border:0;border-radius:999px;cursor:pointer;
+  }
+
+  @media (max-width:900px){
+    .timeline{grid-template-columns:48px 1fr}
+    :root{--rail-w:48px}
+    .rail-dot::after{display:none}
+    .rail-year{font-size:14px}
+    .rail-progress{font-size:9px}
+    .panel-meta{grid-template-columns:repeat(2,auto);gap:24px}
+    .panel-title{font-size:56px}
+    .hero-grid{grid-template-columns:1fr}
+  }
+</style>
+</head>
+<body>
+
+<div class="variant-banner">
+  <b>V3 · Cinematic Timeline</b>
+  <span>Endorfin · Club Detail Mockup</span>
+</div>
+
+<div class="wrap">
+
+  <!-- Hero compressed -->
+  <section class="hero">
+    <div class="hero-grid">
+      <div>
+        <span class="kicker">Noida · Curated run experiences · Community</span>
+        <div class="hero-logo">U</div>
+        <h1 class="hero-name">The Uprun<br>Club<span class="red">.</span></h1>
+        <div class="hero-tags">
+          <span class="tag tag-filled">Run Club</span>
+          <span class="tag">Beginner Friendly</span>
+          <span class="tag">5K · 10K</span>
+        </div>
+      </div>
+      <aside class="hero-right">
+        <span class="kicker">About</span>
+        <p>The run club with an ice bath at the finish line, a DJ at the coffee stop or a treasure hunt. Community-first, unconventional, memorable.</p>
+      </aside>
+    </div>
+  </section>
+
+  <!-- Intro -->
+  <section class="history-intro">
+    <span class="kicker eyebrow">A year in runs</span>
+    <h2>Every Sunday<br>We Showed<br>Up<span class="red">.</span></h2>
+    <p class="lede">23 mornings. 184 kilometres. One club. Scroll to relive every one of them.</p>
+    <div class="scroll-cue">Scroll <span>↓</span></div>
+  </section>
+
+</div>
+
+<!-- ── Cinematic timeline ── -->
+<section class="timeline">
+
+  <!-- Sticky rail -->
+  <aside class="rail">
+    <div class="rail-top">
+      <div class="rail-year">2026</div>
+      <div class="rail-dots">
+        <span class="rail-dot active" data-label="May 09"></span>
+        <span class="rail-dot" data-label="Apr 24"></span>
+        <span class="rail-dot" data-label="Apr 13"></span>
+        <span class="rail-dot" data-label="Mar 30"></span>
+        <span class="rail-dot" data-label="Mar 16"></span>
+      </div>
+    </div>
+    <div class="rail-progress">
+      <span class="num">01</span>
+      of<br>23
+    </div>
+  </aside>
+
+  <!-- Panels -->
+  <div class="panels">
+
+    <article class="panel">
+      <div class="panel-bg">
+        <img src="https://images.unsplash.com/photo-1552674605-db6ffd4facb5?w=1800&q=80" alt="">
+      </div>
+      <div class="panel-num">01</div>
+      <div class="panel-content">
+        <div class="panel-eyebrow">
+          <span class="pill">Latest</span>
+          <span class="date">Sunday · 9 May 2026</span>
+        </div>
+        <h3 class="panel-title">Mother's<br>Day Run<span class="red">.</span></h3>
+        <p class="panel-quote">"30 runners showed up. We ran 5K through Sector 49 and painted canvases over chai. The kind of Sunday morning Noida needed."</p>
+        <div class="panel-meta">
+          <div><span class="lbl">Showed up</span><span class="val">30</span></div>
+          <div><span class="lbl">Distance</span><span class="val">5<span class="unit">km</span></span></div>
+          <div><span class="lbl">Pace</span><span class="val">6:30<span class="unit">/km</span></span></div>
+          <div><span class="lbl">After</span><span class="val">Canvas</span></div>
+        </div>
+      </div>
+      <div class="panel-foot">
+        <div class="panel-mini-reel">
+          <img src="https://images.unsplash.com/photo-1486218119243-13883505764c?w=200&q=80" alt="">
+          <img src="https://images.unsplash.com/photo-1571008887538-b36bb32f4571?w=200&q=80" alt="">
+          <img src="https://images.unsplash.com/photo-1517649763962-0c623066013b?w=200&q=80" alt="">
+          <img src="https://images.unsplash.com/photo-1530137073521-28cbe5f0eafe?w=200&q=80" alt="">
+        </div>
+        <a class="panel-link" href="#">Read recap →</a>
+      </div>
+    </article>
+
+    <article class="panel">
+      <div class="panel-bg">
+        <img src="https://images.unsplash.com/photo-1486218119243-13883505764c?w=1800&q=80" alt="">
+      </div>
+      <div class="panel-num">02</div>
+      <div class="panel-content">
+        <div class="panel-eyebrow">
+          <span class="pill dark">Club run</span>
+          <span class="date">Thursday · 24 Apr 2026</span>
+        </div>
+        <h3 class="panel-title">Eid Fun<br>Run<span class="red">.</span></h3>
+        <p class="panel-quote">"Pre-dawn 5K through DLF. Twenty of us, sweets at Hauz Khas after. Easy, slow, perfect."</p>
+        <div class="panel-meta">
+          <div><span class="lbl">Showed up</span><span class="val">20</span></div>
+          <div><span class="lbl">Distance</span><span class="val">5<span class="unit">km</span></span></div>
+          <div><span class="lbl">Pace</span><span class="val">6:45<span class="unit">/km</span></span></div>
+          <div><span class="lbl">After</span><span class="val">Sweets</span></div>
+        </div>
+      </div>
+      <div class="panel-foot">
+        <div class="panel-mini-reel">
+          <img src="https://images.unsplash.com/photo-1502810365585-7d4e7c6e35f6?w=200&q=80" alt="">
+          <img src="https://images.unsplash.com/photo-1538805060514-97d9cc17730c?w=200&q=80" alt="">
+          <img src="https://images.unsplash.com/photo-1476480862126-209bfaa8edc8?w=200&q=80" alt="">
+        </div>
+        <a class="panel-link" href="#">Read recap →</a>
+      </div>
+    </article>
+
+    <article class="panel">
+      <div class="panel-bg">
+        <img src="https://images.unsplash.com/photo-1571008887538-b36bb32f4571?w=1800&q=80" alt="">
+      </div>
+      <div class="panel-num">03</div>
+      <div class="panel-content">
+        <div class="panel-eyebrow">
+          <span class="pill dark">Club run</span>
+          <span class="date">Sunday · 13 Apr 2026</span>
+        </div>
+        <h3 class="panel-title">Dawn<br>Patrol<span class="red">.</span></h3>
+        <p class="panel-quote">"5:30am. Eighteen runners. Seven kilometres of golden light along the Yamuna. Coffee at Blue Tokai. Best Sunday of the month."</p>
+        <div class="panel-meta">
+          <div><span class="lbl">Showed up</span><span class="val">18</span></div>
+          <div><span class="lbl">Distance</span><span class="val">7<span class="unit">km</span></span></div>
+          <div><span class="lbl">Pace</span><span class="val">6:10<span class="unit">/km</span></span></div>
+          <div><span class="lbl">After</span><span class="val">Coffee</span></div>
+        </div>
+      </div>
+      <div class="panel-foot">
+        <div class="panel-mini-reel">
+          <img src="https://images.unsplash.com/photo-1486218119243-13883505764c?w=200&q=80" alt="">
+          <img src="https://images.unsplash.com/photo-1530137073521-28cbe5f0eafe?w=200&q=80" alt="">
+          <img src="https://images.unsplash.com/photo-1517649763962-0c623066013b?w=200&q=80" alt="">
+        </div>
+        <a class="panel-link" href="#">Read recap →</a>
+      </div>
+    </article>
+
+    <article class="panel">
+      <div class="panel-bg">
+        <img src="https://images.unsplash.com/photo-1517649763962-0c623066013b?w=1800&q=80" alt="">
+      </div>
+      <div class="panel-num">04</div>
+      <div class="panel-content">
+        <div class="panel-eyebrow">
+          <span class="pill">Race event</span>
+          <span class="date">Sunday · 30 Mar 2026</span>
+        </div>
+        <h3 class="panel-title">Trail<br>Day<span class="red">.</span></h3>
+        <p class="panel-quote">"Twenty-four of us hit the Aravalli Biodiversity Park. Roots, rocks, dust. A picnic at the top. The kind of run you tell people about."</p>
+        <div class="panel-meta">
+          <div><span class="lbl">Showed up</span><span class="val">24</span></div>
+          <div><span class="lbl">Distance</span><span class="val">10<span class="unit">km</span></span></div>
+          <div><span class="lbl">Terrain</span><span class="val">Trail</span></div>
+          <div><span class="lbl">After</span><span class="val">Picnic</span></div>
+        </div>
+      </div>
+      <div class="panel-foot">
+        <div class="panel-mini-reel">
+          <img src="https://images.unsplash.com/photo-1552674605-db6ffd4facb5?w=200&q=80" alt="">
+          <img src="https://images.unsplash.com/photo-1502810365585-7d4e7c6e35f6?w=200&q=80" alt="">
+          <img src="https://images.unsplash.com/photo-1571008887538-b36bb32f4571?w=200&q=80" alt="">
+          <img src="https://images.unsplash.com/photo-1538805060514-97d9cc17730c?w=200&q=80" alt="">
+        </div>
+        <a class="panel-link" href="#">Read recap →</a>
+      </div>
+    </article>
+
+  </div>
+
+</section>
+
+<!-- End cap -->
+<section class="end-cap">
+  <h3>19 more runs.<br>Keep scrolling<span style="color:var(--signal)">.</span></h3>
+  <p>From our first ever club run last May to today. The full archive.</p>
+  <button class="btn-light">See all 23 runs</button>
+</section>
+
+<script>
+  // Light intersection observer to highlight the rail dot of the visible panel
+  const dots = document.querySelectorAll('.rail-dot');
+  const panels = document.querySelectorAll('.panel');
+  const num = document.querySelector('.rail-progress .num');
+  const obs = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting){
+        const idx = [...panels].indexOf(e.target);
+        dots.forEach((d,i)=>d.classList.toggle('active', i===idx));
+        if(num) num.textContent = String(idx+1).padStart(2,'0');
+      }
+    });
+  },{threshold:0.55});
+  panels.forEach(p=>obs.observe(p));
+</script>
+
+</body>
+</html>

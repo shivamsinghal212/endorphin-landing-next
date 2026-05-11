@@ -9,8 +9,8 @@ import type { ClubEvent } from '../page';
 import { ClubIcons } from './club-icons';
 import { JoinClubButton } from './join-club-button';
 import { RsvpButton } from './rsvp-button';
-import { LastRunReel } from './last-run-reel';
-import { RecapVideoReel } from './recap-video-reel';
+import { RunGallery } from './run-gallery';
+import { PreviousRunsList } from './previous-runs-list';
 import { ExpandableDescription } from './expandable-description';
 import { NextRun } from './next-run';
 import './club-page.css';
@@ -34,7 +34,7 @@ async function getClubEvents(slug: string): Promise<ClubEvent[]> {
 function splitEvents(events: ClubEvent[]): {
   nextEvent: ClubEvent | null;
   upcomingEvents: ClubEvent[];
-  lastEvent: ClubEvent | null;
+  pastEvents: ClubEvent[];
 } {
   const now = Date.now();
   const future: ClubEvent[] = [];
@@ -51,7 +51,7 @@ function splitEvents(events: ClubEvent[]): {
   return {
     nextEvent: nextEvent || null,
     upcomingEvents,
-    lastEvent: past[0] || null,
+    pastEvents: past,
   };
 }
 
@@ -173,7 +173,7 @@ export default async function ClubPage({ params }: PageProps) {
   ]);
   if (!club || !club.publishedAt) notFound();
 
-  const { nextEvent, upcomingEvents, lastEvent } = splitEvents(events);
+  const { nextEvent, upcomingEvents, pastEvents } = splitEvents(events);
   const isAuthed = !!token;
 
   return (
@@ -206,7 +206,7 @@ export default async function ClubPage({ params }: PageProps) {
             myMembership={myMembership}
           />
         )}
-        {lastEvent && <LastRun event={lastEvent} />}
+        {pastEvents.length > 0 && <PreviousRuns events={pastEvents} />}
         {club.admins.length > 0 && <LedBy admins={club.admins} />}
         <CtaFooter club={club} />
       </div>
@@ -301,7 +301,13 @@ function Hero({
   myMembership: MyMembership | null;
 }) {
   return (
-    <section className="hero">
+    <section className={`hero ${club.headerImageUrl ? 'has-cover' : ''}`}>
+      {club.headerImageUrl && (
+        <div className="hero-cover" aria-hidden="true">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={club.headerImageUrl} alt="" loading="eager" />
+        </div>
+      )}
       <div className="hero-grid">
         <div>
           {club.kicker && <span className="kicker">{club.kicker}</span>}
@@ -326,36 +332,36 @@ function Hero({
         <aside className="hero-right">
           {club.description && <ExpandableDescription text={club.description} />}
           <div className="hero-cta-stack">
-            <JoinClubButton
-              slug={club.slug}
-              clubName={club.name}
-              joinForm={club.joinForm}
-              requiresApproval={club.requiresApproval}
-              isAuthed={isAuthed}
-              myMembership={myMembership}
-            />
-            <div className="socials-pill" aria-label="Share and follow">
-              <a className="icon-dot" href={`https://www.endorfin.run/clubs/${club.slug}`} aria-label="Share">
-                <svg aria-hidden="true"><use href="#i-share" /></svg>
-              </a>
-              {(club.whatsappUrl || club.instagramUrl || club.stravaUrl) && (
-                <span className="pill-divider" aria-hidden="true" />
-              )}
-              {club.whatsappUrl && (
-                <a className="icon-dot" data-brand="whatsapp" href={club.whatsappUrl} target="_blank" rel="noopener noreferrer" aria-label="WhatsApp group">
-                  <svg aria-hidden="true"><use href="#i-whatsapp" /></svg>
+            <div className="join-pill" aria-label="Share and join">
+              <div className="join-pill-icons">
+                <a className="icon-dot" href={`https://www.endorfin.run/clubs/${club.slug}`} aria-label="Share">
+                  <svg aria-hidden="true"><use href="#i-share" /></svg>
                 </a>
-              )}
-              {club.instagramUrl && (
-                <a className="icon-dot" data-brand="instagram" href={club.instagramUrl} target="_blank" rel="noopener noreferrer" aria-label="Instagram">
-                  <svg aria-hidden="true"><use href="#i-instagram" /></svg>
-                </a>
-              )}
-              {club.stravaUrl && (
-                <a className="icon-dot" data-brand="strava" href={club.stravaUrl} target="_blank" rel="noopener noreferrer" aria-label="Strava club">
-                  <svg aria-hidden="true"><use href="#i-strava" /></svg>
-                </a>
-              )}
+                {club.whatsappUrl && (
+                  <a className="icon-dot" data-brand="whatsapp" href={club.whatsappUrl} target="_blank" rel="noopener noreferrer" aria-label="WhatsApp group">
+                    <svg aria-hidden="true"><use href="#i-whatsapp" /></svg>
+                  </a>
+                )}
+                {club.instagramUrl && (
+                  <a className="icon-dot" data-brand="instagram" href={club.instagramUrl} target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+                    <svg aria-hidden="true"><use href="#i-instagram" /></svg>
+                  </a>
+                )}
+                {club.stravaUrl && (
+                  <a className="icon-dot" data-brand="strava" href={club.stravaUrl} target="_blank" rel="noopener noreferrer" aria-label="Strava club">
+                    <svg aria-hidden="true"><use href="#i-strava" /></svg>
+                  </a>
+                )}
+              </div>
+              <span className="join-pill-divider" aria-hidden="true" />
+              <JoinClubButton
+                slug={club.slug}
+                clubName={club.name}
+                joinForm={club.joinForm}
+                requiresApproval={club.requiresApproval}
+                isAuthed={isAuthed}
+                myMembership={myMembership}
+              />
             </div>
           </div>
         </aside>
@@ -503,19 +509,35 @@ function UpcomingRow({
   );
 }
 
-function LastRun({ event }: { event: ClubEvent }) {
+function PreviousRuns({ events }: { events: ClubEvent[] }) {
+  const [latest, ...earlier] = events;
+  return (
+    <section className="previous-runs on-jet">
+      <header className="previous-runs-header">
+        <h2 className="previous-runs-title">Previous runs</h2>
+        <span className="kicker previous-runs-count">
+          {events.length} {events.length === 1 ? 'run' : 'runs'}
+        </span>
+      </header>
+      <LatestRun event={latest} />
+      {earlier.length > 0 && <PreviousRunsList events={earlier} />}
+    </section>
+  );
+}
+
+function LatestRun({ event }: { event: ClubEvent }) {
   const isRace = event.eventType === 'race_event';
   const recap = event.recap;
   const photos = recap?.photos ?? [];
   const videos = recap?.videos ?? [];
 
   return (
-    <section className="last-run">
+    <article className="latest-run">
       <div className="last-run-head">
         <div>
-          <div className="kicker last-run-kicker">Last run · {fmtLastRunKickerDate(event.startTime)}</div>
+          <div className="kicker last-run-kicker">Latest · {fmtLastRunKickerDate(event.startTime)}</div>
           <span className={`last-run-tag ${isRace ? 'race' : ''}`}>{isRace ? 'Race event' : 'Club run'}</span>
-          <h2 className="last-run-title">{event.title}</h2>
+          <h3 className="last-run-title">{event.title}</h3>
           {recap?.summary && <p className="last-run-summary">{recap.summary}</p>}
         </div>
         <div className="last-run-meta" aria-label="Run summary">
@@ -546,9 +568,10 @@ function LastRun({ event }: { event: ClubEvent }) {
         </div>
       </div>
 
-      {photos.length > 0 && <LastRunReel photos={photos} />}
-      {videos.length > 0 && <RecapVideoReel videos={videos} />}
-    </section>
+      {(photos.length > 0 || videos.length > 0) && (
+        <RunGallery photos={photos} videos={videos} />
+      )}
+    </article>
   );
 }
 

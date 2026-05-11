@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Club History · V2 Heatmap + Poster Reel · Endorfin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@1,9..144,600;1,9..144,700&family=Oswald:wght@400;500;600;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --jet:#0A0A0A;
+    --slate:#1A1A1A;
+    --bone:#F5F0EB;
+    --signal:#E6232A;
+    --dim:#666;
+    --hair:rgba(10,10,10,0.10);
+    --hair-strong:rgba(10,10,10,0.18);
+    --gutter:clamp(20px,4vw,72px);
+    --container:1240px;
+  }
+  *,*::before,*::after{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    font-family:'Poppins',sans-serif;
+    background:var(--bone);color:var(--jet);
+    -webkit-font-smoothing:antialiased;
+  }
+  a{color:inherit;text-decoration:none}
+  img{display:block;max-width:100%}
+  .wrap{max-width:var(--container);margin:0 auto;padding:0 var(--gutter)}
+
+  .variant-banner{
+    background:var(--jet);color:var(--bone);
+    padding:14px var(--gutter);display:flex;justify-content:space-between;align-items:center;
+    font-family:'Poppins',sans-serif;font-size:12px;letter-spacing:.12em;text-transform:uppercase;
+  }
+  .variant-banner b{font-family:'Oswald';font-weight:600;letter-spacing:.05em;font-size:14px}
+  .variant-banner span{color:rgba(245,240,235,.55)}
+
+  .kicker{font-family:'Oswald';font-weight:500;text-transform:uppercase;letter-spacing:.12em;font-size:11px;color:var(--dim)}
+
+  /* Hero compressed */
+  .hero{padding:64px 0 32px}
+  .hero-grid{display:grid;grid-template-columns:1fr 380px;gap:64px;align-items:end}
+  .hero-logo{
+    width:88px;height:88px;border-radius:50%;
+    background:linear-gradient(135deg,#E6232A,#8a0f15);
+    display:flex;align-items:center;justify-content:center;
+    color:var(--bone);font-family:'Oswald';font-weight:700;font-size:36px;margin-bottom:24px;
+  }
+  .hero-name{font-family:'Oswald';font-weight:700;font-size:clamp(64px,9vw,128px);line-height:.92;letter-spacing:-.01em;text-transform:uppercase;margin:0}
+  .hero-name .red{color:var(--signal)}
+  .hero-tags{margin-top:24px;display:flex;gap:8px;flex-wrap:wrap}
+  .tag{font-family:'Oswald';font-size:11px;text-transform:uppercase;letter-spacing:.1em;padding:6px 14px;border:1px solid var(--hair-strong);border-radius:999px}
+  .tag-filled{background:var(--jet);color:var(--bone);border-color:var(--jet)}
+  .hero-right p{font-size:15px;line-height:1.6;color:rgba(10,10,10,.72);margin:0 0 24px}
+  .hero-right .kicker{margin-bottom:8px;display:block}
+
+  /* ── HERO STATS BAR — the aspirational headline ── */
+  .consistency{
+    background:var(--jet);color:var(--bone);
+    padding:80px var(--gutter) 64px;margin:64px 0 0;
+    position:relative;overflow:hidden;
+  }
+  .consistency-inner{max-width:var(--container);margin:0 auto;position:relative;z-index:2}
+  .consistency-eyebrow{
+    font-family:'Oswald';font-weight:500;font-size:12px;letter-spacing:.18em;text-transform:uppercase;
+    color:rgba(245,240,235,.55);margin-bottom:24px;display:block;
+  }
+  .consistency-headline{
+    font-family:'Oswald';font-weight:700;font-size:clamp(56px,9vw,140px);
+    line-height:.9;letter-spacing:-.02em;text-transform:uppercase;margin:0 0 8px;
+  }
+  .consistency-headline .red{color:var(--signal)}
+  .consistency-headline .dim{color:rgba(245,240,235,.32)}
+  .consistency-sub{
+    font-family:'Fraunces',serif;font-style:italic;font-weight:600;font-size:22px;
+    color:rgba(245,240,235,.7);margin:16px 0 56px;max-width:600px;
+  }
+
+  /* ── Heatmap ── */
+  .heatmap-shell{
+    background:rgba(245,240,235,.04);border:1px solid rgba(245,240,235,.08);
+    border-radius:8px;padding:32px;overflow-x:auto;
+  }
+  .heatmap-months{
+    display:grid;grid-template-columns:repeat(12,1fr);gap:8px;
+    font-family:'Oswald';font-size:10px;letter-spacing:.14em;text-transform:uppercase;
+    color:rgba(245,240,235,.5);margin-bottom:12px;
+  }
+  .heatmap-grid{
+    display:grid;grid-template-rows:repeat(7,1fr);grid-auto-flow:column;
+    grid-auto-columns:14px;gap:4px;min-width:680px;
+  }
+  .cell{width:14px;height:14px;border-radius:2px;background:rgba(245,240,235,.06)}
+  .cell.l1{background:rgba(230,35,42,.35)}
+  .cell.l2{background:rgba(230,35,42,.6)}
+  .cell.l3{background:rgba(230,35,42,.85)}
+  .cell.l4{background:var(--signal);box-shadow:0 0 0 1px rgba(230,35,42,.4)}
+  .heatmap-legend{
+    display:flex;justify-content:space-between;align-items:center;margin-top:20px;
+    color:rgba(245,240,235,.5);font-family:'Oswald';font-size:11px;letter-spacing:.12em;text-transform:uppercase;
+  }
+  .legend-scale{display:flex;align-items:center;gap:8px}
+  .legend-scale .cell{width:12px;height:12px}
+
+  /* ── Poster reel ── */
+  .reel-section{padding:96px 0 64px}
+  .reel-header{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:40px}
+  .reel-title{font-family:'Oswald';font-weight:700;font-size:clamp(40px,5vw,72px);letter-spacing:-.01em;text-transform:uppercase;line-height:.95;margin:0}
+  .reel-title .red{color:var(--signal)}
+  .reel-nav{display:flex;gap:8px}
+  .reel-btn{
+    width:48px;height:48px;border-radius:50%;border:1.5px solid var(--jet);
+    background:var(--bone);cursor:pointer;display:flex;align-items:center;justify-content:center;
+    font-family:'Oswald';font-size:20px;color:var(--jet);transition:all .2s;
+  }
+  .reel-btn:hover{background:var(--jet);color:var(--bone)}
+
+  .reel{
+    display:flex;gap:20px;overflow-x:auto;scroll-snap-type:x mandatory;
+    margin:0 calc(-1 * var(--gutter));padding:8px var(--gutter);
+    scrollbar-width:none;
+  }
+  .reel::-webkit-scrollbar{display:none}
+  .poster{
+    flex:0 0 auto;width:320px;height:440px;border-radius:6px;
+    position:relative;overflow:hidden;scroll-snap-align:start;
+    cursor:pointer;transition:transform .3s;
+    background:var(--jet);
+  }
+  .poster:hover{transform:translateY(-4px)}
+  .poster.lg{width:380px;height:480px}
+  .poster img{
+    position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
+    transition:transform .6s;
+  }
+  .poster:hover img{transform:scale(1.05)}
+  .poster::after{
+    content:'';position:absolute;inset:0;
+    background:linear-gradient(to top,rgba(10,10,10,.92) 0%,rgba(10,10,10,.3) 45%,rgba(10,10,10,0) 65%);
+  }
+  .poster-stamp{
+    position:absolute;top:20px;left:20px;z-index:2;
+    background:var(--signal);color:var(--bone);
+    padding:8px 12px;border-radius:3px;
+    font-family:'Oswald';font-weight:700;
+    display:flex;flex-direction:column;align-items:center;line-height:1;
+  }
+  .poster-stamp .day{font-size:22px;letter-spacing:-.02em}
+  .poster-stamp .mon{font-size:10px;letter-spacing:.14em;text-transform:uppercase;margin-top:2px}
+  .poster-tag{
+    position:absolute;top:24px;right:20px;z-index:2;
+    background:rgba(245,240,235,.92);color:var(--jet);
+    font-family:'Oswald';font-size:10px;letter-spacing:.14em;text-transform:uppercase;
+    padding:5px 10px;border-radius:2px;
+  }
+  .poster-body{
+    position:absolute;left:0;right:0;bottom:0;z-index:2;
+    padding:24px;color:var(--bone);
+  }
+  .poster-title{
+    font-family:'Oswald';font-weight:700;font-size:32px;line-height:.95;
+    letter-spacing:-.01em;text-transform:uppercase;margin:0 0 10px;
+  }
+  .poster-stats{
+    display:flex;gap:14px;font-family:'Oswald';font-size:11px;letter-spacing:.12em;text-transform:uppercase;
+    color:rgba(245,240,235,.85);align-items:center;flex-wrap:wrap;
+  }
+  .poster-stats .sep{opacity:.5}
+  .poster-stats strong{font-weight:600;color:var(--bone)}
+
+  /* Hint card to see more */
+  .poster-more{
+    flex:0 0 auto;width:200px;height:440px;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    border:2px dashed var(--hair-strong);border-radius:6px;
+    font-family:'Oswald';font-weight:600;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--dim);font-size:14px;text-align:center;line-height:1.6;
+    cursor:pointer;transition:all .2s;
+  }
+  .poster-more:hover{border-color:var(--jet);color:var(--jet)}
+  .poster-more .num{font-size:48px;color:var(--signal);letter-spacing:-.02em;line-height:1;margin-bottom:8px}
+
+  /* Pads at bottom */
+  .pad{padding-bottom:96px}
+
+  @media (max-width:760px){
+    .hero-grid{grid-template-columns:1fr;gap:32px}
+    .consistency-headline{font-size:48px}
+    .heatmap-shell{padding:16px}
+    .heatmap-grid{min-width:520px}
+    .reel-header{flex-direction:column;align-items:flex-start;gap:16px}
+    .poster{width:260px;height:380px}
+    .poster.lg{width:280px;height:400px}
+  }
+</style>
+</head>
+<body>
+
+<div class="variant-banner">
+  <b>V2 · Heatmap + Poster Reel</b>
+  <span>Endorfin · Club Detail Mockup</span>
+</div>
+
+<div class="wrap">
+
+  <!-- Hero (compressed context) -->
+  <section class="hero">
+    <div class="hero-grid">
+      <div>
+        <span class="kicker">Noida · Curated run experiences · Community</span>
+        <div class="hero-logo">U</div>
+        <h1 class="hero-name">The Uprun<br>Club<span class="red">.</span></h1>
+        <div class="hero-tags">
+          <span class="tag tag-filled">Run Club</span>
+          <span class="tag">Beginner Friendly</span>
+          <span class="tag">5K · 10K</span>
+        </div>
+      </div>
+      <aside class="hero-right">
+        <span class="kicker">About</span>
+        <p>The run club with an ice bath at the finish line, a DJ at the coffee stop or a treasure hunt. Community-first, unconventional, memorable.</p>
+      </aside>
+    </div>
+  </section>
+
+</div>
+
+<!-- ── Consistency block (dark, aspirational) ── -->
+<section class="consistency">
+  <div class="consistency-inner">
+    <span class="consistency-eyebrow">One year of running together</span>
+    <h2 class="consistency-headline">
+      23 Runs<span class="dim">.</span><br>
+      <span class="red">184 KM</span> Together<span class="dim">.</span>
+    </h2>
+    <p class="consistency-sub">Every red square is a Sunday you showed up. Every empty one is a Sunday we'll get next time.</p>
+
+    <div class="heatmap-shell">
+      <div class="heatmap-months">
+        <span>May</span><span>Jun</span><span>Jul</span><span>Aug</span><span>Sep</span><span>Oct</span><span>Nov</span><span>Dec</span><span>Jan</span><span>Feb</span><span>Mar</span><span>Apr</span>
+      </div>
+      <div class="heatmap-grid" id="heatmap"></div>
+      <div class="heatmap-legend">
+        <span>Each square = 1 day</span>
+        <div class="legend-scale">
+          <span>Rest</span>
+          <span class="cell"></span>
+          <span class="cell l1"></span>
+          <span class="cell l2"></span>
+          <span class="cell l3"></span>
+          <span class="cell l4"></span>
+          <span>Long run</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="wrap">
+
+  <!-- ── Poster reel ── -->
+  <section class="reel-section">
+    <header class="reel-header">
+      <h3 class="reel-title">Every Run.<br>Every <span class="red">Memory</span>.</h3>
+      <div class="reel-nav">
+        <button class="reel-btn" aria-label="Previous">←</button>
+        <button class="reel-btn" aria-label="Next">→</button>
+      </div>
+    </header>
+  </section>
+
+</div>
+
+<!-- Poster reel (edge-to-edge) -->
+<div class="reel pad">
+  <article class="poster lg">
+    <img src="https://images.unsplash.com/photo-1552674605-db6ffd4facb5?w=900&q=80" alt="">
+    <div class="poster-stamp"><span class="day">09</span><span class="mon">May</span></div>
+    <span class="poster-tag">Latest</span>
+    <div class="poster-body">
+      <h4 class="poster-title">Mother's<br>Day Run.</h4>
+      <div class="poster-stats">
+        <strong>5 KM</strong><span class="sep">·</span>
+        <strong>30 going</strong><span class="sep">·</span>
+        <span>Canvas after</span>
+      </div>
+    </div>
+  </article>
+
+  <article class="poster">
+    <img src="https://images.unsplash.com/photo-1486218119243-13883505764c?w=900&q=80" alt="">
+    <div class="poster-stamp"><span class="day">24</span><span class="mon">Apr</span></div>
+    <div class="poster-body">
+      <h4 class="poster-title">Eid Fun Run.</h4>
+      <div class="poster-stats">
+        <strong>5 KM</strong><span class="sep">·</span>
+        <strong>20 going</strong><span class="sep">·</span>
+        <span>Sweets</span>
+      </div>
+    </div>
+  </article>
+
+  <article class="poster">
+    <img src="https://images.unsplash.com/photo-1571008887538-b36bb32f4571?w=900&q=80" alt="">
+    <div class="poster-stamp"><span class="day">13</span><span class="mon">Apr</span></div>
+    <div class="poster-body">
+      <h4 class="poster-title">Dawn Patrol.</h4>
+      <div class="poster-stats">
+        <strong>7 KM</strong><span class="sep">·</span>
+        <strong>18 going</strong><span class="sep">·</span>
+        <span>Blue Tokai</span>
+      </div>
+    </div>
+  </article>
+
+  <article class="poster">
+    <img src="https://images.unsplash.com/photo-1517649763962-0c623066013b?w=900&q=80" alt="">
+    <div class="poster-stamp" style="background:var(--jet);color:var(--bone)"><span class="day">30</span><span class="mon">Mar</span></div>
+    <span class="poster-tag" style="background:var(--signal);color:var(--bone)">Race</span>
+    <div class="poster-body">
+      <h4 class="poster-title">Trail Day.</h4>
+      <div class="poster-stats">
+        <strong>10 KM</strong><span class="sep">·</span>
+        <strong>24 going</strong><span class="sep">·</span>
+        <span>Aravalli</span>
+      </div>
+    </div>
+  </article>
+
+  <article class="poster">
+    <img src="https://images.unsplash.com/photo-1530137073521-28cbe5f0eafe?w=900&q=80" alt="">
+    <div class="poster-stamp"><span class="day">16</span><span class="mon">Mar</span></div>
+    <div class="poster-body">
+      <h4 class="poster-title">Sunday Long.</h4>
+      <div class="poster-stats">
+        <strong>15 KM</strong><span class="sep">·</span>
+        <strong>12 going</strong><span class="sep">·</span>
+        <span>Brunch</span>
+      </div>
+    </div>
+  </article>
+
+  <article class="poster">
+    <img src="https://images.unsplash.com/photo-1502810365585-7d4e7c6e35f6?w=900&q=80" alt="">
+    <div class="poster-stamp"><span class="day">23</span><span class="mon">Feb</span></div>
+    <div class="poster-body">
+      <h4 class="poster-title">Holi Sprint.</h4>
+      <div class="poster-stats">
+        <strong>5 KM</strong><span class="sep">·</span>
+        <strong>45 going</strong><span class="sep">·</span>
+        <span>Colour throw</span>
+      </div>
+    </div>
+  </article>
+
+  <article class="poster">
+    <img src="https://images.unsplash.com/photo-1538805060514-97d9cc17730c?w=900&q=80" alt="">
+    <div class="poster-stamp"><span class="day">09</span><span class="mon">Feb</span></div>
+    <div class="poster-body">
+      <h4 class="poster-title">V-Day Chase.</h4>
+      <div class="poster-stats">
+        <strong>5 KM</strong><span class="sep">·</span>
+        <strong>28 going</strong><span class="sep">·</span>
+        <span>Cookies</span>
+      </div>
+    </div>
+  </article>
+
+  <article class="poster">
+    <img src="https://images.unsplash.com/photo-1476480862126-209bfaa8edc8?w=900&q=80" alt="">
+    <div class="poster-stamp" style="background:var(--jet);color:var(--bone)"><span class="day">26</span><span class="mon">Jan</span></div>
+    <span class="poster-tag" style="background:var(--signal);color:var(--bone)">Race</span>
+    <div class="poster-body">
+      <h4 class="poster-title">Republic 10K.</h4>
+      <div class="poster-stats">
+        <strong>10 KM</strong><span class="sep">·</span>
+        <strong>35 going</strong><span class="sep">·</span>
+        <span>Chai</span>
+      </div>
+    </div>
+  </article>
+
+  <div class="poster-more">
+    <div class="num">+15</div>
+    more runs<br>in the archive
+  </div>
+</div>
+
+<script>
+  // Generate a year of heatmap cells (52 weeks * 7 days = 364 cells)
+  // Sundays in week 0 column = heavy runs (l4 for race events, l3 for long Sundays)
+  const grid = document.getElementById('heatmap');
+  const total = 52 * 7;
+  // Define run days as offsets from start (Sundays each week + a few extras)
+  // We pretend the user started 52 weeks ago; mark Sundays with varying intensity.
+  const runDays = new Set();
+  // Add Sundays — day 6 of each week (last row in 7-row column-flow grid)
+  // With column-flow, cells fill column by column. Position within column = day index.
+  // To put runs on Sundays we mark cells where (i % 7 === 6).
+  // Vary intensity randomly but seeded.
+  function seeded(n){ return (Math.sin(n*9301+49297)*233280) % 1 }
+  for(let i=0;i<total;i++){
+    const dayOfWeek = i % 7;
+    let cls = '';
+    if(dayOfWeek === 6){ // Sunday — most runs
+      const r = Math.abs(seeded(i));
+      if(r < 0.18) cls = '';                // missed Sunday
+      else if(r < 0.4) cls = 'l1';
+      else if(r < 0.7) cls = 'l2';
+      else if(r < 0.92) cls = 'l3';
+      else cls = 'l4';
+    } else if(dayOfWeek === 2){ // occasional Wed run
+      const r = Math.abs(seeded(i+999));
+      if(r > 0.78) cls = 'l1';
+      else if(r > 0.92) cls = 'l2';
+    }
+    const div = document.createElement('div');
+    div.className = 'cell' + (cls ? ' ' + cls : '');
+    grid.appendChild(div);
+  }
+</script>
+
+</body>
+</html>
