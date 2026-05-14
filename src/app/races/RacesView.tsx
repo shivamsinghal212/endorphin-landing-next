@@ -395,6 +395,13 @@ export default function RacesView({
   const [allRaces, setAllRaces] = useState<ApiEvent[]>(initialRaces);
   const [currentCity, setCurrentCity] = useState<string>('');
   const [loginRace, setLoginRace] = useState<ApiEvent | null>(null);
+  // Tracks whether we've passed initial hydration. Time-derived UI
+  // (daysTo, etc.) must defer to post-mount so SSR/cached HTML doesn't
+  // mismatch the client render → React error #418 in production.
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
   // When a plain (non-coupon) Register click triggers login, stash the URL so
   // we can pop it open in a new tab once the post-login refresh commits.
   const pendingRegistrationUrlRef = useRef<string | null>(null);
@@ -735,8 +742,8 @@ export default function RacesView({
                 This month&apos;s featured in <b>{scope}</b>.
               </h2>
               <div className="v1r-featured-header-right">
-                <span className="v1r-section-count">
-                  {daysTo(featured[0].startTime)} days to start line
+                <span className="v1r-section-count" suppressHydrationWarning>
+                  {mounted ? `${daysTo(featured[0].startTime)} days to start line` : ''}
                 </span>
                 <div className="v1r-carousel-controls" hidden={!featuredCanScroll} role="group">
                   <button
