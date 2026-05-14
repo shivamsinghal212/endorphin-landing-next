@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useTransition } from 'react';
 import Link from 'next/link';
+import posthog from 'posthog-js';
 import LoginModal from '@/components/LoginModal';
 import {
   joinKipWaitlistAction,
@@ -115,6 +116,11 @@ export default function WorkoutPlanView({
     startJoin(async () => {
       const res = await joinKipWaitlistAction();
       if (res.ok) {
+        posthog.capture('kip_waitlist_joined', {
+          total_on_waitlist: res.result.total,
+          waitlist_capacity: res.result.capacity,
+          waitlist_full: res.result.total >= res.result.capacity,
+        });
         setJoined(true);
         setStats((s) => ({
           ...s,

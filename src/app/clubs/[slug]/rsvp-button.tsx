@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
+import posthog from 'posthog-js';
 import LoginModal from '@/components/LoginModal';
 import JoinClubFormModal from './join-club-form-modal';
 import { cancelRsvpAction, rsvpAction } from '@/app/actions/clubs';
@@ -81,6 +82,11 @@ export function RsvpButton({
       if (goingHint) {
         const r = await cancelRsvpAction(slug, eventId);
         if (r.ok) {
+          posthog.capture('event_rsvp_cancelled', {
+            club_slug: slug,
+            club_name: clubName,
+            event_id: eventId,
+          });
           setGoingHint(false);
           router.refresh();
         } else {
@@ -89,6 +95,11 @@ export function RsvpButton({
       } else {
         const r = await rsvpAction(slug, eventId);
         if (r.ok) {
+          posthog.capture('event_rsvp', {
+            club_slug: slug,
+            club_name: clubName,
+            event_id: eventId,
+          });
           setGoingHint(true);
           router.refresh();
         } else if (r.status === 403) {

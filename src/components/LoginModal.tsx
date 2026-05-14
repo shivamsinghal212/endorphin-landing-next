@@ -2,6 +2,7 @@
 
 import * as Dialog from '@radix-ui/react-dialog';
 import { useEffect, useRef, useState, useTransition, type ReactNode } from 'react';
+import posthog from 'posthog-js';
 import {
   loginAction,
   registerAction,
@@ -85,6 +86,15 @@ export default function LoginModal({
     startTransition(async () => {
       const r = await loginAction(email.trim().toLowerCase(), password);
       if (r.ok && r.user) {
+        posthog.identify(r.user.id, {
+          email: r.user.email,
+          name: r.user.name,
+          auth_provider: r.user.authProvider,
+        });
+        posthog.capture('user_signed_in', {
+          auth_provider: 'email',
+          user_id: r.user.id,
+        });
         onSuccess?.(r.user);
       } else if (!r.ok && r.code === 'EMAIL_NOT_VERIFIED') {
         // Backend already resent OTP — go straight to OTP screen
@@ -126,6 +136,15 @@ export default function LoginModal({
     startTransition(async () => {
       const r = await verifyOtpAction(email.trim().toLowerCase(), otp);
       if (r.ok && r.user) {
+        posthog.identify(r.user.id, {
+          email: r.user.email,
+          name: r.user.name,
+          auth_provider: r.user.authProvider,
+        });
+        posthog.capture('user_signed_up', {
+          auth_provider: 'email',
+          user_id: r.user.id,
+        });
         onSuccess?.(r.user);
       } else if (!r.ok) {
         setError(r.error);
@@ -189,9 +208,20 @@ export default function LoginModal({
 
   function handleGoogleCredential(idToken: string) {
     setError(null);
+    const googleScreen = screen;
     startTransition(async () => {
       const r = await googleSignInAction(idToken);
       if (r.ok && r.user) {
+        posthog.identify(r.user.id, {
+          email: r.user.email,
+          name: r.user.name,
+          auth_provider: r.user.authProvider,
+        });
+        posthog.capture('user_google_signed_in', {
+          auth_provider: 'google',
+          user_id: r.user.id,
+          intent: googleScreen,
+        });
         onSuccess?.(r.user);
       } else if (!r.ok) {
         setError(r.error);

@@ -15,27 +15,37 @@ interface PageProps {
  * Look up an event by slug, falling back to UUID id when the param looks
  * like one. Only returns null for genuine 404s — re-throws on transient
  * errors (5xx, network, timeout) so Next renders error.tsx instead of a
- * sticky `notFound()`. One quick retry per backend call to absorb cold-
- * start blips on Railway.
+ * sticky `notFound()`.
+ *
+ * Retry policy: 3 attempts with exponential-ish backoff (300ms, 900ms,
+ * 2100ms) — sized to absorb a Railway cold start (~3-5s warm-up) without
+ * blowing past the user's patience. Network-level `TypeError: fetch
+ * failed` and 5xx responses both trigger retries; only 404 short-circuits.
  */
 async function loadEvent(slug: string, token: string | null): Promise<Event | null> {
   const isUuid = /^[0-9a-f-]{36}$/i.test(slug);
+  const RETRY_DELAYS_MS = [300, 900, 2100];
 
   const tryFetch = async (
     fn: () => Promise<Event>,
     label: string,
   ): Promise<Event | 'not_found'> => {
-    for (let attempt = 0; attempt < 2; attempt++) {
+    for (let attempt = 0; attempt <= RETRY_DELAYS_MS.length; attempt++) {
       try {
         return await fn();
       } catch (err) {
         if (err instanceof ApiError && err.status === 404) return 'not_found';
-        if (attempt === 0) {
-          await new Promise((r) => setTimeout(r, 250));
+        const delay = RETRY_DELAYS_MS[attempt];
+        if (delay != null) {
+          console.warn(
+            `[races/[slug]] ${label} attempt ${attempt + 1} failed for "${slug}", retrying in ${delay}ms:`,
+            err instanceof Error ? err.message : err,
+          );
+          await new Promise((r) => setTimeout(r, delay));
           continue;
         }
-        // Final attempt failed for a non-404 reason — bubble up so Next
-        // renders error.tsx (which auto-retries) instead of 404'ing.
+        // All attempts exhausted — bubble up so Next renders error.tsx
+        // (which auto-retries on user click) instead of 404'ing.
         console.error(`[races/[slug]] ${label} failed for "${slug}":`, err);
         throw err;
       }
@@ -139,7 +149,7 @@ export default async function RaceDetailPage({ params }: PageProps) {
         }}
       />
       <Header />
-      <RaceDetailView event={event} />
+      <RaceDetailView event={event} isAuthed={!!token} />
       <Footer />
     </main>
   );

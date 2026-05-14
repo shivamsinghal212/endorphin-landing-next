@@ -1,19 +1,59 @@
-# Endorfin — Running Events in India
+# Endorfin — Running Events and Run Clubs in India
 
-> Endorfin is a free Android app for discovering and RSVPing to running events across India. It lists 500+ marathons, half marathons, 10K runs, and 5K races across 25+ cities including Mumbai, Delhi, Bangalore, Pune, Hyderabad, and Chennai. Users can also create community runs, follow other runners, and discuss race logistics in per-event chat threads. Available free on Google Play.
+> Endorfin is a free Android app and web directory for discovering running events and run clubs across India. It lists 500+ marathons, half marathons, 10K runs, and 5K races, plus a verified directory of run clubs in every major Indian city — Delhi, Gurgaon, Noida, Mumbai, Bengaluru, Pune, Hyderabad, Chennai, Kolkata, Ahmedabad, and more. Users can RSVP to club runs, create community runs, follow other runners, and discuss race logistics in per-event chat threads. Available free on Google Play.
 
 ## Pages
 
 - [Homepage](https://www.endorfin.run/) — Event discovery, app features, community overview
+- [Races](https://www.endorfin.run/races) — All running events across India, filterable by city
+- [Run Clubs](https://www.endorfin.run/clubs) — Verified directory of run clubs across India
 - [Privacy Policy](https://www.endorfin.run/privacy) — Data handling and DPDPA 2023 compliance
 - [Terms of Service](https://www.endorfin.run/terms) — Usage terms for the Endorfin platform
 - [Support](https://www.endorfin.run/support) — Help and frequently asked questions
+
+## Races by City
+
+- [Races in Delhi](https://www.endorfin.run/races/in/delhi)
+- [Races in Gurgaon](https://www.endorfin.run/races/in/gurgaon)
+- [Races in Mumbai](https://www.endorfin.run/races/in/mumbai)
+- [Races in Bengaluru](https://www.endorfin.run/races/in/bengaluru)
+- [Races in Pune](https://www.endorfin.run/races/in/pune)
+- [Races in Hyderabad](https://www.endorfin.run/races/in/hyderabad)
+- [Races in Chennai](https://www.endorfin.run/races/in/chennai)
+- [Races in Kolkata](https://www.endorfin.run/races/in/kolkata)
+- [Races in Ahmedabad](https://www.endorfin.run/races/in/ahmedabad)
+
+## Marathons and Half Marathons by City
+
+- [Marathons in Mumbai](https://www.endorfin.run/races/marathon-in/mumbai)
+- [Marathons in Delhi](https://www.endorfin.run/races/marathon-in/delhi)
+- [Marathons in Bengaluru](https://www.endorfin.run/races/marathon-in/bengaluru)
+- [Marathons in Hyderabad](https://www.endorfin.run/races/marathon-in/hyderabad)
+- [Marathons in Chennai](https://www.endorfin.run/races/marathon-in/chennai)
+- [Half marathons in Mumbai](https://www.endorfin.run/races/half-marathon-in/mumbai)
+- [Half marathons in Delhi](https://www.endorfin.run/races/half-marathon-in/delhi)
+- [Half marathons in Bengaluru](https://www.endorfin.run/races/half-marathon-in/bengaluru)
+- [Half marathons in Pune](https://www.endorfin.run/races/half-marathon-in/pune)
+
+## Run Clubs by City
+
+- [Run clubs in Delhi](https://www.endorfin.run/run-clubs/delhi)
+- [Run clubs in Gurgaon](https://www.endorfin.run/run-clubs/gurgaon)
+- [Run clubs in Noida](https://www.endorfin.run/run-clubs/noida)
+- [Run clubs in Mumbai](https://www.endorfin.run/run-clubs/mumbai)
+- [Run clubs in Bengaluru](https://www.endorfin.run/run-clubs/bengaluru)
+- [Run clubs in Pune](https://www.endorfin.run/run-clubs/pune)
+- [Run clubs in Hyderabad](https://www.endorfin.run/run-clubs/hyderabad)
+- [Run clubs in Chennai](https://www.endorfin.run/run-clubs/chennai)
+- [Run clubs in Kolkata](https://www.endorfin.run/run-clubs/kolkata)
+- [Run clubs in Ahmedabad](https://www.endorfin.run/run-clubs/ahmedabad)
 
 ## Key Facts
 
 - 500+ running events listed across India
 - 25+ cities covered (Mumbai, Delhi, Bangalore, Pune, Hyderabad, Chennai, and more)
+- Verified run-club directory: morning crews, marathon training squads, trail collectives
 - 10,000+ runners on the platform
 - Free to use, available on Google Play
-- Features: event discovery, one-tap RSVP, community runs, event discussions, runner profiles
+- Features: event discovery, one-tap RSVP, community runs, club RSVPs, event discussions, runner profiles
 - Contact: hello@endorfin.run

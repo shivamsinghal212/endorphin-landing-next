@@ -1,6 +1,23 @@
 import Link from 'next/link';
+import { Suspense } from 'react';
 import Logo from './Logo';
 import { PLAY_STORE_URL, APP_STORE_URL } from '@/lib/store-links';
+import type { ApiEvent } from '@/app/races/page';
+import {
+  CLUB_CITY_PAGES,
+  MIN_CLUBS_PER_CITY,
+  clubsForCityPage,
+} from '@/lib/club-city-pages';
+import {
+  RACE_CITY_PAGES,
+  RACE_SCOPE_META,
+  filterRacesForCityScope,
+  passesQualityGate,
+  type RaceScope,
+} from '@/lib/race-city-pages';
+
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE || 'https://api.endorfin.run';
+const SITE = 'https://www.endorfin.run';
 
 const PRODUCT = [
   { label: 'Races', href: '/races' },
@@ -21,6 +38,144 @@ const LEGAL = [
 ];
 
 const INSTAGRAM_URL = 'https://www.instagram.com/hacknflex/';
+
+type ListedClub = { slug: string; name: string; city: string };
+
+async function fetchClubs(): Promise<ListedClub[]> {
+  try {
+    const res = await fetch(`${API_BASE}/api/v1/clubs`, {
+      next: { revalidate: 3600 },
+    });
+    if (!res.ok) return [];
+    const data = (await res.json()) as ListedClub[];
+    return Array.isArray(data) ? data : [];
+  } catch {
+    return [];
+  }
+}
+
+async function fetchRaces(): Promise<ApiEvent[]> {
+  const PAGE_SIZE = 50;
+  const MAX_PAGES = 20;
+  const collected: ApiEvent[] = [];
+  try {
+    let page = 1;
+    let totalPages = 1;
+    do {
+      const res = await fetch(
+        `${API_BASE}/api/v1/events?limit=${PAGE_SIZE}&page=${page}`,
+        { next: { revalidate: 3600 } },
+      );
+      if (!res.ok) break;
+      const data = await res.json();
+      const items: ApiEvent[] = data.items || [];
+      collected.push(...items);
+      totalPages = Math.max(1, Number(data.pages) || 1);
+      if (items.length < PAGE_SIZE) break;
+      page += 1;
+    } while (page <= totalPages && page <= MAX_PAGES);
+  } catch {
+    return [];
+  }
+  const cutoff = Date.now() - 86_400_000;
+  return collected.filter(
+    (e) => e.startTime && new Date(e.startTime).getTime() >= cutoff,
+  );
+}
+
+/**
+ * SEO cross-link block — internal links to /run-clubs/[city] and
+ * /races/[scope]/[city] pages that pass quality gates. Streamed in via
+ * Suspense so an API hiccup never blocks the rest of the footer.
+ */
+async function SeoFooterLinks() {
+  const [clubs, races] = await Promise.all([fetchClubs(), fetchRaces()]);
+
+  const clubCities = CLUB_CITY_PAGES
+    .map((p) => ({ page: p, count: clubsForCityPage(clubs, p).length }))
+    .filter((x) => x.count >= MIN_CLUBS_PER_CITY)
+    .sort((a, b) => b.count - a.count);
+
+  function citiesForScope(scope: RaceScope) {
+    return RACE_CITY_PAGES.map((p) => ({
+      page: p,
+      count: filterRacesForCityScope(races, p, scope).length,
+    }))
+      .filter((x) => passesQualityGate(x.count, scope))
+      .sort((a, b) => b.count - a.count);
+  }
+
+  const racesAllCities = citiesForScope('in');
+  const marathonCities = citiesForScope('marathon-in');
+  const halfMarathonCities = citiesForScope('half-marathon-in');
+
+  if (
+    clubCities.length === 0 &&
+    racesAllCities.length === 0 &&
+    marathonCities.length === 0 &&
+    halfMarathonCities.length === 0
+  ) {
+    return null;
+  }
+
+  const columns: { title: string; links: { href: string; label: string }[] }[] = [];
+
+  if (racesAllCities.length > 0) {
+    columns.push({
+      title: 'Races by city',
+      links: racesAllCities.map(({ page }) => ({
+        href: `/races/in/${page.slug}`,
+        label: `Races in ${page.name}`,
+      })),
+    });
+  }
+  if (marathonCities.length > 0) {
+    columns.push({
+      title: 'Marathons by city',
+      links: marathonCities.map(({ page }) => ({
+        href: `/races/marathon-in/${page.slug}`,
+        label: `${RACE_SCOPE_META['marathon-in'].noun} in ${page.name}`,
+      })),
+    });
+  }
+  if (halfMarathonCities.length > 0) {
+    columns.push({
+      title: 'Half marathons by city',
+      links: halfMarathonCities.map(({ page }) => ({
+        href: `/races/half-marathon-in/${page.slug}`,
+        label: `${RACE_SCOPE_META['half-marathon-in'].noun} in ${page.name}`,
+      })),
+    });
+  }
+  if (clubCities.length > 0) {
+    columns.push({
+      title: 'Run clubs by city',
+      links: clubCities.map(({ page }) => ({
+        href: `/run-clubs/${page.slug}`,
+        label: `Run clubs in ${page.name}`,
+      })),
+    });
+  }
+
+  return (
+    <div className="v1-footer-seo">
+      <div className="v1-footer-seo-grid">
+        {columns.map((col) => (
+          <div key={col.title}>
+            <div className="v1-footer-col-title">{col.title}</div>
+            <ul className="v1-footer-links">
+              {col.links.map((l) => (
+                <li key={l.href}>
+                  <Link href={l.href}>{l.label}</Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 const Footer = () => (
   <footer className="v1-footer">
@@ -62,6 +217,11 @@ const Footer = () => (
         </ul>
       </div>
     </div>
+
+    <Suspense fallback={null}>
+      <SeoFooterLinks />
+    </Suspense>
+
     <div className="v1-footer-bottom">
       <span>&copy; {new Date().getFullYear()} Endorfin · Made in India</span>
       <span className="v1-footer-bottom-right">

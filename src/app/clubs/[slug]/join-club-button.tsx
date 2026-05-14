@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
+import posthog from 'posthog-js';
 import LoginModal from '@/components/LoginModal';
 import JoinClubFormModal from './join-club-form-modal';
 import {
@@ -66,8 +67,15 @@ export function JoinClubButton({
     if (!confirm(`Leave ${clubName}?`)) return;
     startTransition(async () => {
       const r = await leaveClubAction(slug);
-      if (r.ok) router.refresh();
-      else alert(r.error);
+      if (r.ok) {
+        posthog.capture('club_left', {
+          club_slug: slug,
+          club_name: clubName,
+        });
+        router.refresh();
+      } else {
+        alert(r.error);
+      }
     });
   }
 
@@ -75,8 +83,15 @@ export function JoinClubButton({
     if (!confirm('Withdraw your join request?')) return;
     startTransition(async () => {
       const r = await cancelJoinRequestAction(slug);
-      if (r.ok) router.refresh();
-      else alert(r.error);
+      if (r.ok) {
+        posthog.capture('club_join_request_cancelled', {
+          club_slug: slug,
+          club_name: clubName,
+        });
+        router.refresh();
+      } else {
+        alert(r.error);
+      }
     });
   }
 

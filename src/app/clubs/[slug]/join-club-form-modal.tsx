@@ -2,6 +2,7 @@
 
 import * as Dialog from '@radix-ui/react-dialog';
 import { useEffect, useMemo, useState, useTransition } from 'react';
+import posthog from 'posthog-js';
 import type { JoinFormField } from '@/lib/admin-api';
 import { joinClubAction } from '@/app/actions/clubs';
 
@@ -96,6 +97,12 @@ export default function JoinClubFormModal({
         safeFields.length === 0 ? null : payload,
       );
       if (r.ok && r.data) {
+        posthog.capture('club_joined', {
+          club_slug: slug,
+          club_name: clubName,
+          status: r.data.status,
+          auto_join: autoJoin,
+        });
         onSuccess?.(r.data.status);
       } else if (!r.ok) {
         setSubmitError(r.error);

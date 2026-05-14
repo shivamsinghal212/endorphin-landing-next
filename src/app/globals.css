@@ -816,7 +816,34 @@ body.nav-open { overflow: hidden; }
 .v1-footer-bottom-right a { display: inline-flex; align-items: center; gap: 6px; color: rgba(245, 240, 235, 0.65); transition: color 160ms ease-out; }
 .v1-footer-bottom-right a:hover { color: var(--bone); }
 .v1-footer-bottom-right svg { display: inline-block; }
-@media (max-width: 860px) { .v1-footer-top { grid-template-columns: 1fr; gap: 32px; } }
+
+/* Race city page — grid layout reusing v1r-race-card design from /races. */
+.v1-races-page .v1r-races-grid {
+  display: grid;
+  gap: 18px;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+}
+.v1-races-page .v1r-races-grid .v1r-race-card {
+  flex: 1 1 auto;
+  min-width: 0;
+  width: 100%;
+}
+/* SEO cross-links on city pages — small label + scroll-wrap chips. */
+.v1-races-page .v1r-seo-links { padding: 28px 0 8px; }
+.v1-races-page .v1r-seo-links + .v1r-seo-links { padding-top: 8px; }
+.v1-races-page .v1r-seo-links .v1r-filter-chips { flex-wrap: wrap; }
+
+.v1-footer-seo { padding: 24px 24px 36px; max-width: 1200px; margin: 0 auto; border-bottom: 0.5px solid rgba(245, 240, 235, 0.12); margin-bottom: 28px; }
+.v1-footer-seo-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 32px; }
+.v1-footer-seo .v1-footer-links a { font-family: inherit; font-weight: 400; font-size: 13px; letter-spacing: normal; text-transform: none; color: rgba(245, 240, 235, 0.7); }
+.v1-footer-seo .v1-footer-links a:hover { color: var(--bone); }
+@media (max-width: 860px) {
+  .v1-footer-top { grid-template-columns: 1fr; gap: 32px; }
+  .v1-footer-seo-grid { grid-template-columns: 1fr 1fr; gap: 24px; }
+}
+@media (max-width: 540px) {
+  .v1-footer-seo-grid { grid-template-columns: 1fr; }
+}
 
 /* Reserve room for fixed nav */
 body { padding-top: var(--nav-h, 68px); }

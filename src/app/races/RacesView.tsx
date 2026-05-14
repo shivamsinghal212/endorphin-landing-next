@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useRef, useState, useTransition } from 'react';
+import posthog from 'posthog-js';
 import { APP_STORE_URL, PLAY_STORE_URL } from '@/lib/store-links';
 import { useStoreLink } from '@/lib/use-store-link';
 import { TOP_CITIES, extractCity } from '@/lib/cities';
@@ -122,11 +123,13 @@ function CtaButton({
   cta,
   isAuthed,
   onLoginNeeded,
+  onRegisterClick,
   shape = 'race-action',
 }: {
   cta: CouponCta;
   isAuthed: boolean;
   onLoginNeeded: (pendingUrl?: string) => void;
+  onRegisterClick?: () => void;
   shape?: 'race-action' | 'btn';
 }) {
   const baseClass = shape === 'race-action' ? 'v1r-race-action' : 'v1r-btn';
@@ -150,6 +153,7 @@ function CtaButton({
         onClick={(e) => {
           e.preventDefault();
           e.stopPropagation();
+          onRegisterClick?.();
           onLoginNeeded(cta.intent === 'register' ? cta.href : undefined);
         }}
       >
@@ -165,7 +169,7 @@ function CtaButton({
     );
   }
   return (
-    <a href={cta.href} target="_blank" rel="noopener noreferrer" className={cls}>
+    <a href={cta.href} target="_blank" rel="noopener noreferrer" className={cls} onClick={onRegisterClick}>
       {cta.label}
     </a>
   );
@@ -265,6 +269,14 @@ function RaceCard({
             cta={cta}
             isAuthed={isAuthed}
             onLoginNeeded={(pendingUrl) => onLoginNeeded(r, pendingUrl)}
+            onRegisterClick={() => posthog.capture('race_register_clicked', {
+              race_id: r.id,
+              race_slug: r.slug,
+              race_title: r.title,
+              race_location: r.locationName,
+              has_coupon: r.hasCoupon,
+              source: 'listing',
+            })}
           />
         </div>
       )}
@@ -350,6 +362,14 @@ function FeaturedCard({
               cta={cta}
               isAuthed={isAuthed}
               onLoginNeeded={(pendingUrl) => onLoginNeeded(r, pendingUrl)}
+              onRegisterClick={() => posthog.capture('race_register_clicked', {
+                race_id: r.id,
+                race_slug: r.slug,
+                race_title: r.title,
+                race_location: r.locationName,
+                has_coupon: r.hasCoupon,
+                source: 'featured',
+              })}
               shape="btn"
             />
             <Link href={detailHref} className="v1r-btn v1r-btn-ghost-light">
@@ -680,7 +700,10 @@ export default function RacesView({
             <div className="v1r-filter-chips">
               <button
                 className={`v1r-chip ${!currentCity ? 'is-active' : ''}`}
-                onClick={() => setCurrentCity('')}
+                onClick={() => {
+                  setCurrentCity('');
+                  posthog.capture('city_filter_selected', { city: 'All India' });
+                }}
                 aria-pressed={!currentCity}
               >
                 All India <span className="v1r-count">{allRaces.length}</span>
@@ -689,7 +712,10 @@ export default function RacesView({
                 <button
                   key={name}
                   className={`v1r-chip ${currentCity === name ? 'is-active' : ''}`}
-                  onClick={() => setCurrentCity(name)}
+                  onClick={() => {
+                    setCurrentCity(name);
+                    posthog.capture('city_filter_selected', { city: name, race_count: count });
+                  }}
                   aria-pressed={currentCity === name}
                 >
                   {name} <span className="v1r-count">{count}</span>

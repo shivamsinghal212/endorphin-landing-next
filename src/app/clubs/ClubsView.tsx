@@ -5,6 +5,11 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { APP_STORE_URL, PLAY_STORE_URL } from '@/lib/store-links';
 import { useStoreLink } from '@/lib/use-store-link';
 import { TOP_CITIES, locationMatchesCity } from '@/lib/cities';
+import {
+  CLUB_CITY_PAGES,
+  MIN_CLUBS_PER_CITY,
+  clubsForCityPage,
+} from '@/lib/club-city-pages';
 import type { ApiClub, ClubEvent } from './page';
 
 const matchesCity = (club: ApiClub, city: string) => locationMatchesCity(club.city, city);
@@ -518,6 +523,17 @@ export default function ClubsView({
     return o;
   }, [allClubs]);
 
+  // SEO city landers: only surface cities with enough clubs so we
+  // don't link to a /run-clubs/[city] page that 404s.
+  const cityPageLinks = useMemo(
+    () =>
+      CLUB_CITY_PAGES
+        .map((p) => ({ page: p, count: clubsForCityPage(allClubs, p).length }))
+        .filter((x) => x.count >= MIN_CLUBS_PER_CITY)
+        .sort((a, b) => b.count - a.count),
+    [allClubs],
+  );
+
   const uniqueCities = useMemo(() => {
     const set = new Set(allClubs.map((c) => (c.city || '').trim()).filter(Boolean));
     return set.size;
@@ -710,6 +726,37 @@ export default function ClubsView({
               ))}
             </div>
           </div>
+          {cityPageLinks.length > 0 && (
+            <div
+              className="v1c-filter-row"
+              style={{ marginTop: 10, alignItems: 'flex-start' }}
+            >
+              <span className="v1c-filter-label">Browse by city</span>
+              <ul
+                style={{
+                  display: 'flex',
+                  flexWrap: 'wrap',
+                  gap: 8,
+                  listStyle: 'none',
+                  padding: 0,
+                  margin: 0,
+                }}
+              >
+                {cityPageLinks.map(({ page, count }) => (
+                  <li key={page.slug}>
+                    <Link
+                      href={`/run-clubs/${page.slug}`}
+                      className="v1c-chip"
+                      style={{ textDecoration: 'none' }}
+                    >
+                      Run clubs in {page.name}{' '}
+                      <span className="v1c-count">{count}</span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
         </div>
       </section>
 

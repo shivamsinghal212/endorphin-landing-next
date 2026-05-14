@@ -2,9 +2,10 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState, useTransition } from 'react';
 import { createPortal } from 'react-dom';
 import ReactMarkdown from 'react-markdown';
+import posthog from 'posthog-js';
 import CouponTopStrip from '@/components/CouponTopStrip';
 import LoginModal from '@/components/LoginModal';
 import RaceCouponContext from '@/components/RaceCouponContext';
@@ -38,11 +39,33 @@ function hasAnyPrice(cats: DistanceCategory[]): boolean {
   return cats.some((d) => (d.discountedPrice ?? d.price) != null);
 }
 
-export default function RaceDetailView({ event }: { event: Event }) {
+export default function RaceDetailView({
+  event,
+  isAuthed,
+}: {
+  event: Event;
+  isAuthed: boolean;
+}) {
   const router = useRouter();
   const [mounted, setMounted] = useState(false);
   const [loginOpen, setLoginOpen] = useState(false);
+  const [isFinalizingLogin, startLoginRefresh] = useTransition();
+  // Pending registrationUrl to open in a new tab once the post-login
+  // refresh commits — same popup-safe pattern as /races listing.
+  const pendingUrlRef = useRef<string | null>(null);
+  const postLoginRef = useRef(false);
   useEffect(() => setMounted(true), []);
+  useEffect(() => {
+    posthog.capture('race_viewed', {
+      race_id: event.id,
+      race_slug: event.slug,
+      race_title: event.title,
+      race_location: event.locationName,
+      has_coupon: event.hasCoupon,
+      is_featured: event.isFeatured,
+    });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [event.id]);
   const showCoupon = event.hasCoupon && event.couponDiscountPercent != null;
   const dateStr = fmtFullDate(event.startTime);
   const timeStr = fmtTime(event.startTime);
@@ -62,21 +85,56 @@ export default function RaceDetailView({ event }: { event: Event }) {
         : 'Register ↗'
     : 'Register ↗';
 
-  const handleHeroCta = useCallback(
+  // Auth-gate Register clicks. Same rule as the /races listing:
+  //   intent === 'login'                              → always modal (anon + coupon)
+  //   intent === 'register' && !isAuthed              → modal, stash URL for post-login open
+  //   anything else                                   → let the <a target="_blank"> run
+  const handleRegisterClick = useCallback(
     (e: React.MouseEvent) => {
-      // Anon + coupon → open login. Otherwise let the underlying anchor handle it.
+      posthog.capture('race_register_clicked', {
+        race_id: event.id,
+        race_slug: event.slug,
+        race_title: event.title,
+        race_location: event.locationName,
+        has_coupon: event.hasCoupon,
+        source: 'detail',
+      });
       if (cta.intent === 'login') {
         e.preventDefault();
+        pendingUrlRef.current = null;
+        setLoginOpen(true);
+        return;
+      }
+      if (cta.intent === 'register' && !isAuthed) {
+        e.preventDefault();
+        pendingUrlRef.current = event.registrationUrl ?? null;
         setLoginOpen(true);
       }
     },
-    [cta.intent],
+    [cta.intent, isAuthed, event.registrationUrl, event.id, event.slug, event.title, event.locationName, event.hasCoupon],
   );
 
   const handleLoginSuccess = useCallback(() => {
-    setLoginOpen(false);
-    router.refresh();
+    postLoginRef.current = true;
+    // Refresh wrapped in startTransition so the modal can show a loader
+    // until the server re-renders with the auth cookie attached.
+    startLoginRefresh(() => {
+      router.refresh();
+    });
   }, [router]);
+
+  // Once the post-login refresh commits, close the modal and pop the
+  // stashed registration URL in a new tab — staying close to the
+  // original click gesture keeps most popup blockers happy.
+  useEffect(() => {
+    if (!isFinalizingLogin && postLoginRef.current) {
+      postLoginRef.current = false;
+      const pending = pendingUrlRef.current;
+      pendingUrlRef.current = null;
+      setLoginOpen(false);
+      if (pending) window.open(pending, '_blank', 'noopener,noreferrer');
+    }
+  }, [isFinalizingLogin]);
 
   return (
     <div className="v1rd-page">
@@ -169,7 +227,7 @@ export default function RaceDetailView({ event }: { event: Event }) {
                 href={event.registrationUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                onClick={handleHeroCta}
+                onClick={handleRegisterClick}
               >
                 {heroCtaLabel}
               </a>
@@ -366,7 +424,7 @@ export default function RaceDetailView({ event }: { event: Event }) {
                 href={event.registrationUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                onClick={handleHeroCta}
+                onClick={handleRegisterClick}
               >
                 {heroCtaLabel}
               </a>
@@ -414,7 +472,7 @@ export default function RaceDetailView({ event }: { event: Event }) {
                   href={event.registrationUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  onClick={handleHeroCta}
+                  onClick={handleRegisterClick}
                 >
                   {heroCtaLabel}
                 </a>
@@ -427,16 +485,27 @@ export default function RaceDetailView({ event }: { event: Event }) {
         )}
 
       <LoginModal
-        open={loginOpen}
+        open={loginOpen || isFinalizingLogin}
         onClose={() => setLoginOpen(false)}
         onSuccess={handleLoginSuccess}
+        finalizing={isFinalizingLogin}
         context={<RaceCouponContext race={event} />}
         title={
-          <>
-            One tap to your <span className="v1lm-red">discount.</span>
-          </>
+          showCoupon ? (
+            <>
+              One tap to your <span className="v1lm-red">discount.</span>
+            </>
+          ) : (
+            <>
+              Sign in to <span className="v1lm-red">register.</span>
+            </>
+          )
         }
-        subtitle="Sign in to unlock your member discount."
+        subtitle={
+          showCoupon
+            ? 'Sign in to unlock your member discount.'
+            : 'Sign in so we can save your registration and remind you on race day.'
+        }
       />
     </div>
   );
