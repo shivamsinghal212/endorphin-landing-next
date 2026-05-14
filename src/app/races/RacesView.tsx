@@ -424,21 +424,41 @@ export default function RacesView({
   // (e.g. transient DNS during build). Authed users get coupon codes from the
   // server render — refetching client-side would lose them since the JWT
   // lives in an HttpOnly cookie and isn't readable here.
+  // API caps limit at 50, so page through (hard cap 20 pages) to grab all.
   useEffect(() => {
     if (initialRaces.length > 0) return;
     let cancelled = false;
-    fetch('https://api.endorfin.run/api/v1/events?limit=1000', { cache: 'no-store' })
-      .then((r) => (r.ok ? r.json() : null))
-      .then((data) => {
-        if (cancelled || !data) return;
-        const items: ApiEvent[] = data.items || [];
-        const cutoff = Date.now() - 86400000;
-        const fresh = items
-          .filter((e) => e.startTime && new Date(e.startTime).getTime() >= cutoff)
-          .sort((a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime());
-        if (fresh.length) setAllRaces(fresh);
-      })
-      .catch(() => {});
+    (async () => {
+      const PAGE_SIZE = 50;
+      const MAX_PAGES = 20;
+      const collected: ApiEvent[] = [];
+      let page = 1;
+      let totalPages = 1;
+      try {
+        do {
+          const r = await fetch(
+            `https://api.endorfin.run/api/v1/events?limit=${PAGE_SIZE}&page=${page}`,
+            { cache: 'no-store' },
+          );
+          if (!r.ok) break;
+          const data = await r.json();
+          if (cancelled || !data) return;
+          const items: ApiEvent[] = data.items || [];
+          collected.push(...items);
+          totalPages = Math.max(1, Number(data.pages) || 1);
+          if (items.length < PAGE_SIZE) break;
+          page += 1;
+        } while (page <= totalPages && page <= MAX_PAGES);
+      } catch {
+        return;
+      }
+      if (cancelled) return;
+      const cutoff = Date.now() - 86400000;
+      const fresh = collected
+        .filter((e) => e.startTime && new Date(e.startTime).getTime() >= cutoff)
+        .sort((a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime());
+      if (fresh.length) setAllRaces(fresh);
+    })();
     return () => {
       cancelled = true;
     };

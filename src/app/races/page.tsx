@@ -46,20 +46,39 @@ export interface ApiEvent {
   hasCoupon?: boolean;
 }
 
+// API caps `limit` at 50 and returns { items, total, page, pages }. Page
+// through the result set so /races can display every upcoming event. Hard
+// cap at 20 pages (1000 events) as a guard against runaway loops.
 async function getRaces(token: string | null): Promise<ApiEvent[]> {
+  const PAGE_SIZE = 50;
+  const MAX_PAGES = 20;
+  // When authed we can't use ISR (response varies by user), so go fresh.
+  // 60s revalidate keeps anon results fresh enough for is_featured / coupon
+  // edits to appear within a minute.
+  const fetchInit: RequestInit = {
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
+    ...(token ? { cache: 'no-store' } : { next: { revalidate: 60 } }),
+  };
   try {
-    // When authed we can't use ISR (response varies by user), so go fresh.
-    const res = await fetch(`${API_BASE}/api/v1/events?limit=1000`, {
-      headers: token ? { Authorization: `Bearer ${token}` } : {},
-      // 60s revalidate so flipping is_featured / coupon fields in the DB
-      // shows up on the public page within a minute (was 1 hour).
-      ...(token ? { cache: 'no-store' } : { next: { revalidate: 60 } }),
-    });
-    if (!res.ok) return [];
-    const data = await res.json();
-    const items: ApiEvent[] = data.items || [];
+    const collected: ApiEvent[] = [];
+    let page = 1;
+    let totalPages = 1;
+    do {
+      const res = await fetch(
+        `${API_BASE}/api/v1/events?limit=${PAGE_SIZE}&page=${page}`,
+        fetchInit,
+      );
+      if (!res.ok) break;
+      const data = await res.json();
+      const items: ApiEvent[] = data.items || [];
+      collected.push(...items);
+      totalPages = Math.max(1, Number(data.pages) || 1);
+      if (items.length < PAGE_SIZE) break;
+      page += 1;
+    } while (page <= totalPages && page <= MAX_PAGES);
+
     const cutoff = Date.now() - 86400000;
-    return items
+    return collected
       .filter((e) => e.startTime && new Date(e.startTime).getTime() >= cutoff)
       .sort((a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime());
   } catch {
