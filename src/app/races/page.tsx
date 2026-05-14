@@ -49,7 +49,7 @@ export interface ApiEvent {
 async function getRaces(token: string | null): Promise<ApiEvent[]> {
   try {
     // When authed we can't use ISR (response varies by user), so go fresh.
-    const res = await fetch(`${API_BASE}/api/v1/events?limit=30`, {
+    const res = await fetch(`${API_BASE}/api/v1/events?limit=1000`, {
       headers: token ? { Authorization: `Bearer ${token}` } : {},
       // 60s revalidate so flipping is_featured / coupon fields in the DB
       // shows up on the public page within a minute (was 1 hour).
@@ -133,7 +133,7 @@ export default async function RacesPage() {
       )}
       <Header />
       <div className="v1-races-page">
-        <RacesView races={races} />
+        <RacesView races={races} isAuthed={!!token} />
       </div>
       <Footer />
     </main>

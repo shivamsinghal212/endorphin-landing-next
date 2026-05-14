@@ -111,14 +111,19 @@ function storySnippet(r: ApiEvent) {
 // ─── Cards ───────────────────────────────────
 
 /** Shared coupon-aware Register button for race + featured cards.
- *  variant: 'race-action' = listing card bottom bar; 'btn' = featured card side panel. */
+ *  variant: 'race-action' = listing card bottom bar; 'btn' = featured card side panel.
+ *  When `isAuthed` is false, plain Register (intent='register') is also routed
+ *  through the login modal — the parent receives the registrationUrl so it can
+ *  reopen it in a new tab once auth finalizes. */
 function CtaButton({
   cta,
+  isAuthed,
   onLoginNeeded,
   shape = 'race-action',
 }: {
   cta: CouponCta;
-  onLoginNeeded: () => void;
+  isAuthed: boolean;
+  onLoginNeeded: (pendingUrl?: string) => void;
   shape?: 'race-action' | 'btn';
 }) {
   const baseClass = shape === 'race-action' ? 'v1r-race-action' : 'v1r-btn';
@@ -133,7 +138,8 @@ function CtaButton({
   if (cta.intent === 'tbd') {
     return <span className={cls}>{cta.label}</span>;
   }
-  if (cta.intent === 'login') {
+  const needsLogin = cta.intent === 'login' || (cta.intent === 'register' && !isAuthed);
+  if (needsLogin) {
     return (
       <button
         type="button"
@@ -141,7 +147,7 @@ function CtaButton({
         onClick={(e) => {
           e.preventDefault();
           e.stopPropagation();
-          onLoginNeeded();
+          onLoginNeeded(cta.intent === 'register' ? cta.href : undefined);
         }}
       >
         {cta.label}
@@ -164,10 +170,12 @@ function CtaButton({
 
 function RaceCard({
   r,
+  isAuthed,
   onLoginNeeded,
 }: {
   r: ApiEvent;
-  onLoginNeeded: (r: ApiEvent) => void;
+  isAuthed: boolean;
+  onLoginNeeded: (r: ApiEvent, pendingUrl?: string) => void;
 }) {
   const title = normalizeTitle(r.title);
   const dist = primaryDistance(r);
@@ -177,6 +185,8 @@ function RaceCard({
   const detailHref = `/races/${r.slug || r.id}`;
   const showCoupon = !!r.hasCoupon && r.couponDiscountPercent != null;
   const cta = couponCta(r);
+  // Auth-gate plain Register too — when anon, even no-coupon registers route
+  // through the login modal before opening the external URL.
   const showActions = cta.intent !== 'tbd' || showCoupon;
 
   return (
@@ -248,7 +258,11 @@ function RaceCard({
           <Link href={detailHref} className="v1r-race-action v1r-race-action-ghost">
             Show details
           </Link>
-          <CtaButton cta={cta} onLoginNeeded={() => onLoginNeeded(r)} />
+          <CtaButton
+            cta={cta}
+            isAuthed={isAuthed}
+            onLoginNeeded={(pendingUrl) => onLoginNeeded(r, pendingUrl)}
+          />
         </div>
       )}
     </div>
@@ -257,10 +271,12 @@ function RaceCard({
 
 function FeaturedCard({
   r,
+  isAuthed,
   onLoginNeeded,
 }: {
   r: ApiEvent;
-  onLoginNeeded: (r: ApiEvent) => void;
+  isAuthed: boolean;
+  onLoginNeeded: (r: ApiEvent, pendingUrl?: string) => void;
 }) {
   const dateStr = new Date(r.startTime).toLocaleString('en-GB', { day: 'numeric', month: 'long' });
   const dist = primaryDistance(r) || 'Run';
@@ -327,7 +343,12 @@ function FeaturedCard({
             <p className="v1r-featured-story">{story}</p>
           </div>
           <div className="v1r-featured-ctas">
-            <CtaButton cta={cta} onLoginNeeded={() => onLoginNeeded(r)} shape="btn" />
+            <CtaButton
+              cta={cta}
+              isAuthed={isAuthed}
+              onLoginNeeded={(pendingUrl) => onLoginNeeded(r, pendingUrl)}
+              shape="btn"
+            />
             <Link href={detailHref} className="v1r-btn v1r-btn-ghost-light">
               Show details →
             </Link>
@@ -340,19 +361,29 @@ function FeaturedCard({
 
 // ─── Main view ─────────────────────────────
 
-export default function RacesView({ races: initialRaces }: { races: ApiEvent[] }) {
+export default function RacesView({
+  races: initialRaces,
+  isAuthed,
+}: {
+  races: ApiEvent[];
+  isAuthed: boolean;
+}) {
   const router = useRouter();
   const [allRaces, setAllRaces] = useState<ApiEvent[]>(initialRaces);
   const [currentCity, setCurrentCity] = useState<string>('');
-  const [couponLoginRace, setCouponLoginRace] = useState<ApiEvent | null>(null);
+  const [loginRace, setLoginRace] = useState<ApiEvent | null>(null);
+  // When a plain (non-coupon) Register click triggers login, stash the URL so
+  // we can pop it open in a new tab once the post-login refresh commits.
+  const pendingRegistrationUrlRef = useRef<string | null>(null);
   const [isFinalizingLogin, startLoginRefresh] = useTransition();
   const postLoginRef = useRef(false);
   // Mobile: send "Get the app" CTAs straight to the right store.
   // Desktop / unknown UA: keep #download anchor → both store buttons inline.
   const downloadHref = useStoreLink('#download');
 
-  const handleLoginNeeded = useCallback((r: ApiEvent) => {
-    setCouponLoginRace(r);
+  const handleLoginNeeded = useCallback((r: ApiEvent, pendingUrl?: string) => {
+    pendingRegistrationUrlRef.current = pendingUrl ?? null;
+    setLoginRace(r);
   }, []);
 
   const handleLoginSuccess = useCallback(() => {
@@ -366,11 +397,17 @@ export default function RacesView({ races: initialRaces }: { races: ApiEvent[] }
     });
   }, [router]);
 
-  // Close the login modal once the post-login refresh commits.
+  // Close the login modal once the post-login refresh commits. If the click
+  // that opened the modal was a plain Register (we stashed the URL), pop it in
+  // a new tab now — this stays close enough to the original user gesture that
+  // most browsers allow window.open.
   useEffect(() => {
     if (!isFinalizingLogin && postLoginRef.current) {
       postLoginRef.current = false;
-      setCouponLoginRace(null);
+      const pending = pendingRegistrationUrlRef.current;
+      pendingRegistrationUrlRef.current = null;
+      setLoginRace(null);
+      if (pending) window.open(pending, '_blank', 'noopener,noreferrer');
     }
   }, [isFinalizingLogin]);
 
@@ -390,7 +427,7 @@ export default function RacesView({ races: initialRaces }: { races: ApiEvent[] }
   useEffect(() => {
     if (initialRaces.length > 0) return;
     let cancelled = false;
-    fetch('https://api.endorfin.run/api/v1/events?limit=30', { cache: 'no-store' })
+    fetch('https://api.endorfin.run/api/v1/events?limit=1000', { cache: 'no-store' })
       .then((r) => (r.ok ? r.json() : null))
       .then((data) => {
         if (cancelled || !data) return;
@@ -415,14 +452,31 @@ export default function RacesView({ races: initialRaces }: { races: ApiEvent[] }
     () => pickFeatured(allRaces, currentCity),
     [allRaces, currentCity]
   );
-  const grid = useMemo(() => filtered.slice(0, 12), [filtered]);
+  const grid = filtered;
 
-  const cityCounts = useMemo(() => {
-    const o: Record<string, number> = {};
-    TOP_CITIES.forEach((c) => {
-      o[c] = allRaces.filter((r) => matchesCity(r, c)).length;
-    });
-    return o;
+  // City chips: top-cities first (only those present), then any other distinct
+  // locationName found in the data, sorted by race count desc. Virtual races
+  // are excluded so "Anywhere" doesn't show up as a city.
+  const cityChips = useMemo(() => {
+    const topCounts = TOP_CITIES.map((c) => ({
+      name: c,
+      count: allRaces.filter((r) => matchesCity(r, c)).length,
+    })).filter((x) => x.count > 0);
+
+    const claimedTopCities = topCounts.map((x) => x.name);
+    const extraCounts = new Map<string, number>();
+    for (const r of allRaces) {
+      if (isVirtual(r)) continue;
+      const loc = (r.locationName || '').trim();
+      if (!loc) continue;
+      if (claimedTopCities.some((c) => matchesCity(r, c))) continue;
+      extraCounts.set(loc, (extraCounts.get(loc) || 0) + 1);
+    }
+    const extras = Array.from(extraCounts.entries())
+      .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
+      .map(([name, count]) => ({ name, count }));
+
+    return [...topCounts, ...extras];
   }, [allRaces]);
 
   const uniqueCities = useMemo(() => {
@@ -607,14 +661,14 @@ export default function RacesView({ races: initialRaces }: { races: ApiEvent[] }
               >
                 All India <span className="v1r-count">{allRaces.length}</span>
               </button>
-              {TOP_CITIES.map((c) => (
+              {cityChips.map(({ name, count }) => (
                 <button
-                  key={c}
-                  className={`v1r-chip ${currentCity === c ? 'is-active' : ''}`}
-                  onClick={() => setCurrentCity(c)}
-                  aria-pressed={currentCity === c}
+                  key={name}
+                  className={`v1r-chip ${currentCity === name ? 'is-active' : ''}`}
+                  onClick={() => setCurrentCity(name)}
+                  aria-pressed={currentCity === name}
                 >
-                  {c} <span className="v1r-count">{cityCounts[c]}</span>
+                  {name} <span className="v1r-count">{count}</span>
                 </button>
               ))}
             </div>
@@ -670,7 +724,12 @@ export default function RacesView({ races: initialRaces }: { races: ApiEvent[] }
                 aria-label="Featured races"
               >
                 {featured.map((r) => (
-                  <FeaturedCard key={r.id} r={r} onLoginNeeded={handleLoginNeeded} />
+                  <FeaturedCard
+                    key={r.id}
+                    r={r}
+                    isAuthed={isAuthed}
+                    onLoginNeeded={handleLoginNeeded}
+                  />
                 ))}
               </div>
             </div>
@@ -702,7 +761,7 @@ export default function RacesView({ races: initialRaces }: { races: ApiEvent[] }
             </h2>
             <div className="v1r-races-header-right">
               <span className="v1r-section-count">
-                {grid.length === 0 ? '0 races' : `Showing ${grid.length} of ${filtered.length}`}
+                {grid.length === 0 ? '0 races' : `${grid.length} ${grid.length === 1 ? 'race' : 'races'}`}
               </span>
               <div className="v1r-carousel-controls" hidden={!upCanScroll} role="group">
                 <button
@@ -744,7 +803,14 @@ export default function RacesView({ races: initialRaces }: { races: ApiEvent[] }
                   No upcoming races{currentCity ? ` in ${currentCity}` : ''}. Try another city.
                 </div>
               ) : (
-                grid.map((r) => <RaceCard key={r.id} r={r} onLoginNeeded={handleLoginNeeded} />)
+                grid.map((r) => (
+                  <RaceCard
+                    key={r.id}
+                    r={r}
+                    isAuthed={isAuthed}
+                    onLoginNeeded={handleLoginNeeded}
+                  />
+                ))
               )}
             </div>
           </div>
@@ -756,13 +822,11 @@ export default function RacesView({ races: initialRaces }: { races: ApiEvent[] }
                 style={{ left: `${progressLeft}%`, width: `${progressWidth}%` }}
               />
             </div>
-            {filtered.length > 12 && (
-              <div className="v1r-races-more">
-                <a href={downloadHref} className="v1r-btn v1r-btn-ghost">
-                  Get the app for all races →
-                </a>
-              </div>
-            )}
+            <div className="v1r-races-more">
+              <a href={downloadHref} className="v1r-btn v1r-btn-ghost">
+                Get the app →
+              </a>
+            </div>
           </div>
         </div>
       </section>
@@ -812,21 +876,38 @@ export default function RacesView({ races: initialRaces }: { races: ApiEvent[] }
         </div>
       </section>
 
-      {/* Contextual login modal — opened by anon "Register at X% off" CTAs.
-          On success we router.refresh() so the cookie-based fetch returns
-          coupon codes and CTAs flip to the green "Coupon unlocked" variant. */}
+      {/* Contextual login modal — opened by anon Register CTAs (both coupon
+          "Register at X% off" and plain "Register"). On success we
+          router.refresh() so the cookie-based fetch returns coupon codes and
+          CTAs flip to the unlocked variant; for plain registers we also
+          window.open the registrationUrl in a new tab once refresh commits. */}
       <LoginModal
-        open={!!couponLoginRace || isFinalizingLogin}
-        onClose={() => setCouponLoginRace(null)}
+        open={!!loginRace || isFinalizingLogin}
+        onClose={() => {
+          pendingRegistrationUrlRef.current = null;
+          setLoginRace(null);
+        }}
         onSuccess={handleLoginSuccess}
         finalizing={isFinalizingLogin}
-        context={couponLoginRace ? <RaceCouponContext race={couponLoginRace} /> : undefined}
-        title={
-          <>
-            One tap to your <span className="v1lm-red">discount.</span>
-          </>
+        context={
+          loginRace && loginRace.hasCoupon ? <RaceCouponContext race={loginRace} /> : undefined
         }
-        subtitle="Sign in to unlock the member discount and save races."
+        title={
+          loginRace?.hasCoupon ? (
+            <>
+              One tap to your <span className="v1lm-red">discount.</span>
+            </>
+          ) : (
+            <>
+              Sign in to <span className="v1lm-red">register.</span>
+            </>
+          )
+        }
+        subtitle={
+          loginRace?.hasCoupon
+            ? 'Sign in to unlock the member discount and save races.'
+            : 'Quick sign-in, then we’ll send you straight to registration.'
+        }
       />
     </>
   );
