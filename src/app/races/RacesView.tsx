@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useRef, useState, useTransition } from 'react';
 import { APP_STORE_URL, PLAY_STORE_URL } from '@/lib/store-links';
 import { useStoreLink } from '@/lib/use-store-link';
-import { TOP_CITIES, locationMatchesCity } from '@/lib/cities';
+import { TOP_CITIES, extractCity } from '@/lib/cities';
 import { couponCta, type CouponCta } from '@/lib/coupon-cta';
 import CouponTopStrip from '@/components/CouponTopStrip';
 import LoginModal from '@/components/LoginModal';
@@ -73,7 +73,10 @@ function popularitySignal(r: ApiEvent): Signal | null {
 }
 const isVirtual = (r: ApiEvent) => r.eventType === 'virtual' || (r.locationName || '').toLowerCase() === 'anywhere';
 const displayLocation = (r: ApiEvent) => (isVirtual(r) ? 'Virtual · India' : r.locationName || '—');
-const matchesCity = (r: ApiEvent, city: string) => locationMatchesCity(r.locationName, city);
+// City filtering uses the same canonical extractor as chip generation so a
+// race shows up under the same chip the user clicked.
+const matchesCity = (r: ApiEvent, city: string) =>
+  !city || (!isVirtual(r) && extractCity(r.locationName) === city);
 
 const fmtDay = (iso: string) => String(new Date(iso).getDate()).padStart(2, '0');
 const fmtMonth = (iso: string) => new Date(iso).toLocaleString('en-GB', { month: 'short' }).toUpperCase();
@@ -474,37 +477,38 @@ export default function RacesView({
   );
   const grid = filtered;
 
-  // City chips: top-cities first (only those present), then any other distinct
-  // locationName found in the data, sorted by race count desc. Virtual races
-  // are excluded so "Anywhere" doesn't show up as a city.
+  // City chips: derive a canonical city for each race via extractCity, then
+  // bucket counts. TOP_CITIES present in scope appear first (in their canonical
+  // order), the remainder are sorted by race count desc. Races whose
+  // locationName resolves to null (long venue addresses we can't safely
+  // shorten) are dropped from the chip strip — they remain in the listing.
   const cityChips = useMemo(() => {
-    const topCounts = TOP_CITIES.map((c) => ({
-      name: c,
-      count: allRaces.filter((r) => matchesCity(r, c)).length,
-    })).filter((x) => x.count > 0);
-
-    const claimedTopCities = topCounts.map((x) => x.name);
-    const extraCounts = new Map<string, number>();
+    const counts = new Map<string, number>();
     for (const r of allRaces) {
       if (isVirtual(r)) continue;
-      const loc = (r.locationName || '').trim();
-      if (!loc) continue;
-      if (claimedTopCities.some((c) => matchesCity(r, c))) continue;
-      extraCounts.set(loc, (extraCounts.get(loc) || 0) + 1);
+      const city = extractCity(r.locationName);
+      if (!city) continue;
+      counts.set(city, (counts.get(city) || 0) + 1);
     }
-    const extras = Array.from(extraCounts.entries())
+    const top = TOP_CITIES.filter((c) => (counts.get(c) || 0) > 0).map((c) => ({
+      name: c as string,
+      count: counts.get(c)!,
+    }));
+    const topSet = new Set(top.map((x) => x.name));
+    const extras = Array.from(counts.entries())
+      .filter(([name]) => !topSet.has(name))
       .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
       .map(([name, count]) => ({ name, count }));
-
-    return [...topCounts, ...extras];
+    return [...top, ...extras];
   }, [allRaces]);
 
   const uniqueCities = useMemo(() => {
-    const set = new Set(
-      allRaces
-        .map((r) => r.locationName)
-        .filter((l): l is string => !!l && l.toLowerCase() !== 'anywhere')
-    );
+    const set = new Set<string>();
+    for (const r of allRaces) {
+      if (isVirtual(r)) continue;
+      const c = extractCity(r.locationName);
+      if (c) set.add(c);
+    }
     return set.size;
   }, [allRaces]);
 
@@ -641,11 +645,11 @@ export default function RacesView({
             </p>
             <div className="v1r-hero-stats">
               <div>
-                <div className="v1r-hero-stat-n">{allRaces.length}+</div>
+                <div className="v1r-hero-stat-n">{allRaces.length}</div>
                 <div className="v1r-hero-stat-l">Races</div>
               </div>
               <div>
-                <div className="v1r-hero-stat-n">{uniqueCities}+</div>
+                <div className="v1r-hero-stat-n">{uniqueCities}</div>
                 <div className="v1r-hero-stat-l">Indian cities</div>
               </div>
             </div>
