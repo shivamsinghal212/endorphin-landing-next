@@ -9,6 +9,8 @@ interface ApiEvent {
   id: string;
   title: string;
   startTime: string;
+  endTime?: string | null;
+  registrationEndDate?: string | null;
   locationName?: string;
   locationAddress?: string;
   priceMin?: number;
@@ -37,37 +39,50 @@ function buildEventsJsonLd(events: ApiEvent[]) {
     description: 'Marathons, half marathons, 10K and 5K races across India',
     url: 'https://www.endorfin.run',
     numberOfItems: events.length,
-    itemListElement: events.map((event, i) => ({
-      '@type': 'ListItem',
-      position: i + 1,
-      item: {
-        '@type': 'Event',
-        name: event.title,
-        startDate: event.startTime,
-        eventStatus: 'https://schema.org/EventScheduled',
-        eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
-        location: {
-          '@type': 'Place',
-          name: event.locationName || event.locationAddress || 'India',
-          address: {
-            '@type': 'PostalAddress',
-            addressLocality: event.locationName || undefined,
-            addressCountry: 'IN',
+    itemListElement: events.map((event, i) => {
+      const locationLabel = event.locationName || event.locationAddress || 'India';
+      const validFromAnchor = event.registrationEndDate || event.startTime;
+      const validFrom = new Date(
+        new Date(validFromAnchor).getTime() - 90 * 24 * 60 * 60 * 1000,
+      ).toISOString();
+      return {
+        '@type': 'ListItem',
+        position: i + 1,
+        item: {
+          '@type': 'Event',
+          name: event.title,
+          startDate: event.startTime,
+          endDate: event.endTime || event.startTime,
+          eventStatus: 'https://schema.org/EventScheduled',
+          eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
+          location: {
+            '@type': 'Place',
+            name: event.locationName || event.locationAddress || 'India',
+            address: {
+              '@type': 'PostalAddress',
+              addressLocality: event.locationName || undefined,
+              addressCountry: 'IN',
+            },
           },
+          description: `${event.title} — a running event in ${locationLabel}. Register on Endorfin.`,
+          organizer: { '@type': 'Organization', name: 'Endorfin' },
+          performer: { '@type': 'PerformingGroup', name: 'Race participants' },
+          ...(event.priceMin != null && {
+            offers: {
+              '@type': 'Offer',
+              price: String(event.priceMin),
+              priceCurrency: 'INR',
+              availability: 'https://schema.org/InStock',
+              url: `https://api.endorfin.run/e/${event.id}`,
+              validFrom,
+              ...(event.registrationEndDate && { validThrough: event.registrationEndDate }),
+            },
+          }),
+          ...(event.imageUrl && { image: event.imageUrl }),
+          url: `https://api.endorfin.run/e/${event.id}`,
         },
-        ...(event.priceMin != null && {
-          offers: {
-            '@type': 'Offer',
-            price: String(event.priceMin),
-            priceCurrency: 'INR',
-            availability: 'https://schema.org/InStock',
-            url: `https://api.endorfin.run/e/${event.id}`,
-          },
-        }),
-        ...(event.imageUrl && { image: event.imageUrl }),
-        url: `https://api.endorfin.run/e/${event.id}`,
-      },
-    })),
+      };
+    }),
   };
 }
 

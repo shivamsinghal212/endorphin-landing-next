@@ -93,12 +93,26 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 function buildJsonLd(event: Event) {
+  const organizerName = event.organizerName || 'Endorfin';
+  const locationLabel = event.locationName || 'India';
+  const description =
+    event.description ||
+    event.fullDescription ||
+    `Register for ${event.title} on Endorfin — a ${event.category || 'running'} event in ${locationLabel}.`;
+  // No reliable backend signal for when registration opens — anchor 90 days
+  // before the deadline (or before start, if no deadline). validThrough below
+  // is the real, sourced value.
+  const validFromAnchor = event.registrationEndDate || event.startTime;
+  const offerValidFrom = new Date(
+    new Date(validFromAnchor).getTime() - 90 * 24 * 60 * 60 * 1000,
+  ).toISOString();
+
   return {
     '@context': 'https://schema.org',
     '@type': 'Event',
     name: event.title,
     startDate: event.startTime,
-    endDate: event.endTime || undefined,
+    endDate: event.endTime || event.startTime,
     eventStatus: 'https://schema.org/EventScheduled',
     eventAttendanceMode:
       event.eventType === 'virtual'
@@ -112,10 +126,9 @@ function buildJsonLd(event: Event) {
         : { '@type': 'PostalAddress', addressLocality: event.locationName || undefined, addressCountry: 'IN' },
     },
     image: event.imageUrl || undefined,
-    description: event.description || undefined,
-    organizer: event.organizerName
-      ? { '@type': 'Organization', name: event.organizerName }
-      : undefined,
+    description,
+    organizer: { '@type': 'Organization', name: organizerName },
+    performer: { '@type': 'PerformingGroup', name: 'Race participants' },
     offers:
       event.priceMin != null
         ? {
@@ -126,6 +139,8 @@ function buildJsonLd(event: Event) {
               ? 'https://schema.org/SoldOut'
               : 'https://schema.org/InStock',
             url: event.registrationUrl || `https://www.endorfin.run/races/${event.slug || event.id}`,
+            validFrom: offerValidFrom,
+            ...(event.registrationEndDate && { validThrough: event.registrationEndDate }),
           }
         : undefined,
     url: `https://www.endorfin.run/races/${event.slug || event.id}`,

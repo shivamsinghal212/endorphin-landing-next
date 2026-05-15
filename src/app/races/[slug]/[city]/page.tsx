@@ -131,40 +131,54 @@ function buildJsonLd(
     description: buildDescription(scope, cityPage.name),
     url,
     numberOfItems: races.length,
-    itemListElement: races.slice(0, 30).map((r, i) => ({
-      '@type': 'ListItem',
-      position: i + 1,
-      item: {
-        '@type': 'Event',
-        name: r.title,
-        startDate: r.startTime,
-        eventStatus: 'https://schema.org/EventScheduled',
-        eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
-        location: {
-          '@type': 'Place',
-          name: r.locationName || cityPage.name,
-          address: {
-            '@type': 'PostalAddress',
-            addressLocality: cityPage.name,
-            addressRegion: cityPage.region,
-            addressCountry: 'IN',
+    itemListElement: races.slice(0, 30).map((r, i) => {
+      const validFromAnchor = r.registrationEndDate || r.startTime;
+      const validFrom = new Date(
+        new Date(validFromAnchor).getTime() - 90 * 24 * 60 * 60 * 1000,
+      ).toISOString();
+      return {
+        '@type': 'ListItem',
+        position: i + 1,
+        item: {
+          '@type': 'Event',
+          name: r.title,
+          startDate: r.startTime,
+          endDate: r.endTime || r.startTime,
+          eventStatus: 'https://schema.org/EventScheduled',
+          eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
+          location: {
+            '@type': 'Place',
+            name: r.locationName || cityPage.name,
+            address: {
+              '@type': 'PostalAddress',
+              addressLocality: cityPage.name,
+              addressRegion: cityPage.region,
+              addressCountry: 'IN',
+            },
           },
+          description:
+            r.description ||
+            `${r.title} — a running event in ${cityPage.name}. Register on Endorfin.`,
+          organizer: { '@type': 'Organization', name: r.organizerName || 'Endorfin' },
+          performer: { '@type': 'PerformingGroup', name: 'Race participants' },
+          ...(r.priceMin != null && {
+            offers: {
+              '@type': 'Offer',
+              price: String(r.priceMin),
+              priceCurrency: r.currency || 'INR',
+              availability: r.soldOut
+                ? 'https://schema.org/SoldOut'
+                : 'https://schema.org/InStock',
+              url: `${SITE}/races/${r.slug || r.id}`,
+              validFrom,
+              ...(r.registrationEndDate && { validThrough: r.registrationEndDate }),
+            },
+          }),
+          ...(r.imageUrl && { image: r.imageUrl }),
+          url: `${SITE}/races/${r.slug || r.id}`,
         },
-        ...(r.priceMin != null && {
-          offers: {
-            '@type': 'Offer',
-            price: String(r.priceMin),
-            priceCurrency: r.currency || 'INR',
-            availability: r.soldOut
-              ? 'https://schema.org/SoldOut'
-              : 'https://schema.org/InStock',
-            url: `${SITE}/races/${r.slug || r.id}`,
-          },
-        }),
-        ...(r.imageUrl && { image: r.imageUrl }),
-        url: `${SITE}/races/${r.slug || r.id}`,
-      },
-    })),
+      };
+    }),
   };
 
   const breadcrumb = {

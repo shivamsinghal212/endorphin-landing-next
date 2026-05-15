@@ -30,6 +30,8 @@ export interface ApiEvent {
   locationName?: string;
   locationAddress?: string;
   startTime: string;
+  endTime?: string | null;
+  registrationEndDate?: string | null;
   organizerName?: string;
   priceMin?: number;
   currency?: string;
@@ -96,42 +98,57 @@ function buildJsonLd(races: ApiEvent[]) {
       'Every running race in India — marathons, half marathons, 10K and 5K races across 25+ cities',
     url: 'https://www.endorfin.run/races',
     numberOfItems: races.length,
-    itemListElement: races.slice(0, 30).map((r, i) => ({
-      '@type': 'ListItem',
-      position: i + 1,
-      item: {
-        '@type': 'Event',
-        name: r.title,
-        startDate: r.startTime,
-        eventStatus: 'https://schema.org/EventScheduled',
-        eventAttendanceMode:
-          r.eventType === 'virtual'
-            ? 'https://schema.org/OnlineEventAttendanceMode'
-            : 'https://schema.org/OfflineEventAttendanceMode',
-        location: {
-          '@type': 'Place',
-          name: r.locationName || 'India',
-          address: {
-            '@type': 'PostalAddress',
-            addressLocality: r.locationName || undefined,
-            addressCountry: 'IN',
+    itemListElement: races.slice(0, 30).map((r, i) => {
+      const locationLabel = r.locationName || 'India';
+      const validFromAnchor = r.registrationEndDate || r.startTime;
+      const validFrom = new Date(
+        new Date(validFromAnchor).getTime() - 90 * 24 * 60 * 60 * 1000,
+      ).toISOString();
+      return {
+        '@type': 'ListItem',
+        position: i + 1,
+        item: {
+          '@type': 'Event',
+          name: r.title,
+          startDate: r.startTime,
+          endDate: r.endTime || r.startTime,
+          eventStatus: 'https://schema.org/EventScheduled',
+          eventAttendanceMode:
+            r.eventType === 'virtual'
+              ? 'https://schema.org/OnlineEventAttendanceMode'
+              : 'https://schema.org/OfflineEventAttendanceMode',
+          location: {
+            '@type': 'Place',
+            name: r.locationName || 'India',
+            address: {
+              '@type': 'PostalAddress',
+              addressLocality: r.locationName || undefined,
+              addressCountry: 'IN',
+            },
           },
+          description:
+            r.description ||
+            `${r.title} — a running event in ${locationLabel}. Register on Endorfin.`,
+          organizer: { '@type': 'Organization', name: r.organizerName || 'Endorfin' },
+          performer: { '@type': 'PerformingGroup', name: 'Race participants' },
+          ...(r.priceMin != null && {
+            offers: {
+              '@type': 'Offer',
+              price: String(r.priceMin),
+              priceCurrency: r.currency || 'INR',
+              availability: r.soldOut
+                ? 'https://schema.org/SoldOut'
+                : 'https://schema.org/InStock',
+              url: `https://endorfin.run/e/${r.slug || r.id}`,
+              validFrom,
+              ...(r.registrationEndDate && { validThrough: r.registrationEndDate }),
+            },
+          }),
+          ...(r.imageUrl && { image: r.imageUrl }),
+          url: `https://endorfin.run/e/${r.slug || r.id}`,
         },
-        ...(r.priceMin != null && {
-          offers: {
-            '@type': 'Offer',
-            price: String(r.priceMin),
-            priceCurrency: r.currency || 'INR',
-            availability: r.soldOut
-              ? 'https://schema.org/SoldOut'
-              : 'https://schema.org/InStock',
-            url: `https://endorfin.run/e/${r.slug || r.id}`,
-          },
-        }),
-        ...(r.imageUrl && { image: r.imageUrl }),
-        url: `https://endorfin.run/e/${r.slug || r.id}`,
-      },
-    })),
+      };
+    }),
   };
 }
 
