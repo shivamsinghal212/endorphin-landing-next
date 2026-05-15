@@ -74,11 +74,11 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const { slug } = await params;
   // Metadata can fail soft — we don't want bad SEO copy to crash render.
   const event = await loadEvent(slug, null).catch(() => null);
-  if (!event) return { title: 'Race not found — Endorfin' };
+  if (!event) return { title: 'Race not found' };
 
   const url = `https://www.endorfin.run/races/${event.slug || event.id}`;
   return {
-    title: `${event.title} — Endorfin`,
+    title: event.title,
     description: event.description?.slice(0, 200) || `Register for ${event.title} on Endorfin.`,
     alternates: { canonical: url },
     openGraph: {
@@ -154,6 +154,20 @@ export default async function RaceDetailPage({ params }: PageProps) {
   if (!event) notFound();
 
   const jsonLd = buildJsonLd(event);
+  const breadcrumbJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://www.endorfin.run/' },
+      { '@type': 'ListItem', position: 2, name: 'Races', item: 'https://www.endorfin.run/races' },
+      {
+        '@type': 'ListItem',
+        position: 3,
+        name: event.title,
+        item: `https://www.endorfin.run/races/${event.slug || event.id}`,
+      },
+    ],
+  };
 
   return (
     <main id="main-content" className="overflow-x-hidden">
@@ -161,6 +175,12 @@ export default async function RaceDetailPage({ params }: PageProps) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{
           __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c'),
+        }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(breadcrumbJsonLd).replace(/</g, '\\u003c'),
         }}
       />
       <Header />

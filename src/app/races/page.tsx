@@ -54,30 +54,36 @@ export interface ApiEvent {
 async function getRaces(token: string | null): Promise<ApiEvent[]> {
   const PAGE_SIZE = 50;
   const MAX_PAGES = 20;
-  // When authed we can't use ISR (response varies by user), so go fresh.
-  // 60s revalidate keeps anon results fresh enough for is_featured / coupon
-  // edits to appear within a minute.
+  // When authed we can't use the Next data cache (response varies by user),
+  // so go fresh. For anon traffic — the vast majority — cache for 10 minutes
+  // so TTFB doesn't spike when the cache expires.
   const fetchInit: RequestInit = {
     headers: token ? { Authorization: `Bearer ${token}` } : {},
-    ...(token ? { cache: 'no-store' } : { next: { revalidate: 60 } }),
+    ...(token ? { cache: 'no-store' } : { next: { revalidate: 600 } }),
   };
   try {
-    const collected: ApiEvent[] = [];
-    let page = 1;
-    let totalPages = 1;
-    do {
+    const fetchPage = async (page: number) => {
       const res = await fetch(
         `${API_BASE}/api/v1/events?limit=${PAGE_SIZE}&page=${page}`,
         fetchInit,
       );
-      if (!res.ok) break;
+      if (!res.ok) return { items: [] as ApiEvent[], pages: 0 };
       const data = await res.json();
-      const items: ApiEvent[] = data.items || [];
-      collected.push(...items);
-      totalPages = Math.max(1, Number(data.pages) || 1);
-      if (items.length < PAGE_SIZE) break;
-      page += 1;
-    } while (page <= totalPages && page <= MAX_PAGES);
+      return { items: (data.items || []) as ApiEvent[], pages: Math.max(1, Number(data.pages) || 1) };
+    };
+
+    // Fetch page 1 to learn how many pages exist, then fan-out the rest in
+    // parallel. Sequential pagination was costing 4–5s TTFB; parallel cuts it
+    // to ~max(single page latency).
+    const first = await fetchPage(1);
+    const collected: ApiEvent[] = [...first.items];
+    const totalPages = Math.min(first.pages, MAX_PAGES);
+    if (totalPages > 1) {
+      const rest = await Promise.all(
+        Array.from({ length: totalPages - 1 }, (_, i) => fetchPage(i + 2)),
+      );
+      for (const r of rest) collected.push(...r.items);
+    }
 
     const cutoff = Date.now() - 86400000;
     return collected
@@ -139,7 +145,7 @@ function buildJsonLd(races: ApiEvent[]) {
               availability: r.soldOut
                 ? 'https://schema.org/SoldOut'
                 : 'https://schema.org/InStock',
-              url: `https://endorfin.run/e/${r.slug || r.id}`,
+              url: `https://www.endorfin.run/races/${r.slug || r.id}`,
               validFrom,
               ...(r.registrationEndDate && { validThrough: r.registrationEndDate }),
             },
@@ -151,6 +157,15 @@ function buildJsonLd(races: ApiEvent[]) {
     }),
   };
 }
+
+const breadcrumbJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://www.endorfin.run/' },
+    { '@type': 'ListItem', position: 2, name: 'Races', item: 'https://www.endorfin.run/races' },
+  ],
+};
 
 export default async function RacesPage() {
   const token = await getSessionToken();
@@ -167,6 +182,12 @@ export default async function RacesPage() {
           }}
         />
       )}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(breadcrumbJsonLd).replace(/</g, '\\u003c'),
+        }}
+      />
       <Header />
       <div className="v1-races-page">
         <RacesView races={races} isAuthed={!!token} />

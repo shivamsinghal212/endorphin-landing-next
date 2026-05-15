@@ -7,6 +7,7 @@ import Footer from '@/components/Footer';
 
 interface ApiEvent {
   id: string;
+  slug?: string | null;
   title: string;
   startTime: string;
   endTime?: string | null;
@@ -73,7 +74,7 @@ function buildEventsJsonLd(events: ApiEvent[]) {
               price: String(event.priceMin),
               priceCurrency: 'INR',
               availability: 'https://schema.org/InStock',
-              url: `https://api.endorfin.run/e/${event.id}`,
+              url: `https://www.endorfin.run/races/${event.slug || event.id}`,
               validFrom,
               ...(event.registrationEndDate && { validThrough: event.registrationEndDate }),
             },

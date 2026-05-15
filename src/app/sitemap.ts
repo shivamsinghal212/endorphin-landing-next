@@ -15,7 +15,13 @@ import {
 const SITE = 'https://www.endorfin.run';
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE || 'https://api.endorfin.run';
 
-type ListedClub = { slug: string; name: string; city: string; updatedAt: string | null };
+type ListedClub = {
+  slug: string;
+  name: string;
+  city: string;
+  updatedAt: string | null;
+  publishedAt?: string | null;
+};
 
 async function fetchAllRaces(): Promise<ApiEvent[]> {
   const PAGE_SIZE = 50;
@@ -66,7 +72,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   try {
     const res = await fetch(`${API_BASE}/api/v1/clubs`, { next: { revalidate: 3600 } });
     if (res.ok) {
-      const clubs = (await res.json()) as ListedClub[];
+      const allClubs = (await res.json()) as ListedClub[];
+      // Drop unpublished clubs: /clubs/[slug] sets robots:noindex for them,
+      // so emitting them in the sitemap wastes Googlebot's crawl budget on
+      // pages it isn't allowed to index.
+      const clubs = allClubs.filter((c) => c.publishedAt);
       for (const c of clubs) {
         staticRoutes.push({
           url: `${SITE}/clubs/${c.slug}`,
@@ -109,6 +119,20 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
           priority: scope === 'in' ? 0.85 : 0.8,
         });
       }
+    }
+
+    // Race detail pages: each upcoming race gets its own sitemap entry so
+    // Google indexes them directly rather than waiting to discover via
+    // internal links.
+    for (const race of races) {
+      const slug = race.slug || race.id;
+      if (!slug) continue;
+      staticRoutes.push({
+        url: `${SITE}/races/${slug}`,
+        lastModified: new Date(race.startTime),
+        changeFrequency: 'weekly',
+        priority: 0.7,
+      });
     }
   }
 

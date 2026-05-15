@@ -104,6 +104,14 @@ const websiteJsonLd = {
   url: 'https://www.endorfin.run',
   description: 'Discover 500+ running events across India. Find marathons, half marathons, 10K and 5K races near you.',
   inLanguage: 'en-IN',
+  potentialAction: {
+    '@type': 'SearchAction',
+    target: {
+      '@type': 'EntryPoint',
+      urlTemplate: 'https://www.endorfin.run/races?q={search_term_string}',
+    },
+    'query-input': 'required name=search_term_string',
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

@@ -76,7 +76,8 @@ export async function generateMetadata(
   const page = getClubCityPage(city);
   if (!page) return { title: 'Not found' };
 
-  const title = `Run clubs in ${page.name} — every crew, listed | Endorfin`;
+  const title = `Run clubs in ${page.name} — every crew, listed`;
+  const socialTitle = `${title} | Endorfin`;
   const description =
     `Find a run club in ${page.name}. A verified directory of morning crews, ` +
     `marathon training groups, and weekend trail collectives across ${page.name}. ` +
@@ -90,14 +91,14 @@ export async function generateMetadata(
     openGraph: {
       type: 'website',
       url,
-      title,
+      title: socialTitle,
       description,
       siteName: 'Endorfin',
       locale: 'en_IN',
     },
     twitter: {
       card: 'summary_large_image',
-      title,
+      title: socialTitle,
       description,
     },
   };

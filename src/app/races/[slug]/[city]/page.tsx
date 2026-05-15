@@ -77,7 +77,7 @@ export async function generateStaticParams() {
 
 function buildTitle(scope: RaceScope, cityName: string) {
   const meta = RACE_SCOPE_META[scope];
-  return `${meta.noun} in ${cityName} — every race, listed | Endorfin`;
+  return `${meta.noun} in ${cityName} — every race, listed`;
 }
 
 function buildDescription(scope: RaceScope, cityName: string) {
@@ -93,6 +93,7 @@ export async function generateMetadata({ params }: RouteParams): Promise<Metadat
 
   const url = `${SITE}/races/${slug}/${city}`;
   const title = buildTitle(scopeRes.scope, cityPage.name);
+  const socialTitle = `${title} | Endorfin`;
   const description = buildDescription(scopeRes.scope, cityPage.name);
 
   return {
@@ -102,12 +103,12 @@ export async function generateMetadata({ params }: RouteParams): Promise<Metadat
     openGraph: {
       type: 'website',
       url,
-      title,
+      title: socialTitle,
       description,
       siteName: 'Endorfin',
       locale: 'en_IN',
     },
-    twitter: { card: 'summary_large_image', title, description },
+    twitter: { card: 'summary_large_image', title: socialTitle, description },
   };
 }
 

@@ -4,7 +4,7 @@ import Footer from '@/components/Footer';
 import CoachesView from './CoachesView';
 
 export const metadata: Metadata = {
-  title: "Train with Elites — learn from India's fastest runners | Endorfin",
+  title: "Train with Elites — learn from India's fastest runners",
   description:
     "India's fastest runners. Real race-tested training from athletes who've podium'd at TCS Mumbai, Satara, and beyond — not textbook coaches. Coming Summer 2026 — join the waitlist.",
   alternates: { canonical: 'https://www.endorfin.run/coaches' },

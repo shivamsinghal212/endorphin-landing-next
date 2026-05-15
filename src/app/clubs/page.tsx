@@ -164,6 +164,15 @@ function buildJsonLd(clubs: ApiClub[]) {
   };
 }
 
+const breadcrumbJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://www.endorfin.run/' },
+    { '@type': 'ListItem', position: 2, name: 'Run Clubs', item: 'https://www.endorfin.run/clubs' },
+  ],
+};
+
 export default async function ClubsPage() {
   const token = await getSessionToken();
   const [clubs, myClubs] = await Promise.all([
@@ -181,6 +190,10 @@ export default async function ClubsPage() {
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       )}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
       <Header />
       <div className="v1-clubs-page">
         <ClubsView clubs={clubs} memberSlugs={memberSlugs} />

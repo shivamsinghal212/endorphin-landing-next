@@ -180,6 +180,7 @@ export default async function ClubPage({ params }: PageProps) {
     <main id="main-content" className="overflow-x-hidden">
       <ClubIcons />
       <ClubJsonLd club={club} />
+      <ClubBreadcrumbJsonLd club={club} />
       <Header />
       <div className="club-page">
         <Hero
@@ -248,6 +249,29 @@ function ClubJsonLd({ club }: { club: Club }) {
     data.numberOfEmployees = { '@type': 'QuantitativeValue', value: club.stats.members };
   }
 
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }}
+    />
+  );
+}
+
+function ClubBreadcrumbJsonLd({ club }: { club: Club }) {
+  const data = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://www.endorfin.run/' },
+      { '@type': 'ListItem', position: 2, name: 'Run Clubs', item: 'https://www.endorfin.run/clubs' },
+      {
+        '@type': 'ListItem',
+        position: 3,
+        name: club.name,
+        item: `https://www.endorfin.run/clubs/${club.slug}`,
+      },
+    ],
+  };
   return (
     <script
       type="application/ld+json"

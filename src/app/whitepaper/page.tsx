@@ -11,7 +11,7 @@ import Footer from '@/components/Footer';
 export const dynamic = 'force-static';
 
 export const metadata: Metadata = {
-  title: 'Methodology — Working Paper No. 1 | Endorfin',
+  title: 'Methodology — Working Paper No. 1',
   description:
     "The methodology behind Kip — Endorfin's hyperlocal AI running coach. Working paper covering framework selection, environmental adaptation, equipment-free substitutes, and masters protocols.",
   alternates: { canonical: 'https://www.endorfin.run/whitepaper' },
