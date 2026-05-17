@@ -7,48 +7,56 @@ import posthog from 'posthog-js';
 import LoginModal from '@/components/LoginModal';
 import { claimClubAction } from '@/app/actions/clubs';
 
-interface ClaimClubLinkProps {
+interface ClaimClubModalProps {
+  isOpen: boolean;
+  onClose: () => void;
   slug: string;
   clubName: string;
   isAuthed: boolean;
   userEmail: string | null;
 }
 
-export function ClaimClubLink({
+export function ClaimClubModal({
+  isOpen,
+  onClose,
   slug,
   clubName,
   isAuthed,
   userEmail,
-}: ClaimClubLinkProps) {
+}: ClaimClubModalProps) {
   const router = useRouter();
   const [loginOpen, setLoginOpen] = useState(false);
-  const [confirmOpen, setConfirmOpen] = useState(false);
   const [finalizing, setFinalizing] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [submitted, setSubmitted] = useState(false);
   const [pending, startTransition] = useTransition();
   const wantsClaimAfterLogin = useRef(false);
 
+  // When opened against an unauth'd session, surface the login modal first.
+  useEffect(() => {
+    if (!isOpen) {
+      setLoginOpen(false);
+      setFinalizing(false);
+      setSubmitError(null);
+      setSubmitted(false);
+      wantsClaimAfterLogin.current = false;
+      return;
+    }
+    if (!isAuthed) {
+      wantsClaimAfterLogin.current = true;
+      setLoginOpen(true);
+    }
+  }, [isOpen, isAuthed]);
+
+  // After login completes and the server-rendered isAuthed flips to true,
+  // close the login modal and reveal the confirm UI in-place.
   useEffect(() => {
     if (isAuthed && wantsClaimAfterLogin.current) {
       wantsClaimAfterLogin.current = false;
       setFinalizing(false);
       setLoginOpen(false);
-      setConfirmOpen(true);
     }
   }, [isAuthed]);
-
-  function handleClick(e: React.MouseEvent) {
-    e.preventDefault();
-    if (!isAuthed) {
-      wantsClaimAfterLogin.current = true;
-      setLoginOpen(true);
-      return;
-    }
-    setSubmitError(null);
-    setSubmitted(false);
-    setConfirmOpen(true);
-  }
 
   function handleConfirm() {
     setSubmitError(null);
@@ -67,29 +75,22 @@ export function ClaimClubLink({
     });
   }
 
-  function handleClose() {
+  function requestClose() {
     if (pending) return;
-    setConfirmOpen(false);
-    setSubmitError(null);
-    setSubmitted(false);
+    onClose();
   }
 
+  // Two cases for what's open: the LoginModal (if signed out), and the
+  // confirmation Dialog (when signed in). Both close back to the caller.
   return (
     <>
-      <button
-        type="button"
-        onClick={handleClick}
-        className="claim-club-link"
-      >
-        Run this club? Claim ownership →
-      </button>
-
       <LoginModal
-        open={loginOpen || finalizing}
+        open={isOpen && (loginOpen || finalizing)}
         onClose={() => {
           if (finalizing) return;
           wantsClaimAfterLogin.current = false;
           setLoginOpen(false);
+          onClose();
         }}
         onSuccess={() => {
           setFinalizing(true);
@@ -105,8 +106,8 @@ export function ClaimClubLink({
       />
 
       <Dialog.Root
-        open={confirmOpen}
-        onOpenChange={(o) => !o && handleClose()}
+        open={isOpen && isAuthed && !loginOpen && !finalizing}
+        onOpenChange={(o) => !o && requestClose()}
       >
         <Dialog.Portal>
           <Dialog.Overlay className="v1lm-overlay" />
@@ -124,7 +125,7 @@ export function ClaimClubLink({
               type="button"
               className="v1lm-close"
               aria-label="Close"
-              onClick={handleClose}
+              onClick={requestClose}
               disabled={pending}
             >
               <CloseIcon />
@@ -148,7 +149,7 @@ export function ClaimClubLink({
                     <button
                       type="button"
                       className="v1lm-btn-primary mt-5"
-                      onClick={handleClose}
+                      onClick={requestClose}
                     >
                       Done
                     </button>
@@ -186,6 +187,42 @@ export function ClaimClubLink({
           </Dialog.Content>
         </Dialog.Portal>
       </Dialog.Root>
+    </>
+  );
+}
+
+interface ClaimClubLinkProps {
+  slug: string;
+  clubName: string;
+  isAuthed: boolean;
+  userEmail: string | null;
+}
+
+export function ClaimClubLink({
+  slug,
+  clubName,
+  isAuthed,
+  userEmail,
+}: ClaimClubLinkProps) {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <>
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        className="claim-club-link"
+      >
+        Run this club? Claim ownership →
+      </button>
+      <ClaimClubModal
+        isOpen={open}
+        onClose={() => setOpen(false)}
+        slug={slug}
+        clubName={clubName}
+        isAuthed={isAuthed}
+        userEmail={userEmail}
+      />
     </>
   );
 }
