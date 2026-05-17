@@ -10,6 +10,8 @@ import {
   MIN_CLUBS_PER_CITY,
   clubsForCityPage,
 } from '@/lib/club-city-pages';
+import { ClaimClubModal } from './[slug]/claim-club-link';
+import { JoinClubModal } from './[slug]/join-club-modal';
 import type { ApiClub, ClubEvent } from './page';
 
 const matchesCity = (club: ApiClub, city: string) => locationMatchesCity(club.city, city);
@@ -80,7 +82,17 @@ const VerifiedTick = ({ className }: { className?: string }) => (
 
 // ─── Flagship card ──────────────────────────
 
-function FlagshipCard({ c, isMember }: { c: ApiClub; isMember: boolean }) {
+function FlagshipCard({
+  c,
+  isMember,
+  onJoin,
+  onClaim,
+}: {
+  c: ApiClub;
+  isMember: boolean;
+  onJoin: (club: ApiClub) => void;
+  onClaim: (club: ApiClub) => void;
+}) {
   const stats = c.stats || {};
   const nr = pickNextEvent(c.events);
   const href = `/clubs/${c.slug}`;
@@ -189,17 +201,25 @@ function FlagshipCard({ c, isMember }: { c: ApiClub; isMember: boolean }) {
               Already a member
             </span>
           ) : (
-            <Link href={href} className="v1c-btn v1c-btn-primary">
+            <button
+              type="button"
+              className="v1c-btn v1c-btn-primary"
+              onClick={() => onJoin(c)}
+            >
               Join club
-            </Link>
+            </button>
           )}
           <Link href={href} className="v1c-btn v1c-btn-ghost-light">
             View details →
           </Link>
           {!c.isClaimed && (
-            <Link href={href} className="v1c-flagship-claim-link">
+            <button
+              type="button"
+              className="v1c-flagship-claim-link"
+              onClick={() => onClaim(c)}
+            >
               Run this club? Claim ownership →
-            </Link>
+            </button>
           )}
         </div>
       </div>
@@ -209,7 +229,15 @@ function FlagshipCard({ c, isMember }: { c: ApiClub; isMember: boolean }) {
 
 // ─── Club card (dark grid) ──────────────────
 
-function ClubCard({ c }: { c: ApiClub }) {
+function ClubCard({
+  c,
+  onJoin,
+  onClaim,
+}: {
+  c: ApiClub;
+  onJoin: (club: ApiClub) => void;
+  onClaim: (club: ApiClub) => void;
+}) {
   const stats = c.stats || {};
   const nr = pickNextEvent(c.events);
   const href = `/clubs/${c.slug}`;
@@ -284,13 +312,21 @@ function ClubCard({ c }: { c: ApiClub }) {
         </div>
       </Link>
       <div className="v1c-club-card-actions">
-        <Link href={href} className="v1c-btn v1c-btn-primary v1c-club-card-join">
+        <button
+          type="button"
+          className="v1c-btn v1c-btn-primary v1c-club-card-join"
+          onClick={() => onJoin(c)}
+        >
           Join club
-        </Link>
+        </button>
         {!c.isClaimed && (
-          <Link href={href} className="v1c-club-card-claim-link">
+          <button
+            type="button"
+            className="v1c-club-card-claim-link"
+            onClick={() => onClaim(c)}
+          >
             Run this club? Claim ownership →
-          </Link>
+          </button>
         )}
       </div>
     </article>
@@ -470,15 +506,24 @@ function AdminPanel({ data }: { data: AdminPanelData }) {
 export default function ClubsView({
   clubs: initialClubs,
   memberSlugs = [],
+  isAuthed = false,
+  userEmail = null,
 }: {
   clubs: ApiClub[];
   memberSlugs?: string[];
+  isAuthed?: boolean;
+  userEmail?: string | null;
 }) {
   const memberSet = useMemo(() => new Set(memberSlugs), [memberSlugs]);
   const [allClubs, setAllClubs] = useState<ApiClub[]>(initialClubs);
   const [currentCity, setCurrentCity] = useState<string>('');
   const [activeTab, setActiveTab] = useState<AdminTab>('members');
+  const [modal, setModal] = useState<{ kind: 'join' | 'claim'; club: ApiClub } | null>(null);
   const downloadHref = useStoreLink('#download');
+
+  const openJoin = useCallback((club: ApiClub) => setModal({ kind: 'join', club }), []);
+  const openClaim = useCallback((club: ApiClub) => setModal({ kind: 'claim', club }), []);
+  const closeModal = useCallback(() => setModal(null), []);
 
   // Client-side refresh on mount — also a fallback when the server fetch
   // failed during build/ISR.
@@ -829,6 +874,8 @@ export default function ClubsView({
                     key={c.slug}
                     c={c}
                     isMember={memberSet.has(c.slug)}
+                    onJoin={openJoin}
+                    onClaim={openClaim}
                   />
                 ))}
               </div>
@@ -903,7 +950,14 @@ export default function ClubsView({
                   No clubs{currentCity ? ` in ${currentCity}` : ''} yet. Check back soon.
                 </div>
               ) : (
-                grid.map((c) => <ClubCard key={c.slug} c={c} />)
+                grid.map((c) => (
+                  <ClubCard
+                    key={c.slug}
+                    c={c}
+                    onJoin={openJoin}
+                    onClaim={openClaim}
+                  />
+                ))
               )}
             </div>
           </div>
@@ -996,6 +1050,24 @@ export default function ClubsView({
           </div>
         </div>
       </section>
+
+      <JoinClubModal
+        isOpen={modal?.kind === 'join'}
+        onClose={closeModal}
+        slug={modal?.club.slug ?? ''}
+        clubName={modal?.club.name ?? ''}
+        joinForm={modal?.club.joinForm ?? null}
+        requiresApproval={modal?.club.requiresApproval ?? false}
+        isAuthed={isAuthed}
+      />
+      <ClaimClubModal
+        isOpen={modal?.kind === 'claim'}
+        onClose={closeModal}
+        slug={modal?.club.slug ?? ''}
+        clubName={modal?.club.name ?? ''}
+        isAuthed={isAuthed}
+        userEmail={userEmail}
+      />
     </>
   );
 }

@@ -3,7 +3,8 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import ClubsView from './ClubsView';
 import { clubsApi } from '@/lib/api';
-import { getSessionToken } from '@/lib/session';
+import { getSessionEmail, getSessionToken } from '@/lib/session';
+import type { JoinFormField } from '@/lib/admin-api';
 
 export const metadata: Metadata = {
   title: 'Run clubs in India — every crew, listed',
@@ -87,6 +88,8 @@ export interface ApiClub {
   isVerified?: boolean;
   isFeatured?: boolean;
   isClaimed?: boolean;
+  joinForm?: JoinFormField[] | null;
+  requiresApproval?: boolean;
   stats?: ApiClubStats;
   events?: ClubEvent[];
   updatedAt?: string | null;
@@ -176,11 +179,13 @@ const breadcrumbJsonLd = {
 
 export default async function ClubsPage() {
   const token = await getSessionToken();
-  const [clubs, myClubs] = await Promise.all([
+  const [clubs, myClubs, userEmail] = await Promise.all([
     getClubs(),
     token ? clubsApi.listMyClubs(token, 'all').catch(() => []) : Promise.resolve([]),
+    getSessionEmail(),
   ]);
   const memberSlugs = myClubs.map((c) => c.slug);
+  const isAuthed = !!token;
   const jsonLd = buildJsonLd(clubs);
 
   return (
@@ -197,7 +202,12 @@ export default async function ClubsPage() {
       />
       <Header />
       <div className="v1-clubs-page">
-        <ClubsView clubs={clubs} memberSlugs={memberSlugs} />
+        <ClubsView
+          clubs={clubs}
+          memberSlugs={memberSlugs}
+          isAuthed={isAuthed}
+          userEmail={userEmail}
+        />
       </div>
       <Footer />
     </main>
