@@ -319,6 +319,7 @@ export interface Club {
   joinUrl: string | null;
   joinForm: JoinFormField[] | null;
   requiresApproval: boolean;
+  isClaimed: boolean;
   stats: ClubStats;
   admins: ClubAdminPerson[];
   createdAt: string;

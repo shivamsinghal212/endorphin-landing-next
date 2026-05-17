@@ -3,6 +3,7 @@
 import {
   ApiError,
   clubsApi,
+  type ClaimClubResponse,
   type JoinClubResponse,
   type RsvpToggleResponse,
 } from '@/lib/api';
@@ -44,6 +45,19 @@ export async function joinClubAction(
   if (!token) return { ok: false, error: 'Not signed in', status: 401 };
   try {
     const data = await clubsApi.joinClub(slug, formData, token);
+    return { ok: true, data };
+  } catch (e) {
+    return toError(e);
+  }
+}
+
+export async function claimClubAction(
+  slug: string,
+): Promise<ClubActionState<ClaimClubResponse>> {
+  const token = await requireToken();
+  if (!token) return { ok: false, error: 'Not signed in', status: 401 };
+  try {
+    const data = await clubsApi.claimClub(slug, token);
     return { ok: true, data };
   } catch (e) {
     return toError(e);

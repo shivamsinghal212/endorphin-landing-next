@@ -205,6 +205,11 @@ export interface JoinClubResponse {
   requestId: string | null;
 }
 
+export interface ClaimClubResponse {
+  status: 'pending';
+  requestId: string | null;
+}
+
 export interface RsvpToggleResponse {
   rsvp: {
     id: string;
@@ -245,6 +250,12 @@ export const clubsApi = {
     api<JoinClubResponse>(`/clubs/${encodeURIComponent(slug)}/join`, {
       method: 'POST',
       body: JSON.stringify({ formData }),
+      token,
+    }),
+
+  claimClub: (slug: string, token: string) =>
+    api<ClaimClubResponse>(`/clubs/${encodeURIComponent(slug)}/claim`, {
+      method: 'POST',
       token,
     }),
 
