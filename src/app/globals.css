@@ -2479,7 +2479,7 @@ body { padding-top: var(--nav-h, 68px); }
   background: transparent;
   color: inherit;
 }
-.v1-clubs-page button.v1c-btn { font: inherit; line-height: normal; }
+.v1-clubs-page button.v1c-btn { line-height: normal; }
 .v1-clubs-page .v1c-btn-primary { background: var(--red); color: #fff; }
 .v1-clubs-page .v1c-btn-primary:hover { background: #c41e24; }
 .v1-clubs-page .v1c-btn-ghost { background: transparent; color: var(--jet); border-color: var(--jet); }
