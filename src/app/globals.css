@@ -2495,6 +2495,16 @@ body { padding-top: var(--nav-h, 68px); }
   cursor: not-allowed; pointer-events: none;
   opacity: 0.95;
 }
+.v1-clubs-page .v1c-btn-owner {
+  background: #C9A21A; color: #1A1303;
+  cursor: not-allowed; pointer-events: none;
+}
+.v1-clubs-page .v1c-btn-pending {
+  background: rgba(10, 10, 10, 0.08);
+  color: rgba(10, 10, 10, 0.55);
+  border-color: rgba(10, 10, 10, 0.12);
+  cursor: not-allowed; pointer-events: none;
+}
 .v1-clubs-page .v1c-btn-icon { width: 16px; height: 16px; margin-right: 10px; flex-shrink: 0; }
 
 /* ─── CTA (bone, matches home) ─────────── */

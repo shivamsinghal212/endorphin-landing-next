@@ -12,7 +12,10 @@ import {
 } from '@/lib/club-city-pages';
 import { ClaimClubModal } from './[slug]/claim-club-link';
 import { JoinClubModal } from './[slug]/join-club-modal';
+import type { MyClubMembership } from '@/lib/api';
 import type { ApiClub, ClubEvent } from './page';
+
+type Membership = MyClubMembership;
 
 const matchesCity = (club: ApiClub, city: string) => locationMatchesCity(club.city, city);
 
@@ -80,16 +83,99 @@ const VerifiedTick = ({ className }: { className?: string }) => (
   </svg>
 );
 
+// ─── Membership CTA ─────────────────────────
+// Renders the primary action slot on listing cards based on the user's
+// relationship to the club. Falls back to the Join button when there is no
+// active membership and no pending request.
+
+function MembershipCta({
+  club,
+  membership,
+  onJoin,
+  className,
+}: {
+  club: ApiClub;
+  membership: Membership | null;
+  onJoin: (club: ApiClub) => void;
+  /** Extra class for the compact sizing variant on ClubCard's Join button. */
+  className?: string;
+}) {
+  const status = membership?.status;
+  const role = membership?.role;
+
+  if (status === 'active' && role === 'owner') {
+    return (
+      <span
+        className={`v1c-btn v1c-btn-owner ${className ?? ''}`}
+        role="status"
+        aria-label={`You own ${club.name}`}
+      >
+        Your club
+      </span>
+    );
+  }
+  if (status === 'active' && role === 'admin') {
+    return (
+      <span
+        className={`v1c-btn v1c-btn-owner ${className ?? ''}`}
+        role="status"
+        aria-label={`You admin ${club.name}`}
+      >
+        Club admin
+      </span>
+    );
+  }
+  if (status === 'active' && role === 'member') {
+    return (
+      <span
+        className={`v1c-btn v1c-btn-success ${className ?? ''}`}
+        role="status"
+        aria-label={`Already a member of ${club.name}`}
+      >
+        Already a member
+      </span>
+    );
+  }
+  if (status === 'pending') {
+    return (
+      <span
+        className={`v1c-btn v1c-btn-pending ${className ?? ''}`}
+        role="status"
+        aria-label={`Pending request for ${club.name}`}
+      >
+        Request pending
+      </span>
+    );
+  }
+  return (
+    <button
+      type="button"
+      className={`v1c-btn v1c-btn-primary ${className ?? ''}`}
+      onClick={() => onJoin(club)}
+    >
+      Join club
+    </button>
+  );
+}
+
+// Show the Claim CTA only when the club is unclaimed AND the viewer isn't
+// already its owner. (Owners can't claim what they already own.)
+function shouldShowClaim(club: ApiClub, membership: Membership | null): boolean {
+  if (club.isClaimed) return false;
+  if (membership?.status === 'active' && membership.role === 'owner') return false;
+  return true;
+}
+
 // ─── Flagship card ──────────────────────────
 
 function FlagshipCard({
   c,
-  isMember,
+  membership,
   onJoin,
   onClaim,
 }: {
   c: ApiClub;
-  isMember: boolean;
+  membership: Membership | null;
   onJoin: (club: ApiClub) => void;
   onClaim: (club: ApiClub) => void;
 }) {
@@ -192,27 +278,11 @@ function FlagshipCard({
           )}
         </div>
         <div className="v1c-flagship-ctas">
-          {isMember ? (
-            <span
-              className="v1c-btn v1c-btn-success"
-              role="status"
-              aria-label={`Already a member of ${c.name}`}
-            >
-              Already a member
-            </span>
-          ) : (
-            <button
-              type="button"
-              className="v1c-btn v1c-btn-primary"
-              onClick={() => onJoin(c)}
-            >
-              Join club
-            </button>
-          )}
+          <MembershipCta club={c} membership={membership} onJoin={onJoin} />
           <Link href={href} className="v1c-btn v1c-btn-ghost-light">
             View details →
           </Link>
-          {!c.isClaimed && (
+          {shouldShowClaim(c, membership) && (
             <button
               type="button"
               className="v1c-flagship-claim-link"
@@ -231,10 +301,12 @@ function FlagshipCard({
 
 function ClubCard({
   c,
+  membership,
   onJoin,
   onClaim,
 }: {
   c: ApiClub;
+  membership: Membership | null;
   onJoin: (club: ApiClub) => void;
   onClaim: (club: ApiClub) => void;
 }) {
@@ -312,14 +384,13 @@ function ClubCard({
         </div>
       </Link>
       <div className="v1c-club-card-actions">
-        <button
-          type="button"
-          className="v1c-btn v1c-btn-primary v1c-club-card-join"
-          onClick={() => onJoin(c)}
-        >
-          Join club
-        </button>
-        {!c.isClaimed && (
+        <MembershipCta
+          club={c}
+          membership={membership}
+          onJoin={onJoin}
+          className="v1c-club-card-join"
+        />
+        {shouldShowClaim(c, membership) && (
           <button
             type="button"
             className="v1c-club-card-claim-link"
@@ -505,16 +576,19 @@ function AdminPanel({ data }: { data: AdminPanelData }) {
 
 export default function ClubsView({
   clubs: initialClubs,
-  memberSlugs = [],
+  membershipBySlug = {},
   isAuthed = false,
   userEmail = null,
 }: {
   clubs: ApiClub[];
-  memberSlugs?: string[];
+  membershipBySlug?: Record<string, Membership>;
   isAuthed?: boolean;
   userEmail?: string | null;
 }) {
-  const memberSet = useMemo(() => new Set(memberSlugs), [memberSlugs]);
+  const membershipFor = useCallback(
+    (slug: string): Membership | null => membershipBySlug[slug] ?? null,
+    [membershipBySlug],
+  );
   const [allClubs, setAllClubs] = useState<ApiClub[]>(initialClubs);
   const [currentCity, setCurrentCity] = useState<string>('');
   const [activeTab, setActiveTab] = useState<AdminTab>('members');
@@ -873,7 +947,7 @@ export default function ClubsView({
                   <FlagshipCard
                     key={c.slug}
                     c={c}
-                    isMember={memberSet.has(c.slug)}
+                    membership={membershipFor(c.slug)}
                     onJoin={openJoin}
                     onClaim={openClaim}
                   />
@@ -954,6 +1028,7 @@ export default function ClubsView({
                   <ClubCard
                     key={c.slug}
                     c={c}
+                    membership={membershipFor(c.slug)}
                     onJoin={openJoin}
                     onClaim={openClaim}
                   />

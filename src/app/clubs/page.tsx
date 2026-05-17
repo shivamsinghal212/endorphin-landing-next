@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import ClubsView from './ClubsView';
-import { clubsApi } from '@/lib/api';
+import { clubsApi, type MyClubMembership } from '@/lib/api';
 import { getSessionEmail, getSessionToken } from '@/lib/session';
 import type { JoinFormField } from '@/lib/admin-api';
 
@@ -181,10 +181,13 @@ export default async function ClubsPage() {
   const token = await getSessionToken();
   const [clubs, myClubs, userEmail] = await Promise.all([
     getClubs(),
-    token ? clubsApi.listMyClubs(token, 'all').catch(() => []) : Promise.resolve([]),
+    token
+      ? clubsApi.listMyClubs(token, 'all', { includePending: true }).catch(() => [])
+      : Promise.resolve([]),
     getSessionEmail(),
   ]);
-  const memberSlugs = myClubs.map((c) => c.slug);
+  const membershipBySlug: Record<string, MyClubMembership> = {};
+  for (const c of myClubs) membershipBySlug[c.slug] = c.membership;
   const isAuthed = !!token;
   const jsonLd = buildJsonLd(clubs);
 
@@ -204,7 +207,7 @@ export default async function ClubsPage() {
       <div className="v1-clubs-page">
         <ClubsView
           clubs={clubs}
-          memberSlugs={memberSlugs}
+          membershipBySlug={membershipBySlug}
           isAuthed={isAuthed}
           userEmail={userEmail}
         />

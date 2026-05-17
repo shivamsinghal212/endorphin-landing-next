@@ -228,6 +228,17 @@ export interface ClubSummary {
   city: string;
 }
 
+export interface MyClubMembership {
+  status: 'active' | 'pending';
+  role: ClubRole | null;
+  requestId: string | null;
+}
+
+export interface MyClubSummary extends ClubSummary {
+  isClaimed?: boolean;
+  membership: MyClubMembership;
+}
+
 export const clubsApi = {
   getMyMembership: (slug: string, token: string) =>
     api<MyMembership>(`/clubs/${encodeURIComponent(slug)}/my-membership`, {
@@ -237,10 +248,18 @@ export const clubsApi = {
   /**
    * Returns clubs the user is an active member of. `role=all` includes
    * regular members; `role=admin` (default on the backend) only returns
-   * clubs the user can manage.
+   * clubs the user can manage. With `includePending=true`, the response
+   * also includes clubs the user has a pending claim/join request on.
    */
-  listMyClubs: (token: string, role: 'all' | 'admin' = 'all') =>
-    api<ClubSummary[]>(`/clubs/mine?role=${role}`, { token }),
+  listMyClubs: (
+    token: string,
+    role: 'all' | 'admin' = 'all',
+    opts: { includePending?: boolean } = {},
+  ) => {
+    const params = new URLSearchParams({ role });
+    if (opts.includePending) params.set('include_pending', 'true');
+    return api<MyClubSummary[]>(`/clubs/mine?${params.toString()}`, { token });
+  },
 
   joinClub: (
     slug: string,
