@@ -86,6 +86,7 @@ export interface ApiClub {
   tags?: string[];
   isVerified?: boolean;
   isFeatured?: boolean;
+  isClaimed?: boolean;
   stats?: ApiClubStats;
   events?: ClubEvent[];
   updatedAt?: string | null;

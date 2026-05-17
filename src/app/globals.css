@@ -1977,6 +1977,23 @@ body { padding-top: var(--nav-h, 68px); }
 .v1-clubs-page .v1c-flagship-ctas {
   margin-top: 20px; display: flex; flex-direction: column; gap: 10px;
 }
+.v1-clubs-page .v1c-flagship-claim-link {
+  align-self: center;
+  margin-top: 2px;
+  padding: 2px 4px;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  color: rgba(245, 240, 235, 0.55);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-color: rgba(245, 240, 235, 0.25);
+  transition: color 0.15s ease;
+}
+.v1-clubs-page .v1c-flagship-claim-link:hover {
+  color: rgba(245, 240, 235, 0.9);
+  text-decoration-color: rgba(245, 240, 235, 0.6);
+}
 
 @media (max-width: 860px) {
   .v1-clubs-page .v1c-featured { padding: 48px 0 56px; }
@@ -2096,9 +2113,7 @@ body { padding-top: var(--nav-h, 68px); }
   scroll-snap-stop: always;
   min-height: 420px;
   transition: all 200ms ease-out;
-  cursor: pointer;
   overflow: hidden;
-  text-decoration: none;
 }
 .v1-clubs-page .v1c-club-card:hover {
   transform: translateY(-2px);
@@ -2209,6 +2224,41 @@ body { padding-top: var(--nav-h, 68px); }
   display: flex; align-items: center; justify-content: space-between;
   font-family: var(--font-oswald), sans-serif;
   gap: 10px;
+}
+.v1-clubs-page .v1c-club-card-body-link {
+  display: flex; flex-direction: column;
+  flex: 1; min-height: 0;
+  color: inherit;
+  text-decoration: none;
+}
+.v1-clubs-page .v1c-club-card-actions {
+  padding: 0 22px 20px;
+  display: flex; flex-direction: column;
+  gap: 8px;
+  align-items: stretch;
+}
+.v1-clubs-page .v1c-club-card-join.v1c-btn {
+  height: 42px;
+  padding: 0 18px;
+  font-size: 12px;
+  letter-spacing: 0.16em;
+  width: 100%;
+}
+.v1-clubs-page .v1c-club-card-claim-link {
+  align-self: center;
+  padding: 2px 4px;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  color: rgba(245, 240, 235, 0.5);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-color: rgba(245, 240, 235, 0.22);
+  transition: color 0.15s ease;
+}
+.v1-clubs-page .v1c-club-card-claim-link:hover {
+  color: rgba(245, 240, 235, 0.9);
+  text-decoration-color: rgba(245, 240, 235, 0.6);
 }
 .v1-clubs-page .v1c-club-card-stat {
   font-size: 11px; letter-spacing: 0.14em;

@@ -196,6 +196,11 @@ function FlagshipCard({ c, isMember }: { c: ApiClub; isMember: boolean }) {
           <Link href={href} className="v1c-btn v1c-btn-ghost-light">
             View details →
           </Link>
+          {!c.isClaimed && (
+            <Link href={href} className="v1c-flagship-claim-link">
+              Run this club? Claim ownership →
+            </Link>
+          )}
         </div>
       </div>
     </article>
@@ -213,70 +218,82 @@ function ClubCard({ c }: { c: ApiClub }) {
   const headerIsLogoFallback = !c.headerImageUrl && !!c.logoUrl;
 
   return (
-    <Link href={href} className="v1c-club-card">
-      <div className="v1c-club-card-header">
-        <div className="v1c-club-card-header-fallback">{initials(c.name)}</div>
-        {headerImg && (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={headerImg}
-            alt={c.name}
-            loading="lazy"
-            className={headerIsLogoFallback ? 'is-logo-fallback' : ''}
-            onError={(e) => {
-              (e.currentTarget as HTMLImageElement).style.display = 'none';
-            }}
-          />
-        )}
-      </div>
-      <div className="v1c-club-card-body">
-        <div className="v1c-club-card-logo">
-          {c.logoUrl ? (
+    <article className="v1c-club-card">
+      <Link href={href} className="v1c-club-card-body-link" aria-label={`View ${c.name}`}>
+        <div className="v1c-club-card-header">
+          <div className="v1c-club-card-header-fallback">{initials(c.name)}</div>
+          {headerImg && (
             // eslint-disable-next-line @next/next/no-img-element
             <img
-              src={c.logoUrl}
-              alt={`${c.name} logo`}
+              src={headerImg}
+              alt={c.name}
+              loading="lazy"
+              className={headerIsLogoFallback ? 'is-logo-fallback' : ''}
               onError={(e) => {
                 (e.currentTarget as HTMLImageElement).style.display = 'none';
               }}
             />
-          ) : (
-            initials(c.name)
           )}
         </div>
-        <div className="v1c-club-card-top">
-          <h3 className="v1c-club-card-title">{c.name}</h3>
-          {c.isVerified && (
-            <span className="v1c-club-card-verified" aria-label="Verified">
-              <VerifiedTick />
-            </span>
-          )}
-        </div>
-        <div className="v1c-club-card-city">
-          {c.city}
-          {c.establishedYear ? ` · Est ${c.establishedYear}` : ''}
-        </div>
-        {c.tags && c.tags.length > 0 && (
-          <div className="v1c-club-card-tags">
-            {c.tags.slice(0, 3).map((t) => (
-              <span key={t} className="v1c-club-card-tag">
-                {t}
-              </span>
-            ))}
+        <div className="v1c-club-card-body">
+          <div className="v1c-club-card-logo">
+            {c.logoUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={c.logoUrl}
+                alt={`${c.name} logo`}
+                onError={(e) => {
+                  (e.currentTarget as HTMLImageElement).style.display = 'none';
+                }}
+              />
+            ) : (
+              initials(c.name)
+            )}
           </div>
-        )}
-        <div className="v1c-club-card-foot">
-          <span className="v1c-club-card-stat">
-            <strong>{(stats.members || 0).toLocaleString('en-IN')}</strong> members
-          </span>
-          {nr && (
-            <span className="v1c-club-card-nextrun">
-              {fmtDayShort(nr.startTime)} · {nr.distanceKm != null ? `${nr.distanceKm}K` : '—'}
-            </span>
+          <div className="v1c-club-card-top">
+            <h3 className="v1c-club-card-title">{c.name}</h3>
+            {c.isVerified && (
+              <span className="v1c-club-card-verified" aria-label="Verified">
+                <VerifiedTick />
+              </span>
+            )}
+          </div>
+          <div className="v1c-club-card-city">
+            {c.city}
+            {c.establishedYear ? ` · Est ${c.establishedYear}` : ''}
+          </div>
+          {c.tags && c.tags.length > 0 && (
+            <div className="v1c-club-card-tags">
+              {c.tags.slice(0, 3).map((t) => (
+                <span key={t} className="v1c-club-card-tag">
+                  {t}
+                </span>
+              ))}
+            </div>
           )}
+          <div className="v1c-club-card-foot">
+            <span className="v1c-club-card-stat">
+              <strong>{(stats.members || 0).toLocaleString('en-IN')}</strong> members
+            </span>
+            {nr && (
+              <span className="v1c-club-card-nextrun">
+                {fmtDayShort(nr.startTime)} · {nr.distanceKm != null ? `${nr.distanceKm}K` : '—'}
+              </span>
+            )}
+          </div>
         </div>
+      </Link>
+      <div className="v1c-club-card-actions">
+        <Link href={href} className="v1c-btn v1c-btn-primary v1c-club-card-join">
+          Join club
+        </Link>
+        {!c.isClaimed && (
+          <Link href={href} className="v1c-club-card-claim-link">
+            Run this club? Claim ownership →
+          </Link>
+        )}
       </div>
-    </Link>
+    </article>
   );
 }
 
