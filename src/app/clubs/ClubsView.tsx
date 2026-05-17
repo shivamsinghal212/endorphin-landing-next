@@ -162,7 +162,7 @@ function MembershipCta({
 // already its owner. (Owners can't claim what they already own.)
 function shouldShowClaim(club: ApiClub, membership: Membership | null): boolean {
   if (club.isClaimed) return false;
-  if (membership?.status === 'active' && membership.role === 'owner') return false;
+  if (membership?.status === 'active' && (membership.role === 'owner' || membership.role === 'admin')) return false;
   return true;
 }
 

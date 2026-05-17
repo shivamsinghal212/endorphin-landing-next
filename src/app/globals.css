@@ -2500,9 +2500,9 @@ body { padding-top: var(--nav-h, 68px); }
   cursor: not-allowed; pointer-events: none;
 }
 .v1-clubs-page .v1c-btn-pending {
-  background: rgba(10, 10, 10, 0.08);
-  color: rgba(10, 10, 10, 0.55);
-  border-color: rgba(10, 10, 10, 0.12);
+  background: rgba(245, 240, 235, 0.08);
+  color: rgba(245, 240, 235, 0.7);
+  border-color: rgba(245, 240, 235, 0.22);
   cursor: not-allowed; pointer-events: none;
 }
 .v1-clubs-page .v1c-btn-icon { width: 16px; height: 16px; margin-right: 10px; flex-shrink: 0; }
