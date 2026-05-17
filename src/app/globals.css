@@ -2028,10 +2028,16 @@ body { padding-top: var(--nav-h, 68px); }
     grid-template-columns: repeat(2, 1fr); gap: 14px 20px; margin-top: 20px;
   }
   .v1-clubs-page .v1c-flagship-stat-value { font-size: 18px; }
-  .v1-clubs-page .v1c-flagship-ctas { margin-top: 16px; flex-direction: row; gap: 8px; }
+  .v1-clubs-page .v1c-flagship-ctas {
+    margin-top: 16px; flex-direction: row; flex-wrap: wrap; gap: 8px;
+  }
   .v1-clubs-page .v1c-flagship-ctas .v1c-btn {
     flex: 1 1 0; min-width: 0; padding: 0 12px; height: 46px;
     font-size: 12px; letter-spacing: 0.1em;
+  }
+  .v1-clubs-page .v1c-flagship-claim-link,
+  .v1-clubs-page .v1c-flagship-ctas .v1c-claim-pending {
+    flex: 1 0 100%; text-align: center; margin-top: 4px;
   }
   .v1-clubs-page .v1c-flagship-dots { margin-top: 24px; }
 }
