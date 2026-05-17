@@ -234,9 +234,15 @@ export interface MyClubMembership {
   requestId: string | null;
 }
 
+export interface MyClubClaim {
+  status: 'pending';
+  requestId: string;
+}
+
 export interface MyClubSummary extends ClubSummary {
   isClaimed?: boolean;
-  membership: MyClubMembership;
+  membership: MyClubMembership | null;
+  claim: MyClubClaim | null;
 }
 
 export const clubsApi = {

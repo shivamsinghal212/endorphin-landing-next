@@ -1998,6 +1998,16 @@ body { padding-top: var(--nav-h, 68px); }
   color: rgba(245, 240, 235, 0.9);
   text-decoration-color: rgba(245, 240, 235, 0.6);
 }
+/* Non-interactive pending indicator. Stacks on top of either claim-link
+   class so it inherits the muted text styling, then neutralizes the
+   interactive bits (cursor, underline, hover). */
+.v1-clubs-page .v1c-claim-pending,
+.v1-clubs-page .v1c-claim-pending:hover {
+  cursor: default;
+  text-decoration: none;
+  color: rgba(245, 240, 235, 0.42);
+  text-decoration-color: transparent;
+}
 
 @media (max-width: 860px) {
   .v1-clubs-page .v1c-featured { padding: 48px 0 56px; }

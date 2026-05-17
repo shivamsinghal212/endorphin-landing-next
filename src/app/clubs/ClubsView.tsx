@@ -12,10 +12,11 @@ import {
 } from '@/lib/club-city-pages';
 import { ClaimClubModal } from './[slug]/claim-club-link';
 import { JoinClubModal } from './[slug]/join-club-modal';
-import type { MyClubMembership } from '@/lib/api';
+import type { MyClubClaim, MyClubMembership } from '@/lib/api';
 import type { ApiClub, ClubEvent } from './page';
 
 type Membership = MyClubMembership;
+type Claim = MyClubClaim;
 
 const matchesCity = (club: ApiClub, city: string) => locationMatchesCity(club.city, city);
 
@@ -158,11 +159,18 @@ function MembershipCta({
   );
 }
 
-// Show the Claim CTA only when the club is unclaimed AND the viewer isn't
-// already its owner. (Owners can't claim what they already own.)
-function shouldShowClaim(club: ApiClub, membership: Membership | null): boolean {
+// Show the Claim CTA only when the club is unclaimed, the viewer isn't
+// already an owner/admin (they can't claim what they already run), and the
+// viewer doesn't already have a pending claim on the club (in which case a
+// muted indicator takes its place instead).
+function shouldShowClaim(
+  club: ApiClub,
+  membership: Membership | null,
+  claim: Claim | null,
+): boolean {
   if (club.isClaimed) return false;
   if (membership?.status === 'active' && (membership.role === 'owner' || membership.role === 'admin')) return false;
+  if (claim?.status === 'pending') return false;
   return true;
 }
 
@@ -171,11 +179,13 @@ function shouldShowClaim(club: ApiClub, membership: Membership | null): boolean 
 function FlagshipCard({
   c,
   membership,
+  claim,
   onJoin,
   onClaim,
 }: {
   c: ApiClub;
   membership: Membership | null;
+  claim: Claim | null;
   onJoin: (club: ApiClub) => void;
   onClaim: (club: ApiClub) => void;
 }) {
@@ -282,7 +292,11 @@ function FlagshipCard({
           <Link href={href} className="v1c-btn v1c-btn-ghost-light">
             View details →
           </Link>
-          {shouldShowClaim(c, membership) && (
+          {claim?.status === 'pending' ? (
+            <span className="v1c-claim-pending v1c-flagship-claim-link">
+              Claim review pending
+            </span>
+          ) : shouldShowClaim(c, membership, claim) ? (
             <button
               type="button"
               className="v1c-flagship-claim-link"
@@ -290,7 +304,7 @@ function FlagshipCard({
             >
               Run this club? Claim ownership →
             </button>
-          )}
+          ) : null}
         </div>
       </div>
     </article>
@@ -302,11 +316,13 @@ function FlagshipCard({
 function ClubCard({
   c,
   membership,
+  claim,
   onJoin,
   onClaim,
 }: {
   c: ApiClub;
   membership: Membership | null;
+  claim: Claim | null;
   onJoin: (club: ApiClub) => void;
   onClaim: (club: ApiClub) => void;
 }) {
@@ -390,7 +406,11 @@ function ClubCard({
           onJoin={onJoin}
           className="v1c-club-card-join"
         />
-        {shouldShowClaim(c, membership) && (
+        {claim?.status === 'pending' ? (
+          <span className="v1c-claim-pending v1c-club-card-claim-link">
+            Claim review pending
+          </span>
+        ) : shouldShowClaim(c, membership, claim) ? (
           <button
             type="button"
             className="v1c-club-card-claim-link"
@@ -398,7 +418,7 @@ function ClubCard({
           >
             Run this club? Claim ownership →
           </button>
-        )}
+        ) : null}
       </div>
     </article>
   );
@@ -577,17 +597,23 @@ function AdminPanel({ data }: { data: AdminPanelData }) {
 export default function ClubsView({
   clubs: initialClubs,
   membershipBySlug = {},
+  claimBySlug = {},
   isAuthed = false,
   userEmail = null,
 }: {
   clubs: ApiClub[];
   membershipBySlug?: Record<string, Membership>;
+  claimBySlug?: Record<string, Claim>;
   isAuthed?: boolean;
   userEmail?: string | null;
 }) {
   const membershipFor = useCallback(
     (slug: string): Membership | null => membershipBySlug[slug] ?? null,
     [membershipBySlug],
+  );
+  const claimFor = useCallback(
+    (slug: string): Claim | null => claimBySlug[slug] ?? null,
+    [claimBySlug],
   );
   const [allClubs, setAllClubs] = useState<ApiClub[]>(initialClubs);
   const [currentCity, setCurrentCity] = useState<string>('');
@@ -948,6 +974,7 @@ export default function ClubsView({
                     key={c.slug}
                     c={c}
                     membership={membershipFor(c.slug)}
+                    claim={claimFor(c.slug)}
                     onJoin={openJoin}
                     onClaim={openClaim}
                   />
@@ -1029,6 +1056,7 @@ export default function ClubsView({
                     key={c.slug}
                     c={c}
                     membership={membershipFor(c.slug)}
+                    claim={claimFor(c.slug)}
                     onJoin={openJoin}
                     onClaim={openClaim}
                   />

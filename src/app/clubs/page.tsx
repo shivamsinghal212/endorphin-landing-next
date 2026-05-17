@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import ClubsView from './ClubsView';
-import { clubsApi, type MyClubMembership } from '@/lib/api';
+import { clubsApi, type MyClubClaim, type MyClubMembership } from '@/lib/api';
 import { getSessionEmail, getSessionToken } from '@/lib/session';
 import type { JoinFormField } from '@/lib/admin-api';
 
@@ -187,7 +187,11 @@ export default async function ClubsPage() {
     getSessionEmail(),
   ]);
   const membershipBySlug: Record<string, MyClubMembership> = {};
-  for (const c of myClubs) membershipBySlug[c.slug] = c.membership;
+  const claimBySlug: Record<string, MyClubClaim> = {};
+  for (const c of myClubs) {
+    if (c.membership) membershipBySlug[c.slug] = c.membership;
+    if (c.claim) claimBySlug[c.slug] = c.claim;
+  }
   const isAuthed = !!token;
   const jsonLd = buildJsonLd(clubs);
 
@@ -208,6 +212,7 @@ export default async function ClubsPage() {
         <ClubsView
           clubs={clubs}
           membershipBySlug={membershipBySlug}
+          claimBySlug={claimBySlug}
           isAuthed={isAuthed}
           userEmail={userEmail}
         />
