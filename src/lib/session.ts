@@ -24,3 +24,17 @@ export async function clearSessionCookie(): Promise<void> {
   const store = await cookies();
   store.delete(COOKIE_NAME);
 }
+
+export async function getSessionEmail(): Promise<string | null> {
+  const token = await getSessionToken();
+  if (!token) return null;
+  const parts = token.split('.');
+  if (parts.length !== 3) return null;
+  try {
+    const json = Buffer.from(parts[1], 'base64url').toString('utf8');
+    const payload = JSON.parse(json) as { email?: string };
+    return payload.email ?? null;
+  } catch {
+    return null;
+  }
+}

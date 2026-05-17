@@ -4,8 +4,9 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { getClub, type Club, type ClubAdminPerson } from '@/lib/admin-api';
 import { clubsApi, type MyMembership } from '@/lib/api';
-import { getSessionToken } from '@/lib/session';
+import { getSessionEmail, getSessionToken } from '@/lib/session';
 import type { ClubEvent } from '../page';
+import { ClaimClubLink } from './claim-club-link';
 import { ClubIcons } from './club-icons';
 import { JoinClubButton } from './join-club-button';
 import { RsvpButton } from './rsvp-button';
@@ -164,12 +165,13 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 export default async function ClubPage({ params }: PageProps) {
   const { slug } = await params;
   const token = await getSessionToken();
-  const [club, events, myMembership] = await Promise.all([
+  const [club, events, myMembership, userEmail] = await Promise.all([
     getClub(slug).catch(() => null),
     getClubEvents(slug),
     token
       ? clubsApi.getMyMembership(slug, token).catch(() => null)
       : Promise.resolve(null as MyMembership | null),
+    getSessionEmail(),
   ]);
   if (!club || !club.publishedAt) notFound();
 
@@ -187,6 +189,7 @@ export default async function ClubPage({ params }: PageProps) {
           club={club}
           isAuthed={isAuthed}
           myMembership={myMembership}
+          userEmail={userEmail}
         />
         <Ribbon />
         <Stats club={club} />
@@ -319,10 +322,12 @@ function Hero({
   club,
   isAuthed,
   myMembership,
+  userEmail,
 }: {
   club: Club;
   isAuthed: boolean;
   myMembership: MyMembership | null;
+  userEmail: string | null;
 }) {
   return (
     <section className={`hero ${club.headerImageUrl ? 'has-cover' : ''}`}>
@@ -387,6 +392,14 @@ function Hero({
                 myMembership={myMembership}
               />
             </div>
+            {!club.isClaimed && (
+              <ClaimClubLink
+                slug={club.slug}
+                clubName={club.name}
+                isAuthed={isAuthed}
+                userEmail={userEmail}
+              />
+            )}
           </div>
         </aside>
       </div>

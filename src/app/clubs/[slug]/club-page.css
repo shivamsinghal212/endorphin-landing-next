@@ -319,6 +319,25 @@
   align-self: flex-end;
   width: fit-content;
 }
+.club-page .claim-club-link {
+  align-self: center;
+  background: transparent;
+  border: 0;
+  padding: 2px 4px;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  color: rgba(245, 240, 235, 0.55);
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-color: rgba(245, 240, 235, 0.25);
+  transition: color 0.15s ease;
+}
+.club-page .claim-club-link:hover {
+  color: rgba(245, 240, 235, 0.9);
+  text-decoration-color: rgba(245, 240, 235, 0.6);
+}
 /* Hero CTA — single unified pill containing the Join button (left, red
    segment) and the share/social icons (right, glass segment), divided by
    a vertical hairline. Outer pill clips inner corners so the Join button
