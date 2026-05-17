@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation';
 import { auth } from '@/lib/auth';
 import { ClubsListContent } from './_components/clubs-list';
+import { PendingClaimsSection } from './_components/pending-claims';
 
 export default async function AdminClubsPage({
   searchParams,
@@ -14,5 +15,10 @@ export default async function AdminClubsPage({
   const { slug } = await searchParams;
   if (slug) redirect(`/admin/clubs/${encodeURIComponent(slug)}`);
 
-  return <ClubsListContent />;
+  return (
+    <>
+      <PendingClaimsSection />
+      <ClubsListContent />
+    </>
+  );
 }

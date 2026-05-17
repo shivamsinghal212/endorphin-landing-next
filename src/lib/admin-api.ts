@@ -466,3 +466,31 @@ export const deleteClubEvent = (token: string, slug: string, eventId: string) =>
   clubFetch(`/clubs/${encodeURIComponent(slug)}/events/${encodeURIComponent(eventId)}`, token, {
     method: 'DELETE',
   });
+
+// ── Club claim requests ────────────────────────────────────────────────────
+
+export interface ClubClaimRequest {
+  id: string;
+  clubId: string;
+  clubSlug: string;
+  clubName: string;
+  userId: string;
+  claimantName: string;
+  claimantEmail: string;
+  status: 'pending' | 'approved' | 'rejected';
+  createdAt: string;
+  reviewedAt: string | null;
+}
+
+export const listPendingClubClaims = (token: string) =>
+  adminFetch<ClubClaimRequest[]>('/club-claims?status=pending', token);
+
+export const approveClubClaim = (token: string, id: string) =>
+  adminFetch<ClubClaimRequest>(`/club-claims/${encodeURIComponent(id)}/approve`, token, {
+    method: 'POST',
+  });
+
+export const rejectClubClaim = (token: string, id: string) =>
+  adminFetch<ClubClaimRequest>(`/club-claims/${encodeURIComponent(id)}/reject`, token, {
+    method: 'POST',
+  });
