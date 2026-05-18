@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useRef, useState, useTransition } from 'react';
 import LoginModal from '@/components/LoginModal';
 import { logoutAction } from '@/app/actions/auth';
@@ -30,7 +30,13 @@ const LogoMark = () => (
   </svg>
 );
 
-const HeaderClient = ({ isAuthed }: { isAuthed: boolean }) => {
+const HeaderClient = ({
+  isAuthed,
+  canAccessStudio = false,
+}: {
+  isAuthed: boolean;
+  canAccessStudio?: boolean;
+}) => {
   const navRef = useRef<HTMLElement | null>(null);
   const [open, setOpen] = useState(false);
   const [loginOpen, setLoginOpen] = useState(false);
@@ -41,6 +47,20 @@ const HeaderClient = ({ isAuthed }: { isAuthed: boolean }) => {
   const postLoginRef = useRef(false);
   const pathname = usePathname();
   const router = useRouter();
+  const searchParams = useSearchParams();
+
+  // Auto-open the login modal when arriving with ?login=1 (e.g. redirected
+  // from /admin/studio without a session). One-shot — strip the param so
+  // refreshes don't keep re-opening it.
+  useEffect(() => {
+    if (!isAuthed && searchParams?.get('login') === '1') {
+      setLoginOpen(true);
+      const url = new URL(window.location.href);
+      url.searchParams.delete('login');
+      window.history.replaceState(null, '', url.pathname + (url.search || ''));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   // On mobile, send the visitor straight to App Store / Play Store. On
   // desktop, fall back to /#download (the homepage section with both buttons).
   const downloadHref = useStoreLink('/#download');
@@ -73,8 +93,13 @@ const HeaderClient = ({ isAuthed }: { isAuthed: boolean }) => {
 
   const handleLoginSuccess = () => {
     postLoginRef.current = true;
+    const next = searchParams?.get('next');
     startLoginRefresh(() => {
-      router.refresh();
+      if (next && next.startsWith('/')) {
+        router.push(next);
+      } else {
+        router.refresh();
+      }
     });
   };
 
@@ -139,15 +164,29 @@ const HeaderClient = ({ isAuthed }: { isAuthed: boolean }) => {
           })}
           <li className="v1-nav-auth-mobile-li">{authButton}</li>
           <li>
-            <a href={downloadHref} className="v1-nav-cta" onClick={closeMenu}>
-              Download
-            </a>
+            {canAccessStudio ? (
+              <Link href="/admin/studio" className="v1-nav-cta" onClick={closeMenu}>
+                Studio
+              </Link>
+            ) : (
+              <a href={downloadHref} className="v1-nav-cta" onClick={closeMenu}>
+                Download
+              </a>
+            )}
           </li>
         </ul>
 
         <div className="v1-nav-actions-desktop">
           {authButton}
-          <a href={downloadHref} className="v1-nav-cta">Download</a>
+          {canAccessStudio ? (
+            <Link href="/admin/studio" className="v1-nav-cta">
+              Studio
+            </Link>
+          ) : (
+            <a href={downloadHref} className="v1-nav-cta">
+              Download
+            </a>
+          )}
         </div>
 
         <button

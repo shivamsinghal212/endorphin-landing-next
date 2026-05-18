@@ -392,7 +392,7 @@ function Hero({
                 myMembership={myMembership}
               />
             </div>
-            {!club.isClaimed && (
+            {!club.isClaimed && !myMembership?.role && (
               <ClaimClubLink
                 slug={club.slug}
                 clubName={club.name}

@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Admin Panel · 4 Variants</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Poppins:wght@400;500;600;700&family=Fraunces:wght@500;600&display=swap" rel="stylesheet">
+<style>
+body { font-family:'Poppins',sans-serif; background:#F8F6F3; color:#0A0A0A; }
+.display { font-family:'Oswald',sans-serif; text-transform:uppercase; letter-spacing:-0.01em; }
+.serif { font-family:'Fraunces',Georgia,serif; }
+</style>
+</head>
+<body>
+
+<header class="border-b border-black/10">
+  <div class="max-w-6xl mx-auto px-6 py-8">
+    <p class="text-[11px] uppercase tracking-wider text-black/40 mb-2">Endorfin · Admin panel</p>
+    <h1 class="display text-4xl md:text-5xl font-bold mb-3">Four directions.</h1>
+    <p class="text-black/60 max-w-2xl text-sm">Same brand foundation (jet · signal · bone · Oswald · Poppins). Four different opinions on hierarchy, density, and primary surface. Pick one — or mix.</p>
+  </div>
+</header>
+
+<main class="max-w-6xl mx-auto px-6 py-10 grid md:grid-cols-2 gap-5">
+
+  <a href="admin-panel-v1-editorial.html" class="block bg-white border border-black/10 hover:border-black/30 rounded-2xl p-6 transition">
+    <div class="flex items-center justify-between mb-3">
+      <span class="display text-[11px] font-bold text-[#E6232A] tracking-wider">V1</span>
+      <span class="text-xs text-black/40">Lowest risk · highest reuse</span>
+    </div>
+    <h2 class="display text-2xl font-bold mb-2">Heritage Editorial</h2>
+    <p class="text-sm text-black/60 mb-4">Closest to existing super-admin. Sidebar nav, tables, pill tabs. Trust through familiarity. Drop-in compatible with current components.</p>
+    <ul class="text-xs text-black/50 space-y-1">
+      <li>· Sidebar navigation (proven on web)</li>
+      <li>· Table-led club &amp; RSVP lists</li>
+      <li>· Underline tabs for sub-sections</li>
+      <li>· Mobile = collapsed sidebar (existing pattern)</li>
+    </ul>
+  </a>
+
+  <a href="admin-panel-v2-focusstack.html" class="block bg-white border border-black/10 hover:border-black/30 rounded-2xl p-6 transition">
+    <div class="flex items-center justify-between mb-3">
+      <span class="display text-[11px] font-bold text-[#E6232A] tracking-wider">V2</span>
+      <span class="text-xs text-black/40">Mobile-first · most accessible</span>
+    </div>
+    <h2 class="display text-2xl font-bold mb-2">Focus Stack</h2>
+    <p class="text-sm text-black/60 mb-4">No sidebar. Top bar + scrolling chip tabs. One thing at a time, big tap targets, sticky save bar on mobile. Reads like the public web app.</p>
+    <ul class="text-xs text-black/50 space-y-1">
+      <li>· Single column, max-w-3xl on desktop</li>
+      <li>· Chip-tab navigation (horizontal scroll)</li>
+      <li>· Card-based RSVPs with inline approve/reject</li>
+      <li>· Sticky bottom CTA bar on mobile</li>
+    </ul>
+  </a>
+
+  <a href="admin-panel-v3-bento.html" class="block bg-white border border-black/10 hover:border-black/30 rounded-2xl p-6 transition">
+    <div class="flex items-center justify-between mb-3">
+      <span class="display text-[11px] font-bold text-[#E6232A] tracking-wider">V3</span>
+      <span class="text-xs text-black/40">Most visual · dashboard-first</span>
+    </div>
+    <h2 class="display text-2xl font-bold mb-2">Bento Studio</h2>
+    <p class="text-sm text-black/60 mb-4">Modular tile grid. Each function is its own card. Fraunces italic for editorial flourish on identity tile. Scannable at a glance.</p>
+    <ul class="text-xs text-black/50 space-y-1">
+      <li>· 12-col bento grid (stacks on mobile)</li>
+      <li>· Dark hero tile with editorial typography</li>
+      <li>· Pending RSVPs surfaced inline on dashboard</li>
+      <li>· Analytics placeholder feels intentional</li>
+    </ul>
+  </a>
+
+  <a href="admin-panel-v4-console.html" class="block bg-white border border-black/10 hover:border-black/30 rounded-2xl p-6 transition">
+    <div class="flex items-center justify-between mb-3">
+      <span class="display text-[11px] font-bold text-[#E6232A] tracking-wider">V4</span>
+      <span class="text-xs text-black/40">Densest · power-user</span>
+    </div>
+    <h2 class="display text-2xl font-bold mb-2">Command Console</h2>
+    <p class="text-sm text-black/60 mb-4">Three-pane Linear-style layout. Keyboard hints, monospaced metadata, dense rows. Built for the admin who lives here daily.</p>
+    <ul class="text-xs text-black/50 space-y-1">
+      <li>· Nav + list + detail tri-pane</li>
+      <li>· ⌘K search + J/K keyboard shortcuts</li>
+      <li>· Inline edit, no save/cancel modals</li>
+      <li>· Mobile collapses to single column</li>
+    </ul>
+  </a>
+</main>
+
+<section class="max-w-6xl mx-auto px-6 py-10 border-t border-black/10">
+  <p class="display text-xs font-bold mb-3 tracking-wider text-black/40">SHARED ACROSS ALL VARIANTS</p>
+  <ul class="grid sm:grid-cols-2 gap-x-8 gap-y-2 text-sm text-black/70 max-w-3xl">
+    <li>· Role picker on entry (Owner / Organiser / Super-admin)</li>
+    <li>· Brand palette: jet · signal · bone · bg #F8F6F3</li>
+    <li>· Mobile-compatible by default (≥375px tested)</li>
+    <li>· Loading skeletons on every async surface</li>
+    <li>· Owner cannot delete club (visible danger-zone copy)</li>
+    <li>· Analytics shown as placeholder until backend lands</li>
+    <li>· RSVP approve/reject is the new functionality vs super-admin</li>
+    <li>· 44px+ touch targets on all interactive elements</li>
+  </ul>
+</section>
+
+</body>
+</html>

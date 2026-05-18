@@ -1,0 +1,854 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>V5 · Hybrid — Admin Panel (bento + quick nav)</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Poppins:wght@400;500;600;700&family=Fraunces:wght@500;600&display=swap" rel="stylesheet">
+<script>
+tailwind.config = { theme: { extend: {
+  colors: { jet:'#0A0A0A', signal:'#E6232A', bone:'#F5F0EB', bg:'#F8F6F3' },
+  fontFamily: { display:['Oswald','sans-serif'], body:['Poppins','sans-serif'], serif:['Fraunces','Georgia','serif'] },
+} } };
+</script>
+<style>
+  body { font-family:'Poppins',sans-serif; background:#F8F6F3; color:#0A0A0A; }
+  .display { font-family:'Oswald',sans-serif; text-transform:uppercase; letter-spacing:-0.01em; }
+  .label { letter-spacing:0.04em; }
+  .grain { background-image: radial-gradient(rgba(255,255,255,0.06) 1px, transparent 1px); background-size: 3px 3px; }
+  .phone { width: 390px; max-width:100%; border:1px solid rgba(10,10,10,0.1); border-radius:36px; background:white; overflow:hidden; box-shadow:0 30px 60px -30px rgba(10,10,10,0.3); }
+  .no-scrollbar::-webkit-scrollbar { display:none; }
+  .no-scrollbar { -ms-overflow-style:none; scrollbar-width:none; }
+  @keyframes shimmer { 0%{background-position:-400px 0} 100%{background-position:400px 0} }
+  .shimmer { background: linear-gradient(90deg, rgba(10,10,10,0.04) 25%, rgba(10,10,10,0.08) 50%, rgba(10,10,10,0.04) 75%); background-size:800px 100%; animation: shimmer 1.4s linear infinite; }
+</style>
+</head>
+<body>
+
+<header class="bg-jet text-bone">
+  <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between gap-4 flex-wrap">
+    <div>
+      <p class="text-[10px] label uppercase text-bone/50 mb-1">V5 · Recommended hybrid</p>
+      <h1 class="display text-xl font-bold">Bento tiles + simple words + quick-jump nav</h1>
+    </div>
+    <span class="text-xs text-bone/60">V3 visuals · V2 language · sidebar for fast section access</span>
+  </div>
+</header>
+
+<!-- ─────────────────────────────────────────────────────────── -->
+<!-- SECTION A · Manage hub — desktop with quick-nav sidebar      -->
+<!-- ─────────────────────────────────────────────────────────── -->
+<section class="border-b border-jet/10">
+  <div class="max-w-7xl mx-auto px-6 py-10">
+    <p class="text-[11px] label uppercase text-jet/40 mb-2">A · Manage hub (desktop)</p>
+    <h2 class="display text-2xl font-bold mb-1">Two-column: quick-jump + bento</h2>
+    <p class="text-sm text-jet/60 max-w-2xl mb-6">Left rail is the quick navigator (always visible). Right side is what V3 had — bento tiles, but in the simple words from V2. Pending counts surface in the rail so you spot what needs you, even from another section.</p>
+
+    <div class="bg-white rounded-2xl border border-jet/10 overflow-hidden">
+
+      <!-- top bar -->
+      <div class="px-5 py-3 border-b border-jet/10 flex items-center gap-4 flex-wrap">
+        <button class="text-jet/60 text-sm">← My clubs</button>
+        <span class="text-jet/15">|</span>
+        <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-jet to-signal flex-shrink-0"></div>
+        <div class="min-w-0 flex-1">
+          <div class="flex items-center gap-2 flex-wrap">
+            <p class="display text-base font-bold">Bandra Runners</p>
+            <span class="text-[9px] px-1.5 py-0.5 rounded-full bg-green-100 text-green-800 font-medium uppercase">Live</span>
+          </div>
+          <p class="text-[11px] text-jet/50">847 members · 5 pending · updated 2h ago</p>
+        </div>
+        <button class="px-3 py-1.5 rounded-lg border border-jet/10 text-xs hover:bg-jet/5">View public page</button>
+        <button class="px-3 py-1.5 rounded-lg bg-jet text-bone text-xs font-medium">Save</button>
+      </div>
+
+      <div class="flex">
+        <!-- Quick-jump rail -->
+        <aside class="hidden md:flex w-56 flex-shrink-0 flex-col border-r border-jet/10 bg-bg/40">
+          <div class="p-3 space-y-0.5 text-sm">
+            <p class="text-[10px] label uppercase text-jet/40 px-2 py-2">Workspace</p>
+            <a class="flex items-center gap-2.5 px-2.5 py-2 rounded-lg bg-jet text-bone">
+              <span class="w-1.5 h-1.5 rounded-full bg-signal"></span>
+              <span class="text-sm">Overview</span>
+            </a>
+            <p class="text-[10px] label uppercase text-jet/40 px-2 py-2 pt-3">Your club</p>
+            <a class="flex items-center gap-2.5 px-2.5 py-2 rounded-lg hover:bg-jet/5 text-jet/70">About <span class="ml-auto text-[10px] text-jet/40">edit</span></a>
+            <a class="flex items-center gap-2.5 px-2.5 py-2 rounded-lg hover:bg-jet/5 text-jet/70">Stats</a>
+            <a class="flex items-center gap-2.5 px-2.5 py-2 rounded-lg hover:bg-jet/5 text-jet/70">Social &amp; links</a>
+            <a class="flex items-center gap-2.5 px-2.5 py-2 rounded-lg hover:bg-jet/5 text-jet/70">Admins <span class="ml-auto text-[10px] text-jet/40">3</span></a>
+            <a class="flex items-center gap-2.5 px-2.5 py-2 rounded-lg hover:bg-jet/5 text-jet/70">Join form</a>
+            <p class="text-[10px] label uppercase text-jet/40 px-2 py-2 pt-3">People &amp; runs</p>
+            <a class="flex items-center gap-2.5 px-2.5 py-2 rounded-lg hover:bg-jet/5 text-jet/70">Members <span class="ml-auto text-[10px] font-medium text-signal">3 pending</span></a>
+            <a class="flex items-center gap-2.5 px-2.5 py-2 rounded-lg hover:bg-jet/5 text-jet/70">Events <span class="ml-auto text-[10px] text-jet/40">12</span></a>
+            <a class="flex items-center gap-2.5 px-2.5 py-2 rounded-lg hover:bg-jet/5 text-jet/70">RSVPs <span class="ml-auto text-[10px] font-medium text-signal">5 pending</span></a>
+            <p class="text-[10px] label uppercase text-jet/40 px-2 py-2 pt-3">Insights</p>
+            <a class="flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-jet/40">Analytics <span class="ml-auto text-[10px]">soon</span></a>
+          </div>
+          <div class="mt-auto p-4 border-t border-jet/10">
+            <p class="text-[10px] label uppercase text-jet/40 mb-1">Need help?</p>
+            <a class="text-xs text-signal hover:underline">Read the owner guide →</a>
+          </div>
+        </aside>
+
+        <!-- Main bento canvas -->
+        <main class="flex-1 p-5 md:p-6">
+          <!-- Heads-up strip -->
+          <div class="bg-signal/5 border border-signal/15 rounded-xl p-3 mb-5 flex items-center gap-3">
+            <span class="w-8 h-8 rounded-full bg-signal text-white flex items-center justify-center font-bold text-sm">!</span>
+            <p class="text-sm flex-1"><span class="font-medium">5 runners</span> want to join Sunday's run. Take a look?</p>
+            <button class="text-xs px-3 py-1.5 rounded-lg bg-signal text-white font-medium">Review</button>
+          </div>
+
+          <div class="grid grid-cols-12 gap-3 md:gap-4 auto-rows-[140px]">
+
+            <!-- Identity hero -->
+            <div class="col-span-12 md:col-span-7 row-span-2 rounded-3xl bg-jet text-bone p-6 overflow-hidden relative">
+              <div class="absolute inset-0 grain opacity-30"></div>
+              <div class="relative h-full flex flex-col">
+                <p class="text-[10px] label uppercase text-bone/50">Your club</p>
+                <p class="font-serif italic text-4xl md:text-5xl leading-[0.95] mt-auto">847 humans<br/>moving together.</p>
+                <div class="mt-4 flex flex-wrap items-center gap-2">
+                  <button class="px-3 py-1.5 rounded-lg bg-bone text-jet text-xs font-medium">Edit about</button>
+                  <button class="px-3 py-1.5 rounded-lg border border-bone/20 text-xs">Change cover</button>
+                  <span class="text-[11px] text-bone/40">·</span>
+                  <span class="text-[11px] text-bone/60">Bandstand · est. 2019</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- KPIs -->
+            <div class="col-span-6 md:col-span-3 rounded-2xl bg-white border border-jet/10 p-4 flex flex-col justify-between">
+              <p class="text-[10px] label uppercase text-jet/40">Members</p>
+              <div><p class="display text-3xl font-bold tabular-nums">847</p><p class="text-[11px] text-green-700">+24 this week</p></div>
+            </div>
+            <div class="col-span-6 md:col-span-2 rounded-2xl bg-white border border-jet/10 p-4 flex flex-col justify-between">
+              <p class="text-[10px] label uppercase text-jet/40">Pending</p>
+              <div><p class="display text-3xl font-bold text-signal tabular-nums">5</p><p class="text-[11px] text-jet/50">RSVPs</p></div>
+            </div>
+            <div class="col-span-4 md:col-span-3 rounded-2xl bg-white border border-jet/10 p-4 flex flex-col justify-between">
+              <p class="text-[10px] label uppercase text-jet/40">This month</p>
+              <div><p class="display text-3xl font-bold tabular-nums">23</p><p class="text-[11px] text-jet/50">runs</p></div>
+            </div>
+            <div class="col-span-4 md:col-span-2 rounded-2xl bg-white border border-jet/10 p-4 flex flex-col justify-between">
+              <p class="text-[10px] label uppercase text-jet/40">KMs</p>
+              <div><p class="display text-3xl font-bold tabular-nums">312</p><p class="text-[11px] text-jet/50">community</p></div>
+            </div>
+
+            <!-- Next event tile -->
+            <div class="col-span-12 md:col-span-7 row-span-2 rounded-2xl bg-white border border-jet/10 p-5">
+              <div class="flex items-center justify-between mb-3">
+                <p class="display text-sm font-bold">Up next</p>
+                <a class="text-xs text-signal hover:underline">Manage all events →</a>
+              </div>
+              <div class="space-y-2.5">
+                <a class="flex items-center gap-3 p-3 rounded-xl border border-jet/5 hover:bg-bg">
+                  <div class="w-12 h-12 rounded-lg bg-jet text-bone flex flex-col items-center justify-center flex-shrink-0">
+                    <span class="text-[9px]">SUN</span><span class="display text-base font-bold leading-none">18</span>
+                  </div>
+                  <div class="flex-1 min-w-0">
+                    <p class="text-sm font-medium truncate">Sunday long run · 10K</p>
+                    <p class="text-xs text-jet/50">6 AM · Bandstand promenade</p>
+                  </div>
+                  <span class="text-xs text-jet/60"><span class="font-medium">42</span> going</span>
+                  <span class="text-[10px] px-2 py-0.5 rounded-full bg-signal/10 text-signal font-medium whitespace-nowrap">5 to approve</span>
+                </a>
+                <a class="flex items-center gap-3 p-3 rounded-xl border border-jet/5 hover:bg-bg">
+                  <div class="w-12 h-12 rounded-lg bg-jet text-bone flex flex-col items-center justify-center flex-shrink-0">
+                    <span class="text-[9px]">THU</span><span class="display text-base font-bold leading-none">22</span>
+                  </div>
+                  <div class="flex-1 min-w-0">
+                    <p class="text-sm font-medium truncate">Tempo Thursday</p>
+                    <p class="text-xs text-jet/50">6:15 AM · Carter Road</p>
+                  </div>
+                  <span class="text-xs text-jet/60"><span class="font-medium">28</span> going</span>
+                </a>
+                <a class="flex items-center gap-3 p-3 rounded-xl border border-dashed border-jet/15 text-jet/50 hover:bg-bg">
+                  <span class="w-12 h-12 rounded-lg bg-jet/5 flex items-center justify-center text-2xl">+</span>
+                  <span class="text-sm">Add a new event</span>
+                </a>
+              </div>
+            </div>
+
+            <!-- People who want in -->
+            <div class="col-span-12 md:col-span-5 row-span-2 rounded-2xl bg-signal/5 border border-signal/15 p-5">
+              <div class="flex items-center justify-between mb-3">
+                <p class="display text-sm font-bold text-signal">People who want in</p>
+                <span class="text-xs text-signal">5 waiting</span>
+              </div>
+              <div class="space-y-2">
+                <div class="bg-white rounded-xl p-3 flex items-center gap-3">
+                  <div class="w-9 h-9 rounded-full bg-gradient-to-br from-signal to-jet text-white text-[10px] font-bold flex items-center justify-center">AS</div>
+                  <div class="flex-1 min-w-0">
+                    <p class="text-sm font-medium truncate">Anita Sharma</p>
+                    <p class="text-[10px] text-jet/50 truncate">5:30 pace · first time</p>
+                  </div>
+                  <button class="text-green-700 hover:bg-green-50 rounded-md w-8 h-8 flex items-center justify-center text-lg leading-none">✓</button>
+                  <button class="text-jet/40 hover:bg-jet/5 rounded-md w-8 h-8 flex items-center justify-center text-lg leading-none">×</button>
+                </div>
+                <div class="bg-white rounded-xl p-3 flex items-center gap-3">
+                  <div class="w-9 h-9 rounded-full bg-gradient-to-br from-jet to-signal/60 text-white text-[10px] font-bold flex items-center justify-center">RJ</div>
+                  <div class="flex-1 min-w-0">
+                    <p class="text-sm font-medium truncate">Rohan Joshi</p>
+                    <p class="text-[10px] text-jet/50 truncate">4:45 pace · member 1y</p>
+                  </div>
+                  <button class="text-green-700 hover:bg-green-50 rounded-md w-8 h-8 flex items-center justify-center text-lg leading-none">✓</button>
+                  <button class="text-jet/40 hover:bg-jet/5 rounded-md w-8 h-8 flex items-center justify-center text-lg leading-none">×</button>
+                </div>
+                <div class="bg-white rounded-xl p-3 flex items-center gap-3">
+                  <div class="w-9 h-9 rounded-full shimmer"></div>
+                  <div class="flex-1 space-y-2"><div class="h-3 rounded shimmer w-24"></div><div class="h-2.5 rounded shimmer w-32"></div></div>
+                </div>
+              </div>
+              <a class="block mt-3 text-center text-xs font-medium text-signal hover:underline">See all 5 →</a>
+            </div>
+
+            <!-- About preview -->
+            <div class="col-span-12 md:col-span-4 rounded-2xl bg-white border border-jet/10 p-5">
+              <div class="flex items-center justify-between mb-2">
+                <p class="display text-sm font-bold">About</p>
+                <a class="text-xs text-signal hover:underline">Edit</a>
+              </div>
+              <p class="text-sm text-jet/70 line-clamp-3">A pace for every soul. We meet every Sunday at Bandstand promenade, rain or shine. Easy, tempo and long runs each week.</p>
+              <div class="mt-3 flex flex-wrap gap-1.5">
+                <span class="text-[10px] px-2 py-0.5 rounded-full bg-bg border border-jet/10">5K – 21K</span>
+                <span class="text-[10px] px-2 py-0.5 rounded-full bg-bg border border-jet/10">Beginner-friendly</span>
+                <span class="text-[10px] px-2 py-0.5 rounded-full bg-bg border border-jet/10">Coffee after</span>
+              </div>
+            </div>
+
+            <!-- Channels -->
+            <div class="col-span-12 md:col-span-4 rounded-2xl bg-white border border-jet/10 p-5">
+              <div class="flex items-center justify-between mb-3">
+                <p class="display text-sm font-bold">Where you live online</p>
+                <a class="text-xs text-signal hover:underline">Edit</a>
+              </div>
+              <ul class="text-sm space-y-1.5">
+                <li class="flex items-center justify-between"><span class="text-jet/70">WhatsApp group</span><span class="text-green-700 text-xs">linked</span></li>
+                <li class="flex items-center justify-between"><span class="text-jet/70">Instagram</span><span class="text-green-700 text-xs">linked</span></li>
+                <li class="flex items-center justify-between"><span class="text-jet/70">Strava club</span><span class="text-jet/40 text-xs">add link</span></li>
+                <li class="flex items-center justify-between"><span class="text-jet/70">Join URL</span><span class="text-jet/40 text-xs">add link</span></li>
+              </ul>
+            </div>
+
+            <!-- Admins -->
+            <div class="col-span-12 md:col-span-4 rounded-2xl bg-white border border-jet/10 p-5">
+              <div class="flex items-center justify-between mb-3">
+                <p class="display text-sm font-bold">Co-admins</p>
+                <a class="text-xs text-signal hover:underline">+ Invite</a>
+              </div>
+              <div class="flex -space-x-2 mb-2">
+                <div class="w-9 h-9 rounded-full bg-gradient-to-br from-signal to-jet text-white text-xs font-bold flex items-center justify-center ring-2 ring-white">SS</div>
+                <div class="w-9 h-9 rounded-full bg-gradient-to-br from-jet to-signal/60 text-white text-xs font-bold flex items-center justify-center ring-2 ring-white">RM</div>
+                <div class="w-9 h-9 rounded-full bg-gradient-to-br from-jet/60 to-signal/40 text-white text-xs font-bold flex items-center justify-center ring-2 ring-white">PK</div>
+              </div>
+              <p class="text-xs text-jet/50">You + 2 others can edit this club.</p>
+            </div>
+
+            <!-- Join form preview -->
+            <div class="col-span-12 md:col-span-6 rounded-2xl bg-white border border-jet/10 p-5">
+              <div class="flex items-center justify-between mb-3">
+                <p class="display text-sm font-bold">How people join</p>
+                <a class="text-xs text-signal hover:underline">Customise</a>
+              </div>
+              <p class="text-sm text-jet/70 mb-2"><span class="font-medium">Approval required</span> · 4 questions on the join form</p>
+              <ul class="text-xs text-jet/50 space-y-0.5">
+                <li>· Name, phone (required)</li>
+                <li>· Pace and goal distance</li>
+                <li>· Where did you hear about us?</li>
+              </ul>
+            </div>
+
+            <!-- Analytics placeholder -->
+            <div class="col-span-12 md:col-span-6 rounded-2xl bg-jet text-bone p-5 overflow-hidden relative">
+              <div class="absolute inset-0 grain opacity-20"></div>
+              <div class="relative">
+                <p class="text-[10px] label uppercase text-bone/50 mb-1">Insights</p>
+                <p class="font-serif italic text-2xl leading-tight mb-2">Coming soon.</p>
+                <p class="text-xs text-bone/60 max-w-xs">Member growth · attendance · drop-off · favourite distances. We'll turn this on once we have a few weeks of data.</p>
+                <div class="mt-3 flex gap-1 items-end h-10 opacity-30">
+                  <div class="w-3 bg-bone/40 rounded-t" style="height:30%"></div>
+                  <div class="w-3 bg-bone/50 rounded-t" style="height:50%"></div>
+                  <div class="w-3 bg-bone/60 rounded-t" style="height:40%"></div>
+                  <div class="w-3 bg-bone/70 rounded-t" style="height:70%"></div>
+                  <div class="w-3 bg-bone rounded-t" style="height:85%"></div>
+                  <div class="w-3 bg-signal rounded-t" style="height:100%"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─────────────────────────────────────────────────────────── -->
+<!-- SECTION B · Manage hub — mobile drill-down                  -->
+<!-- ─────────────────────────────────────────────────────────── -->
+<section class="border-b border-jet/10">
+  <div class="max-w-7xl mx-auto px-6 py-10">
+    <p class="text-[11px] label uppercase text-jet/40 mb-2">B · Manage hub (mobile)</p>
+    <h2 class="display text-2xl font-bold mb-1">Drill-down list (mirrors mobile app)</h2>
+    <p class="text-sm text-jet/60 max-w-2xl mb-6">Each section is one tap. Pending items surface red on the row. The "Approve people" CTA is always reachable, even buried inside the events tab.</p>
+
+    <div class="flex flex-col lg:flex-row gap-8 items-start justify-center">
+      <!-- Phone -->
+      <div class="phone flex-shrink-0 mx-auto">
+        <div class="px-5 pt-8 pb-3 flex items-center gap-3 border-b border-jet/5">
+          <button class="text-jet/60">←</button>
+          <div class="flex-1 min-w-0">
+            <p class="display text-base font-bold truncate">Manage</p>
+          </div>
+          <button class="text-jet/60">⋯</button>
+        </div>
+
+        <!-- Hero card -->
+        <div class="px-4 py-4 bg-bg">
+          <div class="bg-white rounded-2xl border border-jet/10 p-4 mb-3">
+            <div class="flex items-center gap-3 mb-3">
+              <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-jet to-signal flex-shrink-0"></div>
+              <div class="flex-1 min-w-0">
+                <p class="display text-base font-bold truncate">Bandra Runners</p>
+                <p class="text-[11px] text-jet/50">847 members · Mumbai</p>
+              </div>
+              <span class="text-[9px] px-1.5 py-0.5 rounded-full bg-green-100 text-green-800 font-medium uppercase">Live</span>
+            </div>
+            <button class="w-full bg-jet text-bone rounded-xl py-2.5 text-sm font-medium">View public page</button>
+          </div>
+
+          <!-- Heads-up -->
+          <div class="bg-signal/5 border border-signal/15 rounded-xl p-3 mb-3 flex items-center gap-2">
+            <span class="w-7 h-7 rounded-full bg-signal text-white flex items-center justify-center text-xs font-bold">!</span>
+            <p class="text-xs flex-1"><span class="font-medium">5 runners</span> waiting for your nod</p>
+            <button class="text-[10px] px-2.5 py-1 rounded-md bg-signal text-white font-medium">Review</button>
+          </div>
+
+          <!-- Section list cards -->
+          <div class="bg-white rounded-2xl border border-jet/10 overflow-hidden">
+            <a class="flex items-center gap-3 px-4 py-3.5 border-b border-jet/5">
+              <div class="flex-1 min-w-0">
+                <p class="text-sm font-medium">About</p>
+                <p class="text-[11px] text-jet/50 truncate">A pace for every soul.</p>
+              </div>
+              <span class="text-jet/30">›</span>
+            </a>
+            <a class="flex items-center gap-3 px-4 py-3.5 border-b border-jet/5">
+              <div class="flex-1 min-w-0">
+                <p class="text-sm font-medium">Stats</p>
+                <p class="text-[11px] text-jet/50">847 · 23 runs · 312 km</p>
+              </div>
+              <span class="text-jet/30">›</span>
+            </a>
+            <a class="flex items-center gap-3 px-4 py-3.5 border-b border-jet/5">
+              <div class="flex-1 min-w-0">
+                <p class="text-sm font-medium">Social &amp; links</p>
+                <p class="text-[11px] text-jet/50">WhatsApp ✓ · IG ✓ · Strava —</p>
+              </div>
+              <span class="text-jet/30">›</span>
+            </a>
+            <a class="flex items-center gap-3 px-4 py-3.5 border-b border-jet/5">
+              <div class="flex-1 min-w-0">
+                <p class="text-sm font-medium">Members</p>
+                <p class="text-[11px] text-signal font-medium">3 pending requests</p>
+              </div>
+              <span class="text-jet/30">›</span>
+            </a>
+            <a class="flex items-center gap-3 px-4 py-3.5 border-b border-jet/5">
+              <div class="flex-1 min-w-0">
+                <p class="text-sm font-medium">Events</p>
+                <p class="text-[11px] text-jet/50">12 upcoming · 47 past</p>
+              </div>
+              <span class="text-jet/30">›</span>
+            </a>
+            <a class="flex items-center gap-3 px-4 py-3.5 border-b border-jet/5">
+              <div class="flex-1 min-w-0">
+                <p class="text-sm font-medium">RSVPs</p>
+                <p class="text-[11px] text-signal font-medium">5 pending across 1 event</p>
+              </div>
+              <span class="text-jet/30">›</span>
+            </a>
+            <a class="flex items-center gap-3 px-4 py-3.5 border-b border-jet/5">
+              <div class="flex-1 min-w-0">
+                <p class="text-sm font-medium">Admins</p>
+                <p class="text-[11px] text-jet/50">You + 2 others</p>
+              </div>
+              <span class="text-jet/30">›</span>
+            </a>
+            <a class="flex items-center gap-3 px-4 py-3.5 border-b border-jet/5">
+              <div class="flex-1 min-w-0">
+                <p class="text-sm font-medium">Join form</p>
+                <p class="text-[11px] text-jet/50">Approval required · 4 questions</p>
+              </div>
+              <span class="text-jet/30">›</span>
+            </a>
+            <a class="flex items-center gap-3 px-4 py-3.5 opacity-60">
+              <div class="flex-1 min-w-0">
+                <p class="text-sm font-medium">Insights</p>
+                <p class="text-[11px] text-jet/40">Coming soon</p>
+              </div>
+              <span class="text-jet/20">·</span>
+            </a>
+          </div>
+
+          <!-- Danger zone (no delete) -->
+          <p class="text-[11px] text-jet/40 mt-4 px-1">Owners can change anything but can't delete the club. <a class="text-signal">Request removal</a></p>
+        </div>
+      </div>
+
+      <!-- Notes -->
+      <div class="flex-1 max-w-md">
+        <h3 class="display text-lg font-bold mb-3">Why this works</h3>
+        <ul class="text-sm text-jet/70 space-y-2.5">
+          <li>· <span class="font-medium">Mirrors the existing mobile app</span> sectioned list — zero learning curve for owners already on iOS/Android.</li>
+          <li>· <span class="font-medium">Pending counts in row subtitles</span> mean nothing important hides behind a tap.</li>
+          <li>· <span class="font-medium">One primary CTA at top</span> (View public page or Approve) — never two competing actions.</li>
+          <li>· <span class="font-medium">Big tap targets</span> · 56px row height, full-width cards · meets HIG/MD touch standards.</li>
+          <li>· <span class="font-medium">Same row content</span> as desktop sidebar — single source of truth for sections.</li>
+        </ul>
+
+        <div class="mt-6 p-4 bg-bg rounded-xl border border-jet/10">
+          <p class="display text-xs font-bold mb-2">Language pass · examples</p>
+          <table class="text-xs w-full">
+            <tr class="border-b border-jet/5"><td class="py-1.5 text-jet/40 pr-3">Was</td><td class="py-1.5 font-medium">Now</td></tr>
+            <tr class="border-b border-jet/5"><td class="py-1.5 text-jet/60">"Pending RSVPs"</td><td class="py-1.5">"People who want in"</td></tr>
+            <tr class="border-b border-jet/5"><td class="py-1.5 text-jet/60">"Identity"</td><td class="py-1.5">"About"</td></tr>
+            <tr class="border-b border-jet/5"><td class="py-1.5 text-jet/60">"Visibility"</td><td class="py-1.5">"Where this shows"</td></tr>
+            <tr class="border-b border-jet/5"><td class="py-1.5 text-jet/60">"Channels"</td><td class="py-1.5">"Where you live online"</td></tr>
+            <tr><td class="py-1.5 text-jet/60">"Analytics"</td><td class="py-1.5">"Insights"</td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─────────────────────────────────────────────────────────── -->
+<!-- SECTION C · Event edit — three approaches to dense fields    -->
+<!-- ─────────────────────────────────────────────────────────── -->
+<section>
+  <div class="max-w-7xl mx-auto px-6 py-10 pb-20">
+    <p class="text-[11px] label uppercase text-jet/40 mb-2">C · Event edit · field-heavy</p>
+    <h2 class="display text-2xl font-bold mb-1">Three ways to organise ~20 fields</h2>
+    <p class="text-sm text-jet/60 max-w-2xl mb-6">Event has the same fields as the mobile app: title · type · description · location name/address · start/end date+time · distance · max participants · cover · recap (summary · attended · pace groups · after · photos[] with captions · videos[] with poster &amp; duration). Pick how to display.</p>
+
+    <!-- ─── C1 · sectioned single-page with TOC sidebar ─── -->
+    <div class="mb-12">
+      <div class="flex items-center gap-3 mb-3 flex-wrap">
+        <span class="display text-[10px] font-bold tracking-wider text-signal px-2 py-1 rounded bg-signal/10">RECOMMENDED · C1</span>
+        <h3 class="display text-lg font-bold">Single page · sticky TOC sidebar</h3>
+        <span class="text-xs text-jet/50">→ same paradigm as the manage hub · always see where you are</span>
+      </div>
+
+      <div class="bg-white rounded-2xl border border-jet/10 overflow-hidden">
+        <div class="px-5 py-3 border-b border-jet/10 flex items-center gap-3 flex-wrap">
+          <button class="text-jet/60 text-sm">← Events</button>
+          <p class="display text-base font-bold flex-1">Sunday long run · 10K</p>
+          <span class="text-xs text-jet/50">Auto-saved 2s ago</span>
+          <button class="px-3 py-1.5 rounded-lg border border-jet/10 text-xs">Preview</button>
+          <button class="px-3 py-1.5 rounded-lg bg-jet text-bone text-xs font-medium">Publish event</button>
+        </div>
+
+        <div class="flex">
+          <!-- TOC -->
+          <aside class="hidden md:block w-52 flex-shrink-0 border-r border-jet/10 bg-bg/40 p-3 text-sm space-y-0.5 sticky top-0 self-start">
+            <p class="text-[10px] label uppercase text-jet/40 px-2 py-2">Jump to</p>
+            <a class="block px-2.5 py-1.5 rounded-md bg-jet text-bone">The basics</a>
+            <a class="block px-2.5 py-1.5 rounded-md hover:bg-jet/5 text-jet/70">When &amp; where</a>
+            <a class="block px-2.5 py-1.5 rounded-md hover:bg-jet/5 text-jet/70">Run details</a>
+            <a class="block px-2.5 py-1.5 rounded-md hover:bg-jet/5 text-jet/70">Cover image</a>
+            <a class="block px-2.5 py-1.5 rounded-md hover:bg-jet/5 text-jet/70 flex items-center justify-between">Recap <span class="text-[10px] text-jet/40">past event</span></a>
+            <div class="border-t border-jet/10 my-3"></div>
+            <p class="text-[10px] label uppercase text-jet/40 px-2 py-2">After publish</p>
+            <a class="block px-2.5 py-1.5 rounded-md hover:bg-jet/5 text-jet/70 flex items-center justify-between">RSVPs <span class="text-[10px] font-medium text-signal">5</span></a>
+            <a class="block px-2.5 py-1.5 rounded-md hover:bg-jet/5 text-jet/70">Going · 42</a>
+            <div class="border-t border-jet/10 my-3"></div>
+            <a class="block px-2.5 py-1.5 rounded-md text-signal text-xs">Delete this event</a>
+          </aside>
+
+          <!-- Form canvas -->
+          <main class="flex-1 p-5 md:p-6 space-y-5">
+
+            <!-- Basics section -->
+            <section class="bg-bg rounded-2xl border border-jet/10 p-5">
+              <div class="flex items-center justify-between mb-4">
+                <p class="display text-sm font-bold">The basics</p>
+                <span class="text-[10px] text-green-700">Looking good</span>
+              </div>
+
+              <div class="grid sm:grid-cols-[1fr_180px] gap-3 mb-3">
+                <div>
+                  <label class="block text-[11px] label uppercase text-jet/50 mb-1">What's it called <span class="text-signal">·</span></label>
+                  <input value="Sunday long run · 10K" class="w-full px-3 py-2.5 rounded-xl border border-jet/10 text-sm bg-white focus:border-jet outline-none"/>
+                </div>
+                <div>
+                  <label class="block text-[11px] label uppercase text-jet/50 mb-1">Type</label>
+                  <div class="inline-flex rounded-xl bg-white border border-jet/10 p-0.5 w-full">
+                    <button class="flex-1 px-2.5 py-2 rounded-lg bg-jet text-bone text-xs font-medium">Club run</button>
+                    <button class="flex-1 px-2.5 py-2 rounded-lg text-jet/50 text-xs">Race event</button>
+                  </div>
+                </div>
+              </div>
+
+              <label class="block text-[11px] label uppercase text-jet/50 mb-1">Tell folks what to expect</label>
+              <textarea rows="3" class="w-full px-3 py-2.5 rounded-xl border border-jet/10 text-sm bg-white focus:border-jet outline-none" placeholder="Pace groups, meeting point, what to bring…">Three pace groups (5:00 / 5:30 / 6:00). Meet at the gazebo. Coffee after.</textarea>
+              <p class="text-[11px] text-jet/40 mt-1">This shows on the event card and in the WhatsApp share preview.</p>
+            </section>
+
+            <!-- When & where -->
+            <section class="bg-bg rounded-2xl border border-jet/10 p-5">
+              <p class="display text-sm font-bold mb-4">When &amp; where</p>
+              <div class="grid sm:grid-cols-2 gap-3">
+                <div>
+                  <label class="block text-[11px] label uppercase text-jet/50 mb-1">Starts <span class="text-signal">·</span></label>
+                  <input type="datetime-local" value="2026-05-18T06:00" class="w-full px-3 py-2.5 rounded-xl border border-jet/10 text-sm bg-white"/>
+                </div>
+                <div>
+                  <label class="block text-[11px] label uppercase text-jet/50 mb-1">Ends (optional)</label>
+                  <input type="datetime-local" value="2026-05-18T08:00" class="w-full px-3 py-2.5 rounded-xl border border-jet/10 text-sm bg-white"/>
+                </div>
+                <div class="sm:col-span-2">
+                  <label class="block text-[11px] label uppercase text-jet/50 mb-1">Place name</label>
+                  <input value="Bandstand promenade" class="w-full px-3 py-2.5 rounded-xl border border-jet/10 text-sm bg-white"/>
+                </div>
+                <div class="sm:col-span-2">
+                  <label class="block text-[11px] label uppercase text-jet/50 mb-1">Address (helps maps)</label>
+                  <input value="Bandstand, Bandra West, Mumbai" class="w-full px-3 py-2.5 rounded-xl border border-jet/10 text-sm bg-white"/>
+                </div>
+              </div>
+            </section>
+
+            <!-- Run details -->
+            <section class="bg-bg rounded-2xl border border-jet/10 p-5">
+              <p class="display text-sm font-bold mb-4">Run details</p>
+              <div class="grid sm:grid-cols-2 gap-3">
+                <div>
+                  <label class="block text-[11px] label uppercase text-jet/50 mb-1">Distance (km)</label>
+                  <input value="10" class="w-full px-3 py-2.5 rounded-xl border border-jet/10 text-sm bg-white"/>
+                </div>
+                <div>
+                  <label class="block text-[11px] label uppercase text-jet/50 mb-1">Cap on RSVPs (optional)</label>
+                  <input placeholder="No limit" class="w-full px-3 py-2.5 rounded-xl border border-jet/10 text-sm bg-white"/>
+                  <p class="text-[11px] text-jet/40 mt-1">Leave blank for unlimited.</p>
+                </div>
+              </div>
+            </section>
+
+            <!-- Cover -->
+            <section class="bg-bg rounded-2xl border border-jet/10 p-5">
+              <div class="flex items-center justify-between mb-3">
+                <p class="display text-sm font-bold">Cover image</p>
+                <span class="text-[11px] text-jet/40">Optional · used on event card</span>
+              </div>
+              <div class="aspect-[16/7] rounded-xl bg-gradient-to-br from-jet to-signal/60 flex items-end p-4 text-bone">
+                <div>
+                  <p class="text-[10px] label uppercase text-bone/60">Preview</p>
+                  <p class="display text-lg font-bold">Sunday long run · 10K</p>
+                </div>
+                <button class="ml-auto px-3 py-1.5 rounded-lg bg-bone/15 backdrop-blur text-xs">Replace</button>
+              </div>
+            </section>
+
+            <!-- Recap (collapsed by default for future events) -->
+            <section class="bg-bg rounded-2xl border border-jet/10 p-5">
+              <div class="flex items-center justify-between">
+                <div>
+                  <p class="display text-sm font-bold">Recap</p>
+                  <p class="text-[11px] text-jet/50">Add after the run · photos, notes, who showed up</p>
+                </div>
+                <button class="text-xs text-signal font-medium hover:underline">Show fields ↓</button>
+              </div>
+              <!-- collapsed preview -->
+              <div class="mt-3 grid grid-cols-3 gap-2 opacity-50">
+                <div class="aspect-square rounded-lg bg-jet/5"></div>
+                <div class="aspect-square rounded-lg bg-jet/5"></div>
+                <div class="aspect-square rounded-lg bg-jet/5"></div>
+              </div>
+            </section>
+
+            <!-- Sticky footer save -->
+            <div class="sticky bottom-3 bg-white border border-jet/10 rounded-xl p-3 shadow-lg flex items-center gap-3">
+              <span class="text-xs text-jet/50 flex-1">All changes auto-saved · last saved 2s ago</span>
+              <button class="px-3 py-1.5 rounded-lg border border-jet/10 text-xs">Discard</button>
+              <button class="px-3 py-1.5 rounded-lg bg-jet text-bone text-xs font-medium">Publish event</button>
+            </div>
+          </main>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── C2 + C3 side-by-side ─── -->
+    <div class="grid lg:grid-cols-2 gap-6 mb-8">
+
+      <!-- C2 wizard -->
+      <div>
+        <div class="flex items-center gap-3 mb-3 flex-wrap">
+          <span class="display text-[10px] font-bold tracking-wider text-jet/50 px-2 py-1 rounded bg-jet/5">C2</span>
+          <h3 class="display text-base font-bold">Step-by-step (mobile-flow)</h3>
+        </div>
+        <div class="bg-white rounded-2xl border border-jet/10 p-5">
+          <!-- progress -->
+          <div class="flex items-center gap-1 mb-5">
+            <div class="flex-1 h-1.5 rounded-full bg-jet"></div>
+            <div class="flex-1 h-1.5 rounded-full bg-jet"></div>
+            <div class="flex-1 h-1.5 rounded-full bg-jet/15"></div>
+            <div class="flex-1 h-1.5 rounded-full bg-jet/15"></div>
+            <div class="flex-1 h-1.5 rounded-full bg-jet/15"></div>
+          </div>
+          <p class="text-[11px] label uppercase text-jet/40 mb-1">Step 2 of 5 · When &amp; where</p>
+          <h4 class="display text-2xl font-bold mb-1">When are folks running?</h4>
+          <p class="text-sm text-jet/60 mb-5">You can edit any of this later.</p>
+
+          <div class="space-y-3">
+            <div>
+              <label class="block text-[11px] label uppercase text-jet/50 mb-1">Starts</label>
+              <input type="datetime-local" value="2026-05-18T06:00" class="w-full px-3 py-2.5 rounded-xl border border-jet/10 text-sm"/>
+            </div>
+            <div>
+              <label class="block text-[11px] label uppercase text-jet/50 mb-1">Where (place name)</label>
+              <input value="Bandstand promenade" class="w-full px-3 py-2.5 rounded-xl border border-jet/10 text-sm"/>
+            </div>
+            <div>
+              <label class="block text-[11px] label uppercase text-jet/50 mb-1">Address</label>
+              <input value="Bandstand, Bandra West, Mumbai" class="w-full px-3 py-2.5 rounded-xl border border-jet/10 text-sm"/>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-2 mt-5">
+            <button class="flex-1 px-4 py-2.5 rounded-xl border border-jet/10 text-sm">← Back</button>
+            <button class="flex-1 px-4 py-2.5 rounded-xl bg-jet text-bone text-sm font-medium">Continue →</button>
+          </div>
+
+          <p class="text-[11px] text-jet/40 mt-4">Best for: first-time event creators · friendlier on mobile · enforces required fields step by step.</p>
+        </div>
+      </div>
+
+      <!-- C3 accordion -->
+      <div>
+        <div class="flex items-center gap-3 mb-3 flex-wrap">
+          <span class="display text-[10px] font-bold tracking-wider text-jet/50 px-2 py-1 rounded bg-jet/5">C3</span>
+          <h3 class="display text-base font-bold">Stacked accordion (one-screen scroll)</h3>
+        </div>
+        <div class="bg-white rounded-2xl border border-jet/10 p-3">
+          <!-- expanded -->
+          <details open class="rounded-xl border border-jet/10 mb-2 group">
+            <summary class="flex items-center justify-between cursor-pointer p-4 list-none">
+              <div>
+                <p class="display text-sm font-bold">The basics</p>
+                <p class="text-[11px] text-jet/50">Sunday long run · Club run · 10K</p>
+              </div>
+              <span class="text-jet/40 group-open:rotate-90 transition-transform">›</span>
+            </summary>
+            <div class="px-4 pb-4 space-y-2">
+              <input value="Sunday long run · 10K" class="w-full px-3 py-2 rounded-lg border border-jet/10 text-sm"/>
+              <textarea rows="2" class="w-full px-3 py-2 rounded-lg border border-jet/10 text-sm">Three pace groups…</textarea>
+            </div>
+          </details>
+          <details class="rounded-xl border border-jet/10 mb-2 group">
+            <summary class="flex items-center justify-between cursor-pointer p-4 list-none">
+              <div>
+                <p class="display text-sm font-bold">When &amp; where</p>
+                <p class="text-[11px] text-jet/50">Sun 18 May, 6 AM · Bandstand</p>
+              </div>
+              <span class="text-jet/40">›</span>
+            </summary>
+          </details>
+          <details class="rounded-xl border border-jet/10 mb-2 group">
+            <summary class="flex items-center justify-between cursor-pointer p-4 list-none">
+              <div>
+                <p class="display text-sm font-bold">Run details</p>
+                <p class="text-[11px] text-jet/50">10K · no cap</p>
+              </div>
+              <span class="text-jet/40">›</span>
+            </summary>
+          </details>
+          <details class="rounded-xl border border-jet/10 mb-2 group">
+            <summary class="flex items-center justify-between cursor-pointer p-4 list-none">
+              <div>
+                <p class="display text-sm font-bold">Cover image</p>
+                <p class="text-[11px] text-jet/50">Optional</p>
+              </div>
+              <span class="text-jet/40">›</span>
+            </summary>
+          </details>
+          <details class="rounded-xl border border-jet/10 group opacity-70">
+            <summary class="flex items-center justify-between cursor-pointer p-4 list-none">
+              <div>
+                <p class="display text-sm font-bold">Recap</p>
+                <p class="text-[11px] text-jet/50">Add after the run</p>
+              </div>
+              <span class="text-jet/30">›</span>
+            </summary>
+          </details>
+
+          <p class="text-[11px] text-jet/40 mt-4 px-1">Best for: a single, focused screen · familiar from the mobile app pattern · clear scan of what's filled.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recap (expanded) deep-dive — visible in any of C1-C3 -->
+    <div class="mt-8">
+      <h3 class="display text-lg font-bold mb-1">Recap detail (when expanded)</h3>
+      <p class="text-sm text-jet/60 max-w-2xl mb-4">The recap is the densest sub-form. Photos and videos each have caption fields. We render them as media-card rows so it never feels like a wall of inputs.</p>
+
+      <div class="bg-white rounded-2xl border border-jet/10 p-5 md:p-6 max-w-4xl">
+        <div class="flex items-center justify-between mb-4">
+          <p class="display text-sm font-bold">Recap · Sunday long run</p>
+          <span class="text-[10px] px-2 py-0.5 rounded-full bg-jet/5 text-jet/60">Visible after run</span>
+        </div>
+
+        <div class="grid sm:grid-cols-2 gap-3 mb-5">
+          <div>
+            <label class="block text-[11px] label uppercase text-jet/50 mb-1">How did it go?</label>
+            <textarea rows="3" class="w-full px-3 py-2 rounded-xl border border-jet/10 text-sm">Easy hum of a Sunday. Three pace groups, all came back smiling…</textarea>
+          </div>
+          <div class="space-y-3">
+            <div>
+              <label class="block text-[11px] label uppercase text-jet/50 mb-1">How many showed up</label>
+              <input value="38" class="w-full px-3 py-2 rounded-xl border border-jet/10 text-sm"/>
+            </div>
+            <div>
+              <label class="block text-[11px] label uppercase text-jet/50 mb-1">Pace groups</label>
+              <input value="5:00 / 5:30 / 6:00" class="w-full px-3 py-2 rounded-xl border border-jet/10 text-sm"/>
+            </div>
+            <div>
+              <label class="block text-[11px] label uppercase text-jet/50 mb-1">After the run</label>
+              <input value="Coffee at Blue Tokai" class="w-full px-3 py-2 rounded-xl border border-jet/10 text-sm"/>
+            </div>
+          </div>
+        </div>
+
+        <!-- Photos grid -->
+        <div class="mb-5">
+          <div class="flex items-center justify-between mb-2">
+            <p class="display text-xs font-bold">Photos · 3</p>
+            <button class="text-xs text-signal font-medium hover:underline">+ Add photos</button>
+          </div>
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+            <div class="aspect-square rounded-xl bg-gradient-to-br from-jet to-signal/40 relative group">
+              <button class="absolute top-1.5 right-1.5 w-6 h-6 rounded-full bg-white/90 text-jet text-xs">×</button>
+              <input class="absolute bottom-1.5 left-1.5 right-1.5 px-2 py-1 rounded-md bg-white/90 text-[10px] outline-none" placeholder="Caption (optional)" value="Sunrise at Bandstand"/>
+            </div>
+            <div class="aspect-square rounded-xl bg-gradient-to-br from-signal/40 to-jet/80 relative">
+              <button class="absolute top-1.5 right-1.5 w-6 h-6 rounded-full bg-white/90 text-jet text-xs">×</button>
+              <input class="absolute bottom-1.5 left-1.5 right-1.5 px-2 py-1 rounded-md bg-white/90 text-[10px]" placeholder="Caption"/>
+            </div>
+            <div class="aspect-square rounded-xl bg-gradient-to-br from-jet/40 to-bone relative">
+              <button class="absolute top-1.5 right-1.5 w-6 h-6 rounded-full bg-white/90 text-jet text-xs">×</button>
+              <input class="absolute bottom-1.5 left-1.5 right-1.5 px-2 py-1 rounded-md bg-white/90 text-[10px]" placeholder="Caption"/>
+            </div>
+            <button class="aspect-square rounded-xl border-2 border-dashed border-jet/15 flex flex-col items-center justify-center text-jet/40 hover:border-jet/30">
+              <span class="text-2xl">+</span>
+              <span class="text-[10px] mt-1">Add</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Videos -->
+        <div>
+          <div class="flex items-center justify-between mb-2">
+            <p class="display text-xs font-bold">Videos · 1</p>
+            <button class="text-xs text-signal font-medium hover:underline">+ Add video</button>
+          </div>
+          <div class="flex gap-3 items-center bg-bg rounded-xl border border-jet/10 p-3">
+            <div class="w-24 h-16 rounded-lg bg-gradient-to-br from-jet to-signal/60 flex items-center justify-center text-bone/80">▶</div>
+            <div class="flex-1 grid sm:grid-cols-2 gap-2">
+              <input value="The kilometre-7 chant" placeholder="Caption title" class="px-2.5 py-1.5 rounded-lg border border-jet/10 text-xs bg-white"/>
+              <input value="0:42 · shot by @priya" placeholder="Caption meta" class="px-2.5 py-1.5 rounded-lg border border-jet/10 text-xs bg-white"/>
+            </div>
+            <button class="text-jet/40 hover:text-signal text-xs">Remove</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mobile event edit -->
+    <div class="mt-12">
+      <h3 class="display text-lg font-bold mb-1">Mobile · same form, vertical</h3>
+      <p class="text-sm text-jet/60 max-w-2xl mb-4">On phone we stack sections, sticky top bar with Save, no sidebar. The TOC sidebar from C1 collapses into a "Jump to" chip strip you can scroll horizontally.</p>
+
+      <div class="flex flex-col lg:flex-row gap-8 items-start">
+        <div class="phone flex-shrink-0 mx-auto">
+          <div class="px-5 pt-8 pb-2 flex items-center gap-3 border-b border-jet/5">
+            <button class="text-jet/60">←</button>
+            <div class="flex-1 min-w-0">
+              <p class="display text-base font-bold truncate">Sunday long run</p>
+              <p class="text-[10px] text-jet/40">Auto-saved</p>
+            </div>
+            <button class="px-2.5 py-1 rounded-md bg-jet text-bone text-xs font-medium">Publish</button>
+          </div>
+          <!-- jump-to chips -->
+          <div class="px-5 py-2.5 border-b border-jet/5 overflow-x-auto no-scrollbar">
+            <div class="flex gap-2 text-xs whitespace-nowrap">
+              <span class="px-3 py-1.5 rounded-full bg-jet text-bone font-medium">Basics</span>
+              <span class="px-3 py-1.5 rounded-full bg-jet/5">When &amp; where</span>
+              <span class="px-3 py-1.5 rounded-full bg-jet/5">Run details</span>
+              <span class="px-3 py-1.5 rounded-full bg-jet/5">Cover</span>
+              <span class="px-3 py-1.5 rounded-full bg-jet/5 text-jet/40">Recap · later</span>
+            </div>
+          </div>
+          <div class="px-4 py-4 bg-bg space-y-3">
+            <div class="bg-white rounded-2xl border border-jet/10 p-4 space-y-3">
+              <p class="display text-xs font-bold">The basics</p>
+              <input value="Sunday long run · 10K" class="w-full px-3 py-2.5 rounded-xl border border-jet/10 text-sm"/>
+              <div class="inline-flex rounded-xl bg-bg border border-jet/10 p-0.5 w-full">
+                <button class="flex-1 px-2.5 py-1.5 rounded-lg bg-jet text-bone text-xs font-medium">Club run</button>
+                <button class="flex-1 px-2.5 py-1.5 rounded-lg text-jet/50 text-xs">Race event</button>
+              </div>
+              <textarea rows="3" class="w-full px-3 py-2.5 rounded-xl border border-jet/10 text-sm" placeholder="Pace groups, meeting point, what to bring…">Three pace groups…</textarea>
+            </div>
+            <div class="bg-white rounded-2xl border border-jet/10 p-4 space-y-3">
+              <p class="display text-xs font-bold">When &amp; where</p>
+              <input type="datetime-local" value="2026-05-18T06:00" class="w-full px-3 py-2.5 rounded-xl border border-jet/10 text-sm"/>
+              <input value="Bandstand promenade" class="w-full px-3 py-2.5 rounded-xl border border-jet/10 text-sm"/>
+            </div>
+          </div>
+          <!-- sticky save bar -->
+          <div class="px-4 py-3 border-t border-jet/10 bg-white flex items-center gap-2">
+            <span class="text-[10px] text-jet/40 flex-1">Auto-saved 2s ago</span>
+            <button class="px-3 py-2 rounded-xl bg-jet text-bone text-xs font-medium">Publish event</button>
+          </div>
+        </div>
+
+        <div class="flex-1 max-w-md">
+          <div class="p-4 bg-bg rounded-xl border border-jet/10">
+            <p class="display text-xs font-bold mb-2">Coverage check · every field is here</p>
+            <ul class="text-xs text-jet/70 space-y-1.5 columns-2 gap-x-4">
+              <li>· title *</li>
+              <li>· type</li>
+              <li>· description</li>
+              <li>· start (date + time) *</li>
+              <li>· end (date + time)</li>
+              <li>· location name</li>
+              <li>· location address</li>
+              <li>· distance (km)</li>
+              <li>· max participants</li>
+              <li>· cover image</li>
+              <li>· recap summary</li>
+              <li>· recap showedUp</li>
+              <li>· recap paceGroups</li>
+              <li>· recap after</li>
+              <li>· recap photos[] (+caption title, meta)</li>
+              <li>· recap videos[] (+poster, duration, caption title, meta)</li>
+              <li>· delete event</li>
+            </ul>
+          </div>
+
+          <h4 class="display text-sm font-bold mt-6 mb-2">Recommendation</h4>
+          <p class="text-sm text-jet/70">Go with <span class="font-medium">C1 on desktop</span> (sticky TOC) and the <span class="font-medium">jump-to chip strip on mobile</span>. It matches the manage hub paradigm, lets people skim before editing, and never traps them in a long scroll.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="border-t border-jet/10 bg-jet text-bone py-6">
+  <div class="max-w-7xl mx-auto px-6 text-xs text-bone/60">
+    V5 · Bento canvas on the right, persistent quick-jump rail on the left. Mobile becomes a section list (mirrors the existing app). Event form uses the same TOC pattern, with mobile chips for jump-to.
+  </div>
+</footer>
+
+</body>
+</html>

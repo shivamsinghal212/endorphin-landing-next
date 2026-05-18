@@ -467,6 +467,202 @@ export const deleteClubEvent = (token: string, slug: string, eventId: string) =>
     method: 'DELETE',
   });
 
+// ── Studio (owner-facing) ──────────────────────────────────────────────────
+// These wrap the same /api/v1/clubs/* endpoints the mobile app uses. They
+// require a bearer token but not super-admin status — backend authorises by
+// club membership/role.
+
+export type ClubRole = 'owner' | 'admin' | 'member';
+
+export interface ClubMemberUser {
+  id: string;
+  name: string;
+  email?: string | null;
+  pictureUrl?: string | null;
+  city?: string | null;
+}
+
+export type MyMembershipStatus =
+  | 'none'
+  | 'pending'
+  | 'active'
+  | 'removed'
+  | 'rejected';
+
+export interface MyMembership {
+  status: MyMembershipStatus;
+  role: ClubRole | null;
+  requestId: string | null;
+  joinedAt: string | null;
+}
+
+export const getMyMembership = (token: string, slug: string) =>
+  clubFetch<MyMembership>(`/clubs/${encodeURIComponent(slug)}/my-membership`, token);
+
+export const listMyClubs = (token: string, role: 'admin' | 'all' = 'admin') =>
+  clubFetch<Club[]>(`/clubs/mine?role=${role}`, token);
+
+export const patchClub = (token: string, slug: string, patch: Record<string, unknown>) =>
+  clubFetch<Club>(`/clubs/${encodeURIComponent(slug)}`, token, {
+    method: 'PATCH',
+    body: JSON.stringify(patch),
+  });
+
+// ── Members + join requests ────────────────────────────────────────────────
+
+export interface ClubMember {
+  id: string; // membership id
+  user: ClubMemberUser;
+  role: ClubRole;
+  status: 'active' | 'removed';
+  joinedAt: string;
+  removedAt?: string | null;
+}
+
+export interface ClubJoinRequestRow {
+  id: string;
+  user: ClubMemberUser;
+  formData: Record<string, unknown> | null;
+  status: 'pending' | 'approved' | 'rejected';
+  rejectionReason?: string | null;
+  reviewedAt?: string | null;
+  createdAt: string;
+}
+
+export const listClubMembers = (token: string, slug: string) =>
+  clubFetch<ClubMember[]>(`/clubs/${encodeURIComponent(slug)}/members`, token);
+
+export const listJoinRequests = (
+  token: string,
+  slug: string,
+  status: 'pending' | 'approved' | 'rejected' | 'all' = 'pending',
+) =>
+  clubFetch<ClubJoinRequestRow[]>(
+    `/clubs/${encodeURIComponent(slug)}/join-requests?status=${status}`,
+    token,
+  );
+
+export const approveJoinRequest = (token: string, slug: string, requestId: string) =>
+  clubFetch<void>(
+    `/clubs/${encodeURIComponent(slug)}/join-requests/${encodeURIComponent(requestId)}/approve`,
+    token,
+    { method: 'POST' },
+  );
+
+export const rejectJoinRequest = (
+  token: string,
+  slug: string,
+  requestId: string,
+  reason: string | null,
+) =>
+  clubFetch<void>(
+    `/clubs/${encodeURIComponent(slug)}/join-requests/${encodeURIComponent(requestId)}/reject`,
+    token,
+    {
+      method: 'POST',
+      body: JSON.stringify({ rejectionReason: reason }),
+    },
+  );
+
+export const kickMember = (token: string, slug: string, userId: string) =>
+  clubFetch<void>(
+    `/clubs/${encodeURIComponent(slug)}/members/${encodeURIComponent(userId)}`,
+    token,
+    { method: 'DELETE' },
+  );
+
+export const changeMemberRole = (
+  token: string,
+  slug: string,
+  userId: string,
+  role: 'admin' | 'member',
+) =>
+  clubFetch<void>(
+    `/clubs/${encodeURIComponent(slug)}/members/${encodeURIComponent(userId)}`,
+    token,
+    {
+      method: 'PATCH',
+      body: JSON.stringify({ role }),
+    },
+  );
+
+export interface UserSearchResult {
+  id: string;
+  name: string;
+  email?: string | null;
+  pictureUrl?: string | null;
+  city?: string | null;
+}
+
+export const searchUsers = (token: string, q: string) =>
+  clubFetch<UserSearchResult[]>(`/users/search?q=${encodeURIComponent(q)}`, token);
+
+export const addClubAdmin = (
+  token: string,
+  slug: string,
+  userId: string,
+  roleLabel?: string,
+) =>
+  clubFetch<Club>(`/clubs/${encodeURIComponent(slug)}/admins`, token, {
+    method: 'POST',
+    body: JSON.stringify({ userId, roleLabel }),
+  });
+
+export const removeClubAdmin = (token: string, slug: string, userId: string) =>
+  clubFetch<Club>(
+    `/clubs/${encodeURIComponent(slug)}/admins/${encodeURIComponent(userId)}`,
+    token,
+    { method: 'DELETE' },
+  );
+
+export const patchAdminCard = (
+  token: string,
+  slug: string,
+  userId: string,
+  card: {
+    role?: string | null;
+    avatarUrl?: string | null;
+    whatsappUrl?: string | null;
+    instagramUrl?: string | null;
+    stravaUrl?: string | null;
+  },
+) =>
+  clubFetch<Club>(
+    `/clubs/${encodeURIComponent(slug)}/admins/${encodeURIComponent(userId)}`,
+    token,
+    {
+      method: 'PATCH',
+      body: JSON.stringify(card),
+    },
+  );
+
+// ── RSVPs (event attendees) ────────────────────────────────────────────────
+
+export interface RsvpAttendee {
+  userId: string;
+  name: string;
+  email?: string | null;
+  pictureUrl?: string | null;
+  status: string;
+  createdAt: string;
+}
+
+export interface RsvpSummaryRow {
+  eventId: string;
+  title: string;
+  startTime: string;
+  goingCount: number;
+}
+
+export const listEventRsvps = (token: string, slug: string, eventId: string) =>
+  clubFetch<RsvpAttendee[]>(
+    `/clubs/${encodeURIComponent(slug)}/events/${encodeURIComponent(eventId)}/rsvps`,
+    token,
+  );
+
+export const listRsvpSummary = (token: string, slug: string) =>
+  clubFetch<RsvpSummaryRow[]>(`/clubs/${encodeURIComponent(slug)}/rsvps/summary`, token);
+
 // ── Club claim requests ────────────────────────────────────────────────────
 
 export interface ClubClaimRequest {

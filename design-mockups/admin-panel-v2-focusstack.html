@@ -1,0 +1,440 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>V2 · Focus Stack — Admin Panel</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script>
+tailwind.config = {
+  theme: { extend: {
+    colors: { jet:'#0A0A0A', signal:'#E6232A', bone:'#F5F0EB', bg:'#F8F6F3' },
+    fontFamily: { display:['Oswald','sans-serif'], body:['Poppins','sans-serif'] },
+  } },
+};
+</script>
+<style>
+  body { font-family:'Poppins',sans-serif; background:#F8F6F3; }
+  .display { font-family:'Oswald',sans-serif; text-transform:uppercase; letter-spacing:-0.01em; }
+  .label-tight { letter-spacing:0.04em; }
+  /* hide scrollbar on chip strips */
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+  .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+  @keyframes shimmer { 0%{background-position:-400px 0} 100%{background-position:400px 0} }
+  .shimmer { background: linear-gradient(90deg, rgba(10,10,10,0.04) 25%, rgba(10,10,10,0.08) 50%, rgba(10,10,10,0.04) 75%); background-size: 800px 100%; animation: shimmer 1.4s linear infinite; }
+  /* phone frame for mobile preview */
+  .phone { width: 390px; max-width: 100%; border: 1px solid rgba(10,10,10,0.1); border-radius: 36px; background: white; overflow: hidden; box-shadow: 0 30px 60px -30px rgba(10,10,10,0.3); }
+</style>
+</head>
+<body class="text-jet">
+
+<div class="bg-jet text-bone">
+  <div class="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between gap-4 flex-wrap">
+    <div class="flex items-center gap-3">
+      <span class="display text-sm font-bold">V2 / Focus Stack</span>
+      <span class="text-xs text-bone/60">Mobile-first · single column · top bar · sticky CTA</span>
+    </div>
+  </div>
+</div>
+
+<!-- =====================================================  -->
+<!-- Side-by-side: phone (mobile) + desktop frame            -->
+<!-- =====================================================  -->
+<section class="border-b border-jet/10">
+  <div class="max-w-7xl mx-auto px-6 py-10">
+    <p class="text-[11px] label-tight uppercase text-jet/40 mb-2">Screen 1 + 2</p>
+    <h2 class="display text-2xl font-bold mb-6">Role picker → dashboard</h2>
+
+    <div class="flex flex-col lg:flex-row gap-8 items-start">
+
+      <!-- Phone column -->
+      <div class="phone flex-shrink-0 mx-auto">
+        <!-- top bar -->
+        <div class="px-5 pt-8 pb-3 flex items-center justify-between">
+          <span class="display text-lg font-bold">Studio</span>
+          <div class="flex items-center gap-3">
+            <span class="w-2 h-2 rounded-full bg-signal"></span>
+            <div class="w-8 h-8 rounded-full bg-gradient-to-br from-signal to-jet text-white text-xs font-bold flex items-center justify-center">SS</div>
+          </div>
+        </div>
+
+        <!-- Role picker card -->
+        <div class="px-5 pb-4">
+          <p class="text-[11px] label-tight uppercase text-jet/40 mb-1">Welcome back</p>
+          <h1 class="display text-2xl font-bold mb-4 leading-tight">Pick a workspace.</h1>
+          <button class="w-full text-left bg-jet text-bone rounded-2xl p-4 mb-3">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-[10px] label-tight uppercase text-bone/60">Run-club owner</span>
+              <span class="text-bone/60">→</span>
+            </div>
+            <p class="display text-lg font-bold">Bandra Runners</p>
+            <p class="text-xs text-bone/60">+ 2 more clubs · 1,247 members</p>
+          </button>
+          <button class="w-full text-left bg-white border border-jet/10 rounded-2xl p-4 opacity-60">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-[10px] label-tight uppercase text-jet/40">Organiser · WIP</span>
+            </div>
+            <p class="display text-lg font-bold">Events &amp; races</p>
+            <p class="text-xs text-jet/50">Coming soon</p>
+          </button>
+        </div>
+
+        <!-- after pick: dashboard preview snippet -->
+        <div class="bg-bg border-t border-jet/10 px-5 py-4">
+          <p class="text-[10px] label-tight uppercase text-jet/40 mb-1">After pick — dashboard</p>
+          <div class="bg-white rounded-2xl border border-jet/10 p-4 mb-3">
+            <div class="flex items-center gap-3 mb-3">
+              <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-jet to-signal"></div>
+              <div class="flex-1 min-w-0">
+                <p class="font-medium text-sm truncate">Bandra Runners</p>
+                <p class="text-[11px] text-jet/50">847 members · Published</p>
+              </div>
+              <button class="text-jet/40 text-xs">⋯</button>
+            </div>
+            <div class="grid grid-cols-2 gap-2">
+              <div class="bg-bg rounded-lg p-2">
+                <p class="text-[9px] label-tight uppercase text-jet/40">Pending</p>
+                <p class="display text-base font-bold text-signal">18</p>
+              </div>
+              <div class="bg-bg rounded-lg p-2">
+                <p class="text-[9px] label-tight uppercase text-jet/40">Events</p>
+                <p class="display text-base font-bold">12</p>
+              </div>
+            </div>
+          </div>
+          <button class="w-full bg-bg border border-jet/10 rounded-2xl p-4 text-left">
+            <p class="font-medium text-sm">Powai Pacers</p>
+            <p class="text-[11px] text-jet/50">312 · Draft</p>
+          </button>
+        </div>
+      </div>
+
+      <!-- Desktop column -->
+      <div class="flex-1 w-full">
+        <div class="bg-white rounded-2xl border border-jet/10 overflow-hidden">
+          <!-- top bar -->
+          <div class="px-6 py-4 border-b border-jet/10 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <span class="display text-lg font-bold">Studio</span>
+              <span class="text-xs text-jet/40">·</span>
+              <span class="text-xs text-jet/60">Owner workspace</span>
+            </div>
+            <div class="flex items-center gap-3">
+              <button class="text-xs text-jet/60 hover:text-jet">Switch role</button>
+              <div class="w-8 h-8 rounded-full bg-gradient-to-br from-signal to-jet text-white text-xs font-bold flex items-center justify-center">SS</div>
+            </div>
+          </div>
+
+          <div class="p-6 md:p-8 max-w-3xl mx-auto">
+            <p class="text-[11px] label-tight uppercase text-jet/40 mb-1">Welcome back, Shivam</p>
+            <h1 class="display text-3xl md:text-4xl font-bold mb-6">Your clubs</h1>
+
+            <!-- Quick attention strip -->
+            <div class="bg-signal/5 border border-signal/15 rounded-xl p-3 mb-6 flex items-center gap-3">
+              <span class="w-8 h-8 rounded-full bg-signal text-white flex items-center justify-center font-bold text-sm">!</span>
+              <p class="text-sm flex-1"><span class="font-medium">18 RSVPs</span> need your decision today</p>
+              <button class="text-xs px-3 py-1.5 rounded-lg bg-signal text-white font-medium">Review</button>
+            </div>
+
+            <!-- Club cards -->
+            <div class="space-y-3">
+              <a class="block bg-white border border-jet/10 hover:border-jet/30 rounded-2xl p-5 transition-colors">
+                <div class="flex items-center gap-4">
+                  <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-jet to-signal flex-shrink-0"></div>
+                  <div class="flex-1 min-w-0">
+                    <div class="flex items-center gap-2 mb-1">
+                      <p class="display text-lg font-bold truncate">Bandra Runners</p>
+                      <span class="text-[9px] px-1.5 py-0.5 rounded-full bg-green-100 text-green-800 font-medium uppercase">Live</span>
+                    </div>
+                    <p class="text-xs text-jet/50">Mumbai · est. 2019</p>
+                  </div>
+                  <div class="text-right hidden sm:block">
+                    <p class="display text-2xl font-bold tabular-nums">847</p>
+                    <p class="text-[10px] label-tight uppercase text-jet/40">members</p>
+                  </div>
+                </div>
+                <div class="grid grid-cols-3 gap-2 mt-4 pt-4 border-t border-jet/5">
+                  <div><p class="text-[10px] label-tight uppercase text-jet/40">Pending</p><p class="font-medium text-signal">5</p></div>
+                  <div><p class="text-[10px] label-tight uppercase text-jet/40">Next event</p><p class="font-medium">Sun 6 AM</p></div>
+                  <div><p class="text-[10px] label-tight uppercase text-jet/40">This month</p><p class="font-medium">12 runs</p></div>
+                </div>
+              </a>
+
+              <a class="block bg-white border border-jet/10 hover:border-jet/30 rounded-2xl p-5 transition-colors">
+                <div class="flex items-center gap-4">
+                  <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-signal/80 to-jet/60 flex-shrink-0"></div>
+                  <div class="flex-1 min-w-0">
+                    <p class="display text-lg font-bold truncate">Powai Pacers</p>
+                    <p class="text-xs text-jet/50">Mumbai · Draft</p>
+                  </div>
+                  <div class="text-right hidden sm:block">
+                    <p class="display text-2xl font-bold tabular-nums">312</p>
+                    <p class="text-[10px] label-tight uppercase text-jet/40">members</p>
+                  </div>
+                </div>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =====================================================  -->
+<!-- SCREEN 3 · Club management (desktop + mobile)           -->
+<!-- =====================================================  -->
+<section class="border-b border-jet/10">
+  <div class="max-w-7xl mx-auto px-6 py-10">
+    <p class="text-[11px] label-tight uppercase text-jet/40 mb-2">Screen 3</p>
+    <h2 class="display text-2xl font-bold mb-6">Manage a club · mobile + desktop</h2>
+
+    <div class="flex flex-col lg:flex-row gap-8 items-start">
+      <!-- Mobile phone -->
+      <div class="phone flex-shrink-0 mx-auto">
+        <!-- top bar with back -->
+        <div class="px-5 pt-8 pb-3 flex items-center gap-3 border-b border-jet/5">
+          <button class="text-jet/60">←</button>
+          <div class="flex-1 min-w-0">
+            <p class="display text-base font-bold truncate">Bandra Runners</p>
+            <p class="text-[11px] text-jet/50">Owner</p>
+          </div>
+          <button class="text-jet/60">⋯</button>
+        </div>
+        <!-- chip strip -->
+        <div class="px-5 py-3 border-b border-jet/5 overflow-x-auto no-scrollbar">
+          <div class="flex gap-2 text-xs whitespace-nowrap">
+            <span class="px-3 py-1.5 rounded-full bg-jet text-bone font-medium">Overview</span>
+            <span class="px-3 py-1.5 rounded-full bg-jet/5">Details</span>
+            <span class="px-3 py-1.5 rounded-full bg-jet/5">Events</span>
+            <span class="px-3 py-1.5 rounded-full bg-jet/5 flex items-center gap-1">RSVPs <span class="w-4 h-4 rounded-full bg-signal text-white text-[9px] flex items-center justify-center font-bold">18</span></span>
+            <span class="px-3 py-1.5 rounded-full bg-jet/5">Members</span>
+            <span class="px-3 py-1.5 rounded-full bg-jet/5 text-jet/40">Analytics</span>
+          </div>
+        </div>
+        <!-- content -->
+        <div class="px-5 py-4 space-y-3 bg-bg">
+          <div class="grid grid-cols-2 gap-2">
+            <div class="bg-white rounded-xl border border-jet/5 p-3">
+              <p class="text-[9px] label-tight uppercase text-jet/40">Members</p>
+              <p class="display text-xl font-bold tabular-nums">847</p>
+            </div>
+            <div class="bg-white rounded-xl border border-jet/5 p-3">
+              <p class="text-[9px] label-tight uppercase text-jet/40">Pending</p>
+              <p class="display text-xl font-bold text-signal">5</p>
+            </div>
+          </div>
+          <div class="bg-white rounded-xl border border-jet/5 p-3">
+            <p class="display text-xs font-bold mb-2">Next event</p>
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-lg bg-jet text-bone flex flex-col items-center justify-center"><span class="text-[8px]">MAY</span><span class="display text-sm font-bold leading-none">18</span></div>
+              <div class="flex-1 min-w-0">
+                <p class="text-sm font-medium truncate">Sunday long run</p>
+                <p class="text-[10px] text-jet/50">6 AM · Bandstand · 42 going</p>
+              </div>
+            </div>
+          </div>
+          <div class="bg-white rounded-xl border border-dashed border-jet/15 p-4 text-center">
+            <p class="text-[10px] text-jet/50">Analytics · coming soon</p>
+          </div>
+        </div>
+        <!-- sticky bottom CTA -->
+        <div class="px-5 py-3 border-t border-jet/10 bg-white">
+          <button class="w-full bg-jet text-bone rounded-xl py-3 text-sm font-medium">Save changes</button>
+        </div>
+      </div>
+
+      <!-- Desktop -->
+      <div class="flex-1 w-full">
+        <div class="bg-white rounded-2xl border border-jet/10">
+          <!-- Sticky top bar -->
+          <div class="px-6 py-4 border-b border-jet/10 flex items-center gap-4">
+            <button class="text-jet/60 text-sm flex items-center gap-1.5">← My clubs</button>
+            <span class="text-jet/20">|</span>
+            <div class="flex items-center gap-3 flex-1 min-w-0">
+              <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-jet to-signal flex-shrink-0"></div>
+              <div class="min-w-0">
+                <p class="display text-lg font-bold truncate">Bandra Runners</p>
+                <p class="text-xs text-jet/50">847 members · Published</p>
+              </div>
+            </div>
+            <button class="px-3 py-1.5 rounded-lg border border-jet/10 text-xs hover:bg-jet/5">View public</button>
+            <button class="px-3 py-1.5 rounded-lg bg-jet text-bone text-xs font-medium">Save</button>
+          </div>
+
+          <!-- Tab chip strip -->
+          <div class="px-6 py-3 border-b border-jet/10 overflow-x-auto no-scrollbar">
+            <div class="flex gap-2 text-sm whitespace-nowrap">
+              <span class="px-3 py-1.5 rounded-full bg-jet text-bone font-medium">Overview</span>
+              <span class="px-3 py-1.5 rounded-full hover:bg-jet/5">Details</span>
+              <span class="px-3 py-1.5 rounded-full hover:bg-jet/5">Events</span>
+              <span class="px-3 py-1.5 rounded-full hover:bg-jet/5 flex items-center gap-1">RSVPs <span class="w-5 h-5 rounded-full bg-signal text-white text-[10px] flex items-center justify-center font-bold">18</span></span>
+              <span class="px-3 py-1.5 rounded-full hover:bg-jet/5">Members</span>
+              <span class="px-3 py-1.5 rounded-full hover:bg-jet/5">Admins</span>
+              <span class="px-3 py-1.5 rounded-full text-jet/40">Analytics</span>
+            </div>
+          </div>
+
+          <!-- Content -->
+          <div class="p-6 md:p-8 max-w-3xl">
+            <!-- KPI stacked -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+              <div class="bg-bg rounded-xl p-4 border border-jet/5">
+                <p class="text-[10px] label-tight uppercase text-jet/40">Members</p>
+                <p class="display text-2xl font-bold tabular-nums">847</p>
+              </div>
+              <div class="bg-bg rounded-xl p-4 border border-jet/5">
+                <p class="text-[10px] label-tight uppercase text-jet/40">Pending RSVPs</p>
+                <p class="display text-2xl font-bold text-signal">5</p>
+              </div>
+              <div class="bg-bg rounded-xl p-4 border border-jet/5">
+                <p class="text-[10px] label-tight uppercase text-jet/40">Runs / month</p>
+                <p class="display text-2xl font-bold tabular-nums">23</p>
+              </div>
+              <div class="bg-bg rounded-xl p-4 border border-jet/5">
+                <p class="text-[10px] label-tight uppercase text-jet/40">KM / month</p>
+                <p class="display text-2xl font-bold tabular-nums">312</p>
+              </div>
+            </div>
+
+            <p class="display text-sm font-bold mb-3">Next up</p>
+            <div class="space-y-2 mb-6">
+              <a class="flex items-center gap-3 p-3 rounded-xl border border-jet/10 hover:bg-bg">
+                <div class="w-12 h-12 rounded-lg bg-jet text-bone flex flex-col items-center justify-center">
+                  <span class="text-[9px]">MAY</span><span class="display text-base font-bold leading-none">18</span>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <p class="text-sm font-medium truncate">Sunday long run · 10K</p>
+                  <p class="text-xs text-jet/50">6 AM · Bandstand · 42 going</p>
+                </div>
+                <span class="text-xs px-2 py-0.5 rounded-full bg-signal/10 text-signal font-medium">5 pending</span>
+              </a>
+            </div>
+
+            <p class="display text-sm font-bold mb-3">Quick edit</p>
+            <div class="space-y-3 mb-6">
+              <div>
+                <label class="block text-[11px] label-tight uppercase text-jet/40 mb-1">Tagline</label>
+                <input value="A pace for every soul." class="w-full px-3 py-2.5 rounded-xl border border-jet/10 text-sm focus:border-jet outline-none" />
+              </div>
+              <div>
+                <label class="block text-[11px] label-tight uppercase text-jet/40 mb-1">Description</label>
+                <textarea rows="3" class="w-full px-3 py-2.5 rounded-xl border border-jet/10 text-sm focus:border-jet outline-none">Bandra Runners is a community of mornings…</textarea>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =====================================================  -->
+<!-- SCREEN 4 · RSVPs                                        -->
+<!-- =====================================================  -->
+<section>
+  <div class="max-w-7xl mx-auto px-6 py-10 pb-20">
+    <p class="text-[11px] label-tight uppercase text-jet/40 mb-2">Screen 4</p>
+    <h2 class="display text-2xl font-bold mb-6">RSVPs · swipe-friendly card list</h2>
+
+    <div class="flex flex-col lg:flex-row gap-8 items-start">
+      <!-- Mobile -->
+      <div class="phone flex-shrink-0 mx-auto">
+        <div class="px-5 pt-8 pb-3 flex items-center gap-3 border-b border-jet/5">
+          <button class="text-jet/60">←</button>
+          <div class="flex-1 min-w-0">
+            <p class="display text-base font-bold">RSVPs</p>
+            <p class="text-[11px] text-jet/50">Sunday long run · 18 May</p>
+          </div>
+        </div>
+        <div class="px-5 py-3 border-b border-jet/5 overflow-x-auto no-scrollbar">
+          <div class="flex gap-2 text-xs">
+            <span class="px-3 py-1.5 rounded-full bg-jet text-bone font-medium">Pending · 5</span>
+            <span class="px-3 py-1.5 rounded-full bg-jet/5 whitespace-nowrap">Approved · 42</span>
+            <span class="px-3 py-1.5 rounded-full bg-jet/5 whitespace-nowrap">Rejected</span>
+          </div>
+        </div>
+        <div class="px-5 py-4 space-y-3 bg-bg">
+          <!-- Card with inline approve/reject -->
+          <div class="bg-white rounded-2xl border border-jet/10 p-4">
+            <div class="flex items-center gap-3 mb-3">
+              <div class="w-10 h-10 rounded-full bg-gradient-to-br from-signal to-jet text-white text-xs font-bold flex items-center justify-center">AS</div>
+              <div class="flex-1 min-w-0">
+                <p class="text-sm font-medium truncate">Anita Sharma</p>
+                <p class="text-[11px] text-jet/50">First timer · 5:30 pace</p>
+              </div>
+              <span class="text-[10px] text-jet/40">2h</span>
+            </div>
+            <div class="flex gap-2">
+              <button class="flex-1 py-2 rounded-xl bg-green-50 text-green-800 text-sm font-medium">Approve</button>
+              <button class="flex-1 py-2 rounded-xl bg-jet/5 text-jet/60 text-sm">Reject</button>
+            </div>
+          </div>
+          <div class="bg-white rounded-2xl border border-jet/10 p-4">
+            <div class="flex items-center gap-3 mb-3">
+              <div class="w-10 h-10 rounded-full bg-gradient-to-br from-jet to-signal/60 text-white text-xs font-bold flex items-center justify-center">RJ</div>
+              <div class="flex-1 min-w-0">
+                <p class="text-sm font-medium truncate">Rohan Joshi</p>
+                <p class="text-[11px] text-jet/50">Member 1y · 4:45 pace</p>
+              </div>
+              <span class="text-[10px] text-jet/40">4h</span>
+            </div>
+            <div class="flex gap-2">
+              <button class="flex-1 py-2 rounded-xl bg-green-50 text-green-800 text-sm font-medium">Approve</button>
+              <button class="flex-1 py-2 rounded-xl bg-jet/5 text-jet/60 text-sm">Reject</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Desktop -->
+      <div class="flex-1 w-full bg-white rounded-2xl border border-jet/10 p-6 md:p-8">
+        <div class="flex items-center justify-between mb-5 flex-wrap gap-3">
+          <div>
+            <p class="text-[11px] label-tight uppercase text-jet/40">Sunday long run · 18 May</p>
+            <h3 class="display text-xl font-bold">Pending RSVPs <span class="text-signal">· 5</span></h3>
+          </div>
+          <div class="flex items-center gap-2">
+            <button class="px-3 py-1.5 rounded-lg text-xs bg-green-50 text-green-800 font-medium">Approve all</button>
+            <button class="px-3 py-1.5 rounded-lg text-xs bg-jet/5 text-jet/60">Auto-approve on</button>
+          </div>
+        </div>
+        <div class="grid sm:grid-cols-2 gap-3">
+          <div class="bg-bg rounded-2xl border border-jet/5 p-4">
+            <div class="flex items-center gap-3 mb-3">
+              <div class="w-10 h-10 rounded-full bg-gradient-to-br from-signal to-jet text-white text-xs font-bold flex items-center justify-center">AS</div>
+              <div class="flex-1 min-w-0">
+                <p class="text-sm font-medium truncate">Anita Sharma</p>
+                <p class="text-xs text-jet/50">First timer · 5:30 pace · 2h ago</p>
+              </div>
+            </div>
+            <div class="flex gap-2">
+              <button class="flex-1 py-2 rounded-lg bg-green-50 text-green-800 text-xs font-medium hover:bg-green-100">Approve</button>
+              <button class="flex-1 py-2 rounded-lg bg-jet/5 text-jet/60 text-xs hover:bg-jet/10">Reject</button>
+            </div>
+          </div>
+          <!-- skeleton -->
+          <div class="bg-bg rounded-2xl border border-jet/5 p-4">
+            <div class="flex items-center gap-3 mb-3">
+              <div class="w-10 h-10 rounded-full shimmer"></div>
+              <div class="flex-1 space-y-2"><div class="h-3 rounded shimmer w-24"></div><div class="h-2.5 rounded shimmer w-40"></div></div>
+            </div>
+            <div class="flex gap-2"><div class="flex-1 h-8 rounded-lg shimmer"></div><div class="flex-1 h-8 rounded-lg shimmer"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="border-t border-jet/10 bg-jet text-bone py-6">
+  <div class="max-w-7xl mx-auto px-6 text-xs text-bone/60">
+    V2 · Focus Stack — top bar instead of sidebar; chip-tab navigation; mobile = primary canvas, desktop is a centered max-w-3xl version of the same layout.
+  </div>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,857 @@
+{
+  "captured_at": "2026-05-16T10:20:38.700444+00:00",
+  "per_source_price": [
+    {
+      "source": "indiarunning",
+      "n": 114,
+      "paid": 110,
+      "free": 4,
+      "median_price": 624,
+      "mean_price": 648.67,
+      "max_price": 1600
+    },
+    {
+      "source": "townscript",
+      "n": 85,
+      "paid": 83,
+      "free": 2,
+      "median_price": 520,
+      "mean_price": 679.93,
+      "max_price": 2999
+    },
+    {
+      "source": "citywoofer",
+      "n": 15,
+      "paid": 14,
+      "free": 1,
+      "median_price": 600,
+      "mean_price": 786.5,
+      "max_price": 1870
+    },
+    {
+      "source": "mysamay",
+      "n": 12,
+      "paid": 12,
+      "free": 0,
+      "median_price": 950,
+      "mean_price": 1533.33,
+      "max_price": 8000
+    }
+  ],
+  "per_source_sold": [
+    {
+      "source": "indiarunning",
+      "events_with_data": 87,
+      "total_sold": 13330,
+      "mean_sold": 153.22,
+      "median_sold": 11,
+      "max_sold": 2803
+    },
+    {
+      "source": "citywoofer",
+      "events_with_data": 0,
+      "total_sold": null,
+      "mean_sold": null,
+      "median_sold": null,
+      "max_sold": null
+    },
+    {
+      "source": "mysamay",
+      "events_with_data": 0,
+      "total_sold": null,
+      "mean_sold": null,
+      "median_sold": null,
+      "max_sold": null
+    },
+    {
+      "source": "townscript",
+      "events_with_data": 0,
+      "total_sold": null,
+      "mean_sold": null,
+      "median_sold": null,
+      "max_sold": null
+    }
+  ],
+  "gmv_floor_by_source": [
+    {
+      "source": "indiarunning",
+      "observable_events": 83,
+      "gmv_floor_inr": 8810583.0
+    }
+  ],
+  "top_revenue_events": [
+    {
+      "title": "Wesness Women's 5k Fun Run, Bengaluru 2026",
+      "source": "indiarunning",
+      "location_name": "Bengaluru",
+      "start_time": "2026-05-31T00:30:00+00:00",
+      "price_min": 895,
+      "total_tickets_sold": 2803,
+      "gmv_floor_inr": 2508685,
+      "organizer_name": "Fitpage (Main Account)"
+    },
+    {
+      "title": "Farmley Snack Run 2026 ",
+      "source": "indiarunning",
+      "location_name": "New Delhi",
+      "start_time": "2026-04-26T00:30:00+00:00",
+      "price_min": 800,
+      "total_tickets_sold": 2251,
+      "gmv_floor_inr": 1800800,
+      "organizer_name": "MMS Innovative Marketing Solutions"
+    },
+    {
+      "title": "Lonavala Varsha Marathon 2026- The Fog Run",
+      "source": "indiarunning",
+      "location_name": "Tiger Point, Lonavala",
+      "start_time": "2026-07-12T00:00:00+00:00",
+      "price_min": 1100,
+      "total_tickets_sold": 949,
+      "gmv_floor_inr": 1043900,
+      "organizer_name": "united sports & adventures"
+    },
+    {
+      "title": "Bharat Ka Bhavishya  Shahothon 2.0",
+      "source": "indiarunning",
+      "location_name": "New Delhi",
+      "start_time": "2026-05-09T23:30:00+00:00",
+      "price_min": 650,
+      "total_tickets_sold": 1241,
+      "gmv_floor_inr": 806650,
+      "organizer_name": "Voice of Constituion"
+    },
+    {
+      "title": "THANE MONSOON 15K RUN 2026 ",
+      "source": "indiarunning",
+      "location_name": "Thane",
+      "start_time": "2026-06-28T00:00:00+00:00",
+      "price_min": 501,
+      "total_tickets_sold": 633,
+      "gmv_floor_inr": 317133,
+      "organizer_name": "LIVFIT SPORTS AND WELLNESS"
+    },
+    {
+      "title": "Runs & Miles Half Marathon 1st Edition",
+      "source": "indiarunning",
+      "location_name": "Pune",
+      "start_time": "2026-05-17T00:00:00+00:00",
+      "price_min": 750,
+      "total_tickets_sold": 408,
+      "gmv_floor_inr": 306000,
+      "organizer_name": "RunsandMiles"
+    },
+    {
+      "title": "Fit Mumbai Marathon ",
+      "source": "indiarunning",
+      "location_name": "Mumbai",
+      "start_time": "2026-04-25T23:30:00+00:00",
+      "price_min": 990,
+      "total_tickets_sold": 268,
+      "gmv_floor_inr": 265320,
+      "organizer_name": "Sukarma Events"
+    },
+    {
+      "title": "Mumbai Fast Marathon ",
+      "source": "indiarunning",
+      "location_name": "Mumbai",
+      "start_time": "2026-04-26T00:00:00+00:00",
+      "price_min": 1050,
+      "total_tickets_sold": 196,
+      "gmv_floor_inr": 205800,
+      "organizer_name": "Sukarma Events"
+    },
+    {
+      "title": "Kharghar Half Marathon - Run for Education",
+      "source": "indiarunning",
+      "location_name": "Navi Mumbai",
+      "start_time": "2026-06-07T00:00:00+00:00",
+      "price_min": 695,
+      "total_tickets_sold": 243,
+      "gmv_floor_inr": 168885,
+      "organizer_name": "Sukarma Events"
+    },
+    {
+      "title": "KALIMPONG ULTRAMARATHON 2026",
+      "source": "indiarunning",
+      "location_name": "Pedong",
+      "start_time": "2026-04-24T23:30:00+00:00",
+      "price_min": 1000,
+      "total_tickets_sold": 138,
+      "gmv_floor_inr": 138000,
+      "organizer_name": "Run with Roshni Foundation"
+    },
+    {
+      "title": "Aamchi Mumbai Marathon - 07-06-2026",
+      "source": "indiarunning",
+      "location_name": "Mumbai",
+      "start_time": "2026-06-06T23:30:00+00:00",
+      "price_min": 990,
+      "total_tickets_sold": 132,
+      "gmv_floor_inr": 130680,
+      "organizer_name": "Omega events"
+    },
+    {
+      "title": "Kargil Vijay Diwas Half Marathon 5th Edition",
+      "source": "indiarunning",
+      "location_name": "New Delhi",
+      "start_time": "2026-07-25T23:30:00+00:00",
+      "price_min": 1200,
+      "total_tickets_sold": 106,
+      "gmv_floor_inr": 127200,
+      "organizer_name": "Marathon Tak"
+    },
+    {
+      "title": "Hyderabad City Slam - 10K Summer Run 2026",
+      "source": "indiarunning",
+      "location_name": "Hyderabad",
+      "start_time": "2026-05-24T00:00:00+00:00",
+      "price_min": 699,
+      "total_tickets_sold": 136,
+      "gmv_floor_inr": 95064,
+      "organizer_name": "High Five Tribe"
+    },
+    {
+      "title": "Palm Beach 10k Run ",
+      "source": "indiarunning",
+      "location_name": "Navi Mumbai",
+      "start_time": "2026-08-22T23:30:00+00:00",
+      "price_min": 800,
+      "total_tickets_sold": 112,
+      "gmv_floor_inr": 89600,
+      "organizer_name": "Fitpage (Main Account)"
+    },
+    {
+      "title": "NAMMA RUN BENGALURU - SOUTH EDITION",
+      "source": "indiarunning",
+      "location_name": "Bengaluru",
+      "start_time": "2026-10-11T00:00:00+00:00",
+      "price_min": 799,
+      "total_tickets_sold": 104,
+      "gmv_floor_inr": 83096,
+      "organizer_name": "TE SPORTS"
+    },
+    {
+      "title": "SHIMLA MASHOBRA MARATHON 2026",
+      "source": "indiarunning",
+      "location_name": "Shimla",
+      "start_time": "2026-05-10T00:30:00+00:00",
+      "price_min": 1100,
+      "total_tickets_sold": 67,
+      "gmv_floor_inr": 73700,
+      "organizer_name": "RUN AND THRIVE FITNESS PVT LIMITED"
+    },
+    {
+      "title": "Mumbai Monsoon Marathon",
+      "source": "indiarunning",
+      "location_name": "Mumbai",
+      "start_time": "2026-07-04T23:30:00+00:00",
+      "price_min": 990,
+      "total_tickets_sold": 66,
+      "gmv_floor_inr": 65340,
+      "organizer_name": "Omega events"
+    },
+    {
+      "title": "Green BLR 2.0",
+      "source": "indiarunning",
+      "location_name": "Bengaluru",
+      "start_time": "2026-08-16T00:40:00+00:00",
+      "price_min": 499,
+      "total_tickets_sold": 120,
+      "gmv_floor_inr": 59880,
+      "organizer_name": "Thrive Security"
+    },
+    {
+      "title": "7th Edition Gurugram Grand Half Marathon -2026 ",
+      "source": "indiarunning",
+      "location_name": "Gurugram",
+      "start_time": "2026-05-10T00:00:00+00:00",
+      "price_min": 1300,
+      "total_tickets_sold": 36,
+      "gmv_floor_inr": 46800,
+      "organizer_name": "Universal Runners Marathon "
+    },
+    {
+      "title": "WORLD HEALTH DAY RUN 2026",
+      "source": "indiarunning",
+      "location_name": "Ernakulam",
+      "start_time": "2026-04-18T23:30:00+00:00",
+      "price_min": 699,
+      "total_tickets_sold": 61,
+      "gmv_floor_inr": 42639,
+      "organizer_name": "BALAJI RAMKUMAR"
+    },
+    {
+      "title": "Winter Delhi Half Marathon 2026",
+      "source": "indiarunning",
+      "location_name": "Delhi",
+      "start_time": "2026-11-01T00:00:00+00:00",
+      "price_min": 480,
+      "total_tickets_sold": 65,
+      "gmv_floor_inr": 31200,
+      "organizer_name": "WeChaser"
+    },
+    {
+      "title": "FunRun RightToPlay at Decathlon Bannerghatta Road",
+      "source": "indiarunning",
+      "location_name": "Bengaluru",
+      "start_time": "2026-05-23T23:30:00+00:00",
+      "price_min": 349,
+      "total_tickets_sold": 74,
+      "gmv_floor_inr": 25826,
+      "organizer_name": "coachdirect.in"
+    },
+    {
+      "title": "Patnitop Marathon 6.0",
+      "source": "indiarunning",
+      "location_name": "Patnitop",
+      "start_time": "2026-05-30T23:00:00+00:00",
+      "price_min": 1199,
+      "total_tickets_sold": 21,
+      "gmv_floor_inr": 25179,
+      "organizer_name": "K.A.Sports and Events"
+    },
+    {
+      "title": "AAPLA TILAK NAGAR 5K RUN",
+      "source": "indiarunning",
+      "location_name": "Mumbai",
+      "start_time": "2026-04-18T23:30:00+00:00",
+      "price_min": 299,
+      "total_tickets_sold": 83,
+      "gmv_floor_inr": 24817,
+      "organizer_name": "Run2gether"
+    },
+    {
+      "title": "Prayagraj Half Marathon 2026 - 4th Edition",
+      "source": "indiarunning",
+      "location_name": "Prayagraj",
+      "start_time": "2026-04-19T00:00:00+00:00",
+      "price_min": 700,
+      "total_tickets_sold": 35,
+      "gmv_floor_inr": 24500,
+      "organizer_name": "Thrill Zone"
+    },
+    {
+      "title": "Mumbai Ultra 2026 - The 12 Hour Run",
+      "source": "indiarunning",
+      "location_name": "Mumbai",
+      "start_time": "2026-08-15T00:00:00+00:00",
+      "price_min": 1000,
+      "total_tickets_sold": 22,
+      "gmv_floor_inr": 22000,
+      "organizer_name": "Biovis"
+    },
+    {
+      "title": "CHENNAI RISEUP DIGITAL DETOX MARATHON",
+      "source": "indiarunning",
+      "location_name": "Chennai",
+      "start_time": "2026-05-24T00:30:00+00:00",
+      "price_min": 269,
+      "total_tickets_sold": 77,
+      "gmv_floor_inr": 20713,
+      "organizer_name": "SPORTENA ACADEMY"
+    },
+    {
+      "title": "IDOVENT MARATHON UTSAVA",
+      "source": "indiarunning",
+      "location_name": "Bengaluru",
+      "start_time": "2026-05-24T00:00:00+00:00",
+      "price_min": 699,
+      "total_tickets_sold": 27,
+      "gmv_floor_inr": 18873,
+      "organizer_name": "IDOVENT PRIVATE LIMITED"
+    },
+    {
+      "title": "Chatrapati Shivaji Maharaj Marathon - Pune",
+      "source": "indiarunning",
+      "location_name": "Pune",
+      "start_time": "2026-06-13T23:30:00+00:00",
+      "price_min": 990,
+      "total_tickets_sold": 18,
+      "gmv_floor_inr": 17820,
+      "organizer_name": "Omega events"
+    },
+    {
+      "title": "Sinhagad Half Marathon - 4th Edition",
+      "source": "indiarunning",
+      "location_name": "Pune",
+      "start_time": "2026-09-20T00:30:00+00:00",
+      "price_min": 799,
+      "total_tickets_sold": 21,
+      "gmv_floor_inr": 16779,
+      "organizer_name": "SS Multi Sports & Events "
+    }
+  ],
+  "top_organizers_by_revenue": [
+    {
+      "organizer_name": "Fitpage (Main Account)",
+      "source": "indiarunning",
+      "events": 3,
+      "gmv_floor_inr": 2603285.0,
+      "tickets_sold": 2920
+    },
+    {
+      "organizer_name": "MMS Innovative Marketing Solutions",
+      "source": "indiarunning",
+      "events": 1,
+      "gmv_floor_inr": 1800800.0,
+      "tickets_sold": 2251
+    },
+    {
+      "organizer_name": "united sports & adventures",
+      "source": "indiarunning",
+      "events": 2,
+      "gmv_floor_inr": 1045900.0,
+      "tickets_sold": 951
+    },
+    {
+      "organizer_name": "Voice of Constituion",
+      "source": "indiarunning",
+      "events": 1,
+      "gmv_floor_inr": 806650.0,
+      "tickets_sold": 1241
+    },
+    {
+      "organizer_name": "Sukarma Events",
+      "source": "indiarunning",
+      "events": 5,
+      "gmv_floor_inr": 646905.0,
+      "tickets_sold": 717
+    },
+    {
+      "organizer_name": "LIVFIT SPORTS AND WELLNESS",
+      "source": "indiarunning",
+      "events": 1,
+      "gmv_floor_inr": 317133.0,
+      "tickets_sold": 633
+    },
+    {
+      "organizer_name": "RunsandMiles",
+      "source": "indiarunning",
+      "events": 1,
+      "gmv_floor_inr": 306000.0,
+      "tickets_sold": 408
+    },
+    {
+      "organizer_name": "Omega events",
+      "source": "indiarunning",
+      "events": 5,
+      "gmv_floor_inr": 220400.0,
+      "tickets_sold": 224
+    },
+    {
+      "organizer_name": "Run with Roshni Foundation",
+      "source": "indiarunning",
+      "events": 1,
+      "gmv_floor_inr": 138000.0,
+      "tickets_sold": 138
+    },
+    {
+      "organizer_name": "Marathon Tak",
+      "source": "indiarunning",
+      "events": 1,
+      "gmv_floor_inr": 127200.0,
+      "tickets_sold": 106
+    },
+    {
+      "organizer_name": "TE SPORTS",
+      "source": "indiarunning",
+      "events": 5,
+      "gmv_floor_inr": 97346.0,
+      "tickets_sold": 154
+    },
+    {
+      "organizer_name": "High Five Tribe",
+      "source": "indiarunning",
+      "events": 1,
+      "gmv_floor_inr": 95064.0,
+      "tickets_sold": 136
+    },
+    {
+      "organizer_name": "RUN AND THRIVE FITNESS PVT LIMITED",
+      "source": "indiarunning",
+      "events": 1,
+      "gmv_floor_inr": 73700.0,
+      "tickets_sold": 67
+    },
+    {
+      "organizer_name": "BALAJI RAMKUMAR",
+      "source": "indiarunning",
+      "events": 3,
+      "gmv_floor_inr": 66196.0,
+      "tickets_sold": 104
+    },
+    {
+      "organizer_name": "Thrive Security",
+      "source": "indiarunning",
+      "events": 1,
+      "gmv_floor_inr": 59880.0,
+      "tickets_sold": 120
+    },
+    {
+      "organizer_name": "Universal Runners Marathon ",
+      "source": "indiarunning",
+      "events": 3,
+      "gmv_floor_inr": 57500.0,
+      "tickets_sold": 44
+    },
+    {
+      "organizer_name": "Thrill Zone",
+      "source": "indiarunning",
+      "events": 3,
+      "gmv_floor_inr": 36694.0,
+      "tickets_sold": 51
+    },
+    {
+      "organizer_name": "WeChaser",
+      "source": "indiarunning",
+      "events": 3,
+      "gmv_floor_inr": 36000.0,
+      "tickets_sold": 75
+    },
+    {
+      "organizer_name": "coachdirect.in",
+      "source": "indiarunning",
+      "events": 1,
+      "gmv_floor_inr": 25826.0,
+      "tickets_sold": 74
+    },
+    {
+      "organizer_name": "K.A.Sports and Events",
+      "source": "indiarunning",
+      "events": 1,
+      "gmv_floor_inr": 25179.0,
+      "tickets_sold": 21
+    },
+    {
+      "organizer_name": "Run2gether",
+      "source": "indiarunning",
+      "events": 1,
+      "gmv_floor_inr": 24817.0,
+      "tickets_sold": 83
+    },
+    {
+      "organizer_name": "SPORTENA ACADEMY",
+      "source": "indiarunning",
+      "events": 2,
+      "gmv_floor_inr": 23672.0,
+      "tickets_sold": 88
+    },
+    {
+      "organizer_name": "Biovis",
+      "source": "indiarunning",
+      "events": 1,
+      "gmv_floor_inr": 22000.0,
+      "tickets_sold": 22
+    },
+    {
+      "organizer_name": "SS Multi Sports & Events ",
+      "source": "indiarunning",
+      "events": 2,
+      "gmv_floor_inr": 19179.0,
+      "tickets_sold": 29
+    },
+    {
+      "organizer_name": "IDOVENT PRIVATE LIMITED",
+      "source": "indiarunning",
+      "events": 1,
+      "gmv_floor_inr": 18873.0,
+      "tickets_sold": 27
+    }
+  ],
+  "size_buckets": [
+    {
+      "bucket": "big_1000_1999",
+      "events": 1
+    },
+    {
+      "bucket": "flagship_2000+",
+      "events": 2
+    },
+    {
+      "bucket": "large_500_999",
+      "events": 4
+    },
+    {
+      "bucket": "micro_1_49",
+      "events": 60
+    },
+    {
+      "bucket": "mid_200_499",
+      "events": 5
+    },
+    {
+      "bucket": "no_data_or_zero",
+      "events": 139
+    },
+    {
+      "bucket": "small_50_199",
+      "events": 15
+    }
+  ],
+  "bucket_revenue_by_source": [
+    {
+      "source": "citywoofer",
+      "bucket": "no_data",
+      "events": 15,
+      "tickets": null,
+      "gmv_floor": null
+    },
+    {
+      "source": "indiarunning",
+      "bucket": "big",
+      "events": 1,
+      "tickets": 1241.0,
+      "gmv_floor": 806650.0
+    },
+    {
+      "source": "indiarunning",
+      "bucket": "flagship",
+      "events": 2,
+      "tickets": 5054.0,
+      "gmv_floor": 4309485.0
+    },
+    {
+      "source": "indiarunning",
+      "bucket": "large",
+      "events": 4,
+      "tickets": 3231.0,
+      "gmv_floor": 1361033.0
+    },
+    {
+      "source": "indiarunning",
+      "bucket": "micro",
+      "events": 60,
+      "tickets": 582.0,
+      "gmv_floor": 379655.0
+    },
+    {
+      "source": "indiarunning",
+      "bucket": "mid",
+      "events": 5,
+      "tickets": 1685.0,
+      "gmv_floor": 740205.0
+    },
+    {
+      "source": "indiarunning",
+      "bucket": "no_data",
+      "events": 27,
+      "tickets": 0.0,
+      "gmv_floor": 0.0
+    },
+    {
+      "source": "indiarunning",
+      "bucket": "small",
+      "events": 15,
+      "tickets": 1537.0,
+      "gmv_floor": 1213555.0
+    },
+    {
+      "source": "mysamay",
+      "bucket": "no_data",
+      "events": 12,
+      "tickets": null,
+      "gmv_floor": null
+    },
+    {
+      "source": "townscript",
+      "bucket": "no_data",
+      "events": 85,
+      "tickets": null,
+      "gmv_floor": null
+    }
+  ],
+  "upcoming_big_events": [
+    {
+      "title": "Hennur Bamboo Ultra 2026",
+      "source": "townscript",
+      "location_name": "Bengaluru",
+      "start_time": "2026-09-25T09:30:00+00:00",
+      "price_min": 1100,
+      "max_participants": 15002502,
+      "organizer_name": "Bhasin Sports",
+      "registration_url": "https://www.townscript.com/e/hennur-bamboo-ultra-2026"
+    },
+    {
+      "title": "Hoysala Hustle 2026",
+      "source": "townscript",
+      "location_name": "Bengaluru",
+      "start_time": "2026-11-01T00:30:00+00:00",
+      "price_min": 750,
+      "max_participants": 6999993,
+      "organizer_name": "Bhasin Sports",
+      "registration_url": "https://www.townscript.com/e/hoysala-hustle-2026"
+    },
+    {
+      "title": "Udupi 113 Triathlon ' 26",
+      "source": "mysamay",
+      "location_name": "Udupi",
+      "start_time": "2026-10-24T18:30:00+00:00",
+      "price_min": 8000,
+      "max_participants": 10000,
+      "organizer_name": "NEB SPORTS",
+      "registration_url": "https://mysamay.in/event/info/21fd3fa7-975f-4153-903c-cc3950b61164"
+    },
+    {
+      "title": "Wipro Bengaluru Marathon 2026",
+      "source": "mysamay",
+      "location_name": "Bengaluru",
+      "start_time": "2026-09-26T18:30:00+00:00",
+      "price_min": 1500,
+      "max_participants": 15000,
+      "organizer_name": "NEB Sports Pvt Ltd",
+      "registration_url": "https://mysamay.in/event/info/02f1f7a7-6cf0-4f1a-9f73-4ea3edfb6503"
+    },
+    {
+      "title": "Bengaluru Endurance Run 2026",
+      "source": "townscript",
+      "location_name": "Bengaluru",
+      "start_time": "2026-08-13T09:30:00+00:00",
+      "price_min": 1000,
+      "max_participants": 16108,
+      "organizer_name": "Bhasin Sports",
+      "registration_url": "https://www.townscript.com/e/bengaluru-endurance-run-2026"
+    },
+    {
+      "title": "Bengaluru 10K Challenge 26",
+      "source": "mysamay",
+      "location_name": "Bengaluru",
+      "start_time": "2026-07-04T18:30:00+00:00",
+      "price_min": 1000,
+      "max_participants": 15000,
+      "organizer_name": "NEB Sports Entertainment Pvt Ltd",
+      "registration_url": "https://mysamay.in/event/info/caca3aec-f5b8-4135-bfe5-8d2e0cc60830"
+    },
+    {
+      "title": "Tuffman Half Marathon Delhi (3rd Edition)",
+      "source": "townscript",
+      "location_name": "Delhi",
+      "start_time": "2026-08-22T23:30:00+00:00",
+      "price_min": 1275,
+      "max_participants": 10225,
+      "organizer_name": "Tuffman India",
+      "registration_url": "https://www.townscript.com/e/tuffman-half-marathon-delhi-2026"
+    },
+    {
+      "title": "Vrukshathon Half Marathon 2026",
+      "source": "townscript",
+      "location_name": "Pune",
+      "start_time": "2026-06-06T23:30:00+00:00",
+      "price_min": 599,
+      "max_participants": 20000,
+      "organizer_name": "FITNESS FIRST INDIA",
+      "registration_url": "https://www.townscript.com/e/vrukshathon-half-marathon-2026-044111"
+    },
+    {
+      "title": "Udupi Full Marathon 26",
+      "source": "mysamay",
+      "location_name": "Udupi",
+      "start_time": "2026-12-19T18:30:00+00:00",
+      "price_min": 900,
+      "max_participants": 10000,
+      "organizer_name": "NEB Sports",
+      "registration_url": "https://mysamay.in/event/info/8879ecfd-812d-4c7b-b8d5-51fdf229b704"
+    },
+    {
+      "title": "UST Trivandrum Marathon 26",
+      "source": "mysamay",
+      "location_name": "Trivandrum",
+      "start_time": "2026-11-14T18:30:00+00:00",
+      "price_min": 900,
+      "max_participants": 10000,
+      "organizer_name": "NEB Sports",
+      "registration_url": "https://mysamay.in/event/info/e3e02f08-0651-493f-b7eb-953a359bf17f"
+    },
+    {
+      "title": "Freedom Bengaluru Half Marathon",
+      "source": "townscript",
+      "location_name": "Bengaluru",
+      "start_time": "2026-05-23T23:30:00+00:00",
+      "price_min": 770,
+      "max_participants": 10000,
+      "organizer_name": "Kalki Sports",
+      "registration_url": "https://www.townscript.com/e/freedom-bengaluru-half-marathon-2026-241410"
+    },
+    {
+      "title": "Mumbai Ultra Walkathon 2.0",
+      "source": "townscript",
+      "location_name": "Mumbai",
+      "start_time": "2026-10-31T23:30:00+00:00",
+      "price_min": 896,
+      "max_participants": 7525,
+      "organizer_name": "K.A.Sports and Events",
+      "registration_url": "https://www.townscript.com/e/mumbai-ultra-walkathon"
+    },
+    {
+      "title": "PUNE MARATHON 2026",
+      "source": "mysamay",
+      "location_name": "Pune",
+      "start_time": "2026-08-01T18:30:00+00:00",
+      "price_min": 1000,
+      "max_participants": 6000,
+      "organizer_name": "NEB Sports Pvt Ltd",
+      "registration_url": "https://mysamay.in/event/info/e4fd2bdb-ef0b-4c77-a6e3-fc9d0d54a3bd"
+    },
+    {
+      "title": "Simple Steps presents EVERESTING - Edition 3 at Sinhagad Fort, Pune",
+      "source": "townscript",
+      "location_name": "Ghera Sinhagad",
+      "start_time": "2026-10-29T18:30:00+00:00",
+      "price_min": 2499,
+      "max_participants": 2055,
+      "organizer_name": "Simplesteps Fitness Pvt.Ltd.",
+      "registration_url": "https://www.townscript.com/e/simple-steps-presents-everesting-edition-3-at-sinhagad-fort-pune"
+    },
+    {
+      "title": "Bangalore Ultra 2026",
+      "source": "mysamay",
+      "location_name": "Bengaluru",
+      "start_time": "2026-07-25T18:30:00+00:00",
+      "price_min": 1000,
+      "max_participants": 5000,
+      "organizer_name": "NEB Sports Pvt Ltd",
+      "registration_url": "https://mysamay.in/event/info/213855ab-1223-4f0e-8af7-9610b87e1980"
+    }
+  ],
+  "past_180d_gmv_by_source": [
+    {
+      "source": "indiarunning",
+      "events": 20,
+      "gmv_floor": 3465243.0,
+      "tickets": 4468
+    }
+  ],
+  "future_90d_pipeline_by_source": [
+    {
+      "source": "indiarunning",
+      "events": 55,
+      "sum_min_price": 36567.0,
+      "avg_min_price": 664.85,
+      "sum_cap": null,
+      "sold_so_far": 5927.0
+    },
+    {
+      "source": "townscript",
+      "events": 33,
+      "sum_min_price": 27008.0,
+      "avg_min_price": 818.42,
+      "sum_cap": 104347.0,
+      "sold_so_far": null
+    },
+    {
+      "source": "citywoofer",
+      "events": 11,
+      "sum_min_price": 9313.0,
+      "avg_min_price": 846.64,
+      "sum_cap": null,
+      "sold_so_far": null
+    },
+    {
+      "source": "mysamay",
+      "events": 4,
+      "sum_min_price": 4000.0,
+      "avg_min_price": 1000.0,
+      "sum_cap": 27788.0,
+      "sold_so_far": null
+    }
+  ]
+}

@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { auth } from '@/lib/auth';
+import { getStudioAuth } from '@/lib/studio/server-auth';
 
 const ALLOWED_MIME = new Set([
   'image/jpeg',
@@ -33,8 +33,10 @@ function safeFolder(input: string): string | null {
 }
 
 export async function POST(request: Request) {
-  const session = await auth();
-  if (!session) {
+  // Accept either the marketing-site `endorfin_session` cookie or a
+  // NextAuth session — matches the rest of the studio surface.
+  const studio = await getStudioAuth();
+  if (!studio) {
     return NextResponse.json({ ok: false, error: 'unauthorized' }, { status: 401 });
   }
 

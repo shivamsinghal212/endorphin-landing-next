@@ -1,0 +1,767 @@
+{
+  "captured_at": "2026-05-16T10:18:02.547832+00:00",
+  "total_events": 226,
+  "by_source": [
+    {
+      "source": "indiarunning",
+      "n": 114
+    },
+    {
+      "source": "townscript",
+      "n": 85
+    },
+    {
+      "source": "citywoofer",
+      "n": 15
+    },
+    {
+      "source": "mysamay",
+      "n": 12
+    }
+  ],
+  "by_event_status": [
+    {
+      "event_status": "live",
+      "n": 226
+    }
+  ],
+  "by_event_source_type": [
+    {
+      "event_source_type": "imported",
+      "n": 226
+    }
+  ],
+  "by_category": [
+    {
+      "category": "running",
+      "n": 226
+    }
+  ],
+  "date_buckets": [
+    {
+      "bucket": "next_181_365",
+      "n": 13
+    },
+    {
+      "bucket": "next_30",
+      "n": 59
+    },
+    {
+      "bucket": "next_31_90",
+      "n": 45
+    },
+    {
+      "bucket": "next_91_180",
+      "n": 40
+    },
+    {
+      "bucket": "past_30",
+      "n": 67
+    },
+    {
+      "bucket": "past_30plus",
+      "n": 2
+    }
+  ],
+  "by_registration_brand": [
+    {
+      "brand": "indiarunning.com",
+      "events": 112
+    },
+    {
+      "brand": "townscript.com",
+      "events": 85
+    },
+    {
+      "brand": "www.citywoofer.com",
+      "events": 15
+    },
+    {
+      "brand": "mysamay.in",
+      "events": 12
+    },
+    {
+      "brand": "allevents.in",
+      "events": 1
+    }
+  ],
+  "by_city_recent_or_upcoming": [
+    {
+      "location_name": "Bengaluru",
+      "n": 31
+    },
+    {
+      "location_name": "Pune",
+      "n": 23
+    },
+    {
+      "location_name": "Mumbai",
+      "n": 18
+    },
+    {
+      "location_name": "Chennai",
+      "n": 15
+    },
+    {
+      "location_name": "New Delhi",
+      "n": 14
+    },
+    {
+      "location_name": "Delhi",
+      "n": 12
+    },
+    {
+      "location_name": "Hyderabad",
+      "n": 12
+    },
+    {
+      "location_name": "Noida",
+      "n": 10
+    },
+    {
+      "location_name": "Anywhere",
+      "n": 9
+    },
+    {
+      "location_name": "Gurugram",
+      "n": 7
+    },
+    {
+      "location_name": "Greater Noida",
+      "n": 6
+    },
+    {
+      "location_name": "Thane",
+      "n": 5
+    },
+    {
+      "location_name": "Navi Mumbai",
+      "n": 5
+    },
+    {
+      "location_name": "Dehradun",
+      "n": 3
+    },
+    {
+      "location_name": "Ghaziabad",
+      "n": 3
+    },
+    {
+      "location_name": "Prayagraj",
+      "n": 2
+    },
+    {
+      "location_name": "Udupi",
+      "n": 2
+    },
+    {
+      "location_name": "Indore ",
+      "n": 1
+    },
+    {
+      "location_name": "Dharampur",
+      "n": 1
+    },
+    {
+      "location_name": "Tiger Point, Lonavala",
+      "n": 1
+    },
+    {
+      "location_name": "Mehsana",
+      "n": 1
+    },
+    {
+      "location_name": "Visakhapatnam",
+      "n": 1
+    },
+    {
+      "location_name": "Jalavihar WaterPark, PV Narasimha Rao Marg, Hussain Sagar, Khairtabad, Hyderabad, Telangana, India",
+      "n": 1
+    },
+    {
+      "location_name": "Pedong",
+      "n": 1
+    },
+    {
+      "location_name": "Olcott Memorial Higher Secondary School, III Avenue Road, Sai Ram Colony, Besant Nagar, Chennai, Tamil Nadu, India",
+      "n": 1
+    },
+    {
+      "location_name": "JLN STADIUM GATE 1, Jawaharlal Nehru Stadium Marg, Jawaharlal Nehru Stadium, Lodi Colony, New Delhi, Delhi, India",
+      "n": 1
+    },
+    {
+      "location_name": "Indore",
+      "n": 1
+    },
+    {
+      "location_name": "",
+      "n": 1
+    },
+    {
+      "location_name": "Lavasa",
+      "n": 1
+    },
+    {
+      "location_name": "Kozhikode",
+      "n": 1
+    }
+  ],
+  "by_organizer_recent": [
+    {
+      "organizer_name": "Omega Events",
+      "source": "townscript",
+      "n": 17
+    },
+    {
+      "organizer_name": "TE SPORTS",
+      "source": "indiarunning",
+      "n": 8
+    },
+    {
+      "organizer_name": "Sukarma Events",
+      "source": "indiarunning",
+      "n": 6
+    },
+    {
+      "organizer_name": "Fitpage (Main Account)",
+      "source": "indiarunning",
+      "n": 6
+    },
+    {
+      "organizer_name": "Omega events",
+      "source": "indiarunning",
+      "n": 6
+    },
+    {
+      "organizer_name": "Sportz Zone Events",
+      "source": "indiarunning",
+      "n": 5
+    },
+    {
+      "organizer_name": "NEB Sports Pvt Ltd",
+      "source": "mysamay",
+      "n": 5
+    },
+    {
+      "organizer_name": "Thrill Zone",
+      "source": "indiarunning",
+      "n": 5
+    },
+    {
+      "organizer_name": "BALAJI RAMKUMAR",
+      "source": "indiarunning",
+      "n": 4
+    },
+    {
+      "organizer_name": "BeAthlit",
+      "source": "townscript",
+      "n": 3
+    },
+    {
+      "organizer_name": "NEB Sports",
+      "source": "mysamay",
+      "n": 3
+    },
+    {
+      "organizer_name": "Universal Runners Marathon ",
+      "source": "indiarunning",
+      "n": 3
+    },
+    {
+      "organizer_name": "Kanchan",
+      "source": "townscript",
+      "n": 3
+    },
+    {
+      "organizer_name": "Book of Youth",
+      "source": "indiarunning",
+      "n": 3
+    },
+    {
+      "organizer_name": "Bhasin Sports",
+      "source": "townscript",
+      "n": 3
+    },
+    {
+      "organizer_name": "SPORTENA ACADEMY",
+      "source": "indiarunning",
+      "n": 3
+    },
+    {
+      "organizer_name": "WeChaser",
+      "source": "indiarunning",
+      "n": 3
+    },
+    {
+      "organizer_name": "Janapav Academy ",
+      "source": "indiarunning",
+      "n": 3
+    },
+    {
+      "organizer_name": "Global Events ",
+      "source": "indiarunning",
+      "n": 3
+    },
+    {
+      "organizer_name": "NOBLE FOUNDATION TRUST",
+      "source": "indiarunning",
+      "n": 3
+    },
+    {
+      "organizer_name": "VINCERA SPORTS",
+      "source": "indiarunning",
+      "n": 3
+    },
+    {
+      "organizer_name": "18thkilometer",
+      "source": "indiarunning",
+      "n": 3
+    },
+    {
+      "organizer_name": "united sports & adventures",
+      "source": "indiarunning",
+      "n": 2
+    },
+    {
+      "organizer_name": "XYVIA MOBILITY PRIVATE LIMITED",
+      "source": "indiarunning",
+      "n": 2
+    },
+    {
+      "organizer_name": "Perfect Fitness Solutions Pvt Ltd",
+      "source": "townscript",
+      "n": 2
+    },
+    {
+      "organizer_name": "SS Multi Sports & Events ",
+      "source": "indiarunning",
+      "n": 2
+    },
+    {
+      "organizer_name": "Next Mile",
+      "source": "indiarunning",
+      "n": 2
+    },
+    {
+      "organizer_name": "K.A.Sports and Events",
+      "source": "townscript",
+      "n": 2
+    },
+    {
+      "organizer_name": "Lyfefit",
+      "source": "townscript",
+      "n": 2
+    },
+    {
+      "organizer_name": "Awaara Run Club",
+      "source": "indiarunning",
+      "n": 2
+    }
+  ],
+  "priced_events": 9,
+  "tier_price_stats": {
+    "tiers": 16,
+    "min_price": 99,
+    "p25": 474.0,
+    "p50": 599.0,
+    "p75": 1475.0,
+    "p90": 6500.000000000001,
+    "max_price": 10000,
+    "mean": 1974.38
+  },
+  "tier_price_by_category": [],
+  "price_min_stats": {
+    "priced_events": 219,
+    "free_events": 7,
+    "unpriced_events": 0,
+    "max_price_min": 8000,
+    "median_price_min": 600.0,
+    "p25_price_min": 439.0,
+    "p75_price_min": 812.5,
+    "p90_price_min": 1100.0,
+    "mean_price_min": 717.8
+  },
+  "source_x_time": [
+    {
+      "source": "indiarunning",
+      "next_90": 56,
+      "next_365": 86,
+      "beyond_year": 0,
+      "past": 28
+    },
+    {
+      "source": "townscript",
+      "next_90": 33,
+      "next_365": 47,
+      "beyond_year": 0,
+      "past": 38
+    },
+    {
+      "source": "citywoofer",
+      "next_90": 11,
+      "next_365": 12,
+      "beyond_year": 0,
+      "past": 3
+    },
+    {
+      "source": "mysamay",
+      "next_90": 4,
+      "next_365": 12,
+      "beyond_year": 0,
+      "past": 0
+    }
+  ],
+  "tickets_sold_summary": {
+    "with_sold": 87,
+    "total_sold": 13330,
+    "biggest": 2803
+  },
+  "rating_stats": {
+    "rated": 128,
+    "mean_rating": 2.25
+  },
+  "big_upcoming_events": [
+    {
+      "title": "Udupi 113 Triathlon ' 26",
+      "source": "mysamay",
+      "location_name": "Udupi",
+      "start_time": "2026-10-24T18:30:00+00:00",
+      "price_min": 8000,
+      "total_tickets_sold": null,
+      "organizer_name": "NEB SPORTS",
+      "registration_url": "https://mysamay.in/event/info/21fd3fa7-975f-4153-903c-cc3950b61164"
+    },
+    {
+      "title": "Lavasa Sahyadri Hill Ultra 2026",
+      "source": "townscript",
+      "location_name": "Lavasa",
+      "start_time": "2026-07-04T12:30:00+00:00",
+      "price_min": 2999,
+      "total_tickets_sold": null,
+      "organizer_name": "Vrattanta Endurance & Sports Pvt. Ltd",
+      "registration_url": "https://www.townscript.com/e/lavasa-sahyadri-hill-ultra-2026-433240"
+    },
+    {
+      "title": "Simple Steps presents EVERESTING - Edition 3 at Sinhagad Fort, Pune",
+      "source": "townscript",
+      "location_name": "Ghera Sinhagad",
+      "start_time": "2026-10-29T18:30:00+00:00",
+      "price_min": 2499,
+      "total_tickets_sold": null,
+      "organizer_name": "Simplesteps Fitness Pvt.Ltd.",
+      "registration_url": "https://www.townscript.com/e/simple-steps-presents-everesting-edition-3-at-sinhagad-fort-pune"
+    },
+    {
+      "title": "TUFFMAN SHIMLA ULTRA AND HALF MARATHON MASHOBRA (10th EDITION)",
+      "source": "citywoofer",
+      "location_name": "MASHOBRA GREENS, village Shipur, Mashobra, Shimla, HP, India",
+      "start_time": "2026-06-06T00:00:00+00:00",
+      "price_min": 1870,
+      "total_tickets_sold": null,
+      "organizer_name": null,
+      "registration_url": "https://www.citywoofer.com/e/tuffman-shimla-ultra-and-half-marathon-mashobra-10th-edition"
+    },
+    {
+      "title": "TRI2CHAMP - AQUAFEST OPEN CHAMPIONSHIP - CHENNAI 2026",
+      "source": "townscript",
+      "location_name": "Chennai",
+      "start_time": "2026-05-24T00:30:00+00:00",
+      "price_min": 1800,
+      "total_tickets_sold": null,
+      "organizer_name": "TRI2CHAMP SPORTS",
+      "registration_url": "https://www.townscript.com/e/tri2champ-aquafest-2026"
+    },
+    {
+      "title": "SINHAGAD EPIC TRAIL 2026",
+      "source": "townscript",
+      "location_name": "Pune",
+      "start_time": "2026-06-27T00:30:00+00:00",
+      "price_min": 1649,
+      "total_tickets_sold": null,
+      "organizer_name": "Western Ghats Running Foundation",
+      "registration_url": "https://www.townscript.com/e/sinhagadepictrail2026"
+    },
+    {
+      "title": "Omaxe Faridabad Neon Run -2026",
+      "source": "indiarunning",
+      "location_name": "Faridabad",
+      "start_time": "2026-05-16T12:30:00+00:00",
+      "price_min": 1600,
+      "total_tickets_sold": 1,
+      "organizer_name": "Universal Runners Marathon ",
+      "registration_url": "https://registrations.indiarunning.com/omaxe_faridabad_neon_run_2026_22535"
+    },
+    {
+      "title": "Wipro Bengaluru Marathon 2026",
+      "source": "mysamay",
+      "location_name": "Bengaluru",
+      "start_time": "2026-09-26T18:30:00+00:00",
+      "price_min": 1500,
+      "total_tickets_sold": null,
+      "organizer_name": "NEB Sports Pvt Ltd",
+      "registration_url": "https://mysamay.in/event/info/02f1f7a7-6cf0-4f1a-9f73-4ea3edfb6503"
+    },
+    {
+      "title": "The Great Mawla Ghaati Ultra 2026",
+      "source": "townscript",
+      "location_name": "Pune",
+      "start_time": "2026-06-04T22:30:00+00:00",
+      "price_min": 1497,
+      "total_tickets_sold": null,
+      "organizer_name": "THE JUMPING GORILLA OUTDOORS & SPORTS EDUCATION PRIVATE LIMITED",
+      "registration_url": "https://www.townscript.com/e/the-great-mawla-ghaati-ultra-2026-002443"
+    },
+    {
+      "title": "Matheran Hill Half Marathon (MHHM) - 2nd Edition",
+      "source": "townscript",
+      "location_name": "Neral, Maharashtra, India",
+      "start_time": "2026-08-01T23:30:00+00:00",
+      "price_min": 1487,
+      "total_tickets_sold": null,
+      "organizer_name": "RELIABLE HUBS FOUNDATION",
+      "registration_url": "https://www.townscript.com/e/mhhm-2"
+    },
+    {
+      "title": "8th Edition Dwarka Half Marathon -2026",
+      "source": "indiarunning",
+      "location_name": "Delhi",
+      "start_time": "2026-08-01T23:30:00+00:00",
+      "price_min": 1300,
+      "total_tickets_sold": 7,
+      "organizer_name": "Universal Runners Marathon ",
+      "registration_url": "https://registrations.indiarunning.com/8th_edition_dwarka_half_marathon_2026_21331"
+    },
+    {
+      "title": "8th Edition Of Dwarka Half Marathon - 2026",
+      "source": "citywoofer",
+      "location_name": null,
+      "start_time": "2026-08-01T18:30:00+00:00",
+      "price_min": 1300,
+      "total_tickets_sold": null,
+      "organizer_name": null,
+      "registration_url": "https://www.citywoofer.com/e/8th-edition-of-dwarka-half-marathon---2026"
+    },
+    {
+      "title": "Pune Monsoon Stadium Run - 2026",
+      "source": "townscript",
+      "location_name": "Pune",
+      "start_time": "2026-06-27T00:30:00+00:00",
+      "price_min": 1275,
+      "total_tickets_sold": null,
+      "organizer_name": "Beyond Milez",
+      "registration_url": "https://www.townscript.com/e/pune-monsoon-stadium-run-2026-024323"
+    },
+    {
+      "title": "Tuffman Half Marathon Delhi (3rd Edition)",
+      "source": "townscript",
+      "location_name": "Delhi",
+      "start_time": "2026-08-22T23:30:00+00:00",
+      "price_min": 1275,
+      "total_tickets_sold": null,
+      "organizer_name": "Tuffman India",
+      "registration_url": "https://www.townscript.com/e/tuffman-half-marathon-delhi-2026"
+    },
+    {
+      "title": "Kargil Vijay Diwas Half Marathon 5th Edition",
+      "source": "indiarunning",
+      "location_name": "New Delhi",
+      "start_time": "2026-07-25T23:30:00+00:00",
+      "price_min": 1200,
+      "total_tickets_sold": 106,
+      "organizer_name": "Marathon Tak",
+      "registration_url": "https://registrations.indiarunning.com/kargil_vijay_diwas_half_marathon_5th_edition_67198"
+    },
+    {
+      "title": "MS 10K - Edition 5",
+      "source": "townscript",
+      "location_name": "Mumbai",
+      "start_time": "2026-06-21T00:30:00+00:00",
+      "price_min": 1199,
+      "total_tickets_sold": null,
+      "organizer_name": "Bhupesh Prajapati",
+      "registration_url": "https://www.townscript.com/e/ms-10k-edition-5-413012"
+    },
+    {
+      "title": "PATNITOP MARATHON 6.0 - (INDIA'S MOST BEAUTIFUL HILL RACE)",
+      "source": "citywoofer",
+      "location_name": null,
+      "start_time": "2026-05-30T18:30:00+00:00",
+      "price_min": 1199,
+      "total_tickets_sold": null,
+      "organizer_name": null,
+      "registration_url": "https://www.citywoofer.com/e/patnitop-marathon-60---indias-most-beautiful-hill-race"
+    },
+    {
+      "title": "Patnitop Marathon 6.0",
+      "source": "indiarunning",
+      "location_name": "Patnitop",
+      "start_time": "2026-05-30T23:00:00+00:00",
+      "price_min": 1199,
+      "total_tickets_sold": 21,
+      "organizer_name": "K.A.Sports and Events",
+      "registration_url": "https://registrations.indiarunning.com/patnitopmarathon60-37830"
+    },
+    {
+      "title": "Hennur Bamboo Ultra 2026",
+      "source": "townscript",
+      "location_name": "Bengaluru",
+      "start_time": "2026-09-25T09:30:00+00:00",
+      "price_min": 1100,
+      "total_tickets_sold": null,
+      "organizer_name": "Bhasin Sports",
+      "registration_url": "https://www.townscript.com/e/hennur-bamboo-ultra-2026"
+    },
+    {
+      "title": "Lonavala Varsha Marathon 2026- The Fog Run",
+      "source": "indiarunning",
+      "location_name": "Tiger Point, Lonavala",
+      "start_time": "2026-07-12T00:00:00+00:00",
+      "price_min": 1100,
+      "total_tickets_sold": 949,
+      "organizer_name": "united sports & adventures",
+      "registration_url": "https://registrations.indiarunning.com/lonavala_varsha_marathon_67808"
+    }
+  ],
+  "most_active_organizers_all_time": [
+    {
+      "organizer_name": "Omega Events",
+      "source": "townscript",
+      "lifetime_events": 17
+    },
+    {
+      "organizer_name": "TE SPORTS",
+      "source": "indiarunning",
+      "lifetime_events": 8
+    },
+    {
+      "organizer_name": "Omega events",
+      "source": "indiarunning",
+      "lifetime_events": 6
+    },
+    {
+      "organizer_name": "Sukarma Events",
+      "source": "indiarunning",
+      "lifetime_events": 6
+    },
+    {
+      "organizer_name": "Fitpage (Main Account)",
+      "source": "indiarunning",
+      "lifetime_events": 6
+    },
+    {
+      "organizer_name": "Sportz Zone Events",
+      "source": "indiarunning",
+      "lifetime_events": 5
+    },
+    {
+      "organizer_name": "Thrill Zone",
+      "source": "indiarunning",
+      "lifetime_events": 5
+    },
+    {
+      "organizer_name": "NEB Sports Pvt Ltd",
+      "source": "mysamay",
+      "lifetime_events": 5
+    },
+    {
+      "organizer_name": "BALAJI RAMKUMAR",
+      "source": "indiarunning",
+      "lifetime_events": 4
+    },
+    {
+      "organizer_name": "Universal Runners Marathon ",
+      "source": "indiarunning",
+      "lifetime_events": 3
+    },
+    {
+      "organizer_name": "BeAthlit",
+      "source": "townscript",
+      "lifetime_events": 3
+    },
+    {
+      "organizer_name": "NEB Sports",
+      "source": "mysamay",
+      "lifetime_events": 3
+    },
+    {
+      "organizer_name": "SPORTENA ACADEMY",
+      "source": "indiarunning",
+      "lifetime_events": 3
+    },
+    {
+      "organizer_name": "VINCERA SPORTS",
+      "source": "indiarunning",
+      "lifetime_events": 3
+    },
+    {
+      "organizer_name": "Janapav Academy ",
+      "source": "indiarunning",
+      "lifetime_events": 3
+    },
+    {
+      "organizer_name": "Global Events ",
+      "source": "indiarunning",
+      "lifetime_events": 3
+    },
+    {
+      "organizer_name": "18thkilometer",
+      "source": "indiarunning",
+      "lifetime_events": 3
+    },
+    {
+      "organizer_name": "NOBLE FOUNDATION TRUST",
+      "source": "indiarunning",
+      "lifetime_events": 3
+    },
+    {
+      "organizer_name": "Bhasin Sports",
+      "source": "townscript",
+      "lifetime_events": 3
+    },
+    {
+      "organizer_name": "WeChaser",
+      "source": "indiarunning",
+      "lifetime_events": 3
+    },
+    {
+      "organizer_name": "Kanchan",
+      "source": "townscript",
+      "lifetime_events": 3
+    },
+    {
+      "organizer_name": "Book of Youth",
+      "source": "indiarunning",
+      "lifetime_events": 3
+    },
+    {
+      "organizer_name": "XYVIA MOBILITY PRIVATE LIMITED",
+      "source": "indiarunning",
+      "lifetime_events": 2
+    },
+    {
+      "organizer_name": "Next Mile",
+      "source": "indiarunning",
+      "lifetime_events": 2
+    },
+    {
+      "organizer_name": "SS Multi Sports & Events ",
+      "source": "indiarunning",
+      "lifetime_events": 2
+    }
+  ],
+  "orgs_per_source": [
+    {
+      "source": "indiarunning",
+      "unique_organizers": 57
+    },
+    {
+      "source": "townscript",
+      "unique_organizers": 56
+    },
+    {
+      "source": "mysamay",
+      "unique_organizers": 4
+    }
+  ]
+}

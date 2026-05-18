@@ -1,0 +1,381 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>V4 · Command Console — Admin Panel</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Poppins:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script>
+tailwind.config = {
+  theme: { extend: {
+    colors: { jet:'#0A0A0A', signal:'#E6232A', bone:'#F5F0EB', bg:'#F8F6F3' },
+    fontFamily: { display:['Oswald','sans-serif'], body:['Poppins','sans-serif'], mono:['JetBrains Mono','monospace'] },
+  } },
+};
+</script>
+<style>
+  body { font-family:'Poppins',sans-serif; background:#F8F6F3; }
+  .display { font-family:'Oswald',sans-serif; text-transform:uppercase; letter-spacing:-0.01em; }
+  .mono { font-family:'JetBrains Mono', monospace; }
+  .label-tight { letter-spacing:0.04em; }
+  @keyframes shimmer { 0%{background-position:-400px 0} 100%{background-position:400px 0} }
+  .shimmer { background: linear-gradient(90deg, rgba(10,10,10,0.04) 25%, rgba(10,10,10,0.08) 50%, rgba(10,10,10,0.04) 75%); background-size: 800px 100%; animation: shimmer 1.4s linear infinite; }
+  .row:hover { background: rgba(10,10,10,0.02); }
+</style>
+</head>
+<body class="text-jet">
+
+<div class="bg-jet text-bone">
+  <div class="max-w-[1400px] mx-auto px-6 py-3 flex items-center justify-between gap-4 flex-wrap">
+    <div class="flex items-center gap-3">
+      <span class="display text-sm font-bold">V4 / Command Console</span>
+      <span class="text-xs text-bone/60">Dense · power-user · keyboard-first · list+detail</span>
+    </div>
+  </div>
+</div>
+
+<!-- =====================================================  -->
+<!-- SCREEN 1 · Role picker (compact modal-style)            -->
+<!-- =====================================================  -->
+<section class="border-b border-jet/10">
+  <div class="max-w-[1400px] mx-auto px-6 py-10">
+    <p class="text-[11px] label-tight uppercase text-jet/40 mb-2">Screen 1</p>
+    <h2 class="display text-2xl font-bold mb-6">Role picker · compact</h2>
+
+    <div class="bg-white border border-jet/10 rounded-xl max-w-xl p-5">
+      <div class="flex items-center justify-between mb-4">
+        <p class="display text-sm font-bold">Pick workspace</p>
+        <span class="mono text-[10px] text-jet/40">⌘+/ to switch</span>
+      </div>
+      <div class="space-y-1">
+        <button class="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-bg border border-transparent hover:border-jet/10 text-left">
+          <span class="w-2 h-2 rounded-full bg-signal"></span>
+          <span class="flex-1">
+            <span class="text-sm font-medium block">Run-club owner</span>
+            <span class="text-xs text-jet/50">Bandra Runners + 2 more · 1,247 members · 18 RSVPs pending</span>
+          </span>
+          <span class="mono text-[10px] text-jet/40">↵</span>
+        </button>
+        <button class="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-bg border border-transparent text-left opacity-60">
+          <span class="w-2 h-2 rounded-full bg-jet/20"></span>
+          <span class="flex-1">
+            <span class="text-sm font-medium block">Organiser</span>
+            <span class="text-xs text-jet/40">Race / event tooling · WIP</span>
+          </span>
+          <span class="text-[10px] text-jet/40">soon</span>
+        </button>
+        <button class="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-bg border border-transparent text-left">
+          <span class="w-2 h-2 rounded-full bg-signal"></span>
+          <span class="flex-1">
+            <span class="text-sm font-medium block flex items-center gap-2">Super admin <span class="text-[9px] px-1.5 py-0.5 rounded bg-signal/10 text-signal mono uppercase tracking-wide">root</span></span>
+            <span class="text-xs text-jet/50">All clubs · all organisers · platform tools</span>
+          </span>
+          <span class="mono text-[10px] text-jet/40">↵</span>
+        </button>
+      </div>
+      <div class="mt-4 pt-4 border-t border-jet/5 mono text-[10px] text-jet/40">
+        shivam.singhal212@gmail.com · roles: owner, super_admin
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =====================================================  -->
+<!-- SCREEN 2+3 · Console layout: list + detail              -->
+<!-- =====================================================  -->
+<section class="border-b border-jet/10">
+  <div class="max-w-[1400px] mx-auto px-6 py-10">
+    <p class="text-[11px] label-tight uppercase text-jet/40 mb-2">Screen 2 + 3</p>
+    <h2 class="display text-2xl font-bold mb-6">Console · list + detail (full workspace)</h2>
+
+    <div class="bg-white border border-jet/10 rounded-xl overflow-hidden">
+
+      <!-- Top command bar -->
+      <div class="px-4 py-2.5 border-b border-jet/10 flex items-center gap-3 bg-bg/50">
+        <span class="display text-sm font-bold">Studio</span>
+        <span class="text-jet/20">/</span>
+        <button class="text-xs px-2 py-1 rounded bg-jet/5 hover:bg-jet/10">Owner · Bandra Runners ▾</button>
+        <div class="flex-1 mx-2 relative max-w-md">
+          <input placeholder="⌘+K · jump to club, event, member…" class="w-full pl-3 pr-3 py-1.5 rounded-md border border-jet/10 text-xs bg-white outline-none focus:border-jet/40"/>
+        </div>
+        <span class="mono text-[10px] text-jet/40">v0.1 · 18 pending</span>
+        <div class="w-7 h-7 rounded-full bg-gradient-to-br from-signal to-jet text-white text-[10px] font-bold flex items-center justify-center">SS</div>
+      </div>
+
+      <!-- 3-pane: nav | list | detail -->
+      <div class="flex min-h-[700px]">
+
+        <!-- Left rail -->
+        <aside class="hidden md:flex w-48 flex-shrink-0 flex-col border-r border-jet/10 bg-bg/40">
+          <div class="p-2 space-y-0.5">
+            <p class="text-[10px] label-tight uppercase text-jet/40 px-2 py-1">Workspace</p>
+            <a class="flex items-center gap-2 px-2 py-1.5 rounded-md bg-jet text-bone text-xs">
+              <span class="w-1.5 h-1.5 rounded-full bg-signal"></span> My clubs <span class="ml-auto text-bone/40">3</span>
+            </a>
+            <a class="flex items-center gap-2 px-2 py-1.5 rounded-md hover:bg-jet/5 text-xs text-jet/70">
+              <span class="w-1.5 h-1.5 rounded-full bg-jet/30"></span> All events <span class="ml-auto text-jet/40">28</span>
+            </a>
+            <a class="flex items-center gap-2 px-2 py-1.5 rounded-md hover:bg-jet/5 text-xs text-jet/70">
+              <span class="w-1.5 h-1.5 rounded-full bg-signal"></span> RSVPs <span class="ml-auto text-signal font-medium">18</span>
+            </a>
+            <a class="flex items-center gap-2 px-2 py-1.5 rounded-md hover:bg-jet/5 text-xs text-jet/70">
+              <span class="w-1.5 h-1.5 rounded-full bg-jet/30"></span> Members <span class="ml-auto text-jet/40">1.2k</span>
+            </a>
+            <p class="text-[10px] label-tight uppercase text-jet/40 px-2 py-1 mt-3">Tools</p>
+            <a class="flex items-center gap-2 px-2 py-1.5 rounded-md hover:bg-jet/5 text-xs text-jet/70">Admins</a>
+            <a class="flex items-center gap-2 px-2 py-1.5 rounded-md hover:bg-jet/5 text-xs text-jet/70">Join form</a>
+            <a class="flex items-center gap-2 px-2 py-1.5 rounded-md text-xs text-jet/40">Analytics · soon</a>
+          </div>
+          <div class="mt-auto p-3 border-t border-jet/10 mono text-[10px] text-jet/40">
+            ↑↓ navigate · ↵ open · ⌘k search
+          </div>
+        </aside>
+
+        <!-- List pane -->
+        <div class="w-full md:w-[340px] flex-shrink-0 border-r border-jet/10 flex flex-col">
+          <div class="px-3 py-2.5 border-b border-jet/10 flex items-center gap-2">
+            <p class="display text-xs font-bold flex-1">My clubs</p>
+            <button class="text-jet/40 text-xs hover:text-jet">filter</button>
+            <button class="text-jet/40 text-xs hover:text-jet">sort</button>
+          </div>
+          <div class="overflow-y-auto">
+            <!-- selected row -->
+            <a class="flex items-center gap-3 px-3 py-2.5 border-l-2 border-signal bg-signal/5 cursor-pointer">
+              <div class="w-9 h-9 rounded-md bg-gradient-to-br from-jet to-signal"></div>
+              <div class="flex-1 min-w-0">
+                <p class="text-sm font-medium truncate">Bandra Runners</p>
+                <p class="text-[11px] text-jet/50 truncate mono">bandra-runners · 847</p>
+              </div>
+              <span class="text-[10px] text-signal font-medium">5</span>
+            </a>
+            <a class="flex items-center gap-3 px-3 py-2.5 border-l-2 border-transparent row cursor-pointer">
+              <div class="w-9 h-9 rounded-md bg-gradient-to-br from-signal/80 to-jet/60"></div>
+              <div class="flex-1 min-w-0">
+                <p class="text-sm font-medium truncate">Powai Pacers</p>
+                <p class="text-[11px] text-jet/50 truncate mono">powai-pacers · 312 · draft</p>
+              </div>
+            </a>
+            <a class="flex items-center gap-3 px-3 py-2.5 border-l-2 border-transparent row cursor-pointer">
+              <div class="w-9 h-9 rounded-md bg-gradient-to-br from-jet/40 to-bone"></div>
+              <div class="flex-1 min-w-0">
+                <p class="text-sm font-medium truncate">Carter Striders</p>
+                <p class="text-[11px] text-amber-700 truncate mono">claim · pending</p>
+              </div>
+            </a>
+            <div class="px-3 py-3 mono text-[10px] text-jet/40 border-t border-jet/5">3 clubs · cannot create new</div>
+          </div>
+        </div>
+
+        <!-- Detail pane -->
+        <div class="flex-1 flex flex-col min-w-0">
+          <!-- Header -->
+          <div class="px-5 py-3 border-b border-jet/10 flex items-center gap-3 flex-wrap">
+            <div class="w-10 h-10 rounded-md bg-gradient-to-br from-jet to-signal flex-shrink-0"></div>
+            <div class="min-w-0">
+              <div class="flex items-center gap-2">
+                <p class="display text-base font-bold">Bandra Runners</p>
+                <span class="text-[9px] px-1.5 py-0.5 rounded bg-green-100 text-green-800 font-medium uppercase">Published</span>
+                <span class="text-[9px] px-1.5 py-0.5 rounded bg-jet/5 text-jet/60 font-medium uppercase mono">slug: bandra-runners</span>
+              </div>
+              <p class="text-[11px] text-jet/50 mono">id: clb_8sH2k · updated 2h ago by you</p>
+            </div>
+            <div class="ml-auto flex items-center gap-1.5">
+              <span class="mono text-[10px] text-jet/40 mr-2">⌘S save</span>
+              <button class="px-2.5 py-1 rounded-md border border-jet/10 text-xs hover:bg-jet/5">Preview</button>
+              <button class="px-2.5 py-1 rounded-md bg-jet text-bone text-xs font-medium">Save</button>
+            </div>
+          </div>
+
+          <!-- Sub tabs (compact, segmented) -->
+          <div class="px-5 py-2 border-b border-jet/10 flex items-center gap-1 text-xs overflow-x-auto">
+            <button class="px-2.5 py-1 rounded-md bg-jet/5 font-medium">Details</button>
+            <button class="px-2.5 py-1 rounded-md hover:bg-jet/5 text-jet/60">Events <span class="text-jet/40">28</span></button>
+            <button class="px-2.5 py-1 rounded-md hover:bg-jet/5 text-jet/60 flex items-center gap-1">RSVPs <span class="text-signal font-medium">5</span></button>
+            <button class="px-2.5 py-1 rounded-md hover:bg-jet/5 text-jet/60">Members <span class="text-jet/40">847</span></button>
+            <button class="px-2.5 py-1 rounded-md hover:bg-jet/5 text-jet/60">Admins <span class="text-jet/40">3</span></button>
+            <button class="px-2.5 py-1 rounded-md hover:bg-jet/5 text-jet/60">Join form</button>
+            <button class="px-2.5 py-1 rounded-md text-jet/40">Analytics</button>
+          </div>
+
+          <!-- Body: two cols inline edit -->
+          <div class="p-5 grid md:grid-cols-2 gap-x-6 gap-y-3 text-sm flex-1 overflow-y-auto">
+            <!-- left col -->
+            <div class="space-y-3">
+              <div>
+                <label class="block mono text-[10px] uppercase text-jet/40 mb-1">name</label>
+                <input value="Bandra Runners" class="w-full px-2.5 py-1.5 rounded-md border border-jet/10 text-sm bg-bg focus:bg-white focus:border-jet/40 outline-none"/>
+              </div>
+              <div>
+                <label class="block mono text-[10px] uppercase text-jet/40 mb-1">slug · read-only</label>
+                <input value="bandra-runners" disabled class="w-full px-2.5 py-1.5 rounded-md border border-jet/10 text-sm bg-bg/50 text-jet/50 mono"/>
+              </div>
+              <div>
+                <label class="block mono text-[10px] uppercase text-jet/40 mb-1">city</label>
+                <input value="Mumbai" class="w-full px-2.5 py-1.5 rounded-md border border-jet/10 text-sm bg-bg focus:bg-white focus:border-jet/40 outline-none"/>
+              </div>
+              <div>
+                <label class="block mono text-[10px] uppercase text-jet/40 mb-1">tagline</label>
+                <input value="A pace for every soul." class="w-full px-2.5 py-1.5 rounded-md border border-jet/10 text-sm bg-bg focus:bg-white focus:border-jet/40 outline-none"/>
+              </div>
+              <div>
+                <label class="block mono text-[10px] uppercase text-jet/40 mb-1">description</label>
+                <textarea rows="4" class="w-full px-2.5 py-1.5 rounded-md border border-jet/10 text-sm bg-bg focus:bg-white focus:border-jet/40 outline-none">Bandra Runners is a community of mornings…</textarea>
+              </div>
+            </div>
+            <!-- right col -->
+            <div class="space-y-3">
+              <div class="bg-bg rounded-lg p-3 border border-jet/5">
+                <p class="mono text-[10px] uppercase text-jet/40 mb-2">flags</p>
+                <div class="space-y-1.5 text-xs">
+                  <label class="flex items-center justify-between"><span>published</span><span class="w-7 h-4 bg-signal rounded-full relative"><span class="absolute right-0.5 top-0.5 w-3 h-3 bg-white rounded-full"></span></span></label>
+                  <label class="flex items-center justify-between"><span>requires_approval</span><span class="w-7 h-4 bg-signal rounded-full relative"><span class="absolute right-0.5 top-0.5 w-3 h-3 bg-white rounded-full"></span></span></label>
+                  <label class="flex items-center justify-between text-jet/40"><span>is_featured · admin</span><span class="text-[10px]">off</span></label>
+                  <label class="flex items-center justify-between text-jet/40"><span>is_verified · admin</span><span class="text-[10px]">on</span></label>
+                </div>
+              </div>
+              <div class="bg-bg rounded-lg p-3 border border-jet/5">
+                <p class="mono text-[10px] uppercase text-jet/40 mb-2">stats · live</p>
+                <div class="grid grid-cols-2 gap-2 text-xs">
+                  <div><p class="text-jet/40">members</p><p class="font-medium mono tabular-nums">847</p></div>
+                  <div><p class="text-jet/40">runs/mo</p><p class="font-medium mono tabular-nums">23</p></div>
+                  <div><p class="text-jet/40">km/mo</p><p class="font-medium mono tabular-nums">312</p></div>
+                  <div><p class="text-jet/40">years</p><p class="font-medium mono tabular-nums">5</p></div>
+                </div>
+              </div>
+              <div class="bg-bg rounded-lg p-3 border border-jet/5">
+                <p class="mono text-[10px] uppercase text-jet/40 mb-2">channels</p>
+                <div class="space-y-1.5 text-xs">
+                  <input placeholder="whatsapp_url" class="w-full px-2 py-1 rounded border border-jet/10 mono text-[11px] bg-white outline-none"/>
+                  <input placeholder="instagram_url" class="w-full px-2 py-1 rounded border border-jet/10 mono text-[11px] bg-white outline-none"/>
+                  <input placeholder="strava_url" class="w-full px-2 py-1 rounded border border-jet/10 mono text-[11px] bg-white outline-none"/>
+                </div>
+              </div>
+              <div class="bg-jet/[0.02] rounded-lg p-3 border border-dashed border-jet/15 text-xs text-jet/50">
+                <span class="mono text-[10px] uppercase text-jet/40 block mb-1">danger zone</span>
+                Owners cannot delete clubs. <a class="text-signal hover:underline">Request removal</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =====================================================  -->
+<!-- SCREEN 4 · RSVP queue (full screen variant)             -->
+<!-- =====================================================  -->
+<section>
+  <div class="max-w-[1400px] mx-auto px-6 py-10 pb-20">
+    <p class="text-[11px] label-tight uppercase text-jet/40 mb-2">Screen 4</p>
+    <h2 class="display text-2xl font-bold mb-6">RSVPs · dense queue</h2>
+
+    <div class="bg-white border border-jet/10 rounded-xl overflow-hidden">
+      <div class="px-4 py-2.5 border-b border-jet/10 flex items-center gap-3 flex-wrap bg-bg/50">
+        <p class="display text-sm font-bold">RSVPs</p>
+        <span class="text-jet/20">/</span>
+        <select class="text-xs bg-transparent outline-none font-medium">
+          <option>Sunday long run · 18 May</option>
+        </select>
+        <div class="flex-1"></div>
+        <div class="inline-flex rounded-md bg-jet/5 p-0.5 text-xs">
+          <button class="px-2.5 py-1 rounded bg-white shadow-sm font-medium">pending <span class="text-signal">5</span></button>
+          <button class="px-2.5 py-1 rounded text-jet/50">approved 42</button>
+          <button class="px-2.5 py-1 rounded text-jet/50">rejected 3</button>
+        </div>
+        <button class="text-xs px-2 py-1 rounded bg-jet text-bone font-medium">↵ approve · J</button>
+        <button class="text-xs px-2 py-1 rounded border border-jet/10">reject · K</button>
+      </div>
+
+      <!-- table head -->
+      <div class="grid grid-cols-[20px_28px_2fr_1.5fr_80px_80px_120px] gap-3 px-4 py-2 border-b border-jet/10 mono text-[10px] uppercase text-jet/40">
+        <span><input type="checkbox"/></span>
+        <span></span>
+        <span>name · email</span>
+        <span>note · pace</span>
+        <span>requested</span>
+        <span>history</span>
+        <span class="text-right">action</span>
+      </div>
+
+      <!-- rows -->
+      <div class="divide-y divide-jet/5 text-sm">
+        <div class="grid grid-cols-[20px_28px_2fr_1.5fr_80px_80px_120px] gap-3 px-4 py-2.5 items-center row">
+          <input type="checkbox"/>
+          <div class="w-7 h-7 rounded-full bg-gradient-to-br from-signal to-jet text-white text-[10px] font-bold flex items-center justify-center">AS</div>
+          <div class="min-w-0">
+            <p class="text-sm font-medium truncate">Anita Sharma</p>
+            <p class="mono text-[10px] text-jet/50 truncate">anita@gmail.com</p>
+          </div>
+          <p class="text-xs text-jet/60 truncate">5:30 · first timer · "excited!"</p>
+          <span class="mono text-[10px] text-jet/50">2h ago</span>
+          <span class="mono text-[10px] text-jet/50">0/0</span>
+          <div class="flex justify-end gap-1">
+            <button class="px-2 py-1 rounded bg-green-50 text-green-800 text-xs font-medium">✓ approve</button>
+            <button class="px-2 py-1 rounded hover:bg-jet/5 text-jet/60 text-xs">reject</button>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-[20px_28px_2fr_1.5fr_80px_80px_120px] gap-3 px-4 py-2.5 items-center row">
+          <input type="checkbox"/>
+          <div class="w-7 h-7 rounded-full bg-gradient-to-br from-jet to-signal/60 text-white text-[10px] font-bold flex items-center justify-center">RJ</div>
+          <div class="min-w-0">
+            <p class="text-sm font-medium truncate">Rohan Joshi</p>
+            <p class="mono text-[10px] text-jet/50 truncate">rohan.j@outlook.com</p>
+          </div>
+          <p class="text-xs text-jet/60 truncate">4:45 · member 1y</p>
+          <span class="mono text-[10px] text-jet/50">4h ago</span>
+          <span class="mono text-[10px] text-jet/50">38/38</span>
+          <div class="flex justify-end gap-1">
+            <button class="px-2 py-1 rounded bg-green-50 text-green-800 text-xs font-medium">✓ approve</button>
+            <button class="px-2 py-1 rounded hover:bg-jet/5 text-jet/60 text-xs">reject</button>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-[20px_28px_2fr_1.5fr_80px_80px_120px] gap-3 px-4 py-2.5 items-center row">
+          <input type="checkbox"/>
+          <div class="w-7 h-7 rounded-full bg-gradient-to-br from-jet/60 to-signal/40 text-white text-[10px] font-bold flex items-center justify-center">PV</div>
+          <div class="min-w-0">
+            <p class="text-sm font-medium truncate">Priya Venkat</p>
+            <p class="mono text-[10px] text-jet/50 truncate">priya.v@gmail.com</p>
+          </div>
+          <p class="text-xs text-jet/60 truncate">6:00 · returning after injury</p>
+          <span class="mono text-[10px] text-jet/50">6h ago</span>
+          <span class="mono text-[10px] text-jet/50">12/18</span>
+          <div class="flex justify-end gap-1">
+            <button class="px-2 py-1 rounded bg-green-50 text-green-800 text-xs font-medium">✓ approve</button>
+            <button class="px-2 py-1 rounded hover:bg-jet/5 text-jet/60 text-xs">reject</button>
+          </div>
+        </div>
+
+        <!-- skeleton -->
+        <div class="grid grid-cols-[20px_28px_2fr_1.5fr_80px_80px_120px] gap-3 px-4 py-2.5 items-center">
+          <div class="w-4 h-4 rounded shimmer"></div>
+          <div class="w-7 h-7 rounded-full shimmer"></div>
+          <div class="space-y-1.5"><div class="h-3 rounded shimmer w-32"></div><div class="h-2.5 rounded shimmer w-40"></div></div>
+          <div class="h-3 rounded shimmer w-36"></div>
+          <div class="h-3 rounded shimmer w-12"></div>
+          <div class="h-3 rounded shimmer w-10"></div>
+          <div class="h-7 rounded shimmer"></div>
+        </div>
+      </div>
+
+      <div class="px-4 py-2 border-t border-jet/10 flex items-center justify-between mono text-[10px] text-jet/40">
+        <span>3 of 5 · ↑↓ navigate · J approve · K reject · ⌘A select all</span>
+        <span>auto-approve: off</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="border-t border-jet/10 bg-jet text-bone py-6">
+  <div class="max-w-[1400px] mx-auto px-6 text-xs text-bone/60">
+    V4 · Command Console — dense 3-pane layout (nav + list + detail), monospaced metadata, keyboard hints. Best for power admins who manage daily. Mobile collapses to single column.
+  </div>
+</footer>
+
+</body>
+</html>

@@ -1,26 +1,32 @@
-import { auth } from '@/lib/auth';
-import { AdminSidebar } from './components/sidebar';
+import { Toaster } from 'sonner';
 import AdminSessionProvider from './components/session-provider';
+import { StudioQueryProvider } from './components/query-provider';
 
 export const metadata = { title: 'Admin | Endorfin', robots: { index: false, follow: false } };
 
-export default async function AdminLayout({ children }: { children: React.ReactNode }) {
-  const session = await auth();
-
+export default function AdminLayout({ children }: { children: React.ReactNode }) {
   return (
     <AdminSessionProvider>
-      <div className="min-h-screen bg-[#F8F6F3]">
-        {session ? (
-          <div className="flex">
-            <AdminSidebar user={session.user!} />
-            <main className="flex-1 min-h-screen ml-0 md:ml-64">
-              <div className="p-6 md:p-8 max-w-7xl">{children}</div>
-            </main>
-          </div>
-        ) : (
-          children
-        )}
-      </div>
+      <StudioQueryProvider>
+        {/* text-jet here cancels the global body `text-bone` set in
+            globals.css for the marketing site. Without this, any element
+            without an explicit text color renders cream-on-cream. */}
+        <div className="min-h-screen bg-[#F8F6F3] text-jet">
+          {children}
+        </div>
+        <Toaster
+          position="bottom-right"
+          theme="light"
+          richColors
+          closeButton
+          toastOptions={{
+            style: {
+              fontFamily: 'var(--font-poppins), sans-serif',
+              borderRadius: '12px',
+            },
+          }}
+        />
+      </StudioQueryProvider>
     </AdminSessionProvider>
   );
 }

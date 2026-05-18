@@ -418,7 +418,17 @@ function ClubCard({
           >
             Run this club? Claim ownership →
           </button>
-        ) : null}
+        ) : (
+          // Invisible placeholder — keeps all cards in the carousel the
+          // same height regardless of whether the claim CTA is applicable.
+          <span
+            aria-hidden
+            className="v1c-club-card-claim-link"
+            style={{ visibility: 'hidden', pointerEvents: 'none' }}
+          >
+            Run this club? Claim ownership →
+          </span>
+        )}
       </div>
     </article>
   );
@@ -675,14 +685,39 @@ export default function ClubsView({
     () => pickFlagships(allClubs, currentCity, TOP_CITIES),
     [allClubs, currentCity]
   );
-  const grid = useMemo(() => filtered.slice(0, 12), [filtered]);
+  const grid = filtered;
 
-  const cityCounts = useMemo(() => {
-    const o: Record<string, number> = {};
+  // Top cities first (canonical order, only those with clubs), then every
+  // remaining city sorted by club count. Mirrors the races page.
+  const cityChips = useMemo(() => {
+    const counts = new Map<string, number>();
+    for (const c of allClubs) {
+      const city = (c.city || '').trim();
+      if (!city) continue;
+      counts.set(city, (counts.get(city) || 0) + 1);
+    }
+    const topCounts = new Map<string, number>();
     TOP_CITIES.forEach((c) => {
-      o[c] = allClubs.filter((cl) => matchesCity(cl, c)).length;
+      const n = allClubs.filter((cl) => matchesCity(cl, c)).length;
+      if (n > 0) topCounts.set(c, n);
     });
-    return o;
+    const top = TOP_CITIES.filter((c) => topCounts.has(c)).map((c) => ({
+      name: c as string,
+      count: topCounts.get(c)!,
+    }));
+    // Skip cities already represented by a TOP_CITIES bucket (handled by
+    // CITY_ALIASES via matchesCity), and skip empty names.
+    const topAliases = new Set<string>();
+    for (const c of TOP_CITIES) {
+      for (const cl of allClubs) {
+        if (matchesCity(cl, c) && cl.city) topAliases.add(cl.city.trim());
+      }
+    }
+    const extras = Array.from(counts.entries())
+      .filter(([name]) => !topAliases.has(name))
+      .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
+      .map(([name, count]) => ({ name, count }));
+    return [...top, ...extras];
   }, [allClubs]);
 
   // SEO city landers: only surface cities with enough clubs so we
@@ -876,14 +911,14 @@ export default function ClubsView({
               >
                 All India <span className="v1c-count">{allClubs.length}</span>
               </button>
-              {TOP_CITIES.map((c) => (
+              {cityChips.map(({ name, count }) => (
                 <button
-                  key={c}
-                  className={`v1c-chip ${currentCity === c ? 'is-active' : ''}`}
-                  onClick={() => setCurrentCity(c)}
-                  aria-pressed={currentCity === c}
+                  key={name}
+                  className={`v1c-chip ${currentCity === name ? 'is-active' : ''}`}
+                  onClick={() => setCurrentCity(name)}
+                  aria-pressed={currentCity === name}
                 >
-                  {c} <span className="v1c-count">{cityCounts[c]}</span>
+                  {name} <span className="v1c-count">{count}</span>
                 </button>
               ))}
             </div>

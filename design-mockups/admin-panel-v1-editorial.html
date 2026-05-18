@@ -1,0 +1,440 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>V1 · Heritage Editorial — Admin Panel</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Poppins:wght@400;500;600;700&family=Fraunces:wght@500;600&display=swap" rel="stylesheet">
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        jet: '#0A0A0A',
+        signal: '#E6232A',
+        bone: '#F5F0EB',
+        bg: '#F8F6F3',
+      },
+      fontFamily: {
+        display: ['Oswald', 'sans-serif'],
+        body: ['Poppins', 'sans-serif'],
+        serif: ['Fraunces', 'Georgia', 'serif'],
+      },
+    },
+  },
+};
+</script>
+<style>
+  body { font-family: 'Poppins', sans-serif; background: #F8F6F3; }
+  .label-tight { letter-spacing: 0.04em; }
+  .display { font-family: 'Oswald', sans-serif; text-transform: uppercase; letter-spacing: -0.01em; }
+  /* skeleton shimmer */
+  @keyframes shimmer { 0%{background-position: -400px 0} 100%{background-position: 400px 0} }
+  .shimmer { background: linear-gradient(90deg, rgba(10,10,10,0.04) 25%, rgba(10,10,10,0.08) 50%, rgba(10,10,10,0.04) 75%); background-size: 800px 100%; animation: shimmer 1.4s linear infinite; }
+</style>
+</head>
+<body class="text-jet">
+
+<!-- VARIANT META -->
+<div class="bg-jet text-bone">
+  <div class="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between gap-4 flex-wrap">
+    <div class="flex items-center gap-3">
+      <span class="display text-sm font-bold">V1 / Heritage Editorial</span>
+      <span class="text-xs text-bone/60">Closest to current super-admin · sidebar + table-led</span>
+    </div>
+    <a href="#" class="text-xs text-bone/70 underline">View other variants</a>
+  </div>
+</div>
+
+<!-- =====================================================  -->
+<!-- SCREEN 1 · Role Picker (post-login)                     -->
+<!-- =====================================================  -->
+<section class="border-b border-jet/10">
+  <div class="max-w-7xl mx-auto px-6 py-10">
+    <p class="text-[11px] label-tight uppercase text-jet/40 mb-2">Screen 1</p>
+    <h2 class="display text-2xl font-bold mb-6">Role picker</h2>
+
+    <div class="bg-white rounded-2xl border border-jet/10 p-8 md:p-12 max-w-3xl">
+      <p class="text-[11px] label-tight uppercase text-jet/40 mb-2">Welcome back, Shivam</p>
+      <h1 class="display text-3xl md:text-4xl font-bold mb-2">Where to today?</h1>
+      <p class="text-sm text-jet/60 mb-8 max-w-md">Pick the workspace you want to manage. You can switch any time from the top-right menu.</p>
+
+      <div class="grid sm:grid-cols-2 gap-4">
+        <button class="group text-left bg-bg hover:bg-white border border-jet/10 hover:border-jet rounded-xl p-5 transition-all">
+          <div class="flex items-center gap-3 mb-3">
+            <span class="w-10 h-10 rounded-full bg-jet text-bone flex items-center justify-center font-bold">RC</span>
+            <span class="display text-[11px] font-bold tracking-wider text-signal">Run-club owner</span>
+          </div>
+          <p class="display text-xl font-bold mb-1">Manage your club</p>
+          <p class="text-xs text-jet/60">Bandra Runners · 2 more</p>
+          <p class="mt-4 text-xs text-jet/40 group-hover:text-jet transition-colors">Enter workspace →</p>
+        </button>
+
+        <button class="group text-left bg-bg hover:bg-white border border-jet/10 rounded-xl p-5 transition-all opacity-70">
+          <div class="flex items-center gap-3 mb-3">
+            <span class="w-10 h-10 rounded-full bg-jet/10 text-jet/60 flex items-center justify-center font-bold">OR</span>
+            <span class="display text-[11px] font-bold tracking-wider text-jet/40">Organiser · WIP</span>
+          </div>
+          <p class="display text-xl font-bold mb-1">Race &amp; event tooling</p>
+          <p class="text-xs text-jet/50">Listings, registrations, results</p>
+          <p class="mt-4 text-xs text-jet/40">Coming soon</p>
+        </button>
+      </div>
+
+      <div class="mt-6 pt-6 border-t border-jet/5 text-xs text-jet/40">
+        Signed in as <span class="text-jet">shivam.singhal212@gmail.com</span> · <span class="text-signal">Super-admin access</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =====================================================  -->
+<!-- SCREEN 2 · Owner dashboard                              -->
+<!-- =====================================================  -->
+<section class="border-b border-jet/10">
+  <div class="max-w-7xl mx-auto px-6 py-10">
+    <p class="text-[11px] label-tight uppercase text-jet/40 mb-2">Screen 2</p>
+    <h2 class="display text-2xl font-bold mb-6">Owner workspace · my clubs</h2>
+
+    <!-- Frame mimicking the real app shell (sidebar + content) -->
+    <div class="bg-white rounded-2xl border border-jet/10 overflow-hidden">
+      <div class="flex">
+        <!-- Sidebar -->
+        <aside class="hidden md:flex w-60 flex-shrink-0 flex-col border-r border-jet/10 bg-white">
+          <div class="px-5 py-5 border-b border-jet/10">
+            <div class="flex items-center gap-2">
+              <span class="w-7 h-7 rounded-full bg-signal flex items-center justify-center">
+                <span class="text-white font-bold text-xs">E</span>
+              </span>
+              <span class="display text-base font-bold">Club Studio</span>
+            </div>
+          </div>
+          <nav class="flex-1 p-3 space-y-1 text-sm">
+            <a class="flex items-center gap-3 px-3 py-2 rounded-lg bg-signal/10 text-signal font-medium">
+              <span class="w-2 h-2 rounded-full bg-signal"></span> My clubs
+            </a>
+            <a class="flex items-center gap-3 px-3 py-2 rounded-lg text-jet/60 hover:bg-jet/5">
+              <span class="w-2 h-2 rounded-full bg-jet/20"></span> Events
+            </a>
+            <a class="flex items-center gap-3 px-3 py-2 rounded-lg text-jet/60 hover:bg-jet/5">
+              <span class="w-2 h-2 rounded-full bg-jet/20"></span> RSVPs
+            </a>
+            <a class="flex items-center gap-3 px-3 py-2 rounded-lg text-jet/60 hover:bg-jet/5">
+              <span class="w-2 h-2 rounded-full bg-jet/20"></span> Analytics
+              <span class="ml-auto text-[10px] text-jet/40">Soon</span>
+            </a>
+          </nav>
+          <div class="p-4 border-t border-jet/10 text-xs">
+            <div class="flex items-center gap-2 mb-2">
+              <div class="w-7 h-7 rounded-full bg-jet/10 flex items-center justify-center text-[10px] font-medium">SS</div>
+              <div class="min-w-0">
+                <p class="font-medium truncate">Shivam Singhal</p>
+                <p class="text-jet/40 truncate">Owner · Bandra Runners</p>
+              </div>
+            </div>
+            <button class="text-jet/50 hover:text-signal">Sign out</button>
+          </div>
+        </aside>
+
+        <!-- Main -->
+        <main class="flex-1 p-6 md:p-8">
+          <div class="flex items-center justify-between mb-1 flex-wrap gap-3">
+            <p class="text-[11px] label-tight uppercase text-jet/40">Workspace</p>
+            <div class="flex items-center gap-2 text-xs">
+              <span class="px-2 py-1 rounded-full bg-jet/5 text-jet/60">Owner view</span>
+              <button class="text-jet/50 hover:text-jet underline">Switch role</button>
+            </div>
+          </div>
+          <h1 class="display text-3xl md:text-4xl font-bold mb-6">Your clubs</h1>
+
+          <!-- Stat strip -->
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
+            <div class="bg-bg rounded-xl p-4 border border-jet/5">
+              <p class="text-[10px] label-tight uppercase text-jet/40">Members</p>
+              <p class="display text-2xl font-bold tabular-nums">1,247</p>
+              <p class="text-[11px] text-green-700 mt-1">+24 this week</p>
+            </div>
+            <div class="bg-bg rounded-xl p-4 border border-jet/5">
+              <p class="text-[10px] label-tight uppercase text-jet/40">Pending RSVPs</p>
+              <p class="display text-2xl font-bold tabular-nums text-signal">18</p>
+              <p class="text-[11px] text-jet/50 mt-1">Across 3 events</p>
+            </div>
+            <div class="bg-bg rounded-xl p-4 border border-jet/5">
+              <p class="text-[10px] label-tight uppercase text-jet/40">Events this month</p>
+              <p class="display text-2xl font-bold tabular-nums">12</p>
+              <p class="text-[11px] text-jet/50 mt-1">3 upcoming</p>
+            </div>
+            <div class="bg-bg rounded-xl p-4 border border-jet/5">
+              <p class="text-[10px] label-tight uppercase text-jet/40">Join requests</p>
+              <p class="display text-2xl font-bold tabular-nums">7</p>
+              <p class="text-[11px] text-jet/50 mt-1">Awaiting review</p>
+            </div>
+          </div>
+
+          <!-- Clubs list -->
+          <div class="bg-white rounded-xl border border-jet/10 overflow-hidden">
+            <div class="grid grid-cols-[64px_1fr_auto_auto] gap-4 px-4 py-3 border-b border-jet/10 text-[10px] label-tight uppercase text-jet/40">
+              <span></span>
+              <span>Club</span>
+              <span class="hidden sm:inline">Members</span>
+              <span>Status</span>
+            </div>
+
+            <a class="grid grid-cols-[64px_1fr_auto_auto] gap-4 items-center px-4 py-3 border-b border-jet/5 hover:bg-jet/[0.02] cursor-pointer">
+              <div class="w-12 h-12 rounded-lg bg-gradient-to-br from-jet to-signal"></div>
+              <div class="min-w-0">
+                <p class="font-medium text-sm truncate">Bandra Runners</p>
+                <p class="text-xs text-jet/50 truncate">bandra-runners · Mumbai · est. 2019</p>
+              </div>
+              <span class="hidden sm:inline text-sm tabular-nums text-jet/70">847</span>
+              <span class="px-2 py-0.5 rounded-full text-[10px] font-medium bg-green-100 text-green-800 uppercase">Published</span>
+            </a>
+
+            <a class="grid grid-cols-[64px_1fr_auto_auto] gap-4 items-center px-4 py-3 border-b border-jet/5 hover:bg-jet/[0.02] cursor-pointer">
+              <div class="w-12 h-12 rounded-lg bg-gradient-to-br from-signal/80 to-jet/60"></div>
+              <div class="min-w-0">
+                <p class="font-medium text-sm truncate">Powai Pacers</p>
+                <p class="text-xs text-jet/50 truncate">powai-pacers · Mumbai</p>
+              </div>
+              <span class="hidden sm:inline text-sm tabular-nums text-jet/70">312</span>
+              <span class="px-2 py-0.5 rounded-full text-[10px] font-medium bg-jet/5 text-jet/60 uppercase">Draft</span>
+            </a>
+
+            <a class="grid grid-cols-[64px_1fr_auto_auto] gap-4 items-center px-4 py-3 hover:bg-jet/[0.02] cursor-pointer">
+              <div class="w-12 h-12 rounded-lg bg-gradient-to-br from-jet/40 to-bone"></div>
+              <div class="min-w-0">
+                <p class="font-medium text-sm truncate">Carter Road Striders</p>
+                <p class="text-xs text-jet/50 truncate">carter-road · Mumbai</p>
+              </div>
+              <span class="hidden sm:inline text-sm tabular-nums text-jet/70">88</span>
+              <span class="px-2 py-0.5 rounded-full text-[10px] font-medium bg-amber-100 text-amber-800 uppercase">Claim · pending</span>
+            </a>
+          </div>
+        </main>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =====================================================  -->
+<!-- SCREEN 3 · Club management (single club)                -->
+<!-- =====================================================  -->
+<section class="border-b border-jet/10">
+  <div class="max-w-7xl mx-auto px-6 py-10">
+    <p class="text-[11px] label-tight uppercase text-jet/40 mb-2">Screen 3</p>
+    <h2 class="display text-2xl font-bold mb-6">Manage a club</h2>
+
+    <div class="bg-white rounded-2xl border border-jet/10 p-6 md:p-8">
+      <!-- Breadcrumb -->
+      <div class="flex items-center gap-2 text-xs text-jet/50 mb-4">
+        <a class="hover:text-jet">My clubs</a>
+        <span>/</span>
+        <span class="text-jet">Bandra Runners</span>
+      </div>
+
+      <!-- Header -->
+      <div class="flex items-start gap-4 mb-6 flex-wrap">
+        <div class="w-16 h-16 rounded-xl bg-gradient-to-br from-jet to-signal flex-shrink-0"></div>
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center gap-2 mb-1">
+            <h1 class="display text-2xl md:text-3xl font-bold">Bandra Runners</h1>
+            <span class="text-[10px] px-2 py-0.5 rounded-full bg-green-100 text-green-800 font-medium uppercase">Published</span>
+          </div>
+          <p class="text-sm text-jet/60">bandra-runners · Mumbai · 847 members</p>
+        </div>
+        <div class="flex gap-2">
+          <button class="px-3 py-2 rounded-lg border border-jet/10 text-sm hover:bg-jet/5">View public</button>
+          <button class="px-3 py-2 rounded-lg bg-jet text-bone text-sm font-medium hover:bg-jet/90">Save changes</button>
+        </div>
+      </div>
+
+      <!-- Tabs -->
+      <div class="border-b border-jet/10 mb-6 -mx-6 md:-mx-8 px-6 md:px-8 overflow-x-auto">
+        <nav class="flex gap-1 text-sm">
+          <a class="px-3 py-2 border-b-2 border-signal text-jet font-medium">Overview</a>
+          <a class="px-3 py-2 border-b-2 border-transparent text-jet/60 hover:text-jet">Details</a>
+          <a class="px-3 py-2 border-b-2 border-transparent text-jet/60 hover:text-jet">Events</a>
+          <a class="px-3 py-2 border-b-2 border-transparent text-jet/60 hover:text-jet">RSVPs <span class="ml-1 inline-flex items-center justify-center w-5 h-5 rounded-full bg-signal text-white text-[10px] font-bold">18</span></a>
+          <a class="px-3 py-2 border-b-2 border-transparent text-jet/60 hover:text-jet">Members</a>
+          <a class="px-3 py-2 border-b-2 border-transparent text-jet/60 hover:text-jet">Admins</a>
+          <a class="px-3 py-2 border-b-2 border-transparent text-jet/40">Analytics · Soon</a>
+        </nav>
+      </div>
+
+      <!-- Overview content -->
+      <div class="grid lg:grid-cols-3 gap-6">
+        <!-- Left: stats + recent activity -->
+        <div class="lg:col-span-2 space-y-6">
+          <div class="grid grid-cols-3 gap-3">
+            <div class="bg-bg rounded-xl p-4 border border-jet/5">
+              <p class="text-[10px] label-tight uppercase text-jet/40">Members</p>
+              <p class="display text-2xl font-bold tabular-nums">847</p>
+            </div>
+            <div class="bg-bg rounded-xl p-4 border border-jet/5">
+              <p class="text-[10px] label-tight uppercase text-jet/40">Runs / month</p>
+              <p class="display text-2xl font-bold tabular-nums">23</p>
+            </div>
+            <div class="bg-bg rounded-xl p-4 border border-jet/5">
+              <p class="text-[10px] label-tight uppercase text-jet/40">KM / month</p>
+              <p class="display text-2xl font-bold tabular-nums">312</p>
+            </div>
+          </div>
+
+          <!-- Upcoming events -->
+          <div>
+            <div class="flex items-center justify-between mb-3">
+              <h3 class="display text-sm font-bold">Upcoming events</h3>
+              <a class="text-xs text-signal hover:underline">View all →</a>
+            </div>
+            <div class="bg-bg rounded-xl border border-jet/5 divide-y divide-jet/5">
+              <a class="flex items-center gap-3 p-3 hover:bg-white">
+                <div class="w-12 h-12 rounded-lg bg-jet text-bone flex flex-col items-center justify-center">
+                  <span class="text-[9px] uppercase tracking-wider">May</span>
+                  <span class="display text-base font-bold leading-none">18</span>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <p class="text-sm font-medium truncate">Sunday long run · 10K</p>
+                  <p class="text-xs text-jet/50 truncate">6:00 AM · Bandstand</p>
+                </div>
+                <span class="text-xs text-jet/60"><span class="font-medium tabular-nums">42</span> going</span>
+                <span class="text-xs px-2 py-0.5 rounded-full bg-signal/10 text-signal font-medium">5 pending</span>
+              </a>
+              <a class="flex items-center gap-3 p-3 hover:bg-white">
+                <div class="w-12 h-12 rounded-lg bg-jet text-bone flex flex-col items-center justify-center">
+                  <span class="text-[9px] uppercase tracking-wider">May</span>
+                  <span class="display text-base font-bold leading-none">22</span>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <p class="text-sm font-medium truncate">Tempo Thursday</p>
+                  <p class="text-xs text-jet/50 truncate">6:15 AM · Carter Road</p>
+                </div>
+                <span class="text-xs text-jet/60"><span class="font-medium tabular-nums">28</span> going</span>
+              </a>
+            </div>
+          </div>
+
+          <!-- Analytics placeholder -->
+          <div class="bg-bg rounded-xl border border-dashed border-jet/15 p-8 text-center">
+            <p class="display text-sm font-bold text-jet/50 mb-1">Analytics · Coming soon</p>
+            <p class="text-xs text-jet/40 max-w-sm mx-auto">Member growth, RSVP conversion, attendance heatmaps, retention.</p>
+          </div>
+        </div>
+
+        <!-- Right: quick edit -->
+        <div class="space-y-4">
+          <div class="bg-bg rounded-xl border border-jet/5 p-4">
+            <p class="display text-xs font-bold mb-3">Quick info</p>
+            <label class="block text-[11px] label-tight uppercase text-jet/40 mb-1">Tagline</label>
+            <input value="A pace for every soul." class="w-full px-3 py-2 rounded-lg border border-jet/10 text-sm bg-white focus:border-jet outline-none mb-3" />
+            <label class="block text-[11px] label-tight uppercase text-jet/40 mb-1">Description</label>
+            <textarea rows="4" class="w-full px-3 py-2 rounded-lg border border-jet/10 text-sm bg-white focus:border-jet outline-none">Bandra Runners is a community of mornings…</textarea>
+          </div>
+          <div class="bg-bg rounded-xl border border-jet/5 p-4">
+            <p class="display text-xs font-bold mb-3">Visibility</p>
+            <label class="flex items-center justify-between text-sm py-2"><span>Published</span><span class="w-9 h-5 bg-signal rounded-full relative"><span class="absolute right-0.5 top-0.5 w-4 h-4 bg-white rounded-full"></span></span></label>
+            <label class="flex items-center justify-between text-sm py-2"><span>Requires approval</span><span class="w-9 h-5 bg-signal rounded-full relative"><span class="absolute right-0.5 top-0.5 w-4 h-4 bg-white rounded-full"></span></span></label>
+            <label class="flex items-center justify-between text-sm py-2 text-jet/50"><span>Featured</span><span class="text-xs">admin-only</span></label>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =====================================================  -->
+<!-- SCREEN 4 · RSVPs management                             -->
+<!-- =====================================================  -->
+<section>
+  <div class="max-w-7xl mx-auto px-6 py-10 pb-20">
+    <p class="text-[11px] label-tight uppercase text-jet/40 mb-2">Screen 4</p>
+    <h2 class="display text-2xl font-bold mb-6">RSVPs · approve / reject</h2>
+
+    <div class="bg-white rounded-2xl border border-jet/10 p-6 md:p-8">
+      <div class="flex items-center justify-between flex-wrap gap-3 mb-4">
+        <div>
+          <p class="text-[11px] label-tight uppercase text-jet/40">Sunday long run · 18 May</p>
+          <h3 class="display text-xl font-bold">RSVPs <span class="text-jet/40">· 47</span></h3>
+        </div>
+        <div class="flex items-center gap-2">
+          <div class="inline-flex rounded-lg bg-jet/5 p-0.5 text-xs">
+            <button class="px-3 py-1.5 rounded-md bg-white shadow-sm">Pending <span class="text-signal font-medium">5</span></button>
+            <button class="px-3 py-1.5 rounded-md text-jet/50">Approved <span class="tabular-nums">42</span></button>
+            <button class="px-3 py-1.5 rounded-md text-jet/50">Rejected</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bulk -->
+      <div class="flex items-center gap-2 mb-3 text-xs text-jet/60">
+        <input type="checkbox" class="w-4 h-4 rounded border-jet/20">
+        <span>Select all on this page</span>
+        <span class="mx-2 text-jet/20">·</span>
+        <button class="px-2 py-1 rounded bg-green-50 text-green-800 hover:bg-green-100">Approve selected</button>
+        <button class="px-2 py-1 rounded bg-red-50 text-red-800 hover:bg-red-100">Reject selected</button>
+      </div>
+
+      <!-- Rows -->
+      <div class="border border-jet/10 rounded-xl divide-y divide-jet/5">
+        <div class="grid grid-cols-[auto_1fr_auto_auto] gap-3 items-center p-3 hover:bg-jet/[0.015]">
+          <input type="checkbox" class="w-4 h-4 rounded border-jet/20">
+          <div class="flex items-center gap-3 min-w-0">
+            <div class="w-9 h-9 rounded-full bg-gradient-to-br from-signal to-jet text-white flex items-center justify-center text-xs font-bold">AS</div>
+            <div class="min-w-0">
+              <p class="text-sm font-medium truncate">Anita Sharma</p>
+              <p class="text-xs text-jet/50 truncate">anita@gmail.com · Goal pace 5:30 · First time</p>
+            </div>
+          </div>
+          <span class="text-xs text-jet/50">2 hrs ago</span>
+          <div class="flex items-center gap-1">
+            <button class="px-3 py-1.5 rounded-md bg-green-50 text-green-800 text-xs font-medium hover:bg-green-100">Approve</button>
+            <button class="px-3 py-1.5 rounded-md text-jet/50 hover:bg-jet/5 text-xs">Reject</button>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-[auto_1fr_auto_auto] gap-3 items-center p-3 hover:bg-jet/[0.015]">
+          <input type="checkbox" class="w-4 h-4 rounded border-jet/20">
+          <div class="flex items-center gap-3 min-w-0">
+            <div class="w-9 h-9 rounded-full bg-gradient-to-br from-jet to-signal/60 text-white flex items-center justify-center text-xs font-bold">RJ</div>
+            <div class="min-w-0">
+              <p class="text-sm font-medium truncate">Rohan Joshi</p>
+              <p class="text-xs text-jet/50 truncate">rohan.j@outlook.com · Goal pace 4:45 · Member 1y</p>
+            </div>
+          </div>
+          <span class="text-xs text-jet/50">4 hrs ago</span>
+          <div class="flex items-center gap-1">
+            <button class="px-3 py-1.5 rounded-md bg-green-50 text-green-800 text-xs font-medium hover:bg-green-100">Approve</button>
+            <button class="px-3 py-1.5 rounded-md text-jet/50 hover:bg-jet/5 text-xs">Reject</button>
+          </div>
+        </div>
+
+        <!-- Skeleton row (loading) -->
+        <div class="grid grid-cols-[auto_1fr_auto_auto] gap-3 items-center p-3">
+          <div class="w-4 h-4 rounded shimmer"></div>
+          <div class="flex items-center gap-3 min-w-0">
+            <div class="w-9 h-9 rounded-full shimmer"></div>
+            <div class="space-y-2 min-w-0 flex-1">
+              <div class="h-3 rounded shimmer w-32"></div>
+              <div class="h-2.5 rounded shimmer w-48"></div>
+            </div>
+          </div>
+          <div class="h-3 rounded shimmer w-16"></div>
+          <div class="h-7 rounded shimmer w-32"></div>
+        </div>
+      </div>
+
+      <p class="text-[11px] text-jet/40 mt-4">Loader visible during fetch · Auto-approve switch available in Details tab.</p>
+    </div>
+  </div>
+</section>
+
+<footer class="border-t border-jet/10 bg-jet text-bone py-6">
+  <div class="max-w-7xl mx-auto px-6 text-xs text-bone/60">
+    V1 · Heritage Editorial — mirrors current super-admin patterns (sidebar, table-first, pill tabs). Lowest risk, highest reuse.
+  </div>
+</footer>
+
+</body>
+</html>

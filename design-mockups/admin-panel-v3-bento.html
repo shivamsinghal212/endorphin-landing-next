@@ -1,0 +1,447 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>V3 · Bento Studio — Admin Panel</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Poppins:wght@400;500;600;700&family=Fraunces:wght@500;600&display=swap" rel="stylesheet">
+<script>
+tailwind.config = {
+  theme: { extend: {
+    colors: { jet:'#0A0A0A', signal:'#E6232A', bone:'#F5F0EB', bg:'#F8F6F3' },
+    fontFamily: { display:['Oswald','sans-serif'], body:['Poppins','sans-serif'], serif:['Fraunces','Georgia','serif'] },
+  } },
+};
+</script>
+<style>
+  body { font-family:'Poppins',sans-serif; background:#F8F6F3; }
+  .display { font-family:'Oswald',sans-serif; text-transform:uppercase; letter-spacing:-0.01em; }
+  .label-tight { letter-spacing:0.04em; }
+  @keyframes shimmer { 0%{background-position:-400px 0} 100%{background-position:400px 0} }
+  .shimmer { background: linear-gradient(90deg, rgba(245,240,235,0.08) 25%, rgba(245,240,235,0.18) 50%, rgba(245,240,235,0.08) 75%); background-size: 800px 100%; animation: shimmer 1.4s linear infinite; }
+  .grain { background-image: radial-gradient(rgba(255,255,255,0.06) 1px, transparent 1px); background-size: 3px 3px; }
+</style>
+</head>
+<body class="text-jet">
+
+<div class="bg-jet text-bone">
+  <div class="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between gap-4 flex-wrap">
+    <div class="flex items-center gap-3">
+      <span class="display text-sm font-bold">V3 / Bento Studio</span>
+      <span class="text-xs text-bone/60">Modular tile grid · scannable · dashboard-first</span>
+    </div>
+  </div>
+</div>
+
+<!-- =====================================================  -->
+<!-- SCREEN 1 · Role picker as twin tiles                    -->
+<!-- =====================================================  -->
+<section class="border-b border-jet/10">
+  <div class="max-w-7xl mx-auto px-6 py-10">
+    <p class="text-[11px] label-tight uppercase text-jet/40 mb-2">Screen 1</p>
+    <h2 class="display text-2xl font-bold mb-6">Role picker · two-tile choice</h2>
+
+    <div class="grid sm:grid-cols-2 gap-4">
+      <button class="group relative aspect-[5/4] rounded-3xl bg-jet text-bone p-6 md:p-8 overflow-hidden text-left">
+        <div class="absolute inset-0 grain opacity-40"></div>
+        <div class="relative h-full flex flex-col">
+          <span class="text-[11px] label-tight uppercase text-bone/50 mb-auto">01 / Run-club owner</span>
+          <h3 class="font-serif italic text-3xl md:text-5xl font-medium leading-[0.95] mb-3">Manage<br/>your clubs.</h3>
+          <p class="text-sm text-bone/70 max-w-xs">3 clubs · 1,247 members · 18 RSVPs waiting on you.</p>
+          <div class="mt-6 flex items-center justify-between">
+            <span class="text-bone/60 text-sm">Open workspace</span>
+            <span class="w-10 h-10 rounded-full bg-signal flex items-center justify-center group-hover:scale-105 transition-transform">→</span>
+          </div>
+        </div>
+      </button>
+
+      <button class="group relative aspect-[5/4] rounded-3xl bg-bone p-6 md:p-8 overflow-hidden text-left border border-jet/10 opacity-80">
+        <div class="relative h-full flex flex-col">
+          <span class="text-[11px] label-tight uppercase text-jet/40 mb-auto">02 / Organiser · WIP</span>
+          <h3 class="font-serif italic text-3xl md:text-5xl font-medium leading-[0.95] mb-3 text-jet/50">Races &amp;<br/>events.</h3>
+          <p class="text-sm text-jet/50 max-w-xs">Listings, registrations, results. Currently in build.</p>
+          <div class="mt-6 flex items-center justify-between">
+            <span class="text-jet/40 text-sm">Coming soon</span>
+            <span class="w-10 h-10 rounded-full bg-jet/10 flex items-center justify-center text-jet/40">→</span>
+          </div>
+        </div>
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- =====================================================  -->
+<!-- SCREEN 2 · Bento dashboard (owner)                      -->
+<!-- =====================================================  -->
+<section class="border-b border-jet/10">
+  <div class="max-w-7xl mx-auto px-6 py-10">
+    <p class="text-[11px] label-tight uppercase text-jet/40 mb-2">Screen 2</p>
+    <h2 class="display text-2xl font-bold mb-6">Owner dashboard · bento grid</h2>
+
+    <!-- Top bar -->
+    <div class="bg-white rounded-2xl border border-jet/10 px-5 py-3 mb-4 flex items-center gap-4 flex-wrap">
+      <span class="display text-lg font-bold">Studio</span>
+      <span class="text-jet/20">·</span>
+      <button class="text-xs px-2 py-1 rounded-md bg-jet/5 hover:bg-jet/10">Bandra Runners ▾</button>
+      <div class="flex-1"></div>
+      <button class="text-xs text-jet/60">Switch role</button>
+      <div class="w-8 h-8 rounded-full bg-gradient-to-br from-signal to-jet text-white text-xs font-bold flex items-center justify-center">SS</div>
+    </div>
+
+    <!-- Bento grid: 6 columns -->
+    <div class="grid grid-cols-12 gap-3 md:gap-4 auto-rows-[140px]">
+      <!-- Identity tile (col-span 6, row-span 2) -->
+      <div class="col-span-12 md:col-span-6 row-span-2 rounded-3xl bg-jet text-bone p-6 overflow-hidden relative">
+        <div class="absolute inset-0 grain opacity-30"></div>
+        <div class="relative h-full flex flex-col">
+          <div class="flex items-center gap-3 mb-auto">
+            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-signal to-bone/30"></div>
+            <div>
+              <span class="text-[10px] label-tight uppercase text-bone/50">Active club</span>
+              <p class="display text-lg font-bold leading-tight">Bandra Runners</p>
+            </div>
+          </div>
+          <p class="font-serif italic text-3xl md:text-4xl leading-tight mt-4">847 humans<br/>moving together.</p>
+          <div class="mt-4 flex items-center gap-3">
+            <button class="px-3 py-1.5 rounded-lg bg-bone text-jet text-xs font-medium">Edit profile</button>
+            <button class="px-3 py-1.5 rounded-lg border border-bone/20 text-xs">View public</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- KPI tiles -->
+      <div class="col-span-6 md:col-span-3 rounded-2xl bg-white border border-jet/10 p-4 flex flex-col justify-between">
+        <p class="text-[10px] label-tight uppercase text-jet/40">Pending RSVPs</p>
+        <div>
+          <p class="display text-3xl font-bold text-signal tabular-nums">18</p>
+          <p class="text-[11px] text-jet/50">across 3 events</p>
+        </div>
+      </div>
+      <div class="col-span-6 md:col-span-3 rounded-2xl bg-white border border-jet/10 p-4 flex flex-col justify-between">
+        <p class="text-[10px] label-tight uppercase text-jet/40">Members</p>
+        <div>
+          <p class="display text-3xl font-bold tabular-nums">847</p>
+          <p class="text-[11px] text-green-700">+24 this week</p>
+        </div>
+      </div>
+      <div class="col-span-6 md:col-span-3 rounded-2xl bg-white border border-jet/10 p-4 flex flex-col justify-between">
+        <p class="text-[10px] label-tight uppercase text-jet/40">This month</p>
+        <div>
+          <p class="display text-3xl font-bold tabular-nums">12</p>
+          <p class="text-[11px] text-jet/50">runs scheduled</p>
+        </div>
+      </div>
+      <div class="col-span-6 md:col-span-3 rounded-2xl bg-white border border-jet/10 p-4 flex flex-col justify-between">
+        <p class="text-[10px] label-tight uppercase text-jet/40">KM logged</p>
+        <div>
+          <p class="display text-3xl font-bold tabular-nums">312</p>
+          <p class="text-[11px] text-jet/50">community total</p>
+        </div>
+      </div>
+
+      <!-- Upcoming events (large tile) -->
+      <div class="col-span-12 md:col-span-7 row-span-2 rounded-2xl bg-white border border-jet/10 p-5">
+        <div class="flex items-center justify-between mb-4">
+          <p class="display text-sm font-bold">Upcoming events</p>
+          <a class="text-xs text-signal hover:underline">Manage all →</a>
+        </div>
+        <div class="space-y-2.5">
+          <a class="flex items-center gap-3 p-3 rounded-xl border border-jet/5 hover:bg-bg">
+            <div class="w-12 h-12 rounded-lg bg-jet text-bone flex flex-col items-center justify-center flex-shrink-0">
+              <span class="text-[9px]">MAY</span><span class="display text-base font-bold leading-none">18</span>
+            </div>
+            <div class="flex-1 min-w-0">
+              <p class="text-sm font-medium truncate">Sunday long run · 10K</p>
+              <p class="text-xs text-jet/50">6 AM · Bandstand</p>
+            </div>
+            <span class="text-xs text-jet/60"><span class="font-medium">42</span> going</span>
+            <span class="text-[10px] px-2 py-0.5 rounded-full bg-signal/10 text-signal font-medium">5 pending</span>
+          </a>
+          <a class="flex items-center gap-3 p-3 rounded-xl border border-jet/5 hover:bg-bg">
+            <div class="w-12 h-12 rounded-lg bg-jet text-bone flex flex-col items-center justify-center flex-shrink-0">
+              <span class="text-[9px]">MAY</span><span class="display text-base font-bold leading-none">22</span>
+            </div>
+            <div class="flex-1 min-w-0">
+              <p class="text-sm font-medium truncate">Tempo Thursday</p>
+              <p class="text-xs text-jet/50">6:15 AM · Carter Road</p>
+            </div>
+            <span class="text-xs text-jet/60"><span class="font-medium">28</span> going</span>
+          </a>
+          <a class="flex items-center gap-3 p-3 rounded-xl border border-dashed border-jet/15 text-jet/50 hover:bg-bg">
+            <span class="w-12 h-12 rounded-lg bg-jet/5 flex items-center justify-center text-2xl">+</span>
+            <span class="text-sm">Schedule a new event</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- Pending RSVPs spotlight -->
+      <div class="col-span-12 md:col-span-5 row-span-2 rounded-2xl bg-signal/5 border border-signal/15 p-5">
+        <div class="flex items-center justify-between mb-3">
+          <p class="display text-sm font-bold text-signal">Needs your nod</p>
+          <span class="text-xs text-signal">5 pending</span>
+        </div>
+        <div class="space-y-2">
+          <div class="bg-white rounded-xl p-3 flex items-center gap-3">
+            <div class="w-9 h-9 rounded-full bg-gradient-to-br from-signal to-jet text-white text-[10px] font-bold flex items-center justify-center">AS</div>
+            <div class="flex-1 min-w-0">
+              <p class="text-sm font-medium truncate">Anita Sharma</p>
+              <p class="text-[10px] text-jet/50 truncate">First timer · 5:30 pace</p>
+            </div>
+            <button class="text-green-700 hover:bg-green-50 rounded-md p-1.5 text-lg leading-none">✓</button>
+            <button class="text-jet/40 hover:bg-jet/5 rounded-md p-1.5 text-lg leading-none">×</button>
+          </div>
+          <div class="bg-white rounded-xl p-3 flex items-center gap-3">
+            <div class="w-9 h-9 rounded-full bg-gradient-to-br from-jet to-signal/60 text-white text-[10px] font-bold flex items-center justify-center">RJ</div>
+            <div class="flex-1 min-w-0">
+              <p class="text-sm font-medium truncate">Rohan Joshi</p>
+              <p class="text-[10px] text-jet/50 truncate">Member 1y · 4:45 pace</p>
+            </div>
+            <button class="text-green-700 hover:bg-green-50 rounded-md p-1.5 text-lg leading-none">✓</button>
+            <button class="text-jet/40 hover:bg-jet/5 rounded-md p-1.5 text-lg leading-none">×</button>
+          </div>
+          <!-- skeleton -->
+          <div class="bg-white rounded-xl p-3 flex items-center gap-3">
+            <div class="w-9 h-9 rounded-full shimmer"></div>
+            <div class="flex-1 space-y-2"><div class="h-3 rounded shimmer w-24"></div><div class="h-2.5 rounded shimmer w-32"></div></div>
+          </div>
+        </div>
+        <a class="block mt-3 text-center text-xs font-medium text-signal hover:underline">Review all 18 →</a>
+      </div>
+
+      <!-- Other clubs -->
+      <div class="col-span-12 md:col-span-6 rounded-2xl bg-white border border-jet/10 p-5">
+        <p class="display text-sm font-bold mb-3">Your other clubs</p>
+        <div class="grid grid-cols-2 gap-2">
+          <a class="p-3 rounded-xl border border-jet/5 hover:bg-bg flex items-center gap-3">
+            <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-signal/80 to-jet/60"></div>
+            <div class="min-w-0">
+              <p class="text-sm font-medium truncate">Powai Pacers</p>
+              <p class="text-[10px] text-jet/50">312 · Draft</p>
+            </div>
+          </a>
+          <a class="p-3 rounded-xl border border-jet/5 hover:bg-bg flex items-center gap-3">
+            <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-jet/40 to-bone"></div>
+            <div class="min-w-0">
+              <p class="text-sm font-medium truncate">Carter Striders</p>
+              <p class="text-[10px] text-amber-700">Claim pending</p>
+            </div>
+          </a>
+        </div>
+      </div>
+
+      <!-- Analytics placeholder -->
+      <div class="col-span-12 md:col-span-6 rounded-2xl bg-white border border-dashed border-jet/15 p-5 text-center flex flex-col items-center justify-center">
+        <p class="display text-sm font-bold text-jet/50 mb-1">Analytics · Coming soon</p>
+        <p class="text-xs text-jet/40 max-w-xs">Member growth, RSVP conversion, attendance heatmaps, retention.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =====================================================  -->
+<!-- SCREEN 3 · Club management as bento sections            -->
+<!-- =====================================================  -->
+<section class="border-b border-jet/10">
+  <div class="max-w-7xl mx-auto px-6 py-10">
+    <p class="text-[11px] label-tight uppercase text-jet/40 mb-2">Screen 3</p>
+    <h2 class="display text-2xl font-bold mb-6">Manage club · bento sections</h2>
+
+    <!-- Header -->
+    <div class="bg-white rounded-2xl border border-jet/10 p-5 mb-3 flex items-center gap-4 flex-wrap">
+      <button class="text-jet/60 text-sm">← My clubs</button>
+      <span class="text-jet/20">|</span>
+      <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-jet to-signal flex-shrink-0"></div>
+      <div class="flex-1 min-w-[150px]">
+        <p class="display text-xl font-bold">Bandra Runners</p>
+        <p class="text-xs text-jet/50">847 members · Published</p>
+      </div>
+      <button class="px-3 py-2 rounded-lg border border-jet/10 text-sm">Preview</button>
+      <button class="px-3 py-2 rounded-lg bg-jet text-bone text-sm font-medium">Save</button>
+    </div>
+
+    <div class="grid grid-cols-12 gap-3 md:gap-4">
+      <!-- Identity edit (large) -->
+      <div class="col-span-12 md:col-span-7 rounded-2xl bg-white border border-jet/10 p-5">
+        <div class="flex items-center justify-between mb-4">
+          <p class="display text-sm font-bold">Identity</p>
+          <span class="text-[10px] text-green-700">All set</span>
+        </div>
+        <div class="grid sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-[11px] label-tight uppercase text-jet/40 mb-1">Name</label>
+            <input value="Bandra Runners" class="w-full px-3 py-2 rounded-lg border border-jet/10 text-sm focus:border-jet outline-none"/>
+          </div>
+          <div>
+            <label class="block text-[11px] label-tight uppercase text-jet/40 mb-1">City</label>
+            <input value="Mumbai" class="w-full px-3 py-2 rounded-lg border border-jet/10 text-sm focus:border-jet outline-none"/>
+          </div>
+          <div class="sm:col-span-2">
+            <label class="block text-[11px] label-tight uppercase text-jet/40 mb-1">Tagline</label>
+            <input value="A pace for every soul." class="w-full px-3 py-2 rounded-lg border border-jet/10 text-sm focus:border-jet outline-none"/>
+          </div>
+          <div class="sm:col-span-2">
+            <label class="block text-[11px] label-tight uppercase text-jet/40 mb-1">Description</label>
+            <textarea rows="3" class="w-full px-3 py-2 rounded-lg border border-jet/10 text-sm focus:border-jet outline-none">Bandra Runners is a community of mornings…</textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- Visibility tile -->
+      <div class="col-span-12 md:col-span-5 rounded-2xl bg-white border border-jet/10 p-5">
+        <p class="display text-sm font-bold mb-3">Visibility</p>
+        <div class="space-y-1">
+          <label class="flex items-center justify-between py-2 text-sm"><span>Published</span><span class="w-9 h-5 bg-signal rounded-full relative"><span class="absolute right-0.5 top-0.5 w-4 h-4 bg-white rounded-full"></span></span></label>
+          <label class="flex items-center justify-between py-2 text-sm"><span>Requires approval</span><span class="w-9 h-5 bg-signal rounded-full relative"><span class="absolute right-0.5 top-0.5 w-4 h-4 bg-white rounded-full"></span></span></label>
+          <label class="flex items-center justify-between py-2 text-sm text-jet/40"><span>Featured</span><span class="text-[10px]">admin-only</span></label>
+        </div>
+        <div class="mt-4 pt-4 border-t border-jet/5 text-xs text-jet/50">
+          You can edit anything but cannot delete this club. <a class="text-signal hover:underline">Request removal</a>
+        </div>
+      </div>
+
+      <!-- Events tile -->
+      <div class="col-span-12 md:col-span-6 rounded-2xl bg-white border border-jet/10 p-5">
+        <div class="flex items-center justify-between mb-3">
+          <p class="display text-sm font-bold">Events</p>
+          <a class="text-xs text-signal hover:underline">+ New event</a>
+        </div>
+        <div class="space-y-2">
+          <div class="flex items-center gap-3 p-2.5 rounded-lg hover:bg-bg">
+            <div class="w-10 h-10 rounded-lg bg-jet text-bone flex flex-col items-center justify-center"><span class="text-[8px]">MAY</span><span class="display text-sm font-bold leading-none">18</span></div>
+            <div class="flex-1 min-w-0"><p class="text-sm font-medium truncate">Sunday long run</p><p class="text-[11px] text-jet/50">42 going · 5 pending</p></div>
+          </div>
+          <div class="flex items-center gap-3 p-2.5 rounded-lg hover:bg-bg">
+            <div class="w-10 h-10 rounded-lg bg-jet text-bone flex flex-col items-center justify-center"><span class="text-[8px]">MAY</span><span class="display text-sm font-bold leading-none">22</span></div>
+            <div class="flex-1 min-w-0"><p class="text-sm font-medium truncate">Tempo Thursday</p><p class="text-[11px] text-jet/50">28 going</p></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Admins tile -->
+      <div class="col-span-12 md:col-span-6 rounded-2xl bg-white border border-jet/10 p-5">
+        <div class="flex items-center justify-between mb-3">
+          <p class="display text-sm font-bold">Admins</p>
+          <a class="text-xs text-signal hover:underline">+ Invite</a>
+        </div>
+        <div class="flex -space-x-2 mb-3">
+          <div class="w-9 h-9 rounded-full bg-gradient-to-br from-signal to-jet text-white text-xs font-bold flex items-center justify-center ring-2 ring-white">SS</div>
+          <div class="w-9 h-9 rounded-full bg-gradient-to-br from-jet to-signal/60 text-white text-xs font-bold flex items-center justify-center ring-2 ring-white">RM</div>
+          <div class="w-9 h-9 rounded-full bg-gradient-to-br from-jet/60 to-signal/40 text-white text-xs font-bold flex items-center justify-center ring-2 ring-white">PK</div>
+        </div>
+        <p class="text-xs text-jet/50">You + 2 co-admins</p>
+      </div>
+
+      <!-- Socials tile -->
+      <div class="col-span-12 md:col-span-6 rounded-2xl bg-white border border-jet/10 p-5">
+        <p class="display text-sm font-bold mb-3">Channels</p>
+        <div class="grid grid-cols-2 gap-2 text-sm">
+          <input placeholder="WhatsApp URL" class="px-3 py-2 rounded-lg border border-jet/10 text-sm" />
+          <input placeholder="Instagram URL" class="px-3 py-2 rounded-lg border border-jet/10 text-sm" />
+          <input placeholder="Strava URL" class="px-3 py-2 rounded-lg border border-jet/10 text-sm" />
+          <input placeholder="Join URL" class="px-3 py-2 rounded-lg border border-jet/10 text-sm" />
+        </div>
+      </div>
+
+      <!-- Analytics placeholder large -->
+      <div class="col-span-12 md:col-span-6 rounded-2xl bg-jet text-bone p-5 overflow-hidden relative">
+        <div class="absolute inset-0 grain opacity-20"></div>
+        <div class="relative">
+          <p class="text-[10px] label-tight uppercase text-bone/50 mb-1">Analytics</p>
+          <p class="font-serif italic text-2xl leading-tight mb-2">Coming soon.</p>
+          <p class="text-xs text-bone/60 max-w-xs">Member growth · RSVP conversion · attendance heatmaps · retention curves.</p>
+          <div class="mt-4 flex gap-1 items-end h-12 opacity-30">
+            <div class="w-3 bg-bone/40 rounded-t" style="height:30%"></div>
+            <div class="w-3 bg-bone/50 rounded-t" style="height:50%"></div>
+            <div class="w-3 bg-bone/60 rounded-t" style="height:40%"></div>
+            <div class="w-3 bg-bone/70 rounded-t" style="height:70%"></div>
+            <div class="w-3 bg-bone rounded-t" style="height:85%"></div>
+            <div class="w-3 bg-signal rounded-t" style="height:100%"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =====================================================  -->
+<!-- SCREEN 4 · RSVPs                                        -->
+<!-- =====================================================  -->
+<section>
+  <div class="max-w-7xl mx-auto px-6 py-10 pb-20">
+    <p class="text-[11px] label-tight uppercase text-jet/40 mb-2">Screen 4</p>
+    <h2 class="display text-2xl font-bold mb-6">RSVPs · queue tile</h2>
+
+    <div class="grid grid-cols-12 gap-3 md:gap-4">
+      <!-- Filters tile -->
+      <div class="col-span-12 md:col-span-3 rounded-2xl bg-white border border-jet/10 p-5">
+        <p class="display text-sm font-bold mb-3">Event</p>
+        <select class="w-full px-3 py-2 rounded-lg border border-jet/10 text-sm mb-4">
+          <option>Sunday long run · 18 May</option>
+          <option>Tempo Thursday · 22 May</option>
+        </select>
+        <p class="display text-sm font-bold mb-2">Status</p>
+        <div class="space-y-1 text-sm">
+          <label class="flex items-center justify-between py-1.5 px-2 rounded-md bg-signal/5 text-signal font-medium"><span>Pending</span><span class="tabular-nums">5</span></label>
+          <label class="flex items-center justify-between py-1.5 px-2 rounded-md hover:bg-bg"><span>Approved</span><span class="tabular-nums text-jet/50">42</span></label>
+          <label class="flex items-center justify-between py-1.5 px-2 rounded-md hover:bg-bg"><span>Rejected</span><span class="tabular-nums text-jet/50">3</span></label>
+        </div>
+        <div class="mt-4 pt-4 border-t border-jet/5">
+          <button class="w-full px-3 py-2 rounded-lg bg-green-50 text-green-800 text-xs font-medium">Approve all pending</button>
+        </div>
+      </div>
+
+      <!-- Queue tile -->
+      <div class="col-span-12 md:col-span-9 rounded-2xl bg-white border border-jet/10 overflow-hidden">
+        <div class="px-5 py-3 border-b border-jet/10 flex items-center justify-between">
+          <p class="display text-sm font-bold">Pending RSVPs <span class="text-signal">· 5</span></p>
+          <input placeholder="Search name, email…" class="px-3 py-1.5 rounded-lg border border-jet/10 text-sm text-xs w-48"/>
+        </div>
+        <div class="divide-y divide-jet/5">
+          <div class="grid grid-cols-[auto_1fr_auto_auto] gap-3 items-center px-5 py-3 hover:bg-bg">
+            <div class="w-10 h-10 rounded-full bg-gradient-to-br from-signal to-jet text-white text-xs font-bold flex items-center justify-center">AS</div>
+            <div class="min-w-0">
+              <p class="text-sm font-medium truncate">Anita Sharma</p>
+              <p class="text-xs text-jet/50 truncate">anita@gmail.com · 5:30 pace · First timer</p>
+            </div>
+            <span class="text-xs text-jet/50">2h ago</span>
+            <div class="flex gap-1">
+              <button class="px-3 py-1.5 rounded-md bg-green-50 text-green-800 text-xs font-medium">Approve</button>
+              <button class="px-3 py-1.5 rounded-md text-jet/50 hover:bg-jet/5 text-xs">Reject</button>
+            </div>
+          </div>
+          <div class="grid grid-cols-[auto_1fr_auto_auto] gap-3 items-center px-5 py-3 hover:bg-bg">
+            <div class="w-10 h-10 rounded-full bg-gradient-to-br from-jet to-signal/60 text-white text-xs font-bold flex items-center justify-center">RJ</div>
+            <div class="min-w-0">
+              <p class="text-sm font-medium truncate">Rohan Joshi</p>
+              <p class="text-xs text-jet/50 truncate">rohan.j@outlook.com · 4:45 pace · Member 1y</p>
+            </div>
+            <span class="text-xs text-jet/50">4h ago</span>
+            <div class="flex gap-1">
+              <button class="px-3 py-1.5 rounded-md bg-green-50 text-green-800 text-xs font-medium">Approve</button>
+              <button class="px-3 py-1.5 rounded-md text-jet/50 hover:bg-jet/5 text-xs">Reject</button>
+            </div>
+          </div>
+          <!-- skeleton -->
+          <div class="grid grid-cols-[auto_1fr_auto_auto] gap-3 items-center px-5 py-3">
+            <div class="w-10 h-10 rounded-full bg-jet/5 shimmer"></div>
+            <div class="space-y-2"><div class="h-3 rounded bg-jet/5 shimmer w-32"></div><div class="h-2.5 rounded bg-jet/5 shimmer w-48"></div></div>
+            <div class="h-3 rounded bg-jet/5 shimmer w-12"></div>
+            <div class="h-7 rounded bg-jet/5 shimmer w-32"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="border-t border-jet/10 bg-jet text-bone py-6">
+  <div class="max-w-7xl mx-auto px-6 text-xs text-bone/60">
+    V3 · Bento Studio — modular tile grid; each function (identity, events, RSVPs, channels, admins, analytics) is its own tile; uses Fraunces italic for editorial flourish on key tiles.
+  </div>
+</footer>
+
+</body>
+</html>
