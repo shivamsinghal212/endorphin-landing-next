@@ -2314,6 +2314,112 @@ body { padding-top: var(--nav-h, 68px); }
   .v1-clubs-page .v1c-clubs-carousel-wrap::after { width: 40px; }
 }
 
+/* ─── Onboard-your-club banner (dark) ──── */
+.v1-clubs-page .v1c-onboard-section {
+  background: var(--jet);
+  padding: 0 0 96px;
+}
+.v1-clubs-page .v1c-onboard-card {
+  position: relative;
+  background:
+    radial-gradient(ellipse 60% 100% at 100% 0%, rgba(230, 35, 42, 0.18) 0%, transparent 60%),
+    #141414;
+  border: 0.5px solid rgba(245, 240, 235, 0.14);
+  padding: 40px 44px;
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  align-items: center;
+  gap: 36px;
+}
+.v1-clubs-page .v1c-onboard-card::before {
+  content: '';
+  position: absolute; left: 0; top: 0; bottom: 0;
+  width: 3px; background: var(--red);
+}
+.v1-clubs-page .v1c-onboard-kicker {
+  display: inline-block;
+  color: var(--red);
+  font-family: var(--font-oswald), sans-serif;
+  font-weight: 600; font-size: 11px;
+  letter-spacing: 0.22em; text-transform: uppercase;
+  margin-bottom: 12px;
+}
+.v1-clubs-page .v1c-onboard-title {
+  font-family: var(--font-fraunces), serif; font-style: italic;
+  font-weight: 700; font-size: 38px; line-height: 1.05;
+  letter-spacing: -0.02em;
+  color: var(--bone);
+  margin: 0 0 12px;
+}
+.v1-clubs-page .v1c-onboard-sub {
+  color: rgba(245, 240, 235, 0.65);
+  font-size: 15px; line-height: 1.55;
+  margin: 0; max-width: 46ch;
+}
+.v1-clubs-page .v1c-onboard-form {
+  display: flex; gap: 10px; align-items: stretch;
+  width: 100%;
+}
+.v1-clubs-page .v1c-onboard-input-wrap {
+  position: relative; flex: 1; min-width: 0;
+  display: flex; align-items: center;
+}
+.v1-clubs-page .v1c-onboard-input-prefix {
+  position: absolute; left: 16px;
+  color: rgba(245, 240, 235, 0.45);
+  font-family: var(--font-oswald), sans-serif;
+  font-weight: 600; font-size: 14px;
+  pointer-events: none;
+}
+.v1-clubs-page .v1c-onboard-input {
+  width: 100%; height: 52px;
+  padding: 0 16px 0 32px;
+  background: rgba(245, 240, 235, 0.04);
+  border: 1px solid rgba(245, 240, 235, 0.22);
+  color: var(--bone);
+  font-family: var(--font-oswald), sans-serif;
+  font-size: 14px; letter-spacing: 0.04em;
+  outline: none;
+  transition: border-color 160ms ease-out, background 160ms ease-out;
+}
+.v1-clubs-page .v1c-onboard-input::placeholder {
+  color: rgba(245, 240, 235, 0.35);
+  letter-spacing: 0.04em;
+}
+.v1-clubs-page .v1c-onboard-input:focus {
+  border-color: rgba(245, 240, 235, 0.55);
+  background: rgba(245, 240, 235, 0.07);
+}
+.v1-clubs-page .v1c-onboard-submit:disabled {
+  opacity: 0.45; cursor: not-allowed; pointer-events: none;
+}
+.v1-clubs-page .v1c-onboard-thanks {
+  display: flex; flex-direction: column; gap: 6px;
+  padding: 18px 20px;
+  background: rgba(7, 160, 57, 0.12);
+  border: 1px solid rgba(7, 160, 57, 0.35);
+  color: var(--bone);
+  font-size: 14px; line-height: 1.5;
+}
+.v1-clubs-page .v1c-onboard-thanks strong {
+  font-family: var(--font-fraunces), serif; font-style: italic;
+  font-weight: 700; font-size: 18px;
+  color: #7de28e;
+}
+.v1-clubs-page .v1c-onboard-thanks a {
+  color: var(--bone); text-decoration: underline;
+}
+@media (max-width: 860px) {
+  .v1-clubs-page .v1c-onboard-section { padding: 0 0 64px; }
+  .v1-clubs-page .v1c-onboard-card {
+    grid-template-columns: 1fr; gap: 24px;
+    padding: 32px 24px;
+  }
+  .v1-clubs-page .v1c-onboard-title { font-size: 28px; }
+  .v1-clubs-page .v1c-onboard-form { flex-direction: column; gap: 12px; }
+  .v1-clubs-page .v1c-onboard-submit { width: 100%; }
+}
+
 /* ─── Admin section (cream, tabs + mock) ─── */
 .v1-clubs-page .v1c-admin-section {
   background: var(--cream);
@@ -2340,6 +2446,16 @@ body { padding-top: var(--nav-h, 68px); }
   margin: 16px auto 0; max-width: 18ch;
 }
 .v1-clubs-page .v1c-admin-head h2 b { font-weight: 700; }
+.v1-clubs-page .v1c-admin-deck {
+  font-size: 16px; line-height: 1.55;
+  color: rgba(10, 10, 10, 0.6);
+  max-width: 56ch;
+  margin: 20px auto 0;
+}
+.v1-clubs-page .v1c-admin-foot {
+  display: flex; justify-content: center;
+  margin-top: 56px;
+}
 .v1-clubs-page .v1c-admin-tabs {
   display: flex; justify-content: center; gap: 2px;
   margin-bottom: 48px; flex-wrap: wrap;
@@ -2472,6 +2588,8 @@ body { padding-top: var(--nav-h, 68px); }
 @media (max-width: 960px) {
   .v1-clubs-page .v1c-admin-section { padding: 64px 0 72px; }
   .v1-clubs-page .v1c-admin-head h2 { font-size: 38px; }
+  .v1-clubs-page .v1c-admin-deck { font-size: 14px; margin-top: 16px; }
+  .v1-clubs-page .v1c-admin-foot { margin-top: 36px; }
   .v1-clubs-page .v1c-admin-tabs { margin-bottom: 32px; }
   .v1-clubs-page .v1c-admin-tab {
     padding: 12px 18px; font-size: 11px; letter-spacing: 0.14em;

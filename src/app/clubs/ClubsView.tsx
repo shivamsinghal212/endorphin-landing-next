@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import posthog from 'posthog-js';
 import { APP_STORE_URL, PLAY_STORE_URL } from '@/lib/store-links';
 import { useStoreLink } from '@/lib/use-store-link';
 import { TOP_CITIES, locationMatchesCity } from '@/lib/cities';
@@ -434,9 +435,94 @@ function ClubCard({
   );
 }
 
+// ─── Onboard-your-club banner ───────────────
+// Self-serve nudge for club organisers whose club isn't in the directory.
+// Opens a prefilled mailto: to the team — no backend dependency.
+
+function OnboardClubBanner() {
+  const [handle, setHandle] = useState('');
+  const [submitted, setSubmitted] = useState(false);
+
+  const cleanHandle = (raw: string) =>
+    raw
+      .trim()
+      .replace(/^https?:\/\/(www\.)?instagram\.com\//i, '')
+      .replace(/\/+$/, '')
+      .replace(/^@/, '');
+
+  function onSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    const cleaned = cleanHandle(handle);
+    if (!cleaned) return;
+    posthog.capture('club_onboard_request', { instagram_handle: cleaned });
+    const subject = `Onboard my run club — @${cleaned}`;
+    const body =
+      `Hi Endorfin team,\n\n` +
+      `I'd like to get my run club listed on Endorfin.\n\n` +
+      `Instagram: https://instagram.com/${cleaned}\n\n` +
+      `Looking forward to hearing from you.`;
+    const mailto = `mailto:hello@endorfin.run?subject=${encodeURIComponent(
+      subject,
+    )}&body=${encodeURIComponent(body)}`;
+    window.location.href = mailto;
+    setSubmitted(true);
+  }
+
+  return (
+    <div className="v1c-onboard-card">
+      <div className="v1c-onboard-copy">
+        <span className="v1c-onboard-kicker">For club organisers</span>
+        <h2 className="v1c-onboard-title">
+          Don&rsquo;t see your club here<span className="v1c-red">?</span>
+        </h2>
+        <p className="v1c-onboard-sub">
+          Drop your Instagram handle and our team will reach out to get your club
+          onboarded — verified listing, member tools, the works.
+        </p>
+      </div>
+
+      {submitted ? (
+        <div className="v1c-onboard-thanks" role="status" aria-live="polite">
+          <strong>Thanks — we&rsquo;ll be in touch.</strong>
+          <span>
+            If your email client didn&rsquo;t open, write to{' '}
+            <a href="mailto:hello@endorfin.run">hello@endorfin.run</a>.
+          </span>
+        </div>
+      ) : (
+        <form className="v1c-onboard-form" onSubmit={onSubmit}>
+          <div className="v1c-onboard-input-wrap">
+            <span className="v1c-onboard-input-prefix" aria-hidden>
+              @
+            </span>
+            <input
+              type="text"
+              className="v1c-onboard-input"
+              placeholder="your_club_handle"
+              aria-label="Your club's Instagram handle"
+              value={handle}
+              onChange={(e) => setHandle(e.target.value)}
+              autoComplete="off"
+              spellCheck={false}
+              required
+            />
+          </div>
+          <button
+            type="submit"
+            className="v1c-btn v1c-btn-primary v1c-onboard-submit"
+            disabled={!cleanHandle(handle)}
+          >
+            Get my club listed →
+          </button>
+        </form>
+      )}
+    </div>
+  );
+}
+
 // ─── Admin tabs data ────────────────────────
 
-type AdminTab = 'members' | 'runs' | 'posts' | 'board';
+type AdminTab = 'members' | 'events' | 'rsvps' | 'profile';
 
 interface AdminMockRow {
   avatar: string;
@@ -461,88 +547,93 @@ interface AdminPanelData {
   };
 }
 
+// Each tab maps to a real Endorfin Studio surface:
+//   members → /admin/studio/[slug]/members
+//   events  → /admin/studio/[slug]/events
+//   rsvps   → /admin/studio/[slug]/rsvps
+//   profile → /admin/studio/[slug]/{about,social,admins,join-form}
 const ADMIN_PANELS: Record<AdminTab, AdminPanelData> = {
   members: {
     num: '01',
     heading: 'Approve the runners who’ll show up.',
-    copy: 'See a joiner’s pace, city, and recent activity before they join. Approve in one tap. Keep your club full of people who actually run.',
+    copy: 'Every join request lands in Studio with the answers you asked for — pace, goals, whatever you put on the form. Approve in a tap. Promote anyone to co-admin.',
     bullets: [
-      'Request feed with pace & city',
-      'Verified-runner badges',
-      'Captain & co-admin roles',
+      'Pending requests with full join-form answers',
+      'Approve, decline (with optional reason)',
+      'Promote members → co-admins',
     ],
     mock: {
       titleStrong: 'Pending',
       title: ' · 3 requests',
       rightMeta: 'Today',
       rows: [
-        { avatar: 'AK', name: 'Aarav Kapoor', meta: '5:30 pace · 12 runs · Delhi', action: 'Approve', actionKind: 'yes' },
-        { avatar: 'SM', name: 'Simran Mehta', meta: '6:10 pace · 28 runs · Gurugram', action: 'Approve', actionKind: 'yes' },
-        { avatar: 'VI', name: 'Vikram Iyer', meta: '4:50 pace · 44 runs · Noida', action: 'Approve', actionKind: 'yes' },
-        { avatar: 'NP', name: 'Neel Patil', meta: 'Unverified · new to Strava', action: 'Review', actionKind: 'muted' },
+        { avatar: 'AK', name: 'Aarav Kapoor', meta: '5:30/km · training for ADHM', action: 'Approve', actionKind: 'yes' },
+        { avatar: 'SM', name: 'Simran Mehta', meta: '6:10/km · returning runner', action: 'Approve', actionKind: 'yes' },
+        { avatar: 'VI', name: 'Vikram Iyer', meta: '4:50/km · sub-90 half goal', action: 'Approve', actionKind: 'yes' },
+        { avatar: 'NP', name: 'Neel Patil', meta: 'New to running · friend of Aarav', action: 'Review', actionKind: 'muted' },
       ],
     },
   },
-  runs: {
+  events: {
     num: '02',
     heading: 'Plan runs, not logistics.',
-    copy: 'Publish the week’s runs with pace groups, start points, distance, and after-run plans. Members RSVP in one tap and get a push the morning of.',
+    copy: 'Schedule the next run with start time, meet point, and distance. Members see it in the app the moment you publish. Free or paid — your call. No more "where do we meet?" at 5am.',
     bullets: [
-      'Weekly schedule publisher',
-      'Pace-group splits (Easy / Tempo / Fast)',
-      'RSVP + auto-reminders',
+      'Date, time, start point, distance',
+      'Free runs or paid events with ₹ at signup',
+      'Upcoming + past archive in one place',
     ],
     mock: {
       titleStrong: 'Upcoming',
       title: ' · this week',
-      rightMeta: '+ Add run',
+      rightMeta: '+ New event',
       rows: [
-        { avatar: 'SU', avatarRed: true, name: 'Sunday Long Run · 25K', meta: '26 Apr · 5:30 am · Marine Drive', action: '48 going', actionKind: 'muted' },
-        { avatar: 'TE', name: 'Tempo Tuesday · 8K', meta: '29 Apr · 6:00 am · JLN Track', action: '22 going', actionKind: 'muted' },
-        { avatar: 'SP', name: 'Speed Thursday · 5K', meta: '01 May · 5:45 am · India Gate', action: '16 going', actionKind: 'muted' },
-        { avatar: 'RR', name: 'Recovery Saturday · 5K', meta: '03 May · 7:00 am · Lodhi Garden', action: '12 going', actionKind: 'muted' },
+        { avatar: 'SU', avatarRed: true, name: 'Sunday Long Run · 25K', meta: '26 May · 5:30 am · Marine Drive', action: '48 going', actionKind: 'muted' },
+        { avatar: 'TT', name: 'Track Workout · paid', meta: '28 May · 6:00 am · ₹300 · 14 paid', action: '₹300', actionKind: 'gold' },
+        { avatar: 'TE', name: 'Tempo Tuesday · 8K', meta: '29 May · 6:00 am · JLN Track', action: '22 going', actionKind: 'muted' },
+        { avatar: 'RR', name: 'Recovery Saturday · 5K', meta: '03 Jun · 7:00 am · Lodhi Garden', action: '12 going', actionKind: 'muted' },
       ],
     },
   },
-  posts: {
+  rsvps: {
     num: '03',
-    heading: 'Updates that actually land.',
-    copy: 'Race recaps, photo drops, pace-group nudges, gear recommendations. Members see them in-app and get a push — not buried in a 400-member WhatsApp group.',
+    heading: 'Know who’s actually showing up.',
+    copy: 'Pick any upcoming run. See the full roster — first-timers, regulars, the people you should say hi to. No more flying blind to the start point.',
     bullets: [
-      'Rich text + photo posts',
-      'Pinned announcements',
-      'Comment threads per post',
+      'Per-event roster with avatars + names',
+      'Live going count, refreshed in real time',
+      'Spot first-timers before they arrive',
     ],
     mock: {
-      titleStrong: 'Latest posts',
-      title: '',
-      rightMeta: '+ New post',
+      titleStrong: 'Sunday Long Run',
+      title: ' · 25K · 48 going',
+      rightMeta: 'Live',
       rows: [
-        { avatar: '📌', name: 'Pinned · Delhi Marathon carpools', meta: '4 days ago · 42 comments', action: 'Pinned', actionKind: 'gold' },
-        { avatar: 'RR', name: 'Race recap · Half Marathon', meta: '1 day ago · 28 photos · 84 likes', action: 'Published', actionKind: 'muted' },
-        { avatar: 'PG', name: 'Pace group update · tempo shift', meta: 'Draft · not published', action: 'Publish', actionKind: 'yes' },
-        { avatar: 'GR', name: 'Gear rec · post-monsoon shoes', meta: 'Published 1 wk ago · 56 likes', action: 'Published', actionKind: 'muted' },
+        { avatar: 'RJ', name: 'Rhea Joshi', meta: 'Regular · 14 runs with the club', action: 'Going', actionKind: 'yes' },
+        { avatar: 'DK', name: 'Dev Khurana', meta: 'Regular · 11 runs', action: 'Going', actionKind: 'yes' },
+        { avatar: 'AP', avatarRed: true, name: 'Anu Prasad', meta: 'First-timer · joined yesterday', action: 'Going', actionKind: 'gold' },
+        { avatar: 'SM', name: 'Sanjay Mishra', meta: 'Regular · PB chase day', action: 'Going', actionKind: 'yes' },
       ],
     },
   },
-  board: {
+  profile: {
     num: '04',
-    heading: 'Leaderboards that keep running.',
-    copy: 'Monthly km, showup streaks, PB chases, age-group rankings. Auto-generated from runs members log. No spreadsheets. No arguments.',
+    heading: 'A public listing that represents you.',
+    copy: 'Tagline, city, year, tags. Link WhatsApp, Instagram, Strava. Customise the join form. Add co-admins so you’re not the bottleneck. Your club, the way you want it on the internet.',
     bullets: [
-      'Km · attendance · streaks',
-      'Custom series (Jan–Mar, race prep)',
-      'Shareable social cards',
+      'About · tagline · tags · established year',
+      'Linked channels: WhatsApp · Instagram · Strava',
+      'Custom join form + approval toggle',
     ],
     mock: {
-      titleStrong: 'April board',
-      title: ' · km',
-      rightMeta: '10 days left',
+      titleStrong: 'Public listing',
+      title: ' · Live',
+      rightMeta: 'View public →',
       rows: [
-        { rank: 1, avatar: 'RJ', name: 'Rhea Joshi', meta: '14 runs · streak: 3 wks', action: '312 km', actionKind: 'gold' },
-        { rank: 2, avatar: 'DK', name: 'Dev Khurana', meta: '11 runs · streak: 2 wks', action: '268 km', actionKind: 'muted' },
-        { rank: 3, avatar: 'AP', name: 'Anu Prasad', meta: '10 runs · streak: 1 wk', action: '244 km', actionKind: 'muted' },
-        { rank: 4, avatar: 'SM', name: 'Sanjay Mishra', meta: '9 runs · PB chase', action: '218 km', actionKind: 'muted' },
+        { avatar: '✎', name: 'About', meta: 'Morning runs across South Delhi · since 2019', action: 'Edit', actionKind: 'yes' },
+        { avatar: '◎', name: 'Social & links', meta: 'WhatsApp ✓ · Instagram ✓ · Strava —', action: 'Edit', actionKind: 'yes' },
+        { avatar: '✦', name: 'Join form', meta: '3 questions · approval required', action: 'Customise', actionKind: 'yes' },
+        { avatar: '◐', name: 'Co-admins', meta: 'You + 2 others can edit this club', action: 'Manage', actionKind: 'yes' },
       ],
     },
   },
@@ -550,9 +641,9 @@ const ADMIN_PANELS: Record<AdminTab, AdminPanelData> = {
 
 const TAB_ORDER: { key: AdminTab; label: string }[] = [
   { key: 'members', label: '01 · Members' },
-  { key: 'runs', label: '02 · Runs' },
-  { key: 'posts', label: '03 · Posts' },
-  { key: 'board', label: '04 · Leaderboard' },
+  { key: 'events', label: '02 · Events' },
+  { key: 'rsvps', label: '03 · RSVPs' },
+  { key: 'profile', label: '04 · Profile' },
 ];
 
 function AdminPanel({ data }: { data: AdminPanelData }) {
@@ -1116,14 +1207,25 @@ export default function ClubsView({
         </div>
       </section>
 
+      {/* Onboard-your-club banner */}
+      <section className="v1c-onboard-section">
+        <div className="v1c-container">
+          <OnboardClubBanner />
+        </div>
+      </section>
+
       {/* Admin tabs */}
       <section className="v1c-admin-section">
         <div className="v1c-container">
           <div className="v1c-admin-head">
-            <div className="v1c-admin-kicker">For club admins</div>
+            <div className="v1c-admin-kicker">Inside Endorfin Studio</div>
             <h2>
               Manage your club<br />like a <b className="v1c-red">pro.</b>
             </h2>
+            <p className="v1c-admin-deck">
+              The four things you actually do every week — without the spreadsheet,
+              the 400-person WhatsApp group, or the 5am &ldquo;where do we meet?&rdquo; messages.
+            </p>
           </div>
 
           <div className="v1c-admin-tabs" role="tablist">
@@ -1141,6 +1243,12 @@ export default function ClubsView({
           </div>
 
           <AdminPanel data={ADMIN_PANELS[activeTab]} />
+
+          <div className="v1c-admin-foot">
+            <Link href="/admin/studio" className="v1c-btn v1c-btn-ghost">
+              Open Endorfin Studio →
+            </Link>
+          </div>
         </div>
       </section>
 
