@@ -12,14 +12,31 @@ import RaceCouponContext from '@/components/RaceCouponContext';
 import { couponCta } from '@/lib/coupon-cta';
 import type { Event, DistanceCategory } from '@/lib/api';
 
+// Pin to IST so SSR (UTC server) and the client (any TZ) render identical
+// text — without an explicit timeZone, locale formatting uses the runtime's
+// local zone, which causes a React #418 hydration mismatch for anyone
+// outside the server's zone.
+const IST = 'Asia/Kolkata';
+
 function fmtFullDate(iso: string) {
   const d = new Date(iso);
-  return d.toLocaleString('en-GB', { weekday: 'short', day: 'numeric', month: 'long', year: 'numeric' });
+  return d.toLocaleString('en-GB', {
+    weekday: 'short',
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+    timeZone: IST,
+  });
 }
 
 function fmtTime(iso: string) {
   const d = new Date(iso);
-  return d.toLocaleString('en-GB', { hour: 'numeric', minute: '2-digit', hour12: true });
+  return d.toLocaleString('en-GB', {
+    hour: 'numeric',
+    minute: '2-digit',
+    hour12: true,
+    timeZone: IST,
+  });
 }
 
 function fmtPrice(amount: number | null, currency: string | null) {
@@ -316,6 +333,7 @@ export default function RaceDetailView({
                               {new Date(d.registrationEndDate).toLocaleString('en-GB', {
                                 day: 'numeric',
                                 month: 'short',
+                                timeZone: IST,
                               })}
                             </span>
                           )}
@@ -460,6 +478,7 @@ export default function RaceDetailView({
                     {new Date(event.registrationEndDate).toLocaleString('en-GB', {
                       day: 'numeric',
                       month: 'short',
+                      timeZone: IST,
                     })}
                   </div>
                 ) : event.locationName ? (

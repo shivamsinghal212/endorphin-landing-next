@@ -36,25 +36,30 @@ function pickFlagships(all: ApiClub[], city: string, _cities: readonly string[])
   });
 }
 
+// Pin to IST so SSR (UTC server) and the client (any TZ) format dates
+// identically — without timeZone, locale formatting uses the runtime's
+// local zone and hydration mismatches (React #418) for anyone outside it.
+const IST = 'Asia/Kolkata';
+
 function fmtDayShort(iso?: string) {
   if (!iso) return '';
   const d = new Date(iso.includes('T') ? iso : `${iso}T00:00:00`);
   if (Number.isNaN(d.getTime())) return '';
-  return d.toLocaleString('en-GB', { day: 'numeric', month: 'short' });
+  return d.toLocaleString('en-GB', { day: 'numeric', month: 'short', timeZone: IST });
 }
 
 function fmtDateFull(iso?: string) {
   if (!iso) return '';
   const d = new Date(iso.includes('T') ? iso : `${iso}T00:00:00`);
   if (Number.isNaN(d.getTime())) return '';
-  return d.toLocaleString('en-GB', { day: 'numeric', month: 'long' });
+  return d.toLocaleString('en-GB', { day: 'numeric', month: 'long', timeZone: IST });
 }
 
 function fmtTimeShort(iso?: string) {
   if (!iso) return '';
   const d = new Date(iso);
   if (Number.isNaN(d.getTime())) return '';
-  return d.toLocaleString('en-GB', { hour: 'numeric', minute: '2-digit', hour12: true });
+  return d.toLocaleString('en-GB', { hour: 'numeric', minute: '2-digit', hour12: true, timeZone: IST });
 }
 
 function pickNextEvent(events: ClubEvent[] | undefined): ClubEvent | null {

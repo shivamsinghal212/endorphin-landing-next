@@ -79,10 +79,18 @@ const displayLocation = (r: ApiEvent) => (isVirtual(r) ? 'Virtual · India' : r.
 const matchesCity = (r: ApiEvent, city: string) =>
   !city || (!isVirtual(r) && extractCity(r.locationName) === city);
 
-const fmtDay = (iso: string) => String(new Date(iso).getDate()).padStart(2, '0');
-const fmtMonth = (iso: string) => new Date(iso).toLocaleString('en-GB', { month: 'short' }).toUpperCase();
-const fmtWeekday = (iso: string) => new Date(iso).toLocaleString('en-GB', { weekday: 'short' }).toUpperCase();
-const fmtTime = (iso: string) => new Date(iso).toLocaleString('en-GB', { hour: 'numeric', minute: '2-digit', hour12: true });
+// Pin to IST so SSR (UTC server) and the client (any TZ) format dates
+// identically — without timeZone, locale formatting and getDate() use the
+// runtime's local zone, which causes React #418 hydration mismatches.
+const IST = 'Asia/Kolkata';
+const fmtDay = (iso: string) =>
+  new Date(iso).toLocaleString('en-GB', { day: '2-digit', timeZone: IST });
+const fmtMonth = (iso: string) =>
+  new Date(iso).toLocaleString('en-GB', { month: 'short', timeZone: IST }).toUpperCase();
+const fmtWeekday = (iso: string) =>
+  new Date(iso).toLocaleString('en-GB', { weekday: 'short', timeZone: IST }).toUpperCase();
+const fmtTime = (iso: string) =>
+  new Date(iso).toLocaleString('en-GB', { hour: 'numeric', minute: '2-digit', hour12: true, timeZone: IST });
 const daysTo = (iso: string) => Math.max(0, Math.round((new Date(iso).getTime() - Date.now()) / 86400000));
 
 function initials(s: string) {
@@ -293,7 +301,7 @@ function FeaturedCard({
   isAuthed: boolean;
   onLoginNeeded: (r: ApiEvent, pendingUrl?: string) => void;
 }) {
-  const dateStr = new Date(r.startTime).toLocaleString('en-GB', { day: 'numeric', month: 'long' });
+  const dateStr = new Date(r.startTime).toLocaleString('en-GB', { day: 'numeric', month: 'long', timeZone: IST });
   const dist = primaryDistance(r) || 'Run';
   const title = normalizeTitle(r.title);
   const price = r.priceMin != null ? `₹${r.priceMin.toLocaleString('en-IN')}` : 'Free';
