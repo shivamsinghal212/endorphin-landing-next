@@ -4,7 +4,7 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { getSessionToken } from '@/lib/session';
 import { getStudioAuth } from '@/lib/studio/server-auth';
-import { RunnerProviders } from '@/app/races/[slug]/register/_components/runner-providers';
+import { RunnerProviders } from '@/app/running-events/[slug]/register/_components/runner-providers';
 import { RegistrationDetailView } from './_registration-detail-view';
 
 interface PageProps {

@@ -225,7 +225,7 @@ export function EventWizard({
   );
 
   const previewHref =
-    draft.slug && draft._eventId ? `/races/${draft.slug}?preview=1` : undefined;
+    draft.slug && draft._eventId ? `/running-events/${draft.slug}?preview=1` : undefined;
 
   // ── Render ──────────────────────────────────────────────────────────────
   if (mode === 'edit' && !hydrated) {

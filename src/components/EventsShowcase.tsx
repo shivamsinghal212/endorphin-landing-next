@@ -17,7 +17,7 @@ interface Event {
   distanceCategories?: { categoryName: string }[];
 }
 
-// Homepage chips intentionally a different list than /races (keeps Pune
+// Homepage chips intentionally a different list than /running-events (keeps Pune
 // + Bangalore wording for the homepage feel). Delhi/NCR groups Delhi
 // proper plus Noida/Faridabad/Gurgaon — see locationMatchesCity.
 const CITIES = ["All", "Mumbai", "Delhi/NCR", "Bangalore", "Pune", "Hyderabad", "Chennai"];
@@ -153,7 +153,7 @@ export default function EventsShowcase() {
             variants={fadeUp}
             className="font-display text-sm font-semibold uppercase tracking-[0.2em] text-signal mb-4"
           >
-            Upcoming Races
+            Upcoming Events
           </motion.p>
           <motion.h2
             variants={fadeUp}

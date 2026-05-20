@@ -7,7 +7,7 @@ import LoginModal from '@/components/LoginModal';
 import RaceCouponContext from '@/components/RaceCouponContext';
 import CouponTopStrip from '@/components/CouponTopStrip';
 import { couponCta } from '@/lib/coupon-cta';
-import type { ApiEvent } from '@/app/races/page';
+import type { ApiEvent } from '@/app/running-events/page';
 
 // ─── Formatters (mirrors RacesView so cards render identically) ─────
 
@@ -79,7 +79,7 @@ function primaryDistance(r: ApiEvent) {
   return DISTANCE_LABELS[first.toUpperCase().replace(/\s+/g, '')] || first;
 }
 
-// ─── Register CTA button — auth-gated, mirrors /races CtaButton ─────
+// ─── Register CTA button — auth-gated, mirrors /running-events CtaButton ─────
 
 function RegisterButton({
   race,
@@ -148,7 +148,7 @@ function RaceCard({
   const dist = primaryDistance(r);
   const virtual = isVirtual(r);
   const priceStr = r.priceMin != null ? `₹${r.priceMin.toLocaleString('en-IN')}` : null;
-  const detailHref = `/races/${r.slug || r.id}`;
+  const detailHref = `/running-events/${r.slug || r.id}`;
   const showCoupon = !!r.hasCoupon && r.couponDiscountPercent != null;
   const cta = couponCta(r);
   const showActions = cta.intent !== 'tbd' || showCoupon;

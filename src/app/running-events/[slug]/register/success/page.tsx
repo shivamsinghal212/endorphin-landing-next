@@ -22,17 +22,17 @@ export default async function SuccessPage({ params, searchParams }: PageProps) {
   const { id } = await searchParams;
 
   if (!id) {
-    redirect(`/races/${encodeURIComponent(slug)}`);
+    redirect(`/running-events/${encodeURIComponent(slug)}`);
   }
 
   const token = await getSessionToken();
   if (!token) {
-    const next = encodeURIComponent(`/races/${slug}/register/success?id=${id}`);
+    const next = encodeURIComponent(`/running-events/${slug}/register/success?id=${id}`);
     redirect(`/?login=1&next=${next}`);
   }
   const studio = await getStudioAuth();
   if (!studio) {
-    const next = encodeURIComponent(`/races/${slug}/register/success?id=${id}`);
+    const next = encodeURIComponent(`/running-events/${slug}/register/success?id=${id}`);
     redirect(`/?login=1&next=${next}`);
   }
 

@@ -21,16 +21,16 @@ type Panel = {
 const PANELS: Panel[] = [
   {
     num: '01',
-    name: 'Races',
-    vertical: 'Races',
+    name: 'Running Events',
+    vertical: 'Running Events',
     bg: 'bg-red',
     image: "image-set(url('/images/ext/pillars-races.avif') type('image/avif'), url('/images/ext/pillars-races.webp') type('image/webp'))",
     position: 'center 22%',
     filter: 'brightness(0.40)',
     title: 'Find your next\nstart line.',
     sub: 'Discover 500+ running events across 25+ Indian cities. Marathons, half marathons, 10Ks, 5Ks, trail runs — all filterable, all RSVPable, all free.',
-    href: '/races',
-    cta: 'Browse races →',
+    href: '/running-events',
+    cta: 'Browse events →',
   },
   {
     num: '02',
@@ -97,7 +97,7 @@ const PillarsAccordion = () => {
       <div className="v1-pillars-header">
         {/* <div className="v1-pillars-kicker">The five pillars</div> */}
         <h2 className="v1-pillars-title">
-          Races, runners, clubs, training,<br />and coaches. One <b>app.</b>
+          Running events, runners, clubs, training,<br />and coaches. One <b>app.</b>
         </h2>
       </div>
 

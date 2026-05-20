@@ -54,13 +54,13 @@ export default async function RegisterPage({ params }: PageProps) {
   const token = await getSessionToken();
   if (!token) {
     // The marketing-site login modal returns the user here post-auth.
-    const next = encodeURIComponent(`/races/${slug}/register`);
+    const next = encodeURIComponent(`/running-events/${slug}/register`);
     redirect(`/?login=1&next=${next}`);
   }
 
   const studio = await getStudioAuth();
   if (!studio) {
-    const next = encodeURIComponent(`/races/${slug}/register`);
+    const next = encodeURIComponent(`/running-events/${slug}/register`);
     redirect(`/?login=1&next=${next}`);
   }
 
@@ -83,7 +83,7 @@ export default async function RegisterPage({ params }: PageProps) {
             registration link on the event page.
           </p>
           <Link
-            href={`/races/${event.slug || event.id}`}
+            href={`/running-events/${event.slug || event.id}`}
             className="inline-flex items-center px-4 py-2 rounded-lg bg-jet text-bone text-sm hover:bg-jet/90"
           >
             ← Back to event
@@ -132,7 +132,7 @@ export default async function RegisterPage({ params }: PageProps) {
          *  registered case. */}
         <div className="max-w-5xl mx-auto px-4 md:px-6 py-8 md:py-12">
           <nav className="text-xs text-jet/50 mb-6">
-            <Link href={`/races/${event.slug || event.id}`} className="hover:underline">
+            <Link href={`/running-events/${event.slug || event.id}`} className="hover:underline">
               ← {event.title}
             </Link>
           </nav>

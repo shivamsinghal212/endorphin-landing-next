@@ -344,7 +344,7 @@ export function RegistrationForm({ bundle }: { bundle: RegistrationEventBundle }
       toast.success('Payment received — confirming…');
       const slug = event.slug || event.id;
       router.push(
-        `/races/${encodeURIComponent(slug)}/register/success?id=${encodeURIComponent(created.registrationId)}`,
+        `/running-events/${encodeURIComponent(slug)}/register/success?id=${encodeURIComponent(created.registrationId)}`,
       );
     } catch (e) {
       fail(friendlyError(describeRunnerError(e)));
@@ -384,7 +384,7 @@ export function RegistrationForm({ bundle }: { bundle: RegistrationEventBundle }
           contact the organiser.
         </p>
         <Link
-          href={`/races/${event.slug || event.id}`}
+          href={`/running-events/${event.slug || event.id}`}
           className="mt-4 inline-block text-sm text-signal hover:underline"
         >
           ← Back to event
@@ -586,7 +586,7 @@ export function RegistrationForm({ bundle }: { bundle: RegistrationEventBundle }
           />
           <p className="mt-3 text-xs text-jet/50 text-center">
             <Link
-              href={`/races/${event.slug || event.id}`}
+              href={`/running-events/${event.slug || event.id}`}
               className="hover:underline"
             >
               ← Back to event details
@@ -696,14 +696,14 @@ function AlreadyRegisteredView({
         <p className="text-sm text-bone/70 mb-5 leading-relaxed max-w-md mx-auto">
           {isVirtual
             ? 'Track your run and upload your result directly from the app — that’s how you collect your medal.'
-            : 'Bib on your lock screen, race-day reminders, and a record of every event you’ve run.'}
+            : 'Bib on your lock screen, event-day reminders, and a record of every event you’ve run.'}
         </p>
         <AppStoreButtons variant="dark" />
       </div>
 
       <div className="mt-6">
         <Link
-          href={`/races/${encodeURIComponent(eventSlug)}`}
+          href={`/running-events/${encodeURIComponent(eventSlug)}`}
           className="text-sm text-jet/55 hover:text-jet underline-offset-2 hover:underline"
         >
           ← Back to event details

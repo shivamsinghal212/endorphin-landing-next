@@ -69,7 +69,7 @@ export default function RaceDetailView({
   const [loginOpen, setLoginOpen] = useState(false);
   const [isFinalizingLogin, startLoginRefresh] = useTransition();
   // Pending registrationUrl to open in a new tab once the post-login
-  // refresh commits — same popup-safe pattern as /races listing.
+  // refresh commits — same popup-safe pattern as /running-events listing.
   const pendingUrlRef = useRef<string | null>(null);
   // Pending internal route to push (same tab) — used by the organiser
   // event Register CTA so the runner stays on-site through login.
@@ -122,7 +122,7 @@ export default function RaceDetailView({
         : 'Register ↗'
     : 'Register ↗';
 
-  // Auth-gate Register clicks. Same rule as the /races listing:
+  // Auth-gate Register clicks. Same rule as the /running-events listing:
   //   intent === 'login'                              → always modal (anon + coupon)
   //   intent === 'register' && !isAuthed              → modal, stash URL for post-login open
   //   anything else                                   → let the <a target="_blank"> run
@@ -216,7 +216,7 @@ export default function RaceDetailView({
 
           <div className="v1rd-meta-strip">
             <div className="v1rd-ms-cell">
-              <div className="v1rd-l">Race day</div>
+              <div className="v1rd-l">Event day</div>
               <div className="v1rd-v">
                 {dateStr}
                 <small>{timeStr}</small>
@@ -278,7 +278,7 @@ export default function RaceDetailView({
               // bib number, wrapped by the same 2px jet border the full
               // bib carries. Click → opens the full bib + share view.
               <Link
-                href={`/races/${event.slug || event.id}/register`}
+                href={`/running-events/${event.slug || event.id}/register`}
                 className="group inline-flex items-stretch border-2 border-jet rounded-md overflow-hidden hover:shadow-[0_8px_24px_-12px_rgba(10,10,10,0.45)] transition-shadow no-underline"
                 style={{ textDecoration: 'none' }}
               >
@@ -303,7 +303,7 @@ export default function RaceDetailView({
               // get bounced to homepage by the server-side auth redirect.
               <Link
                 className="v1rd-btn v1rd-btn-primary"
-                href={`/races/${event.slug || event.id}/register`}
+                href={`/running-events/${event.slug || event.id}/register`}
                 onClick={(e) => {
                   posthog.capture('race_register_clicked', {
                     race_id: event.id,
@@ -313,7 +313,7 @@ export default function RaceDetailView({
                   });
                   if (!isAuthed) {
                     e.preventDefault();
-                    pendingInternalPathRef.current = `/races/${event.slug || event.id}/register`;
+                    pendingInternalPathRef.current = `/running-events/${event.slug || event.id}/register`;
                     setLoginOpen(true);
                   }
                 }}
@@ -354,7 +354,7 @@ export default function RaceDetailView({
         <section className="v1rd-block">
           <div className="v1rd-container">
             <div className="v1rd-block-h">
-              <h2>About this race</h2>
+              <h2>About this event</h2>
               {event.source && (
                 <span className="v1rd-block-meta">Source · {event.source}</span>
               )}
@@ -608,7 +608,7 @@ export default function RaceDetailView({
               {isAlreadyRegistered ? (
                 <Link
                   className="v1rd-sticky-cta"
-                  href={`/races/${event.slug || event.id}/register`}
+                  href={`/running-events/${event.slug || event.id}/register`}
                   style={{ background: '#0A0A0A', color: '#F5F0EB' }}
                 >
                   ✓ Bib {myActiveRegistration!.bibNumber ?? '—'}
@@ -616,11 +616,11 @@ export default function RaceDetailView({
               ) : event.eventSourceType === 'organizer' ? (
                 <Link
                   className="v1rd-sticky-cta"
-                  href={`/races/${event.slug || event.id}/register`}
+                  href={`/running-events/${event.slug || event.id}/register`}
                   onClick={(e) => {
                     if (!isAuthed) {
                       e.preventDefault();
-                      pendingInternalPathRef.current = `/races/${event.slug || event.id}/register`;
+                      pendingInternalPathRef.current = `/running-events/${event.slug || event.id}/register`;
                       setLoginOpen(true);
                     }
                   }}
@@ -665,7 +665,7 @@ export default function RaceDetailView({
         subtitle={
           showCoupon
             ? 'Sign in to unlock your member discount.'
-            : 'Sign in so we can save your registration and remind you on race day.'
+            : 'Sign in so we can save your registration and remind you on event day.'
         }
       />
     </div>

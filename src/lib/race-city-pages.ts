@@ -1,17 +1,17 @@
 /**
- * SEO city × race-type landing pages under /races/[scope]/[city].
+ * SEO city × race-type landing pages under /running-events/[scope]/[city].
  *
  * Scope encodes both race type and the connecting preposition so the URL
  * reads as exact-match for the target query:
- *   - /races/in/mumbai          → "Races in Mumbai"
- *   - /races/marathon-in/mumbai → "Marathons in Mumbai"
+ *   - /running-events/in/mumbai          → "Races in Mumbai"
+ *   - /running-events/marathon-in/mumbai → "Marathons in Mumbai"
  *
  * Quality gate: a page is only emitted when there are enough matching
  * races in the city — different floors for the all-races overview vs the
  * narrower type-filtered pages, to avoid doorway / thin-content spam.
  */
 
-import type { ApiEvent } from '@/app/races/page';
+import type { ApiEvent } from '@/app/running-events/page';
 import { extractCity } from '@/lib/cities';
 
 export type RaceScope = 'in' | 'marathon-in' | 'half-marathon-in' | '10k-in' | '5k-in';
@@ -37,9 +37,9 @@ interface RaceScopeMeta {
 
 export const RACE_SCOPE_META: Record<RaceScope, RaceScopeMeta> = {
   'in': {
-    noun: 'Running races',
-    nounSingular: 'race',
-    keyword: 'races',
+    noun: 'Running events',
+    nounSingular: 'event',
+    keyword: 'running event',
     minCount: 2,
   },
   'marathon-in': {
@@ -80,7 +80,7 @@ export interface RaceCityPage {
 /**
  * extractCityNames is what extractCity() in lib/cities.ts returns for a
  * given race location. We match by canonical city to stay consistent with
- * the chip filter on /races. Delhi-NCR is unique: extractCity groups
+ * the chip filter on /running-events. Delhi-NCR is unique: extractCity groups
  * Gurgaon, Noida etc. into "Delhi/NCR", so we then break the page apart
  * by re-scanning the original locationName via additional aliases.
  */
@@ -97,7 +97,7 @@ export const RACE_CITY_PAGES: RaceCityPage[] = [
     extractCityNames: ['Delhi/NCR'],
     region: 'Delhi',
     intro:
-      'Delhi runs in the cold months. The Airtel Delhi Half Marathon, the Vedanta Delhi Half Marathon, the IDBI Delhi Marathon and a steady drumbeat of timing-chip 10Ks and 5Ks fill the calendar from October through February. Endorfin lists every race in Delhi with dates, distances, entry fees, and one-tap RSVP. Browse below to plan your season.',
+      'Delhi runs in the cold months. The Airtel Delhi Half Marathon, the Vedanta Delhi Half Marathon, the IDBI Delhi Marathon and a steady drumbeat of timing-chip 10Ks and 5Ks fill the calendar from October through February. Endorfin lists every running event in Delhi with dates, distances, entry fees, and one-tap RSVP. Browse below to plan your season.',
   },
   {
     slug: 'gurgaon',
@@ -105,7 +105,7 @@ export const RACE_CITY_PAGES: RaceCityPage[] = [
     extractCityNames: ['Delhi/NCR'],
     region: 'Haryana (Delhi NCR)',
     intro:
-      'Gurgaon\'s race scene runs on Aravalli trails and Cyber Hub roads. The Millennium City Marathon, La Ultra training events, corporate 10Ks, and trail races out of the Biodiversity Park keep the calendar full year-round. Endorfin lists every upcoming race in Gurgaon — marathons, half marathons, 10Ks and 5Ks. Browse below, RSVP in a tap.',
+      'Gurgaon\'s race scene runs on Aravalli trails and Cyber Hub roads. The Millennium City Marathon, La Ultra training events, corporate 10Ks, and trail races out of the Biodiversity Park keep the calendar full year-round. Endorfin lists every upcoming running event in Gurgaon — marathons, half marathons, 10Ks and 5Ks. Browse below, RSVP in a tap.',
   },
   {
     slug: 'noida',
@@ -113,7 +113,7 @@ export const RACE_CITY_PAGES: RaceCityPage[] = [
     extractCityNames: ['Delhi/NCR'],
     region: 'Uttar Pradesh (Delhi NCR)',
     intro:
-      'Noida runs flat. The wide sector roads and the Yamuna Expressway make it a fast course city, and the Noida Marathon plus a steady flow of timing-chip 10Ks and corporate runs fill the calendar. Endorfin lists every race in Noida and Greater Noida. Browse below, see the dates, and lock in your season.',
+      'Noida runs flat. The wide sector roads and the Yamuna Expressway make it a fast course city, and the Noida Marathon plus a steady flow of timing-chip 10Ks and corporate runs fill the calendar. Endorfin lists every running event in Noida and Greater Noida. Browse below, see the dates, and lock in your season.',
   },
   {
     slug: 'mumbai',
@@ -121,7 +121,7 @@ export const RACE_CITY_PAGES: RaceCityPage[] = [
     extractCityNames: ['Mumbai'],
     region: 'Maharashtra',
     intro:
-      'Mumbai\'s racing season is built around one of the world\'s great marathons. The Tata Mumbai Marathon (TMM) — held every January and finishing under Rajabai Tower — anchors a long calendar of half marathons, 10Ks, 5Ks and corporate runs across the city, Navi Mumbai, and Thane. Endorfin lists every race with dates, distances, entry fees and one-tap RSVP.',
+      'Mumbai\'s racing season is built around one of the world\'s great marathons. The Tata Mumbai Marathon (TMM) — held every January and finishing under Rajabai Tower — anchors a long calendar of half marathons, 10Ks, 5Ks and corporate runs across the city, Navi Mumbai, and Thane. Endorfin lists every running event with dates, distances, entry fees and one-tap RSVP.',
   },
   {
     slug: 'bengaluru',
@@ -137,7 +137,7 @@ export const RACE_CITY_PAGES: RaceCityPage[] = [
     extractCityNames: ['Pune'],
     region: 'Maharashtra',
     intro:
-      'Pune\'s race scene runs through Pune Running. The Pune Running Beyond Myself series, the Pune International Marathon, Vasaichi Vaari, and a stream of trail races out of Sinhagad and Lonavla keep the city running year-round. Endorfin lists every race in Pune and Pimpri-Chinchwad — marathons, half marathons, 10Ks and 5Ks. Browse below.',
+      'Pune\'s race scene runs through Pune Running. The Pune Running Beyond Myself series, the Pune International Marathon, Vasaichi Vaari, and a stream of trail races out of Sinhagad and Lonavla keep the city running year-round. Endorfin lists every running event in Pune and Pimpri-Chinchwad — marathons, half marathons, 10Ks and 5Ks. Browse below.',
   },
   {
     slug: 'hyderabad',
@@ -145,7 +145,7 @@ export const RACE_CITY_PAGES: RaceCityPage[] = [
     extractCityNames: ['Hyderabad'],
     region: 'Telangana',
     intro:
-      'Hyderabad runs on Hyderabad Runners. The Airtel Hyderabad Marathon — one of the oldest in India outside Mumbai — anchors a calendar packed with half marathons, 10Ks, and corporate runs around Necklace Road and Gachibowli. Endorfin lists every race in Hyderabad and Secunderabad. Browse below.',
+      'Hyderabad runs on Hyderabad Runners. The Airtel Hyderabad Marathon — one of the oldest in India outside Mumbai — anchors a calendar packed with half marathons, 10Ks, and corporate runs around Necklace Road and Gachibowli. Endorfin lists every running event in Hyderabad and Secunderabad. Browse below.',
   },
   {
     slug: 'chennai',
@@ -153,7 +153,7 @@ export const RACE_CITY_PAGES: RaceCityPage[] = [
     extractCityNames: ['Chennai'],
     region: 'Tamil Nadu',
     intro:
-      'Chennai\'s race season runs cool. The Chennai Marathon, the Wipro Chennai Marathon, the Chennai Trail Marathon, and a steady calendar of beachfront 10Ks and 5Ks fill the months from October to February. Endorfin lists every race in Chennai with dates, distances, fees, and RSVPs in one tap.',
+      'Chennai\'s race season runs cool. The Chennai Marathon, the Wipro Chennai Marathon, the Chennai Trail Marathon, and a steady calendar of beachfront 10Ks and 5Ks fill the months from October to February. Endorfin lists every running event in Chennai with dates, distances, fees, and RSVPs in one tap.',
   },
   {
     slug: 'kolkata',
@@ -161,7 +161,7 @@ export const RACE_CITY_PAGES: RaceCityPage[] = [
     extractCityNames: ['Kolkata'],
     region: 'West Bengal',
     intro:
-      'Kolkata runs the Tata Steel Kolkata 25K — a unique odd-distance race that\'s become a fixture on the Indian calendar — alongside the Kolkata Marathon, half marathons, 10Ks and trail races. Endorfin lists every race in Kolkata and Howrah. Browse below to plan your season.',
+      'Kolkata runs the Tata Steel Kolkata 25K — a unique odd-distance race that\'s become a fixture on the Indian calendar — alongside the Kolkata Marathon, half marathons, 10Ks and trail races. Endorfin lists every running event in Kolkata and Howrah. Browse below to plan your season.',
   },
   {
     slug: 'ahmedabad',
@@ -169,7 +169,7 @@ export const RACE_CITY_PAGES: RaceCityPage[] = [
     extractCityNames: ['Ahmedabad'],
     region: 'Gujarat',
     intro:
-      'Ahmedabad runs the Adani Ahmedabad Marathon along the Sabarmati Riverfront — arguably the most photogenic course in India — plus a calendar of half marathons, 10Ks and 5Ks year-round. Endorfin lists every race in Ahmedabad with dates and distances. Browse below.',
+      'Ahmedabad runs the Adani Ahmedabad Marathon along the Sabarmati Riverfront — arguably the most photogenic course in India — plus a calendar of half marathons, 10Ks and 5Ks year-round. Endorfin lists every running event in Ahmedabad with dates and distances. Browse below.',
   },
 ];
 

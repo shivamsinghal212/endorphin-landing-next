@@ -83,13 +83,13 @@ export function SuccessView({
         </p>
         <div className="flex flex-wrap gap-3">
           <Link
-            href={`/races/${encodeURIComponent(slug)}/register`}
+            href={`/running-events/${encodeURIComponent(slug)}/register`}
             className="inline-flex items-center px-4 py-2 rounded-lg bg-signal text-bone text-sm hover:bg-signal/90"
           >
             Try again
           </Link>
           <Link
-            href={`/races/${encodeURIComponent(slug)}`}
+            href={`/running-events/${encodeURIComponent(slug)}`}
             className="inline-flex items-center px-4 py-2 rounded-lg border border-jet/15 text-jet text-sm hover:bg-jet/5"
           >
             Back to event
@@ -158,7 +158,7 @@ function PaidView({ data }: { data: MyRegistrationItem }) {
         {data.amountPaid != null
           ? ` along with a receipt for ${fmtRupees(data.amountPaid, data.currency)}`
           : ''}
-        . Here&rsquo;s your race bib — screenshot it, share it, and use the
+        . Here&rsquo;s your event bib — screenshot it, share it, and use the
         Endorfin app to track your run.
       </p>
 
@@ -185,7 +185,7 @@ function PaidView({ data }: { data: MyRegistrationItem }) {
         <p className="text-sm text-bone/70 mb-5 leading-relaxed max-w-md mx-auto">
           {data.event.eventFormat === 'virtual'
             ? 'Track your run and upload the result directly from the app. Faster than emailing screenshots.'
-            : 'Race-day reminders, bib on your lock screen, and a record of every event you’ve done.'}
+            : 'Event-day reminders, bib on your lock screen, and a record of every event you’ve done.'}
         </p>
         <AppStoreButtons variant="dark" />
       </div>
@@ -198,10 +198,10 @@ function PaidView({ data }: { data: MyRegistrationItem }) {
           Open My Events
         </Link>
         <Link
-          href="/races"
+          href="/running-events"
           className="inline-flex items-center px-4 py-2 rounded-lg border border-jet/15 text-jet text-sm hover:bg-jet/5"
         >
-          Find more races
+          Find more events
         </Link>
       </div>
     </Wrap>

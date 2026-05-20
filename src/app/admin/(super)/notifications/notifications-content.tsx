@@ -67,7 +67,7 @@ export function NotificationsContent() {
               <textarea
                 value={body}
                 onChange={(e) => setBody(e.target.value)}
-                placeholder="Check out 5 new races this weekend..."
+                placeholder="Check out 5 new events this weekend..."
                 rows={3}
                 className="w-full px-3 py-2.5 rounded-lg border border-jet/10 font-body text-sm text-jet placeholder:text-jet/30 focus:outline-none focus:border-signal/50 resize-none"
               />

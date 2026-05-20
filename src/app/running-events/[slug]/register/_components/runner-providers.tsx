@@ -33,7 +33,7 @@ function handleAuthError(error: unknown) {
  *      marketing-session JWT without a NextAuth `SessionProvider`.
  *   2. TanStack `QueryClientProvider` — the runner hooks are React Query.
  *
- * Used by /races/[slug]/register, /me/registrations and the success page.
+ * Used by /running-events/[slug]/register, /me/registrations and the success page.
  * The marketing root layout intentionally doesn't ship either provider
  * (lighter shell for static marketing routes), so we mount them locally.
  */

@@ -4,7 +4,7 @@
  * Granular per-city (Gurgaon and Noida are separate from Delhi) so each page
  * can rank for its own exact-match query like "run clubs in Gurgaon".
  * Distinct from TOP_CITIES in src/lib/cities.ts, which groups all of NCR
- * into a single chip for the /clubs and /races filter UI.
+ * into a single chip for the /clubs and /running-events filter UI.
  *
  * Quality gate: pages are only emitted in the sitemap and statically built
  * when a city has at least MIN_CLUBS_PER_CITY clubs — avoids doorway/thin

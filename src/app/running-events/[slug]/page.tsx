@@ -76,9 +76,9 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const { slug } = await params;
   // Metadata can fail soft — we don't want bad SEO copy to crash render.
   const event = await loadEvent(slug, null).catch(() => null);
-  if (!event) return { title: 'Race not found' };
+  if (!event) return { title: 'Event not found' };
 
-  const url = `https://www.endorfin.run/races/${event.slug || event.id}`;
+  const url = `https://www.endorfin.run/running-events/${event.slug || event.id}`;
   return {
     title: event.title,
     description: event.description?.slice(0, 200) || `Register for ${event.title} on Endorfin.`,
@@ -130,7 +130,7 @@ function buildJsonLd(event: Event) {
     image: event.imageUrl || undefined,
     description,
     organizer: { '@type': 'Organization', name: organizerName },
-    performer: { '@type': 'PerformingGroup', name: 'Race participants' },
+    performer: { '@type': 'PerformingGroup', name: 'Event participants' },
     offers:
       event.priceMin != null
         ? {
@@ -140,12 +140,12 @@ function buildJsonLd(event: Event) {
             availability: event.soldOut
               ? 'https://schema.org/SoldOut'
               : 'https://schema.org/InStock',
-            url: event.registrationUrl || `https://www.endorfin.run/races/${event.slug || event.id}`,
+            url: event.registrationUrl || `https://www.endorfin.run/running-events/${event.slug || event.id}`,
             validFrom: offerValidFrom,
             ...(event.registrationEndDate && { validThrough: event.registrationEndDate }),
           }
         : undefined,
-    url: `https://www.endorfin.run/races/${event.slug || event.id}`,
+    url: `https://www.endorfin.run/running-events/${event.slug || event.id}`,
   };
 }
 
@@ -161,12 +161,12 @@ export default async function RaceDetailPage({ params }: PageProps) {
     '@type': 'BreadcrumbList',
     itemListElement: [
       { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://www.endorfin.run/' },
-      { '@type': 'ListItem', position: 2, name: 'Races', item: 'https://www.endorfin.run/races' },
+      { '@type': 'ListItem', position: 2, name: 'Running Events', item: 'https://www.endorfin.run/running-events' },
       {
         '@type': 'ListItem',
         position: 3,
         name: event.title,
-        item: `https://www.endorfin.run/races/${event.slug || event.id}`,
+        item: `https://www.endorfin.run/running-events/${event.slug || event.id}`,
       },
     ],
   };

@@ -5,7 +5,7 @@ import { stagger, fadeUp } from "@/lib/animations";
 
 const steps = [
   { num: "01", title: "Sign up with Google", desc: "No forms. No friction. Two taps and you're in." },
-  { num: "02", title: "Discover nearby races", desc: "Browse events filtered by distance, category and location." },
+  { num: "02", title: "Discover nearby events", desc: "Browse running events filtered by distance, category and location." },
   { num: "03", title: "RSVP & run", desc: "One tap to commit. Connect with your crew. Hit the road." },
 ];
 

@@ -62,7 +62,7 @@ export function StepReview({
               <dd className="col-span-2">{draft.title || '—'}</dd>
               <dt className="text-jet/40">Slug</dt>
               <dd className="col-span-2">
-                {draft.slug ? `/races/${draft.slug}` : '—'}
+                {draft.slug ? `/running-events/${draft.slug}` : '—'}
               </dd>
               <dt className="text-jet/40">Registration</dt>
               <dd className="col-span-2">

@@ -22,7 +22,7 @@ const DiscussionHighlight = () => (
           variants={fadeUp}
           className="font-display text-4xl md:text-5xl lg:text-6xl font-bold text-bone leading-[1.1] uppercase"
         >
-          EVERY RACE HAS A<br />
+          EVERY EVENT HAS A<br />
           <span className="text-signal">CONVERSATION</span>
         </motion.h2>
         <motion.p
@@ -101,7 +101,7 @@ const DiscussionHighlight = () => (
           variants={fadeUp}
           className="mt-8 font-body text-bone/30 text-sm"
         >
-          Text, photos, polls, reactions — everything you need before race day.
+          Text, photos, polls, reactions — everything you need before event day.
         </motion.p>
       </motion.div>
     </div>

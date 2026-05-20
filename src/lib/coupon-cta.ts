@@ -27,7 +27,7 @@ export interface CouponCta {
   label: string;
   /** What clicking should do — caller decides how to wire it up. */
   intent: CouponIntent;
-  /** External URL (registrationUrl) or internal path (/races/[slug]).
+  /** External URL (registrationUrl) or internal path (/running-events/[slug]).
    * Empty string when intent === 'login' or 'tbd'. */
   href: string;
   /** 'red' for default register, 'green' for unlocked-coupon variant,
@@ -40,7 +40,7 @@ export interface CouponCta {
 export function couponCta(race: CouponishRace): CouponCta {
   const hasDiscount = !!race.hasCoupon && race.couponDiscountPercent != null;
   const isAuthed = !!race.couponCode; // authed users see the code server-side
-  const detailHref = `/races/${race.slug || race.id}`;
+  const detailHref = `/running-events/${race.slug || race.id}`;
 
   // Has coupon + authed → green "Coupon unlocked", goes to detail page
   if (hasDiscount && isAuthed) {

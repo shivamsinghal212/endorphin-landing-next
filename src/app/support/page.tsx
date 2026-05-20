@@ -12,7 +12,7 @@ const SUPPORT_EMAIL = "hello@endorfin.run";
 const faqs = [
   {
     q: "How do I RSVP for a running event?",
-    a: "Open the event page on Endorfin and tap the \"Going\" button. That's it — one tap and you're registered. You'll see the event in your upcoming races on your profile.",
+    a: "Open the event page on Endorfin and tap the \"Going\" button. That's it — one tap and you're registered. You'll see the event in your upcoming events on your profile.",
   },
   {
     q: "Is Endorfin free to use?",

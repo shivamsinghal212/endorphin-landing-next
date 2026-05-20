@@ -37,7 +37,7 @@ function buildEventsJsonLd(events: ApiEvent[]) {
     '@context': 'https://schema.org',
     '@type': 'ItemList',
     name: 'Upcoming Running Events in India',
-    description: 'Marathons, half marathons, 10K and 5K races across India',
+    description: 'Marathons, half marathons, 10K and 5K events across India',
     url: 'https://www.endorfin.run',
     numberOfItems: events.length,
     itemListElement: events.map((event, i) => {
@@ -67,14 +67,14 @@ function buildEventsJsonLd(events: ApiEvent[]) {
           },
           description: `${event.title} — a running event in ${locationLabel}. Register on Endorfin.`,
           organizer: { '@type': 'Organization', name: 'Endorfin' },
-          performer: { '@type': 'PerformingGroup', name: 'Race participants' },
+          performer: { '@type': 'PerformingGroup', name: 'Event participants' },
           ...(event.priceMin != null && {
             offers: {
               '@type': 'Offer',
               price: String(event.priceMin),
               priceCurrency: 'INR',
               availability: 'https://schema.org/InStock',
-              url: `https://www.endorfin.run/races/${event.slug || event.id}`,
+              url: `https://www.endorfin.run/running-events/${event.slug || event.id}`,
               validFrom,
               ...(event.registrationEndDate && { validThrough: event.registrationEndDate }),
             },

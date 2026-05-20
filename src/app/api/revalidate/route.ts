@@ -8,8 +8,8 @@ import { auth } from '@/lib/auth';
 //   POST { slug }                  → revalidates /clubs/{slug} + sitemap (legacy clubs flow)
 //
 // New uses:
-//   POST { entity: 'race', slug }  → revalidates /races + /races/{slug}
-//   POST { entity: 'races' }       → revalidates /races listing only
+//   POST { entity: 'race', slug }  → revalidates /running-events + /running-events/{slug}
+//   POST { entity: 'races' }       → revalidates /running-events listing only
 //
 // Admin can hit this after flipping is_featured / coupon fields so the
 // public listing reflects the change immediately instead of waiting for
@@ -49,12 +49,12 @@ export async function POST(request: Request) {
     if (!slug) {
       return NextResponse.json({ ok: false, error: 'missing slug' }, { status: 400 });
     }
-    revalidatePath('/races');
-    revalidatePath(`/races/${slug}`);
-    revalidated.push('/races', `/races/${slug}`);
+    revalidatePath('/running-events');
+    revalidatePath(`/running-events/${slug}`);
+    revalidated.push('/running-events', `/running-events/${slug}`);
   } else if (entity === 'races') {
-    revalidatePath('/races');
-    revalidated.push('/races');
+    revalidatePath('/running-events');
+    revalidated.push('/running-events');
   } else {
     return NextResponse.json({ ok: false, error: 'unknown entity' }, { status: 400 });
   }

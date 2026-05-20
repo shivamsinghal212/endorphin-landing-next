@@ -1,5 +1,5 @@
 /**
- * Shared city list + alias matching used by /races, /clubs, and the
+ * Shared city list + alias matching used by /running-events, /clubs, and the
  * homepage Events showcase. Single source of truth so the chips and
  * groupings stay consistent.
  *

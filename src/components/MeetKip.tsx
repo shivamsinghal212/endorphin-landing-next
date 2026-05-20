@@ -33,7 +33,7 @@ const MeetKip = () => (
           <span className="accent">split you ever ran.</span>
         </h2>
         <p className="v1-kip-body">
-          Kip reads your Health Connect data — every pace, every heart rate zone, every drift in a long run — and turns it into a plan that actually fits your body and your target race. Ask anything, anytime. Kip doesn&apos;t forget and doesn&apos;t sleep.
+          Kip reads your Health Connect data — every pace, every heart rate zone, every drift in a long run — and turns it into a plan that actually fits your body and your target event. Ask anything, anytime. Kip doesn&apos;t forget and doesn&apos;t sleep.
         </p>
         <div className="v1-kip-features">
           {CHIPS.map((c) => (

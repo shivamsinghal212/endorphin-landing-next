@@ -57,7 +57,7 @@ export const HomeScreen = () => (
     {/* Greeting */}
     <div style={{ padding: "12px 18px 2px", fontSize: 11, color: dim }}>Good morning, <strong style={{ color: jet }}>Shivam</strong></div>
     <div style={{ fontFamily: "'Clash Display', sans-serif", fontWeight: 700, fontSize: 28, color: jet, padding: "2px 18px 16px", lineHeight: 1 }}>
-      Find your next <span style={{ color: signal }}>race</span>
+      Find your next <span style={{ color: signal }}>event</span>
     </div>
 
     {/* Featured */}
@@ -203,7 +203,7 @@ export const ProfileScreen = () => (
       {[
         { n: "248", l: "Followers" },
         { n: "182", l: "Following" },
-        { n: "15", l: "Races" },
+        { n: "15", l: "Events" },
       ].map((s, i) => (
         <div key={s.l} style={{ flex: 1, textAlign: "center", padding: "14px 0", borderLeft: i > 0 ? `1px solid ${divider}` : "none" }}>
           <div style={{ fontFamily: "'Clash Display', sans-serif", fontWeight: 700, fontSize: 18, color: jet }}>{s.n}</div>

@@ -817,7 +817,7 @@ body.nav-open { overflow: hidden; }
 .v1-footer-bottom-right a:hover { color: var(--bone); }
 .v1-footer-bottom-right svg { display: inline-block; }
 
-/* Race city page — grid layout reusing v1r-race-card design from /races. */
+/* Race city page — grid layout reusing v1r-race-card design from /running-events. */
 .v1-races-page .v1r-races-grid {
   display: grid;
   gap: 18px;
@@ -849,7 +849,7 @@ body.nav-open { overflow: hidden; }
 body { padding-top: var(--nav-h, 68px); }
 
 /* ═══════════════════════════════════════════════
-   V1 RACES PAGE  (/races)
+   V1 RACES PAGE  (/running-events)
    All classes scoped under .v1-races-page
    ═══════════════════════════════════════════════ */
 .v1-races-page {

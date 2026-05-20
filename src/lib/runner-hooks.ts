@@ -8,7 +8,7 @@ import { useStudioAuth } from '@/lib/studio/auth-context';
  * surface, but reads ONLY from `StudioAuthProvider` and never touches
  * `useSession()` from next-auth.
  *
- * The marketing routes (/races/*, /me/*) deliberately don't ship a
+ * The marketing routes (/running-events/*, /me/*) deliberately don't ship a
  * `<SessionProvider>` — keeps NextAuth out of the marketing bundle.
  * `RunnerProviders` mounts `StudioAuthProvider` with a server-resolved
  * marketing-session JWT, which is always sufficient for runner pages.

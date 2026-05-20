@@ -8,17 +8,17 @@ const poppins = Poppins({ subsets: ['latin'], weight: ['300', '400', '500', '600
 const fraunces = Fraunces({ subsets: ['latin'], weight: ['400', '500', '600', '700'], style: ['italic', 'normal'], variable: '--font-fraunces', display: 'swap' });
 
 export const metadata: Metadata = {
-  title: { default: 'Endorfin — Find Running Events, Marathons & Races in India', template: '%s | Endorfin' },
-  description: 'Discover 500+ running events across India. Find marathons, half marathons, 10K & 5K races near you. RSVP instantly, create community runs, and connect with runners.',
-  keywords: ['running events India', 'marathon India', 'half marathon', '10K run', '5K run', 'running app', 'race finder', 'marathon near me', 'running events Mumbai', 'running events Delhi', 'running events Bangalore', 'community runs', 'trail running India', 'fun run', 'race registration', 'running community'],
+  title: { default: 'Endorfin — Find Running Events, Marathons & 10Ks in India', template: '%s | Endorfin' },
+  description: 'Discover 500+ running events across India. Find marathons, half marathons, 10K & 5K events near you. RSVP instantly, create community runs, and connect with runners.',
+  keywords: ['running events India', 'marathon India', 'half marathon', '10K run', '5K run', 'running app', 'running event finder', 'marathon near me', 'running events Mumbai', 'running events Delhi', 'running events Bangalore', 'community runs', 'trail running India', 'fun run', 'event registration', 'running community'],
   authors: [{ name: 'Endorfin' }],
   robots: { index: true, follow: true, 'max-image-preview': 'large', 'max-snippet': -1 },
   alternates: { canonical: 'https://www.endorfin.run/' },
   openGraph: {
     type: 'website',
     url: 'https://www.endorfin.run/',
-    title: 'Endorfin — Find Running Events, Marathons & Races in India',
-    description: 'Discover 500+ running events across India. Find marathons, half marathons, 10K & 5K races near you. RSVP instantly and connect with runners.',
+    title: 'Endorfin — Find Running Events, Marathons & 10Ks in India',
+    description: 'Discover 500+ running events across India. Find marathons, half marathons, 10K & 5K events near you. RSVP instantly and connect with runners.',
     siteName: 'Endorfin',
     locale: 'en_IN',
     images: [{ url: 'https://www.endorfin.run/og-image.png', width: 1200, height: 630 }],
@@ -26,7 +26,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Endorfin — Find Running Events & Marathons in India',
-    description: 'Discover 500+ running events across India. Find marathons, half marathons, 10K & 5K races near you. RSVP instantly and connect with runners.',
+    description: 'Discover 500+ running events across India. Find marathons, half marathons, 10K & 5K events near you. RSVP instantly and connect with runners.',
     images: ['https://www.endorfin.run/og-image.png'],
     site: '@endorfinapp',
   },
@@ -45,10 +45,10 @@ const appJsonLd = {
   url: 'https://www.endorfin.run',
   applicationCategory: 'SportsApplication',
   operatingSystem: 'Android',
-  description: 'Discover 500+ running events across India. Find marathons, half marathons, 10K and 5K races near you. RSVP instantly, create community runs, and connect with runners.',
+  description: 'Discover 500+ running events across India. Find marathons, half marathons, 10K and 5K events near you. RSVP instantly, create community runs, and connect with runners.',
   featureList: [
     'Running event discovery across 25+ Indian cities',
-    'One-tap RSVP for marathons and races',
+    'One-tap RSVP for marathons and running events',
     'Create and host community runs',
     'Per-event discussion threads',
     'Runner social profiles and following',
@@ -102,13 +102,13 @@ const websiteJsonLd = {
   '@type': 'WebSite',
   name: 'Endorfin',
   url: 'https://www.endorfin.run',
-  description: 'Discover 500+ running events across India. Find marathons, half marathons, 10K and 5K races near you.',
+  description: 'Discover 500+ running events across India. Find marathons, half marathons, 10K and 5K events near you.',
   inLanguage: 'en-IN',
   potentialAction: {
     '@type': 'SearchAction',
     target: {
       '@type': 'EntryPoint',
-      urlTemplate: 'https://www.endorfin.run/races?q={search_term_string}',
+      urlTemplate: 'https://www.endorfin.run/running-events?q={search_term_string}',
     },
     'query-input': 'required name=search_term_string',
   },

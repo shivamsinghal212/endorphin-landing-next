@@ -6,16 +6,16 @@ import { API_BASE } from '@/lib/api';
 import { getSessionToken } from '@/lib/session';
 
 export const metadata: Metadata = {
-  title: 'Races in India — every race, listed',
+  title: 'Running Events in India — every event, listed',
   description:
-    "Every running race in India, in one feed. Browse marathons, half marathons, 10K and 5K races in Delhi, Mumbai, Bengaluru, Hyderabad, Chennai and beyond. RSVP in a tap.",
-  alternates: { canonical: 'https://www.endorfin.run/races' },
+    "Every running event in India, in one feed. Browse marathons, half marathons, 10K and 5K events in Delhi, Mumbai, Bengaluru, Hyderabad, Chennai and beyond. RSVP in a tap.",
+  alternates: { canonical: 'https://www.endorfin.run/running-events' },
   openGraph: {
     type: 'website',
-    url: 'https://www.endorfin.run/races',
-    title: 'Races in India — every race, listed | Endorfin',
+    url: 'https://www.endorfin.run/running-events',
+    title: 'Running Events in India — every event, listed | Endorfin',
     description:
-      'Every running race in India, in one feed. Marathons, half marathons, 10K and 5K races across 25+ Indian cities.',
+      'Every running event in India, in one feed. Marathons, half marathons, 10K and 5K events across 25+ Indian cities.',
     siteName: 'Endorfin',
     locale: 'en_IN',
   },
@@ -49,7 +49,7 @@ export interface ApiEvent {
 }
 
 // API caps `limit` at 50 and returns { items, total, page, pages }. Page
-// through the result set so /races can display every upcoming event. Hard
+// through the result set so /running-events can display every upcoming event. Hard
 // cap at 20 pages (1000 events) as a guard against runaway loops.
 async function getRaces(token: string | null): Promise<ApiEvent[]> {
   const PAGE_SIZE = 50;
@@ -99,10 +99,10 @@ function buildJsonLd(races: ApiEvent[]) {
   return {
     '@context': 'https://schema.org',
     '@type': 'ItemList',
-    name: 'Running Races in India',
+    name: 'Running Events in India',
     description:
-      'Every running race in India — marathons, half marathons, 10K and 5K races across 25+ cities',
-    url: 'https://www.endorfin.run/races',
+      'Every running event in India — marathons, half marathons, 10K and 5K events across 25+ cities',
+    url: 'https://www.endorfin.run/running-events',
     numberOfItems: races.length,
     itemListElement: races.slice(0, 30).map((r, i) => {
       const locationLabel = r.locationName || 'India';
@@ -136,7 +136,7 @@ function buildJsonLd(races: ApiEvent[]) {
             r.description ||
             `${r.title} — a running event in ${locationLabel}. Register on Endorfin.`,
           organizer: { '@type': 'Organization', name: r.organizerName || 'Endorfin' },
-          performer: { '@type': 'PerformingGroup', name: 'Race participants' },
+          performer: { '@type': 'PerformingGroup', name: 'Event participants' },
           ...(r.priceMin != null && {
             offers: {
               '@type': 'Offer',
@@ -145,7 +145,7 @@ function buildJsonLd(races: ApiEvent[]) {
               availability: r.soldOut
                 ? 'https://schema.org/SoldOut'
                 : 'https://schema.org/InStock',
-              url: `https://www.endorfin.run/races/${r.slug || r.id}`,
+              url: `https://www.endorfin.run/running-events/${r.slug || r.id}`,
               validFrom,
               ...(r.registrationEndDate && { validThrough: r.registrationEndDate }),
             },
@@ -163,7 +163,7 @@ const breadcrumbJsonLd = {
   '@type': 'BreadcrumbList',
   itemListElement: [
     { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://www.endorfin.run/' },
-    { '@type': 'ListItem', position: 2, name: 'Races', item: 'https://www.endorfin.run/races' },
+    { '@type': 'ListItem', position: 2, name: 'Running Events', item: 'https://www.endorfin.run/running-events' },
   ],
 };
 

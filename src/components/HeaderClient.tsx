@@ -8,7 +8,7 @@ import { logoutAction } from '@/app/actions/auth';
 import { useStoreLink } from '@/lib/use-store-link';
 
 const NAV_LINKS = [
-  { label: 'Races', href: '/races', soon: false },
+  { label: 'Running Events', href: '/running-events', soon: false },
   { label: 'Runners', href: '/runners', soon: false },
   { label: 'Clubs', href: '/clubs', soon: false },
   { label: 'Workout Plan', href: '/workout-plan', soon: true },

@@ -1,5 +1,5 @@
 import type { MetadataRoute } from 'next';
-import type { ApiEvent } from '@/app/races/page';
+import type { ApiEvent } from '@/app/running-events/page';
 import {
   CLUB_CITY_PAGES,
   MIN_CLUBS_PER_CITY,
@@ -58,7 +58,7 @@ export const revalidate = 3600;
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const staticRoutes: MetadataRoute.Sitemap = [
     { url: `${SITE}/`,        lastModified: new Date(), changeFrequency: 'weekly',  priority: 1.0 },
-    { url: `${SITE}/races`,   lastModified: new Date(), changeFrequency: 'daily',   priority: 0.9 },
+    { url: `${SITE}/running-events`,   lastModified: new Date(), changeFrequency: 'daily',   priority: 0.9 },
     { url: `${SITE}/clubs`,   lastModified: new Date(), changeFrequency: 'daily',   priority: 0.9 },
     { url: `${SITE}/runners`, lastModified: new Date(), changeFrequency: 'weekly',  priority: 0.85 },
     { url: `${SITE}/coaches`, lastModified: new Date(), changeFrequency: 'weekly',  priority: 0.85 },
@@ -113,7 +113,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         const count = filterRacesForCityScope(races, page, scope).length;
         if (!passesQualityGate(count, scope)) continue;
         staticRoutes.push({
-          url: `${SITE}/races/${scope}/${page.slug}`,
+          url: `${SITE}/running-events/${scope}/${page.slug}`,
           lastModified: new Date(),
           changeFrequency: 'weekly',
           priority: scope === 'in' ? 0.85 : 0.8,
@@ -128,7 +128,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       const slug = race.slug || race.id;
       if (!slug) continue;
       staticRoutes.push({
-        url: `${SITE}/races/${slug}`,
+        url: `${SITE}/running-events/${slug}`,
         lastModified: new Date(race.startTime),
         changeFrequency: 'weekly',
         priority: 0.7,

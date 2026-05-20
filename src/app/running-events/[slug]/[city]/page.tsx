@@ -5,7 +5,7 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { API_BASE } from '@/lib/api';
 import { getSessionToken } from '@/lib/session';
-import type { ApiEvent } from '@/app/races/page';
+import type { ApiEvent } from '@/app/running-events/page';
 import RaceCardsList from './RaceCardsList';
 import {
   RACE_CITY_PAGES,
@@ -24,13 +24,13 @@ export const revalidate = 600;
 
 // `slug` here is the race-scope segment (e.g. "marathon-in", "in", "10k-in").
 // The route folder is named [slug] to share the dynamic name with the
-// /races/[slug] race-detail route — Next requires dynamic segment names
+// /running-events/[slug] race-detail route — Next requires dynamic segment names
 // to match at the same path depth, even when the deeper segment differs.
 interface RouteParams {
   params: Promise<{ slug: string; city: string }>;
 }
 
-// Reuses /races getRaces logic but kept local — anon (no token) so we can ISR.
+// Reuses /running-events getRaces logic but kept local — anon (no token) so we can ISR.
 async function getRaces(): Promise<ApiEvent[]> {
   const PAGE_SIZE = 50;
   const MAX_PAGES = 20;
@@ -77,7 +77,7 @@ export async function generateStaticParams() {
 
 function buildTitle(scope: RaceScope, cityName: string) {
   const meta = RACE_SCOPE_META[scope];
-  return `${meta.noun} in ${cityName} — every race, listed`;
+  return `${meta.noun} in ${cityName} — every event, listed`;
 }
 
 function buildDescription(scope: RaceScope, cityName: string) {
@@ -91,7 +91,7 @@ export async function generateMetadata({ params }: RouteParams): Promise<Metadat
   const scopeRes = getRaceScopeMeta(slug);
   if (!cityPage || !scopeRes) return { title: 'Not found' };
 
-  const url = `${SITE}/races/${slug}/${city}`;
+  const url = `${SITE}/running-events/${slug}/${city}`;
   const title = buildTitle(scopeRes.scope, cityPage.name);
   const socialTitle = `${title} | Endorfin`;
   const description = buildDescription(scopeRes.scope, cityPage.name);
@@ -114,7 +114,7 @@ export async function generateMetadata({ params }: RouteParams): Promise<Metadat
 
 // Race-card rendering lives in ./RaceCardsList (client component) so it
 // can host the auth-gated Register CTA + shared login modal, matching the
-// /races listing UX exactly.
+// /running-events listing UX exactly.
 
 function buildJsonLd(
   cityPage: ReturnType<typeof getRaceCityPage>,
@@ -122,7 +122,7 @@ function buildJsonLd(
   races: ApiEvent[],
 ) {
   if (!cityPage) return null;
-  const url = `${SITE}/races/${scope}/${cityPage.slug}`;
+  const url = `${SITE}/running-events/${scope}/${cityPage.slug}`;
   const meta = RACE_SCOPE_META[scope];
 
   const itemList = {
@@ -161,7 +161,7 @@ function buildJsonLd(
             r.description ||
             `${r.title} — a running event in ${cityPage.name}. Register on Endorfin.`,
           organizer: { '@type': 'Organization', name: r.organizerName || 'Endorfin' },
-          performer: { '@type': 'PerformingGroup', name: 'Race participants' },
+          performer: { '@type': 'PerformingGroup', name: 'Event participants' },
           ...(r.priceMin != null && {
             offers: {
               '@type': 'Offer',
@@ -170,13 +170,13 @@ function buildJsonLd(
               availability: r.soldOut
                 ? 'https://schema.org/SoldOut'
                 : 'https://schema.org/InStock',
-              url: `${SITE}/races/${r.slug || r.id}`,
+              url: `${SITE}/running-events/${r.slug || r.id}`,
               validFrom,
               ...(r.registrationEndDate && { validThrough: r.registrationEndDate }),
             },
           }),
           ...(r.imageUrl && { image: r.imageUrl }),
-          url: `${SITE}/races/${r.slug || r.id}`,
+          url: `${SITE}/running-events/${r.slug || r.id}`,
         },
       };
     }),
@@ -187,7 +187,7 @@ function buildJsonLd(
     '@type': 'BreadcrumbList',
     itemListElement: [
       { '@type': 'ListItem', position: 1, name: 'Home', item: `${SITE}/` },
-      { '@type': 'ListItem', position: 2, name: 'Races', item: `${SITE}/races` },
+      { '@type': 'ListItem', position: 2, name: 'Running Events', item: `${SITE}/running-events` },
       {
         '@type': 'ListItem',
         position: 3,
@@ -236,13 +236,13 @@ export default async function RaceCityScopePage({ params }: RouteParams) {
       )}
       <Header />
       <div className="v1-races-page">
-        {/* Hero — matches /races styling exactly (v1r-* classes) */}
+        {/* Hero — matches /running-events styling exactly (v1r-* classes) */}
         <section className="v1r-hero">
           <div className="v1r-hero-bg" aria-hidden />
           <div className="v1r-container">
             <nav className="v1r-hero-crumb" aria-label="Breadcrumb">
               <span className="v1r-hero-crumb-trail">
-                <Link href="/races">All races</Link>
+                <Link href="/running-events">All events</Link>
                 <span className="v1r-sep" aria-hidden>·</span>
                 <span className="v1r-current">
                   {meta.noun} in {cityPage.name}
@@ -274,7 +274,7 @@ export default async function RaceCityScopePage({ params }: RouteParams) {
         {(otherScopesInCity.length > 0 || sameScopeOtherCities.length > 0) && (
           <section
             className="v1r-filter-strip"
-            aria-label="Browse races in other distances and cities"
+            aria-label="Browse running events in other distances and cities"
           >
             <div className="v1r-container">
               {otherScopesInCity.length > 0 && (
@@ -284,7 +284,7 @@ export default async function RaceCityScopePage({ params }: RouteParams) {
                     {otherScopesInCity.map((s) => (
                       <Link
                         key={s}
-                        href={`/races/${s}/${cityPage.slug}`}
+                        href={`/running-events/${s}/${cityPage.slug}`}
                         className="v1r-chip"
                       >
                         {RACE_SCOPE_META[s].noun} in {cityPage.name}
@@ -300,14 +300,14 @@ export default async function RaceCityScopePage({ params }: RouteParams) {
                     {sameScopeOtherCities.map((p) => (
                       <Link
                         key={p.slug}
-                        href={`/races/${scopeRes.scope}/${p.slug}`}
+                        href={`/running-events/${scopeRes.scope}/${p.slug}`}
                         className="v1r-chip"
                       >
                         {meta.noun} in {p.name}
                       </Link>
                     ))}
-                    <Link href="/races" className="v1r-chip">
-                      All races across India
+                    <Link href="/running-events" className="v1r-chip">
+                      All events across India
                     </Link>
                   </div>
                 </div>
@@ -316,7 +316,7 @@ export default async function RaceCityScopePage({ params }: RouteParams) {
           </section>
         )}
 
-        {/* Race listing — uses the real /races race-card design */}
+        {/* Race listing — uses the real /running-events race-card design */}
         <section
           className="v1r-races-section"
           aria-label={`${meta.noun} in ${cityPage.name}`}
@@ -327,7 +327,7 @@ export default async function RaceCityScopePage({ params }: RouteParams) {
                 Upcoming {meta.noun.toLowerCase()} in <b>{cityPage.name}.</b>
               </h2>
               <span className="v1r-section-count">
-                {races.length === 1 ? '1 race' : `${races.length} races`}
+                {races.length === 1 ? '1 event' : `${races.length} events`}
               </span>
             </div>
 

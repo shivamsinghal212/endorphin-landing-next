@@ -5,10 +5,10 @@ import { Search, Bell, LayoutGrid, Shield } from "lucide-react";
 import { fadeUp, stagger } from "@/lib/animations";
 
 const features = [
-  { icon: Search, title: "Smart Search", desc: "Search by distance, city, date, or terrain. Find your perfect race in seconds." },
-  { icon: Bell, title: "Push Alerts", desc: "Get notified when friends RSVP, new races drop in your city, or events you saved go live." },
+  { icon: Search, title: "Smart Search", desc: "Search by distance, city, date, or terrain. Find your perfect event in seconds." },
+  { icon: Bell, title: "Push Alerts", desc: "Get notified when friends RSVP, new events drop in your city, or events you saved go live." },
   { icon: LayoutGrid, title: "Curated Feed", desc: "See what runners you follow are racing. Discover events through your community." },
-  { icon: Shield, title: "Private Mode", desc: "Control who sees your profile and race history. Go public or stay private — your call." },
+  { icon: Shield, title: "Private Mode", desc: "Control who sees your profile and event history. Go public or stay private — your call." },
 ];
 
 const MoreFeatures = () => (
@@ -26,10 +26,10 @@ const MoreFeatures = () => (
           The App
         </span>
         <h2 className="mt-4 font-display font-semibold text-5xl md:text-8xl uppercase text-jet leading-[0.95]">
-          YOUR RACE<br />HEADQUARTERS
+          YOUR RUNNING<br />HEADQUARTERS
         </h2>
         <p className="mt-6 font-body text-base text-jet/40">
-          Discover events, RSVP instantly, follow runners, and track your races —
+          Discover events, RSVP instantly, follow runners, and track your events —
           all in one beautifully designed app.
         </p>
       </motion.div>

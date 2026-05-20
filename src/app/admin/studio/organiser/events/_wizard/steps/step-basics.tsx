@@ -138,10 +138,10 @@ export function StepBasics({
               }`}
             >
               <span className="px-3 py-2.5 bg-jet/[0.04] text-jet/50 hidden sm:inline">
-                endorfin.app/races/
+                endorfin.app/running-events/
               </span>
               <span className="px-3 py-2.5 bg-jet/[0.04] text-jet/50 sm:hidden">
-                /races/
+                /running-events/
               </span>
               <input
                 value={draft.slug}

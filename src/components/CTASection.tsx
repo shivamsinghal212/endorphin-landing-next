@@ -9,7 +9,7 @@ const CTASection = () => (
           India&apos;s running<br />scene <span className="dash">—</span><br />in your pocket.
         </h2>
         <p className="v1-cta-sub">
-          Install Endorfin. Discover your next race, your next training partner, your next long-run crew. All free. India-first.
+          Install Endorfin. Discover your next running event, your next training partner, your next long-run crew. All free. India-first.
         </p>
       </div>
       <div className="v1-cta-buttons">

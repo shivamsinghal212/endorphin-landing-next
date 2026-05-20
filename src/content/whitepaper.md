@@ -18,7 +18,7 @@ This paper describes the methodology behind Kip, an AI-augmented running coach d
 
 Running training plans available to recreational runners today fall into three categories, and each fails differently for runners in environments where Kip is designed to operate.
 
-**Static plans** (Hal Higdon, NHS Couch-to-5K, generic race-prep templates). These prescribe a fixed week-by-week progression with no adaptation. They are popular and accessible, but they fail when conditions change. The most-used static plan, Couch-to-5K, has been studied: a 2023 peer-reviewed analysis stated explicitly that "there is no empirical evidence to support the design of Couch-to-5k" (PMC10487403, 2023). In a tracked cohort, only 27.3% of participants completed it.
+**Static plans** (Hal Higdon, NHS Couch-to-5K, generic event-prep templates). These prescribe a fixed week-by-week progression with no adaptation. They are popular and accessible, but they fail when conditions change. The most-used static plan, Couch-to-5K, has been studied: a 2023 peer-reviewed analysis stated explicitly that "there is no empirical evidence to support the design of Couch-to-5k" (PMC10487403, 2023). In a tracked cohort, only 27.3% of participants completed it.
 
 **Wearable-tied adaptive plans** (Strava-Runna, Garmin Coach, Apple Fitness+, TrainingPeaks-style coaching). These adapt based on completed-workout data captured by a watch or sensor. They work well for runners with that infrastructure but assume the runner has it. India's wearable penetration is approximately 5–8% of the population, against 40%+ in the markets where these products were designed. A product that requires a wearable cannot serve the modal Indian runner — beginner or advanced.
 
@@ -48,7 +48,7 @@ Different goals require different frameworks. Kip uses four:
 
 **Higdon for first-time half-marathon.** Higdon's framework has the widest track-record at this distance for beginners and tolerates week-to-week life disruption better than higher-volume plans (Pfitzinger, Daniels) which assume 30+ miles/week of established base. Galloway run-walk intervals can be layered on Higdon's structure at the runner's option.
 
-**Daniels' VDOT system for pace improvement.** For runners with a known race time who want to run that distance faster, Kip uses Jack Daniels' VDOT methodology to derive personalised pace zones from current fitness, with structured tempo, threshold, interval, and repetition work to drive specific physiological adaptations. The 2018 evaluation in the *Journal of Strength and Conditioning Research* (PubMed 28426511) found VDOT's predictions to be conservative — it tends to underestimate VO2max — which fits Kip's safety-first philosophy. Pfitzinger's structures are used for runners with stronger weekly volume (35+ miles/week) who can absorb higher training load.
+**Daniels' VDOT system for pace improvement.** For runners with a known event time who want to run that distance faster, Kip uses Jack Daniels' VDOT methodology to derive personalised pace zones from current fitness, with structured tempo, threshold, interval, and repetition work to drive specific physiological adaptations. The 2018 evaluation in the *Journal of Strength and Conditioning Research* (PubMed 28426511) found VDOT's predictions to be conservative — it tends to underestimate VO2max — which fits Kip's safety-first philosophy. Pfitzinger's structures are used for runners with stronger weekly volume (35+ miles/week) who can absorb higher training load.
 
 **Masters-specific protocols (>35, with sharper adjustments >50).** The Moore (2021) review in *Sports Medicine* established that masters athletes — meaning trained athletes over 35 — are physiologically closer to younger athletes than to untrained older adults. They do not show the anabolic resistance of sedentary aging; their muscle response to training and protein is largely preserved. However, they do require longer recovery between hard sessions, more deliberate strength work to preserve muscle mass, and elevated daily protein intake (~1.6 g/kg/day, vs. 0.8 g/kg/day for the general population). Kip's masters protocol layers these adjustments onto the chosen base framework: longer easy-day recovery between hard sessions, mandatory strength sessions twice per week, age-calibrated warm-up and cool-down, and explicit protein-intake reminders for runners who opt into nutrition guidance.
 
@@ -119,9 +119,9 @@ When environmental conditions force a workout to change, the consequences ripple
 3. Restructures the remaining week, not the remaining plan. Catastrophic re-planning is avoided.
 4. Communicates the tradeoff explicitly: *"This week's long run has been moved. This may add 3–5 minutes to your final half-marathon time but significantly reduces injury risk."*
 
-The constraint that bounds these decisions is **safety, not target time.** Beginner runners are chasing finish lines; advanced runners are chasing PRs. In both cases, the cost of being slightly under-prepared is a slower finishing time. The cost of injury is missing the race entirely or, for masters runners, a longer return-to-running timeline than younger athletes face.
+The constraint that bounds these decisions is **safety, not target time.** Beginner runners are chasing finish lines; advanced runners are chasing PRs. In both cases, the cost of being slightly under-prepared is a slower finishing time. The cost of injury is missing the event entirely or, for masters runners, a longer return-to-running timeline than younger athletes face.
 
-In extreme cases — multiple missed long runs across consecutive weeks, persistently elevated perceived-effort signals, masters runners whose recovery markers indicate accumulated fatigue — Kip is designed to recommend a goal change. Drop from half-marathon to 10K. Push the target PR to the next race. Hold the current VDOT band rather than progress. These messages are difficult but are what a responsible coach would offer.
+In extreme cases — multiple missed long runs across consecutive weeks, persistently elevated perceived-effort signals, masters runners whose recovery markers indicate accumulated fatigue — Kip is designed to recommend a goal change. Drop from half-marathon to 10K. Push the target PR to the next event. Hold the current VDOT band rather than progress. These messages are difficult but are what a responsible coach would offer.
 
 ---
 
@@ -157,13 +157,13 @@ Arjun lives in Delhi NCR. He completed his first 10K six months ago in 58 minute
 
 ### 3.3 Vikram, 35 — improving 10K pace from 50:00 to 45:00 (v2)
 
-Vikram lives in Mumbai. He has been running consistently for three years. His 10K personal best is 50:23. He wants to break 45:00, with a target race in 16 weeks. He is fit, injury-free, and reports having a Garmin watch and a home gym during onboarding. At 35, he is at the entry of the masters athlete window.
+Vikram lives in Mumbai. He has been running consistently for three years. His 10K personal best is 50:23. He wants to break 45:00, with a target event in 16 weeks. He is fit, injury-free, and reports having a Garmin watch and a home gym during onboarding. At 35, he is at the entry of the masters athlete window.
 
 **Plan generated.** Kip selects Daniels' VDOT methodology. His current 10K time of 50:23 yields VDOT ~42. From this anchor, Kip derives personalised pace zones: easy pace 5:55–6:10/km, threshold pace 4:55/km, interval pace 4:35/km, repetition pace 4:15/km. The plan prescribes a 16-week build:
 
 - Weeks 1–4: aerobic base build, mostly easy runs, one weekly threshold session of 20 minutes
 - Weeks 5–10: intensity introduction, threshold sessions extend to 30–35 minutes, VO2max intervals introduced (3–5 minute repeats with equal recovery)
-- Weeks 11–14: race-specific work, including 10K-specific tempo runs at goal pace
+- Weeks 11–14: event-specific work, including 10K-specific tempo runs at goal pace
 - Weeks 15–16: taper
 
 **Light masters calibration.** At 35, Vikram is at the early edge of the masters window. Calibration is light but present: a slightly extended cool-down after hard sessions, a recommendation to consume protein within the post-workout window (~0.3 g/kg), and explicit recovery-day enforcement (no back-to-back hard days, even if he reports feeling good).
@@ -180,7 +180,7 @@ In Week 11, Vikram logs three "harder than expected" entries across his interval
 
 ### 3.4 Ravi, 52 — masters runner, 10K under 50 minutes (v2)
 
-Ravi lives in Hyderabad. He has been running for ten years. His 10K PB is 51:45, set three years ago. He wants to break 50 minutes for the first time, with a target race 14 weeks away. He runs four times per week, has stayed injury-free for eighteen months, and has a basic home setup (resistance bands, no full gym).
+Ravi lives in Hyderabad. He has been running for ten years. His 10K PB is 51:45, set three years ago. He wants to break 50 minutes for the first time, with a target event 14 weeks away. He runs four times per week, has stayed injury-free for eighteen months, and has a basic home setup (resistance bands, no full gym).
 
 **Plan generated.** Kip selects Daniels' VDOT methodology, anchored to his 51:45 10K (VDOT ~41), with **full masters calibration applied** because he is over 50. The plan prescribes a 14-week build, structurally similar to Vikram's but with different volume distribution and recovery cadence:
 
@@ -192,7 +192,7 @@ Ravi lives in Hyderabad. He has been running for ten years. His 10K PB is 51:45,
 - **Strength is non-negotiable, twice per week.** Ravi gets banded squats, banded rows, single-leg work using his bands, and core. The literature on masters athletes is consistent that strength training is a primary tool against age-related muscle loss and a meaningful contributor to running economy at his age.
 - **Protein guidance is surfaced explicitly.** Kip suggests ~1.6 g/kg/day distributed across meals, with a focus on the post-workout window. The Moore (2021) review establishes this as the right target for masters athletes.
 - **Recovery-day enforcement is stricter.** If Ravi logs three hard sessions within five days (regardless of how they felt), Kip injects a forced easy day. The rationale is shown to him explicitly: masters athletes accumulate fatigue more silently than younger athletes; a "feels fine" report at 52 is a less reliable signal than at 25.
-- **VDOT progression is conservative.** Daniels recommends increasing VDOT no more than one point per training cycle for any runner. For masters, Kip holds the band longer — Ravi might run the cycle at VDOT 41 and only reassess after the goal race, even if his early-week threshold sessions suggest he could be faster.
+- **VDOT progression is conservative.** Daniels recommends increasing VDOT no more than one point per training cycle for any runner. For masters, Kip holds the band longer — Ravi might run the cycle at VDOT 41 and only reassess after the goal event, even if his early-week threshold sessions suggest he could be faster.
 
 **Warm-up and cool-down extended.** 12-minute dynamic warm-up before runs, 15-minute cool-down after hard sessions. The literature supports longer warm-ups for older athletes both for injury prevention and for getting the cardiovascular system fully primed.
 

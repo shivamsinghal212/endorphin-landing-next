@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { Suspense } from 'react';
 import Logo from './Logo';
 import { PLAY_STORE_URL, APP_STORE_URL } from '@/lib/store-links';
-import type { ApiEvent } from '@/app/races/page';
+import type { ApiEvent } from '@/app/running-events/page';
 import {
   CLUB_CITY_PAGES,
   MIN_CLUBS_PER_CITY,
@@ -20,7 +20,7 @@ const API_BASE = process.env.NEXT_PUBLIC_API_BASE || 'https://api.endorfin.run';
 const SITE = 'https://www.endorfin.run';
 
 const PRODUCT = [
-  { label: 'Races', href: '/races' },
+  { label: 'Running Events', href: '/running-events' },
   { label: 'Runners', href: '/runners' },
   { label: 'Clubs', href: '/clubs' },
   { label: 'Workout Plan', href: '/workout-plan' },
@@ -85,7 +85,7 @@ async function fetchRaces(): Promise<ApiEvent[]> {
 
 /**
  * SEO cross-link block — internal links to /run-clubs/[city] and
- * /races/[scope]/[city] pages that pass quality gates. Streamed in via
+ * /running-events/[scope]/[city] pages that pass quality gates. Streamed in via
  * Suspense so an API hiccup never blocks the rest of the footer.
  */
 async function SeoFooterLinks() {
@@ -122,10 +122,10 @@ async function SeoFooterLinks() {
 
   if (racesAllCities.length > 0) {
     columns.push({
-      title: 'Races by city',
+      title: 'Running events by city',
       links: racesAllCities.map(({ page }) => ({
-        href: `/races/in/${page.slug}`,
-        label: `Races in ${page.name}`,
+        href: `/running-events/in/${page.slug}`,
+        label: `Running events in ${page.name}`,
       })),
     });
   }
@@ -133,7 +133,7 @@ async function SeoFooterLinks() {
     columns.push({
       title: 'Marathons by city',
       links: marathonCities.map(({ page }) => ({
-        href: `/races/marathon-in/${page.slug}`,
+        href: `/running-events/marathon-in/${page.slug}`,
         label: `${RACE_SCOPE_META['marathon-in'].noun} in ${page.name}`,
       })),
     });
@@ -142,7 +142,7 @@ async function SeoFooterLinks() {
     columns.push({
       title: 'Half marathons by city',
       links: halfMarathonCities.map(({ page }) => ({
-        href: `/races/half-marathon-in/${page.slug}`,
+        href: `/running-events/half-marathon-in/${page.slug}`,
         label: `${RACE_SCOPE_META['half-marathon-in'].noun} in ${page.name}`,
       })),
     });
@@ -183,7 +183,7 @@ const Footer = () => (
       <div>
         <Logo variant="light" />
         <p className="v1-footer-brand-sub">
-          India&apos;s running community — races, runners, clubs, and Kip, your AI run coach. Built for people who actually run.
+          India&apos;s running community — running events, runners, clubs, and Kip, your AI run coach. Built for people who actually run.
         </p>
       </div>
       <div>

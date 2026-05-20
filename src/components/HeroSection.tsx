@@ -15,12 +15,12 @@ const HeroSection = () => (
 
         <h1 className="v1-hero-title">
           Find{' '}
-          <span className="v1-hero-rotate" aria-label="races, runners, clubs">
+          <span className="v1-hero-rotate" aria-label="events, runners, clubs">
             <span className="v1-hero-rotate-track">
-              <span>races</span>
+              <span>events</span>
               <span>runners</span>
               <span>clubs</span>
-              <span>races</span>
+              <span>events</span>
             </span>
           </span>
           <span className="and-line">
@@ -29,7 +29,7 @@ const HeroSection = () => (
         </h1>
 
         <div className="v1-hero-stats-bar">
-          <span className="v1-hero-stat"><span className="v1-hero-stat-n">500+</span><span className="v1-hero-stat-l">Races</span></span>
+          <span className="v1-hero-stat"><span className="v1-hero-stat-n">500+</span><span className="v1-hero-stat-l">Events</span></span>
           <span className="v1-hero-stat"><span className="v1-hero-stat-n">10K+</span><span className="v1-hero-stat-l">Runners</span></span>
           <span className="v1-hero-stat"><span className="v1-hero-stat-n">50+</span><span className="v1-hero-stat-l">Verified Clubs</span></span>
           <span className="v1-hero-stat"><span className="v1-hero-stat-n">25+</span><span className="v1-hero-stat-l">Indian Cities</span></span>

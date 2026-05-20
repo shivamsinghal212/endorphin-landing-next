@@ -555,7 +555,7 @@ export default function ClubPitchDeckPage() {
           <div className="manage-grid" style={{ marginTop: 64 }}>
             <div className="feature-list">
               <FeatureRow letter="A" title="Approve or reject join requests" body="Custom join form. In-app + email approvals. One tap." />
-              <FeatureRow letter="B" title="Create runs, races & community events" body="Set distance, route, time. Members RSVP. Headcount auto-tracked." />
+              <FeatureRow letter="B" title="Create runs & community events" body="Set distance, route, time. Members RSVP. Headcount auto-tracked." />
               <FeatureRow letter="C" title="Last run recap — photos & video reel" body="Post-run, drop your clips. Recap auto-pins on the public club page." />
               <FeatureRow letter="D" title="Edit everything — logo, niche, description" body="Serious / chill / community-building. Tag your vibe. Refresh anytime." />
               <FeatureRow letter="E" title="Member directory & admin roles" body="Promote co-admins. Remove inactive members. Member counts live." />
@@ -643,7 +643,7 @@ export default function ClubPitchDeckPage() {
           <h2 className="h-display">
             Endorfin is built by someone<br />
             who ships <em className="accent">production stacks</em><br />
-            <em className="accent">and runs the races.</em>
+            <em className="accent">and runs the events.</em>
           </h2>
 
           <div className="grid-2" style={{ marginTop: 64 }}>
@@ -729,7 +729,7 @@ export default function ClubPitchDeckPage() {
             </div>
             <div>
               <strong>How we make money</strong>
-              <p>We monetise through races (registrations, ticketing) and brand partnerships — not by taxing communities.</p>
+              <p>We monetise through running events (registrations, ticketing) and brand partnerships — not by taxing communities.</p>
             </div>
             <div>
               <strong>What you commit</strong>
@@ -774,7 +774,7 @@ export default function ClubPitchDeckPage() {
             <nav className="footer-nav" aria-label="More on Endorfin">
               <a href="/clubs">Browse run clubs</a>
               <span aria-hidden="true">·</span>
-              <a href="/races">Races in India</a>
+              <a href="/running-events">Running events in India</a>
               <span aria-hidden="true">·</span>
               <a href="/coaches">Running coaches</a>
               <span aria-hidden="true">·</span>

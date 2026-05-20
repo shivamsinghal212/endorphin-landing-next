@@ -18,7 +18,7 @@ const cards = [
   {
     icon: MapPin,
     title: "Run Together",
-    desc: "Chat before race day. Share routes, carpool plans, and pace strategies in event discussions.",
+    desc: "Chat before event day. Share routes, carpool plans, and pace strategies in event discussions.",
   },
 ];
 
@@ -40,7 +40,7 @@ const CommunitySection = () => (
           CREATE YOUR<br />OWN RUNS
         </h2>
         <p className="mt-6 font-body text-base text-jet/50">
-          Don't just find races — create them. Organize community runs, invite your crew, and chat with fellow runners before race day.
+          Don't just find events — create them. Organize community runs, invite your crew, and chat with fellow runners before event day.
         </p>
       </motion.div>
 

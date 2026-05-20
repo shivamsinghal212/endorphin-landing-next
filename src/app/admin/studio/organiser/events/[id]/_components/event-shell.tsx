@@ -181,7 +181,7 @@ function EventHeader({
             <div className="flex items-center gap-2 ml-auto">
               {event.slug && (
                 <Link
-                  href={`/races/${event.slug}`}
+                  href={`/running-events/${event.slug}`}
                   target="_blank"
                   className="text-xs px-3 py-1.5 rounded-lg border border-jet/15 hover:bg-jet/5 whitespace-nowrap"
                 >

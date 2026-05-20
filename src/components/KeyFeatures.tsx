@@ -13,7 +13,7 @@ const features = [
   {
     num: "02",
     title: "ONE TAP. YOU'RE IN.",
-    description: "RSVP instantly. See real-time participant counts, who else is running, and track every race you've committed to.",
+    description: "RSVP instantly. See real-time participant counts, who else is running, and track every event you've committed to.",
     screen: <EventScreen />,
     reverse: true,
   },

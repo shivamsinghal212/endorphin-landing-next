@@ -49,7 +49,7 @@ export function MyRegistrationsView() {
         My events
       </h1>
       <p className="text-sm text-jet/60 mb-8">
-        Everything you&rsquo;ve registered for — race day details, results, and medals
+        Everything you&rsquo;ve registered for — event day details, results, and medals
         in one place.
       </p>
 
@@ -71,13 +71,13 @@ export function MyRegistrationsView() {
             No registrations yet
           </p>
           <p className="text-sm text-jet/60 mb-4">
-            When you sign up for a race, it&rsquo;ll show up here.
+            When you sign up for a running event, it&rsquo;ll show up here.
           </p>
           <Link
-            href="/races"
+            href="/running-events"
             className="inline-flex items-center px-4 py-2 rounded-lg bg-jet text-bone text-sm hover:bg-jet/90"
           >
-            Find a race
+            Find an event
           </Link>
         </div>
       )}

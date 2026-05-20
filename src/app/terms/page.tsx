@@ -33,7 +33,7 @@ export default function TermsOfService() {
 
           <section>
             <h2 className="text-xl font-display font-semibold uppercase text-foreground mb-3">3. Use of Service</h2>
-            <p>Endorfin provides a platform to discover running events, RSVP to races, and connect with other runners. You are responsible for maintaining the confidentiality of your account credentials and for all activities that occur under your account. You agree to notify us immediately of any unauthorized use of your account.</p>
+            <p>Endorfin provides a platform to discover running events, RSVP to them, and connect with other runners. You are responsible for maintaining the confidentiality of your account credentials and for all activities that occur under your account. You agree to notify us immediately of any unauthorized use of your account.</p>
           </section>
 
           <section>

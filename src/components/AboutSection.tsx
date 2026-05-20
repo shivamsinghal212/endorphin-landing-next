@@ -13,9 +13,9 @@ const AboutSection = () => (
         <p>
           Endorfin is a free running app purpose-built for the Indian running community. It
           aggregates 500+ running events across India — from 5K fun runs and 10K charity
-          races to half marathons and full marathons — with filters by city, distance, and
+          runs to half marathons and full marathons — with filters by city, distance, and
           date. Runners can RSVP with one tap, see real-time participant counts, and follow
-          friends to stay informed when their crew signs up for a race.
+          friends to stay informed when their crew signs up for a running event.
         </p>
         <p>
           Beyond event discovery, Endorfin lets any runner create their own community run —

@@ -7,7 +7,7 @@ import { useRef, useEffect } from "react";
 import { stagger, fadeUp } from "@/lib/animations";
 
 const stats = [
-  { value: 500, suffix: "+", label: "Races Listed" },
+  { value: 500, suffix: "+", label: "Events Listed" },
   { value: 10, suffix: "K+", label: "Runners Joined" },
   { value: 25, suffix: "+", label: "Cities Across India" },
   { value: 4.8, suffix: "", label: "App Rating", decimals: 1 },
@@ -28,7 +28,7 @@ const StatsBar = () => {
       <h2 className="sr-only">Community Metrics</h2>
       {/* Server-rendered stats for crawlers that don't execute JS */}
       <div className="sr-only" aria-hidden="true">
-        <p>500+ Races Listed across India</p>
+        <p>500+ Running Events Listed across India</p>
         <p>10,000+ Runners Joined on Endorfin</p>
         <p>25+ Cities Across India including Mumbai, Delhi, Bangalore, Pune, Hyderabad, Chennai</p>
         <p>4.8 App Rating on Google Play</p>

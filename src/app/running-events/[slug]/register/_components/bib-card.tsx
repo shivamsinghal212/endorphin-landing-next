@@ -164,7 +164,7 @@ export function ShareRow({
   };
   const buildShareUrl = () => {
     if (typeof window === 'undefined') return '';
-    return `${window.location.origin}/races/${encodeURIComponent(eventSlug)}`;
+    return `${window.location.origin}/running-events/${encodeURIComponent(eventSlug)}`;
   };
 
   const copyLink = async () => {

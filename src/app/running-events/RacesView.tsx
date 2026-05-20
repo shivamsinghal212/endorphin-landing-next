@@ -197,7 +197,7 @@ function RaceCard({
   const sig = popularitySignal(r);
   const virtual = isVirtual(r);
   const priceStr = r.priceMin != null ? `₹${r.priceMin.toLocaleString('en-IN')}` : null;
-  const detailHref = `/races/${r.slug || r.id}`;
+  const detailHref = `/running-events/${r.slug || r.id}`;
   const showCoupon = !!r.hasCoupon && r.couponDiscountPercent != null;
   const cta = couponCta(r);
   // Auth-gate plain Register too — when anon, even no-coupon registers route
@@ -314,7 +314,7 @@ function FeaturedCard({
       ? `By ${r.organizerName}`
       : 'Endorfin pick of the month';
   const story = storySnippet(r);
-  const detailHref = `/races/${r.slug || r.id}`;
+  const detailHref = `/running-events/${r.slug || r.id}`;
   const showCoupon = !!r.hasCoupon && r.couponDiscountPercent != null;
   const cta = couponCta(r);
 
@@ -670,7 +670,7 @@ export default function RacesView({
         <div className="v1r-hero-bg" aria-hidden />
         <div className="v1r-container">
           <h1 className="v1r-hero-title">
-            Every race<br />in India. <span className="v1r-red">Listed.</span>
+            Every running event<br />in India. <span className="v1r-red">Listed.</span>
           </h1>
 
           <div className="v1r-hero-foot">
@@ -681,7 +681,7 @@ export default function RacesView({
             <div className="v1r-hero-stats">
               <div>
                 <div className="v1r-hero-stat-n">{allRaces.length}</div>
-                <div className="v1r-hero-stat-l">Races</div>
+                <div className="v1r-hero-stat-l">Events</div>
               </div>
               <div>
                 <div className="v1r-hero-stat-n">{uniqueCities}</div>
@@ -786,7 +786,7 @@ export default function RacesView({
                 onKeyDown={onFeaturedKey}
                 tabIndex={0}
                 role="region"
-                aria-label="Featured races"
+                aria-label="Featured events"
               >
                 {featured.map((r) => (
                   <FeaturedCard
@@ -817,23 +817,23 @@ export default function RacesView({
         </section>
       )}
 
-      {/* Upcoming races */}
+      {/* Upcoming events */}
       <section className="v1r-races-section">
         <div className="v1r-container">
           <div className="v1r-section-header">
             <h2 className="v1r-section-title">
-              Upcoming <b>races.</b>
+              Upcoming <b>events.</b>
             </h2>
             <div className="v1r-races-header-right">
               <span className="v1r-section-count">
-                {grid.length === 0 ? '0 races' : `${grid.length} ${grid.length === 1 ? 'race' : 'races'}`}
+                {grid.length === 0 ? '0 events' : `${grid.length} ${grid.length === 1 ? 'event' : 'events'}`}
               </span>
               <div className="v1r-carousel-controls" hidden={!upCanScroll} role="group">
                 <button
                   className="v1r-carousel-btn"
                   disabled={upPrev}
                   onClick={() => scrollUp(-1)}
-                  aria-label="Previous races"
+                  aria-label="Previous events"
                 >
                   <svg viewBox="0 0 24 24" fill="none" aria-hidden>
                     <path d="M15 18l-6-6 6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
@@ -843,7 +843,7 @@ export default function RacesView({
                   className="v1r-carousel-btn"
                   disabled={upNext}
                   onClick={() => scrollUp(1)}
-                  aria-label="Next races"
+                  aria-label="Next events"
                 >
                   <svg viewBox="0 0 24 24" fill="none" aria-hidden>
                     <path d="M9 6l6 6-6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
@@ -861,11 +861,11 @@ export default function RacesView({
               onKeyDown={onUpKey}
               tabIndex={0}
               role="region"
-              aria-label="Upcoming races"
+              aria-label="Upcoming events"
             >
               {grid.length === 0 ? (
                 <div className="v1r-empty-state">
-                  No upcoming races{currentCity ? ` in ${currentCity}` : ''}. Try another city.
+                  No upcoming events{currentCity ? ` in ${currentCity}` : ''}. Try another city.
                 </div>
               ) : (
                 grid.map((r) => (
@@ -904,7 +904,7 @@ export default function RacesView({
               Your next start<br />line <span className="v1r-red">—</span><br />in your pocket.
             </h2>
             <p className="v1r-cta-sub">
-              Install Endorfin. Bookmark a race, tap &quot;Going,&quot; show up with your crew. Free on Android and
+              Install Endorfin. Bookmark a running event, tap &quot;Going,&quot; show up with your crew. Free on Android and
               iOS.
             </p>
           </div>

@@ -135,7 +135,7 @@ export function RegistrationDetailView({
 
   const r = q.data;
   const timeline = buildTimeline(r);
-  const eventHref = `/races/${r.event.slug || r.event.id}`;
+  const eventHref = `/running-events/${r.event.slug || r.event.id}`;
 
   return (
     <div className="max-w-3xl mx-auto px-4 md:px-6 py-8 md:py-12">

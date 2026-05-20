@@ -474,7 +474,7 @@ function SignUpScreen(props: {
       <h2 className="v1lm-h2">{props.title || <>Join <span className="v1lm-red">endorfin.</span></>}</h2>
       <p className="v1lm-sub">
         {props.subtitle ||
-          'Free, takes 30 seconds. Save races, see member coupons, sync with the app.'}
+          'Free, takes 30 seconds. Save events, see member coupons, sync with the app.'}
       </p>
 
       <GoogleSignInButton onCredential={props.onGoogleCredential} context={props.googleContext} />

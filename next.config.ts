@@ -43,9 +43,19 @@ const nextConfig: NextConfig = {
   async redirects() {
     return [
       {
+        source: '/races',
+        destination: '/running-events',
+        permanent: true,
+      },
+      {
+        source: '/races/:path*',
+        destination: '/running-events/:path*',
+        permanent: true,
+      },
+      {
         source: '/ggm26-ig',
         destination:
-          '/races/7th_edition_gurugram_grand_half_marathon_2026_36780?utm_source=instagram&utm_medium=social&utm_campaign=gurugram_half_2026',
+          '/running-events/7th_edition_gurugram_grand_half_marathon_2026_36780?utm_source=instagram&utm_medium=social&utm_campaign=gurugram_half_2026',
         permanent: false,
       },
       {
