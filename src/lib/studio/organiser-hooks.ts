@@ -200,6 +200,16 @@ export function useUpdateCoupon(eventId: string) {
 export function useInitiateRefund(eventId: string) {
   const token = useAdminToken();
   const qc = useQueryClient();
+  const invalidate = () => {
+    qc.invalidateQueries({
+      predicate: (q) =>
+        Array.isArray(q.queryKey) &&
+        q.queryKey[0] === 'organiser' &&
+        q.queryKey[1] === 'registrations' &&
+        q.queryKey[2] === eventId,
+    });
+    qc.invalidateQueries({ queryKey: organiserKeys.stats(eventId) });
+  };
   return useMutation({
     mutationFn: ({
       registrationId,
@@ -210,17 +220,12 @@ export function useInitiateRefund(eventId: string) {
       amountPaise?: number;
       reason?: string;
     }) => initiateRefund(token!, eventId, registrationId, { amountPaise, reason }),
-    onSuccess: () => {
-      // Invalidate all registration queries for this event (filter hash is
-      // opaque from here — invalidate by event id prefix instead).
-      qc.invalidateQueries({
-        predicate: (q) =>
-          Array.isArray(q.queryKey) &&
-          q.queryKey[0] === 'organiser' &&
-          q.queryKey[1] === 'registrations' &&
-          q.queryKey[2] === eventId,
-      });
-    },
+    // Always refetch — whether the POST returned 201 or the client never saw
+    // the response (Railway edge drops a long connection after Razorpay +
+    // Resend complete), the server-side state may have changed. Pulling fresh
+    // data lets the UI converge on reality instead of trusting a stale optimistic
+    // read.
+    onSettled: invalidate,
   });
 }
 

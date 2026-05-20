@@ -91,7 +91,21 @@ export function RefundDialog({
       onRefundQueued(registration.id);
       onClose();
     } catch (err) {
-      toast.error(describeOrganiserError(err));
+      // "Failed to fetch" / TypeError covers the case where Railway's edge
+      // drops a long-running connection after the server-side flow already
+      // ran. The list will refetch via onSettled — surface an ambiguous-but-
+      // optimistic message and close, so the user isn't told the action
+      // failed when it likely succeeded.
+      const isNetworkBlip = err instanceof TypeError;
+      if (isNetworkBlip) {
+        toast.message(
+          'Refund request sent — refreshing list to confirm. If the status doesn\'t flip, try again.',
+        );
+        onRefundQueued(registration.id);
+        onClose();
+      } else {
+        toast.error(describeOrganiserError(err));
+      }
     }
   };
 
