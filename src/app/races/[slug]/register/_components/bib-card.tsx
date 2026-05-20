@@ -116,13 +116,19 @@ export function BibCard({
       {/* Dashed divider — looks like a perforated tear line */}
       <div aria-hidden className="border-t-2 border-dashed border-jet/60 mx-4" />
 
-      {/* Footer — distance pill + faux barcode for character */}
-      <div className="px-6 py-3 flex items-center justify-between gap-3">
-        <div className="inline-flex items-center gap-2">
-          <span className="inline-flex items-center px-2.5 py-1 rounded-md bg-jet text-bone font-display uppercase text-xs font-bold tracking-wider leading-none">
-            {distanceLabel || 'Distance'}
+      {/* Footer — distance pill (when known) + faux barcode. The pill
+       *  is hidden entirely when distance is unknown so we don't render
+       *  an empty/cropped chip; the barcode then anchors the footer. */}
+      <div className="px-6 py-3 flex items-center justify-between gap-3 min-h-[44px]">
+        {distanceLabel ? (
+          <span className="inline-flex items-center px-2.5 py-1 rounded-md bg-jet text-bone font-display uppercase text-xs font-bold tracking-wider leading-none whitespace-nowrap">
+            {distanceLabel}
           </span>
-        </div>
+        ) : (
+          // Empty spacer so the barcode stays right-aligned without
+          // making the footer collapse to zero height on mobile.
+          <span aria-hidden />
+        )}
         {/* Faux timing barcode — pure decoration, evokes the timing-chip
          *  strip on real race bibs. Deterministic stripes. */}
         <span aria-hidden className="inline-flex items-center gap-[2px] opacity-80">

@@ -453,17 +453,24 @@ export default function RaceDetailView({
         <section className="v1rd-block">
           <div className="v1rd-container">
             <div className="v1rd-block-h">
-              <h2>Where it starts</h2>
-              <span className="v1rd-block-meta">
-                {event.locationName}
-                {event.latitude != null && event.longitude != null
-                  ? ` · ${event.latitude.toFixed(4)}, ${event.longitude.toFixed(4)}`
-                  : ''}
-              </span>
+              <h2>{event.eventFormat === 'virtual' ? 'How it runs' : 'Where it starts'}</h2>
+              {/* Eyebrow meta — coordinates for in-person events; suppressed
+               *  for virtual to avoid duplicating "Virtual · run anywhere"
+               *  in both the meta strip and the h3 below. */}
+              {event.latitude != null && event.longitude != null && (
+                <span className="v1rd-block-meta">
+                  {event.latitude.toFixed(4)}, {event.longitude.toFixed(4)}
+                </span>
+              )}
             </div>
             <div className="v1rd-venue">
               <h3>{event.venueName || event.locationName}</h3>
               {event.locationAddress && <div className="v1rd-venue-addr">{event.locationAddress}</div>}
+              {event.eventFormat === 'virtual' && !event.locationAddress && (
+                <div className="v1rd-venue-addr">
+                  Run any route, any time during the result window — track on Strava, Garmin, or the Endorfin app and submit your result.
+                </div>
+              )}
               {mapUrl && (
                 <a className="v1rd-btn v1rd-btn-ghost" href={mapUrl} target="_blank" rel="noopener noreferrer">
                   Open in Google Maps ↗
@@ -567,7 +574,29 @@ export default function RaceDetailView({
                   <div className="v1rd-sticky-deadline">{event.locationName}</div>
                 ) : null}
               </div>
-              {event.registrationUrl ? (
+              {isAlreadyRegistered ? (
+                <Link
+                  className="v1rd-sticky-cta"
+                  href={`/races/${event.slug || event.id}/register`}
+                  style={{ background: '#0A0A0A', color: '#F5F0EB' }}
+                >
+                  ✓ Bib {myActiveRegistration!.bibNumber ?? '—'}
+                </Link>
+              ) : event.eventSourceType === 'organizer' ? (
+                <Link
+                  className="v1rd-sticky-cta"
+                  href={`/races/${event.slug || event.id}/register`}
+                  onClick={(e) => {
+                    if (!isAuthed) {
+                      e.preventDefault();
+                      pendingInternalPathRef.current = `/races/${event.slug || event.id}/register`;
+                      setLoginOpen(true);
+                    }
+                  }}
+                >
+                  Register →
+                </Link>
+              ) : event.registrationUrl ? (
                 <a
                   className="v1rd-sticky-cta"
                   href={event.registrationUrl}
