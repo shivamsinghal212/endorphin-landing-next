@@ -308,6 +308,56 @@
   border-bottom: 0.5px solid var(--v1rd-hairline-strong);
 }
 
+/* Fine print — refund policy + T&Cs disclosures */
+.v1rd-page .v1rd-fineprint {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.v1rd-page .v1rd-disclosure {
+  border: 1px solid var(--v1rd-hairline);
+  border-radius: 12px;
+  background: var(--v1rd-paper, #fff);
+  overflow: hidden;
+}
+.v1rd-page .v1rd-disclosure[open] {
+  border-color: var(--v1rd-hairline-strong);
+}
+.v1rd-page .v1rd-disclosure > summary {
+  list-style: none;
+  cursor: pointer;
+  padding: 16px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  font-family: 'Oswald', sans-serif;
+  font-weight: 500;
+  font-size: 14px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--v1rd-jet);
+  user-select: none;
+}
+.v1rd-page .v1rd-disclosure > summary::-webkit-details-marker { display: none; }
+.v1rd-page .v1rd-disclosure-icon {
+  font-family: 'Oswald', sans-serif;
+  font-weight: 300;
+  font-size: 22px;
+  line-height: 1;
+  color: var(--v1rd-text-secondary);
+  transition: transform 180ms ease;
+}
+.v1rd-page .v1rd-disclosure[open] .v1rd-disclosure-icon {
+  transform: rotate(45deg);
+  color: var(--v1rd-signal);
+}
+.v1rd-page .v1rd-disclosure-body {
+  padding: 0 18px 18px;
+  border-top: 1px solid var(--v1rd-hairline);
+  padding-top: 14px;
+}
+
 /* End CTA */
 .v1rd-page .v1rd-end-cta {
   padding: 64px 0;
