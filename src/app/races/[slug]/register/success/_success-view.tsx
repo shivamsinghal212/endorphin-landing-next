@@ -4,20 +4,9 @@ import { useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useMyRegistration } from '@/lib/runner-hooks';
 import { AppStoreButtons } from '@/components/AppStoreButtons';
+import { useMe } from '@/lib/runner-hooks';
+import { BibCard, ShareRow } from '../_components/bib-card';
 import type { MyRegistrationItem } from '@/lib/runner-api';
-
-const IST = 'Asia/Kolkata';
-
-function fmtFullDate(iso: string) {
-  const d = new Date(iso);
-  return d.toLocaleString('en-GB', {
-    weekday: 'short',
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
-    timeZone: IST,
-  });
-}
 
 function fmtRupees(paise: number | null, currency: string | null) {
   if (paise == null) return '—';
@@ -145,79 +134,47 @@ export function SuccessView({
 }
 
 function PaidView({ data }: { data: MyRegistrationItem }) {
-  const startTime = data.event.resultWindowStart;
-  const endTime = data.event.resultWindowEnd;
+  // Use the same BibCard the registration-page already-registered view
+  // renders, so the two surfaces are visually identical. The runner
+  // viewing this is the one who paid, so useMe() is the right source
+  // for the participant name on the bib.
+  const meQ = useMe();
+  const participantName = meQ.data?.name ?? '';
+  const eventTitle = data.event.title;
+  const bibNumber = data.bibNumber ?? '—';
+  const distance = data.distance?.fullTitle ?? data.distance?.categoryName ?? '';
+  const eventSlug = data.event.slug ?? data.event.id;
+
   return (
-    <Wrap>
+    <Wrap centered>
       <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-medium uppercase tracking-wider mb-3">
         <span aria-hidden>✓</span> Registration confirmed
       </div>
-      <h1 className="font-display uppercase text-3xl md:text-5xl font-bold leading-tight mb-4">
+      <h1 className="font-display uppercase text-3xl md:text-4xl font-bold leading-tight mb-3">
         See you at the start line
       </h1>
-      <p className="text-sm text-jet/70 mb-8">
-        We&rsquo;ve emailed your confirmation. Here&rsquo;s your bib for the day.
+      <p className="text-sm text-jet/65 mb-7 mx-auto max-w-md">
+        We&rsquo;ve emailed your confirmation
+        {data.amountPaid != null
+          ? ` along with a receipt for ${fmtRupees(data.amountPaid, data.currency)}`
+          : ''}
+        . Here&rsquo;s your race bib — screenshot it, share it, and use the
+        Endorfin app to track your run.
       </p>
 
-      <div className="bg-jet text-bone rounded-2xl p-6 md:p-8 mb-8">
-        <p className="text-xs uppercase tracking-widest text-bone/60 mb-2">Bib</p>
-        <p className="font-display uppercase text-5xl md:text-6xl font-bold leading-none">
-          {data.bibNumber ?? '—'}
-        </p>
-        <div className="mt-6 grid grid-cols-2 gap-4 text-sm">
-          <div>
-            <p className="text-bone/60 text-[11px] uppercase tracking-wider mb-0.5">
-              Event
-            </p>
-            <p className="font-medium">{data.event.title}</p>
-          </div>
-          <div>
-            <p className="text-bone/60 text-[11px] uppercase tracking-wider mb-0.5">
-              Distance
-            </p>
-            <p className="font-medium">
-              {data.distance?.fullTitle ?? data.distance?.categoryName ?? '—'}
-            </p>
-          </div>
-          <div>
-            <p className="text-bone/60 text-[11px] uppercase tracking-wider mb-0.5">
-              Amount paid
-            </p>
-            <p className="font-medium">{fmtRupees(data.amountPaid, data.currency)}</p>
-          </div>
-          <div>
-            <p className="text-bone/60 text-[11px] uppercase tracking-wider mb-0.5">
-              Format
-            </p>
-            <p className="font-medium capitalize">
-              {data.event.eventFormat.replace('_', ' ')}
-            </p>
-          </div>
-        </div>
-      </div>
+      <BibCard
+        eventTitle={eventTitle}
+        bibNumber={bibNumber}
+        participantName={participantName}
+        distance={distance}
+      />
 
-      <div className="bg-white border border-jet/10 rounded-2xl p-5 md:p-6 mb-6">
-        <p className="font-display uppercase text-sm font-bold mb-3">What&rsquo;s next</p>
-        {data.event.eventFormat === 'virtual' ? (
-          <p className="text-sm text-jet/80 leading-relaxed">
-            Run any time during the result window
-            {startTime && endTime ? (
-              <>
-                {' '}
-                (<strong>{fmtFullDate(startTime)}</strong> –{' '}
-                <strong>{fmtFullDate(endTime)}</strong>)
-              </>
-            ) : null}
-            . When the window opens, upload your run screenshot or proof from My
-            Events and we&rsquo;ll verify it within 48 hours.
-          </p>
-        ) : (
-          <p className="text-sm text-jet/80 leading-relaxed">
-            Bring a printout or screenshot of your bib number on race day. Details
-            on venue and start times are on the event page.
-          </p>
-        )}
-      </div>
+      <ShareRow
+        eventTitle={eventTitle}
+        bibNumber={bibNumber}
+        distance={distance}
+        eventSlug={eventSlug}
+      />
 
       {/* Install-the-app nudge. Uses the site-wide AppStoreButtons so it
        *  matches the homepage CTA, footer, and other install touchpoints. */}
@@ -251,8 +208,20 @@ function PaidView({ data }: { data: MyRegistrationItem }) {
   );
 }
 
-function Wrap({ children }: { children: React.ReactNode }) {
+function Wrap({
+  children,
+  centered = false,
+}: {
+  children: React.ReactNode;
+  /** Center the content horizontally — used by the PaidView so the bib
+   *  card and supporting copy line up symmetrically on desktop. */
+  centered?: boolean;
+}) {
   return (
-    <div className="max-w-2xl mx-auto px-4 md:px-6 py-12 md:py-16">{children}</div>
+    <div
+      className={`max-w-2xl mx-auto px-4 md:px-6 py-12 md:py-16 ${centered ? 'text-center' : ''}`}
+    >
+      {children}
+    </div>
   );
 }
