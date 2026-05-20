@@ -151,8 +151,10 @@ export interface OrganiserEventListItem {
   coverImageUrl: string | null;
   registrationOpenAt: string | null;
   registrationCloseAt: string | null;
-  totalRegistrations: number;
-  totalRevenuePaise: number;
+  // Backend (organiser_event_service.list_organiser_events) emits these
+  // names — keep aligned so the dashboard doesn't render ₹NaN.
+  registrationsCount: number;
+  revenuePaise: number;
 }
 
 export interface OrganiserEventListResponse {

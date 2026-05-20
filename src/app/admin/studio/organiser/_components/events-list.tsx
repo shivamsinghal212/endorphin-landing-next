@@ -124,16 +124,16 @@ function EventRow({ ev, accent }: { ev: OrganiserEventListItem; accent: string |
         </div>
         <p className="text-[12px] text-jet/55">{dateLine(ev)}</p>
         <p className="text-[11px] text-jet/55 md:hidden mt-0.5">
-          {ev.totalRegistrations} regs · {inrFromPaise(ev.totalRevenuePaise)}
+          {ev.registrationsCount} regs · {inrFromPaise(ev.revenuePaise)}
         </p>
       </div>
       <div className="hidden md:block text-right pr-2">
         <p className="text-[10px] uppercase tracking-wider text-jet/50">Registrations</p>
-        <p className="text-sm font-medium">{ev.totalRegistrations}</p>
+        <p className="text-sm font-medium">{ev.registrationsCount}</p>
       </div>
       <div className="hidden md:block text-right pr-2">
         <p className="text-[10px] uppercase tracking-wider text-jet/50">Revenue</p>
-        <p className="text-sm font-medium">{inrFromPaise(ev.totalRevenuePaise)}</p>
+        <p className="text-sm font-medium">{inrFromPaise(ev.revenuePaise)}</p>
       </div>
       <Link
         href={`/admin/studio/organiser/events/${ev.id}`}

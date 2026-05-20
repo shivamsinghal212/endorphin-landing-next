@@ -62,13 +62,13 @@ export function Dashboard({ organiser }: { organiser: Organiser }) {
         const open = ev.registrationOpenAt ? Date.parse(ev.registrationOpenAt) : null;
         return open !== null && open >= yearStart;
       })
-      .reduce((s, ev) => s + ev.totalRegistrations, 0);
+      .reduce((s, ev) => s + ev.registrationsCount, 0);
     const yearRevenuePaise = items
       .filter((ev) => {
         const open = ev.registrationOpenAt ? Date.parse(ev.registrationOpenAt) : null;
         return open !== null && open >= yearStart;
       })
-      .reduce((s, ev) => s + ev.totalRevenuePaise, 0);
+      .reduce((s, ev) => s + ev.revenuePaise, 0);
     return { liveCount, yearRegistrations, yearRevenuePaise };
   }, [items, year]);
 
