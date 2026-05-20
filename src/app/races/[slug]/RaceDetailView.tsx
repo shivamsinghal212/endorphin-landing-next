@@ -453,7 +453,7 @@ export default function RaceDetailView({
         <section className="v1rd-block">
           <div className="v1rd-container">
             <div className="v1rd-block-h">
-              <h2>{event.eventFormat === 'virtual' ? 'How it runs' : 'Where it starts'}</h2>
+              <h2>Event location</h2>
               {/* Eyebrow meta — coordinates for in-person events; suppressed
                *  for virtual to avoid duplicating "Virtual · run anywhere"
                *  in both the meta strip and the h3 below. */}
@@ -517,10 +517,6 @@ export default function RaceDetailView({
       {(event.refundPolicyMd || event.termsMd) && (
         <section className="v1rd-block">
           <div className="v1rd-container">
-            <div className="v1rd-block-h">
-              <h2>The fine print</h2>
-              <span className="v1rd-block-meta">Refund · Terms</span>
-            </div>
             <div className="v1rd-fineprint">
               {event.refundPolicyMd && (
                 <details className="v1rd-disclosure">
