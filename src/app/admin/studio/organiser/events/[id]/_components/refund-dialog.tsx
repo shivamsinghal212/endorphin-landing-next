@@ -62,7 +62,7 @@ export function RefundDialog({
       <dialog
         ref={ref}
         onClose={onClose}
-        className="rounded-2xl p-0 backdrop:bg-jet/40 backdrop:backdrop-blur-sm"
+        className="rounded-2xl p-0 m-auto backdrop:bg-jet/40 backdrop:backdrop-blur-sm"
       />
     );
   }
@@ -106,7 +106,7 @@ export function RefundDialog({
         e.preventDefault();
         ref.current?.close();
       }}
-      className="rounded-2xl p-0 w-full max-w-md border border-jet/10 backdrop:bg-jet/40 backdrop:backdrop-blur-sm"
+      className="m-auto rounded-2xl p-0 w-[calc(100vw-2rem)] max-w-md border border-jet/10 backdrop:bg-jet/40 backdrop:backdrop-blur-sm"
     >
       <div className="p-5">
         <p className="font-display uppercase text-sm font-bold mb-1">
