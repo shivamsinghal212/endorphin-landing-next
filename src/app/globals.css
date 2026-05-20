@@ -6253,3 +6253,13 @@ body { padding-top: var(--nav-h, 68px); }
   .wp-prose hr { margin: 40px 0; }
   .wp-prose blockquote { padding-left: 18px; font-size: 17px; }
 }
+
+/* ── Studio: autosave indicator pulse ───────────────────────────────────── */
+@keyframes pulse-soft {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
+.pulse-soft { animation: pulse-soft 1.8s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) {
+  .pulse-soft { animation: none; }
+}

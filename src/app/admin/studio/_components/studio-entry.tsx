@@ -138,24 +138,28 @@ function ClubsTile({ clubs }: { clubs: { slug: string; name: string; logoUrl: st
 
 function OrganiserTile() {
   return (
-    <div
-      className="block bg-white border border-jet/10 rounded-3xl p-6 md:p-8 min-h-[200px] opacity-80 cursor-not-allowed select-none"
-      aria-disabled
+    <Link
+      href="/admin/studio/organiser"
+      className="group block bg-white border border-jet/10 rounded-3xl p-6 md:p-8 hover:border-jet/30 transition-colors min-h-[200px]"
     >
       <p className="text-[10px] uppercase tracking-wider text-jet/40">
-        02 / Organiser · WIP
+        02 / Organiser
       </p>
       <p
-        className="italic text-3xl md:text-4xl leading-[0.95] mt-6 text-jet/50"
+        className="italic text-3xl md:text-4xl leading-[0.95] mt-6 text-jet"
         style={{ fontFamily: 'var(--font-fraunces), Georgia, serif' }}
       >
         Races &amp;<br />events.
       </p>
-      <p className="text-xs text-jet/50 mt-4">
-        Listings, registrations, results. Currently in build.
+      <p className="text-xs text-jet/60 mt-4">
+        Listings, registrations, results.
       </p>
-      <p className="mt-6 text-xs text-jet/40">Coming soon</p>
-    </div>
+      <div className="mt-6">
+        <span className="inline-block px-3 py-1.5 rounded-lg bg-jet text-bone text-xs font-medium group-hover:bg-jet/90">
+          Open organiser →
+        </span>
+      </div>
+    </Link>
   );
 }
 

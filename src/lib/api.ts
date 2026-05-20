@@ -124,6 +124,41 @@ export interface Event {
   couponCode: string | null;
   couponDiscountPercent: number | null;
   hasCoupon: boolean;
+  // ─── Paid-events / organiser-published fields ─────────────────────────
+  // Populated for events with `eventSourceType === 'organizer'`. Null /
+  // default for legacy imported events. Backend's `from_orm_event` always
+  // emits these (with sensible defaults), so they're safe to read but
+  // only meaningful on organiser-published rows.
+  eventFormat?: 'virtual' | 'in_person' | null;
+  coverImageUrl?: string | null;
+  descriptionMd?: string | null;
+  refundPolicyMd?: string | null;
+  termsMd?: string | null;
+  acceptingRegistrations?: boolean;
+  registrationOpenAt?: string | null;
+  registrationCloseAt?: string | null;
+  resultWindowStart?: string | null;
+  resultWindowEnd?: string | null;
+  bibPrefix?: string | null;
+  accentColor?: string | null;
+  // Built-in collection toggles + custom-form config from the wizard.
+  collectDob?: boolean;
+  collectGender?: boolean;
+  collectTshirt?: boolean;
+  tshirtSizes?: string[] | null;
+  collectAddress?: boolean;
+  requiresRunProof?: boolean;
+  shipsMedal?: boolean;
+  registrationForm?: Array<{
+    id: string;
+    label: string;
+    type: 'text' | 'textarea' | 'select' | 'number' | 'date' | 'email' | 'phone' | 'multi_select';
+    required: boolean;
+    options?: string[] | null;
+    placeholder?: string | null;
+    helpText?: string | null;
+    bindToUserField?: 'name' | 'phone' | 'email' | null;
+  }> | null;
 }
 
 // ─── Auth ─────────────────────────────────────────────────────────────────

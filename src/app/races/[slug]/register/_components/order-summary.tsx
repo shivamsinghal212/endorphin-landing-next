@@ -1,0 +1,126 @@
+'use client';
+
+import type { DistanceCategory } from '@/lib/api';
+import type { CouponPreviewResponse } from '@/lib/runner-api';
+
+function fmtRupees(paise: number): string {
+  return `₹${(paise / 100).toLocaleString('en-IN', { maximumFractionDigits: 0 })}`;
+}
+
+function fmtRupeesFromMajor(amount: number, currency: string | null): string {
+  const cur = currency || 'INR';
+  if (cur === 'INR') return `₹${amount.toLocaleString('en-IN')}`;
+  return `${cur} ${amount.toLocaleString('en')}`;
+}
+
+export interface OrderSummaryData {
+  distance: DistanceCategory | null;
+  currency: string | null;
+  coupon: CouponPreviewResponse | null;
+}
+
+/** Derive a base price (paise). Coupon preview is authoritative when present
+ *  — backend has the only canonical paise figure. Falls back to picking
+ *  whichever of price/discountedPrice the organiser set, multiplied by 100. */
+export function deriveTotals(data: OrderSummaryData): {
+  basePaise: number | null;
+  discountPaise: number;
+  finalPaise: number | null;
+  currency: string;
+} {
+  const cur =
+    data.coupon?.currency ?? data.distance?.currency ?? data.currency ?? 'INR';
+  if (data.coupon?.valid && data.coupon.basePricePaise != null) {
+    const base = data.coupon.basePricePaise;
+    const disc = data.coupon.discountPaise ?? 0;
+    const final = data.coupon.finalPricePaise ?? Math.max(0, base - disc);
+    return { basePaise: base, discountPaise: disc, finalPaise: final, currency: cur };
+  }
+  const fromMajor = data.distance?.discountedPrice ?? data.distance?.price;
+  if (fromMajor == null) {
+    return { basePaise: null, discountPaise: 0, finalPaise: null, currency: cur };
+  }
+  const basePaise = Math.round(fromMajor * 100);
+  return {
+    basePaise,
+    discountPaise: 0,
+    finalPaise: basePaise,
+    currency: cur,
+  };
+}
+
+export function OrderSummary({
+  data,
+  payLabel,
+  onPay,
+  disabled,
+  loading,
+}: {
+  data: OrderSummaryData;
+  payLabel?: string;
+  onPay: () => void;
+  disabled?: boolean;
+  loading?: boolean;
+}) {
+  const totals = deriveTotals(data);
+  const baseDisplay =
+    totals.basePaise != null
+      ? fmtRupees(totals.basePaise)
+      : data.distance?.price != null
+        ? fmtRupeesFromMajor(data.distance.price, totals.currency)
+        : '—';
+  const finalDisplay =
+    totals.finalPaise != null ? fmtRupees(totals.finalPaise) : baseDisplay;
+  const payCta =
+    payLabel ??
+    (totals.finalPaise != null && totals.finalPaise > 0
+      ? `Pay ${finalDisplay}`
+      : 'Continue');
+
+  return (
+    <section className="bg-jet text-bone rounded-2xl p-5 md:p-6 sticky top-24">
+      <p className="font-display uppercase text-sm font-bold mb-4">
+        Order summary
+      </p>
+      <dl className="text-sm space-y-2">
+        <div className="flex justify-between">
+          <dt className="text-bone/70">Base price</dt>
+          <dd className="font-medium">{baseDisplay}</dd>
+        </div>
+        {totals.discountPaise > 0 && (
+          <div className="flex justify-between">
+            <dt className="text-bone/70">
+              Discount
+              {data.coupon?.discountPercent != null && (
+                <span className="text-bone/50"> ({data.coupon.discountPercent}%)</span>
+              )}
+            </dt>
+            <dd className="text-signal font-medium">−{fmtRupees(totals.discountPaise)}</dd>
+          </div>
+        )}
+        <div className="border-t border-bone/15 pt-3 mt-3 flex justify-between text-base">
+          <dt className="font-display uppercase">Total</dt>
+          <dd className="font-display uppercase font-bold">{finalDisplay}</dd>
+        </div>
+      </dl>
+      <button
+        type="button"
+        onClick={onPay}
+        disabled={disabled || loading}
+        className="mt-5 w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-signal text-bone text-sm font-display uppercase font-bold tracking-wider hover:bg-signal/90 disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        {loading && (
+          <svg className="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none">
+            <circle className="opacity-20" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" />
+            <path className="opacity-90" fill="currentColor" d="M4 12a8 8 0 018-8v3a5 5 0 00-5 5H4z" />
+          </svg>
+        )}
+        {loading ? 'Opening checkout…' : payCta}
+      </button>
+      <p className="mt-3 text-[11px] text-bone/50 leading-relaxed">
+        You&rsquo;ll be charged via Razorpay (cards, UPI, netbanking). Refunds
+        follow this event&rsquo;s policy.
+      </p>
+    </section>
+  );
+}

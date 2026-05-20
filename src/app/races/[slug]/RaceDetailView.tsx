@@ -238,7 +238,17 @@ export default function RaceDetailView({
           </div>
 
           <div className="v1rd-cta-row">
-            {event.registrationUrl ? (
+            {event.eventSourceType === 'organizer' ? (
+              // Endorfin-hosted paid event — runs through our internal
+              // checkout flow (Razorpay lands in a later stream; today
+              // /races/{slug}/register surfaces the registration form).
+              <Link
+                className="v1rd-btn v1rd-btn-primary"
+                href={`/races/${event.slug || event.id}/register`}
+              >
+                Register →
+              </Link>
+            ) : event.registrationUrl ? (
               <a
                 className="v1rd-btn v1rd-btn-primary"
                 href={event.registrationUrl}

@@ -1,0 +1,1619 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Studio · Organiser mockups</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            display: ['Oswald', 'sans-serif'],
+            body: ['Poppins', 'sans-serif'],
+          },
+          colors: {
+            jet: '#0A0A0A',
+            signal: '#E6232A',
+            bone: '#F5F0EB',
+            slate: '#1A1A1A',
+            gold: '#B89253',
+          },
+        },
+      },
+    };
+  </script>
+  <style>
+    body { font-family: 'Poppins', sans-serif; }
+    .font-display { font-family: 'Oswald', sans-serif; }
+    .screen-frame {
+      background: #ffffff;
+      border: 1px solid rgba(10,10,10,0.08);
+      border-radius: 20px;
+      box-shadow: 0 20px 60px -20px rgba(10,10,10,0.18);
+      overflow: hidden;
+    }
+    .browser-bar {
+      background: linear-gradient(180deg, #fafaf8 0%, #f3f0eb 100%);
+      border-bottom: 1px solid rgba(10,10,10,0.06);
+    }
+    .browser-dot { width: 10px; height: 10px; border-radius: 50%; }
+    /* Tiny markdown preview styling */
+    .md-prose h2 { font-size: 1rem; font-weight: 600; margin: 0.75rem 0 0.25rem; }
+    .md-prose p  { font-size: 0.85rem; line-height: 1.55; margin: 0.4rem 0; color: rgba(10,10,10,0.75); }
+    .md-prose ul { margin: 0.4rem 0; padding-left: 1.1rem; }
+    .md-prose li { font-size: 0.85rem; line-height: 1.55; color: rgba(10,10,10,0.75); }
+    .md-prose strong { font-weight: 600; }
+    /* Subtle dotted divider */
+    .dotted { background-image: radial-gradient(rgba(10,10,10,0.18) 1px, transparent 1px); background-size: 8px 8px; }
+    /* Horizontal scroll affordance for mobile tabs */
+    .scroll-x { overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+    .scroll-x::-webkit-scrollbar { display: none; }
+    /* Validation state */
+    .input-error { border-color: #E6232A !important; background: rgba(230,35,42,0.04); }
+    .err-msg { color: #E6232A; font-size: 11px; margin-top: 4px; display: flex; align-items: center; gap: 4px; }
+    /* Pulse for autosave dot */
+    @keyframes pulse-soft { 0%,100% { opacity: 1 } 50% { opacity: 0.35 } }
+    .pulse-soft { animation: pulse-soft 1.8s ease-in-out infinite; }
+  </style>
+</head>
+<body class="bg-bone text-jet">
+
+  <!-- ─── Top nav (mockup chrome, not part of product) ─── -->
+  <header class="sticky top-0 z-40 bg-jet text-bone border-b border-bone/10">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex items-center gap-4 flex-wrap">
+      <span class="font-display uppercase font-bold text-lg tracking-wide">Endorfin Studio · Organiser mockups</span>
+      <nav class="flex flex-wrap gap-x-4 gap-y-1 ml-auto text-[12px] text-bone/70">
+        <a href="#s0" class="hover:text-bone">0 · Onboarding</a>
+        <a href="#s1" class="hover:text-bone">1 · Dashboard</a>
+        <a href="#s2" class="hover:text-bone">2 · Basics</a>
+        <a href="#s3" class="hover:text-bone">3 · Distances</a>
+        <a href="#s4" class="hover:text-bone">4 · Collect</a>
+        <a href="#s5" class="hover:text-bone">5 · Questions</a>
+        <a href="#s6" class="hover:text-bone">6 · Coupons</a>
+        <a href="#s7" class="hover:text-bone">7 · Policies</a>
+        <a href="#s8" class="hover:text-bone">8 · Review</a>
+        <a href="#s9" class="hover:text-bone">9 · Manage event</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-4 py-10 space-y-16">
+
+    <!-- ════════════════════════════════════════════════════════ -->
+    <!-- 0 · ORGANISER ONBOARDING                                  -->
+    <!-- ════════════════════════════════════════════════════════ -->
+    <section id="s0">
+      <h2 class="font-display uppercase font-bold text-2xl mb-2">0 · Organiser onboarding</h2>
+      <p class="text-sm text-jet/60 mb-5 max-w-2xl">One-time profile. Required before publishing any event. KYC/payouts come later — onboarding only collects what we need to <em>start</em>.</p>
+
+      <div class="screen-frame">
+        <div class="browser-bar px-4 py-2 flex items-center gap-2">
+          <div class="browser-dot bg-[#FF5F57]"></div>
+          <div class="browser-dot bg-[#FEBC2E]"></div>
+          <div class="browser-dot bg-[#28C840]"></div>
+          <div class="ml-3 text-[11px] text-jet/50">endorfin.app/admin/studio/organiser/onboarding</div>
+        </div>
+
+        <div class="bg-bone">
+          <!-- Studio top bar -->
+          <div class="bg-white border-b border-jet/10 px-6 py-3 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="font-display uppercase font-bold text-base">Endorfin</span>
+              <span class="text-[11px] text-jet/40 uppercase tracking-wider">Studio</span>
+            </div>
+            <div class="flex items-center gap-3 text-xs text-jet/60">
+              <span>Shivam Singhal</span>
+              <div class="w-7 h-7 rounded-full bg-jet text-bone grid place-items-center text-[10px] font-semibold">SS</div>
+            </div>
+          </div>
+
+          <div class="max-w-3xl mx-auto px-4 sm:px-6 py-8 md:py-10">
+            <p class="text-[11px] uppercase tracking-wider text-jet/40 mb-2">Step 1 of 1 · You can edit this later</p>
+            <h1 class="font-display uppercase text-3xl font-bold mb-2">Set up your organiser profile</h1>
+            <p class="text-sm text-jet/60 mb-8 max-w-lg">Runners see this on every event page you publish. Keep it short — you're not writing a bio for LinkedIn.</p>
+
+            <!-- Card: Identity -->
+            <div class="bg-white border border-jet/10 rounded-2xl p-6 mb-4">
+              <p class="font-display uppercase text-sm font-bold mb-4">Identity</p>
+
+              <div class="grid grid-cols-12 gap-4">
+                <div class="col-span-12 sm:col-span-4">
+                  <p class="text-[11px] uppercase tracking-wider text-jet/50 mb-2">Logo</p>
+                  <!-- Uploaded state: thumbnail + replace/remove. Hover/long-press shows actions. -->
+                  <div class="aspect-square rounded-2xl border border-jet/10 bg-gradient-to-br from-gold to-[#7A5F33] relative overflow-hidden">
+                    <span class="absolute bottom-2 left-2 font-display uppercase text-bone font-bold text-lg leading-none">PP</span>
+                    <div class="absolute inset-0 bg-jet/0 hover:bg-jet/60 transition flex items-end justify-center gap-1.5 p-2 opacity-0 hover:opacity-100">
+                      <button class="text-[10px] px-2 py-1 rounded bg-bone text-jet font-medium">Replace</button>
+                      <button class="text-[10px] px-2 py-1 rounded bg-signal text-bone font-medium">Remove</button>
+                    </div>
+                  </div>
+                  <p class="text-[10px] text-jet/40 mt-1.5">PNG / JPG / SVG · max 2&nbsp;MB · square works best</p>
+                </div>
+
+                <div class="col-span-12 sm:col-span-8 space-y-3">
+                  <div>
+                    <label class="text-[11px] uppercase tracking-wider text-jet/50">Display name</label>
+                    <input value="Pacing Project" class="mt-1 w-full px-3 py-2.5 rounded-xl border border-jet/10 text-sm bg-white focus:border-jet outline-none" />
+                  </div>
+                  <div>
+                    <label class="text-[11px] uppercase tracking-wider text-jet/50">Short bio</label>
+                    <textarea rows="3" class="mt-1 w-full px-3 py-2.5 rounded-xl border border-jet/10 text-sm bg-white focus:border-jet outline-none">Boutique race operator running themed virtual events out of Mumbai since 2024.</textarea>
+                    <p class="text-[10px] text-jet/40 mt-1">Markdown supported. Max 280 chars.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card: Contact -->
+            <div class="bg-white border border-jet/10 rounded-2xl p-6 mb-4">
+              <p class="font-display uppercase text-sm font-bold mb-4">Contact (runners' support email)</p>
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <label class="text-[11px] uppercase tracking-wider text-jet/50">Email</label>
+                  <input value="hello@pacingproject.in" class="mt-1 w-full px-3 py-2.5 rounded-xl border border-jet/10 text-sm" />
+                </div>
+                <div>
+                  <label class="text-[11px] uppercase tracking-wider text-jet/50">Phone</label>
+                  <input value="+91 98200 12345" class="mt-1 w-full px-3 py-2.5 rounded-xl border border-jet/10 text-sm" />
+                </div>
+              </div>
+            </div>
+
+            <!-- Card: Business (optional) -->
+            <div class="bg-white border border-jet/10 rounded-2xl p-6 mb-6">
+              <div class="flex items-baseline justify-between mb-4">
+                <p class="font-display uppercase text-sm font-bold">Business details</p>
+                <span class="text-[11px] text-jet/40">Optional · needed before payouts</span>
+              </div>
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <label class="text-[11px] uppercase tracking-wider text-jet/50">Registered business name</label>
+                  <input placeholder="Pacing Project Pvt Ltd" class="mt-1 w-full px-3 py-2.5 rounded-xl border border-jet/10 text-sm" />
+                </div>
+                <div>
+                  <label class="text-[11px] uppercase tracking-wider text-jet/50">GSTIN</label>
+                  <input placeholder="27AABCT1234E1Z5" class="mt-1 w-full px-3 py-2.5 rounded-xl border border-jet/10 text-sm" />
+                </div>
+              </div>
+            </div>
+
+            <div class="flex items-center justify-between">
+              <p class="text-[11px] text-jet/40">Your first 3 events are reviewed by the Endorfin team before going live.</p>
+              <button class="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-jet text-bone text-sm font-medium hover:bg-jet/90">
+                Save & enter Studio →
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ════════════════════════════════════════════════════════ -->
+    <!-- 1 · ORGANISER DASHBOARD                                   -->
+    <!-- ════════════════════════════════════════════════════════ -->
+    <section id="s1">
+      <h2 class="font-display uppercase font-bold text-2xl mb-2">1 · Organiser dashboard</h2>
+      <p class="text-sm text-jet/60 mb-5 max-w-2xl">Lands here after onboarding. Top row = lifetime stats. Tabs scope the events list. The big black "+" is the only thing competing with stats for attention.</p>
+
+      <div class="screen-frame">
+        <div class="browser-bar px-4 py-2 flex items-center gap-2">
+          <div class="browser-dot bg-[#FF5F57]"></div>
+          <div class="browser-dot bg-[#FEBC2E]"></div>
+          <div class="browser-dot bg-[#28C840]"></div>
+          <div class="ml-3 text-[11px] text-jet/50">endorfin.app/admin/studio/organiser</div>
+        </div>
+
+        <div class="bg-bone">
+          <div class="bg-white border-b border-jet/10 px-6 py-3 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="font-display uppercase font-bold text-base">Endorfin</span>
+              <span class="text-[11px] text-jet/40 uppercase tracking-wider">Studio · Organiser</span>
+            </div>
+            <div class="flex items-center gap-2 text-xs">
+              <span class="text-jet/60">Pacing Project</span>
+              <div class="w-7 h-7 rounded-full bg-gold text-bone grid place-items-center text-[10px] font-semibold">PP</div>
+            </div>
+          </div>
+
+          <div class="max-w-6xl mx-auto px-4 sm:px-6 py-6 md:py-8">
+            <div class="flex items-end justify-between mb-6 gap-3">
+              <div class="min-w-0">
+                <p class="text-[11px] uppercase tracking-wider text-jet/40 mb-1">Your events</p>
+                <h1 class="font-display uppercase text-2xl sm:text-3xl font-bold">Organiser home</h1>
+              </div>
+              <button class="inline-flex items-center gap-2 px-3 sm:px-4 py-2.5 rounded-lg bg-jet text-bone text-sm font-medium hover:bg-jet/90 shrink-0">
+                <span class="text-base leading-none">+</span> New event
+              </button>
+            </div>
+
+            <!-- Stats row -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
+              <div class="bg-white rounded-2xl border border-jet/10 p-4">
+                <p class="text-[10px] uppercase tracking-wider text-jet/50">Live events</p>
+                <p class="font-display text-3xl font-bold mt-1">3</p>
+                <p class="text-[11px] text-jet/40 mt-0.5">2 closing this week</p>
+              </div>
+              <div class="bg-white rounded-2xl border border-jet/10 p-4">
+                <p class="text-[10px] uppercase tracking-wider text-jet/50">Registrations · 2026</p>
+                <p class="font-display text-3xl font-bold mt-1">1,284</p>
+                <p class="text-[11px] text-emerald-700 mt-0.5">+312 last 30 days</p>
+              </div>
+              <div class="bg-white rounded-2xl border border-jet/10 p-4">
+                <p class="text-[10px] uppercase tracking-wider text-jet/50">Revenue · 2026</p>
+                <p class="font-display text-3xl font-bold mt-1">₹3,84,200</p>
+                <p class="text-[11px] text-jet/40 mt-0.5">Settled by Endorfin</p>
+              </div>
+              <div class="bg-white rounded-2xl border border-jet/10 p-4">
+                <p class="text-[10px] uppercase tracking-wider text-jet/50">Discount given</p>
+                <p class="font-display text-3xl font-bold mt-1">₹46,400</p>
+                <p class="text-[11px] text-jet/40 mt-0.5">12.1% of gross</p>
+              </div>
+            </div>
+
+            <!-- Resume draft banner: appears whenever an in-progress draft exists. -->
+            <div class="mb-4 rounded-2xl border border-jet/15 bg-jet text-bone p-4 flex items-center gap-4 flex-wrap">
+              <div class="w-10 h-10 rounded-lg bg-bone/10 grid place-items-center text-base">↻</div>
+              <div class="flex-1 min-w-0">
+                <p class="text-sm font-medium">You left off on <span class="font-bold">"Midnight Mile · Virtual 5K"</span></p>
+                <p class="text-[11px] text-bone/60">Step 4 of 7 · Custom questions · auto-saved 12 min ago</p>
+              </div>
+              <button class="px-3 py-1.5 rounded-lg border border-bone/25 text-xs hover:bg-bone/10">Discard</button>
+              <button class="px-3 py-1.5 rounded-lg bg-bone text-jet text-xs font-bold">Resume →</button>
+            </div>
+
+            <!-- Tabs (horizontally scrollable on mobile) -->
+            <div class="flex items-center gap-1 mb-4 border-b border-jet/10 scroll-x">
+              <button class="px-3 py-2 text-sm font-medium border-b-2 border-jet whitespace-nowrap">Live <span class="text-jet/50">· 3</span></button>
+              <button class="px-3 py-2 text-sm text-jet/60 hover:text-jet whitespace-nowrap">Upcoming · 2</button>
+              <button class="px-3 py-2 text-sm text-jet/60 hover:text-jet whitespace-nowrap">Past · 11</button>
+              <button class="px-3 py-2 text-sm text-jet/60 hover:text-jet whitespace-nowrap">Drafts · 1</button>
+              <div class="ml-auto pl-3 flex items-center gap-2 shrink-0">
+                <input placeholder="Search events" class="px-3 py-1.5 text-xs border border-jet/10 rounded-lg outline-none focus:border-jet w-36 sm:w-48" />
+              </div>
+            </div>
+
+            <!-- Event rows -->
+            <div class="space-y-3">
+              <!-- Row 1 -->
+              <div class="bg-white border border-jet/10 rounded-2xl p-3 sm:p-4 flex items-center gap-3 sm:gap-4 hover:border-jet/20 transition">
+                <div class="w-16 sm:w-20 h-16 sm:h-20 rounded-xl bg-gradient-to-br from-signal to-[#8B0F14] flex-shrink-0 relative overflow-hidden">
+                  <span class="absolute bottom-1.5 left-2 text-bone font-display text-xs uppercase font-bold">Monsoon</span>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <div class="flex items-center gap-2 mb-0.5 flex-wrap">
+                    <p class="font-medium text-sm truncate">Monsoon Mileage · Virtual 10K</p>
+                    <span class="text-[10px] px-1.5 py-0.5 rounded-full bg-signal text-bone uppercase tracking-wider font-medium shrink-0">Live</span>
+                  </div>
+                  <p class="text-[12px] text-jet/55">Jun 15 → Jun 30 · 4 distances · Virtual</p>
+                  <p class="text-[11px] text-jet/55 md:hidden mt-0.5">482 / 750 regs · ₹1.44L</p>
+                </div>
+                <div class="hidden md:block text-right pr-2">
+                  <p class="text-[10px] uppercase tracking-wider text-jet/50">Registrations</p>
+                  <p class="text-sm font-medium">482 / 750</p>
+                </div>
+                <div class="hidden md:block text-right pr-2">
+                  <p class="text-[10px] uppercase tracking-wider text-jet/50">Revenue</p>
+                  <p class="text-sm font-medium">₹1,44,600</p>
+                </div>
+                <button class="text-xs px-3 py-1.5 rounded-lg border border-jet/15 hover:bg-jet/5">Manage</button>
+              </div>
+
+              <!-- Row 2 -->
+              <div class="bg-white border border-jet/10 rounded-2xl p-4 flex items-center gap-4 hover:border-jet/20 transition">
+                <div class="w-20 h-20 rounded-xl bg-gradient-to-br from-jet to-slate flex-shrink-0 relative overflow-hidden">
+                  <span class="absolute bottom-1.5 left-2 text-bone font-display text-xs uppercase font-bold">Sunrise</span>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <div class="flex items-center gap-2 mb-0.5">
+                    <p class="font-medium text-sm">Sunrise Series · Bandstand 5K</p>
+                    <span class="text-[10px] px-1.5 py-0.5 rounded-full bg-signal text-bone uppercase tracking-wider font-medium">Live</span>
+                  </div>
+                  <p class="text-[12px] text-jet/55">Jul 7 · 1 distance · Physical · Bandra, Mumbai</p>
+                </div>
+                <div class="hidden md:block text-right pr-2">
+                  <p class="text-[10px] uppercase tracking-wider text-jet/50">Registrations</p>
+                  <p class="text-sm font-medium">198 / 200</p>
+                </div>
+                <div class="hidden md:block text-right pr-2">
+                  <p class="text-[10px] uppercase tracking-wider text-jet/50">Revenue</p>
+                  <p class="text-sm font-medium">₹59,400</p>
+                </div>
+                <button class="text-xs px-3 py-1.5 rounded-lg border border-jet/15 hover:bg-jet/5">Manage</button>
+              </div>
+
+              <!-- Row 3 -->
+              <div class="bg-white border border-jet/10 rounded-2xl p-4 flex items-center gap-4 hover:border-jet/20 transition">
+                <div class="w-20 h-20 rounded-xl bg-gradient-to-br from-gold to-[#7A5F33] flex-shrink-0 relative overflow-hidden">
+                  <span class="absolute bottom-1.5 left-2 text-bone font-display text-xs uppercase font-bold">Track</span>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <div class="flex items-center gap-2 mb-0.5">
+                    <p class="font-medium text-sm">Track Tuesdays · 5x1K Intervals</p>
+                    <span class="text-[10px] px-1.5 py-0.5 rounded-full bg-signal text-bone uppercase tracking-wider font-medium">Live</span>
+                  </div>
+                  <p class="text-[12px] text-jet/55">Recurring · 1 distance · Physical · No medal</p>
+                </div>
+                <div class="hidden md:block text-right pr-2">
+                  <p class="text-[10px] uppercase tracking-wider text-jet/50">Registrations</p>
+                  <p class="text-sm font-medium">42 / —</p>
+                </div>
+                <div class="hidden md:block text-right pr-2">
+                  <p class="text-[10px] uppercase tracking-wider text-jet/50">Revenue</p>
+                  <p class="text-sm font-medium">₹12,600</p>
+                </div>
+                <button class="text-xs px-3 py-1.5 rounded-lg border border-jet/15 hover:bg-jet/5">Manage</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ════════════════════════════════════════════════════════ -->
+    <!-- Wizard scaffold reused for steps 2–8                      -->
+    <!-- ════════════════════════════════════════════════════════ -->
+    <section id="wizard-shell" class="hidden">SHELL ONLY</section>
+
+    <!-- ════════════════════════════════════════════════════════ -->
+    <!-- 2 · STEP 1 BASICS                                         -->
+    <!-- ════════════════════════════════════════════════════════ -->
+    <section id="s2">
+      <h2 class="font-display uppercase font-bold text-2xl mb-2">2 · Create event · Step 1 / 7 · Basics</h2>
+      <p class="text-sm text-jet/60 mb-5 max-w-2xl">Left rail = wizard progress, always visible. Right column = current step. Sticky bottom bar holds Save/Next so the user is never hunting for the action.</p>
+
+      <div class="screen-frame">
+        <div class="browser-bar px-4 py-2 flex items-center gap-2">
+          <div class="browser-dot bg-[#FF5F57]"></div>
+          <div class="browser-dot bg-[#FEBC2E]"></div>
+          <div class="browser-dot bg-[#28C840]"></div>
+          <div class="ml-3 text-[11px] text-jet/50">endorfin.app/admin/studio/organiser/events/new</div>
+        </div>
+
+        <div class="bg-bone">
+          <div class="bg-white border-b border-jet/10 px-4 md:px-6 py-3 flex items-center justify-between gap-3 flex-wrap">
+            <div class="flex items-center gap-2 md:gap-3 min-w-0">
+              <a class="text-xs text-jet/50 hover:text-jet whitespace-nowrap">← Home</a>
+              <span class="text-jet/20 hidden sm:inline">·</span>
+              <span class="text-xs font-medium truncate">Monsoon Mileage · Virtual 10K</span>
+              <span class="text-[10px] px-1.5 py-0.5 rounded-full bg-jet/10 text-jet/60 uppercase tracking-wider font-medium shrink-0">Draft</span>
+            </div>
+            <div class="flex items-center gap-2 text-xs ml-auto">
+              <!-- Autosave indicator (live on every wizard step) -->
+              <span class="hidden sm:inline-flex items-center gap-1.5 text-jet/55 px-2 py-1 rounded-md bg-jet/[0.04]">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 pulse-soft"></span>
+                Saved · 4s ago
+              </span>
+              <button class="px-3 py-1.5 rounded-lg border border-jet/15 hover:bg-jet/5 whitespace-nowrap">Preview</button>
+            </div>
+          </div>
+
+          <!-- Mobile-only horizontal step pills (the sidebar shows on md+) -->
+          <div class="md:hidden bg-white border-b border-jet/5 px-4 py-2 scroll-x">
+            <div class="flex items-center gap-1 min-w-max">
+              <span class="text-[11px] px-2 py-1 rounded-full bg-jet text-bone font-medium">1 · Basics</span>
+              <span class="text-[11px] px-2 py-1 rounded-full text-jet/55">2 · Distances</span>
+              <span class="text-[11px] px-2 py-1 rounded-full text-jet/55">3 · Collect</span>
+              <span class="text-[11px] px-2 py-1 rounded-full text-jet/55">4 · Questions</span>
+              <span class="text-[11px] px-2 py-1 rounded-full text-jet/55">5 · Coupons</span>
+              <span class="text-[11px] px-2 py-1 rounded-full text-jet/55">6 · Policies</span>
+              <span class="text-[11px] px-2 py-1 rounded-full text-jet/55">7 · Review</span>
+            </div>
+          </div>
+
+          <div class="max-w-6xl mx-auto px-4 md:px-6 py-6 md:py-8 grid grid-cols-12 gap-6">
+            <!-- Wizard rail (hidden on mobile in favour of the pill strip above) -->
+            <aside class="hidden md:block md:col-span-3">
+              <ol class="space-y-1 sticky top-20">
+                <!-- Step indicator items -->
+                <li class="flex items-center gap-3 px-3 py-2 rounded-lg bg-jet text-bone">
+                  <span class="w-6 h-6 rounded-full bg-bone text-jet grid place-items-center text-[11px] font-bold">1</span>
+                  <span class="text-sm font-medium">Basics</span>
+                </li>
+                <li class="flex items-center gap-3 px-3 py-2 rounded-lg text-jet/60 hover:bg-jet/5">
+                  <span class="w-6 h-6 rounded-full border border-jet/20 grid place-items-center text-[11px]">2</span>
+                  <span class="text-sm">Distances</span>
+                </li>
+                <li class="flex items-center gap-3 px-3 py-2 rounded-lg text-jet/60 hover:bg-jet/5">
+                  <span class="w-6 h-6 rounded-full border border-jet/20 grid place-items-center text-[11px]">3</span>
+                  <span class="text-sm">What we collect</span>
+                </li>
+                <li class="flex items-center gap-3 px-3 py-2 rounded-lg text-jet/60 hover:bg-jet/5">
+                  <span class="w-6 h-6 rounded-full border border-jet/20 grid place-items-center text-[11px]">4</span>
+                  <span class="text-sm">Custom questions</span>
+                </li>
+                <li class="flex items-center gap-3 px-3 py-2 rounded-lg text-jet/60 hover:bg-jet/5">
+                  <span class="w-6 h-6 rounded-full border border-jet/20 grid place-items-center text-[11px]">5</span>
+                  <span class="text-sm">Coupons</span>
+                </li>
+                <li class="flex items-center gap-3 px-3 py-2 rounded-lg text-jet/60 hover:bg-jet/5">
+                  <span class="w-6 h-6 rounded-full border border-jet/20 grid place-items-center text-[11px]">6</span>
+                  <span class="text-sm">Policies</span>
+                </li>
+                <li class="flex items-center gap-3 px-3 py-2 rounded-lg text-jet/60 hover:bg-jet/5">
+                  <span class="w-6 h-6 rounded-full border border-jet/20 grid place-items-center text-[11px]">7</span>
+                  <span class="text-sm">Review & publish</span>
+                </li>
+              </ol>
+            </aside>
+
+            <div class="col-span-12 md:col-span-9 space-y-4">
+              <div>
+                <p class="text-[11px] uppercase tracking-wider text-jet/40">Step 1 of 7</p>
+                <h1 class="font-display uppercase text-2xl font-bold">The basics</h1>
+                <p class="text-sm text-jet/60">Title, when it runs, and the hero image. You can change everything until the first registration comes in.</p>
+              </div>
+
+              <!-- Format toggle -->
+              <div class="bg-white border border-jet/10 rounded-2xl p-5">
+                <p class="font-display uppercase text-sm font-bold mb-3">Event format</p>
+                <div class="grid grid-cols-2 gap-3">
+                  <label class="cursor-pointer border-2 border-jet rounded-xl p-4 flex items-start gap-3 bg-jet/[0.02]">
+                    <input type="radio" name="fmt" checked class="mt-1 accent-jet" />
+                    <div>
+                      <p class="text-sm font-medium">Virtual</p>
+                      <p class="text-[12px] text-jet/55 mt-0.5">Runners complete on their own and submit a screenshot. We verify and ship medals.</p>
+                    </div>
+                  </label>
+                  <label class="cursor-pointer border-2 border-jet/10 rounded-xl p-4 flex items-start gap-3">
+                    <input type="radio" name="fmt" class="mt-1 accent-jet" />
+                    <div>
+                      <p class="text-sm font-medium">Physical</p>
+                      <p class="text-[12px] text-jet/55 mt-0.5">Single venue, single date. Runners check in on race day.</p>
+                    </div>
+                  </label>
+                </div>
+              </div>
+
+              <!-- Title + slug -->
+              <div class="bg-white border border-jet/10 rounded-2xl p-5">
+                <p class="font-display uppercase text-sm font-bold mb-4">Identity</p>
+                <div class="space-y-3">
+                  <div>
+                    <div class="flex items-baseline justify-between">
+                      <label class="text-[11px] uppercase tracking-wider text-jet/50">Title <span class="text-signal">*</span></label>
+                      <span class="text-[10px] text-jet/40">28 / 80</span>
+                    </div>
+                    <input value="Monsoon Mileage · Virtual 10K" maxlength="80" class="mt-1 w-full px-3 py-2.5 rounded-xl border border-jet/10 text-sm" />
+                  </div>
+                  <div>
+                    <label class="text-[11px] uppercase tracking-wider text-jet/50">URL slug <span class="text-signal">*</span></label>
+                    <!-- Error state example: invalid characters. -->
+                    <div class="mt-1 flex items-stretch rounded-xl border border-jet/10 input-error overflow-hidden text-sm">
+                      <span class="px-3 py-2.5 bg-jet/[0.04] text-jet/50 hidden sm:inline">endorfin.app/races/</span>
+                      <span class="px-3 py-2.5 bg-jet/[0.04] text-jet/50 sm:hidden">/races/</span>
+                      <input value="Monsoon Mileage 2026!" class="flex-1 px-3 py-2.5 outline-none min-w-0" />
+                    </div>
+                    <p class="err-msg">⚠ Use lowercase letters, numbers and hyphens only. Try <code class="ml-1 text-jet/80">monsoon-mileage-2026</code></p>
+                  </div>
+                  <div>
+                    <div class="flex items-baseline justify-between">
+                      <label class="text-[11px] uppercase tracking-wider text-jet/50">Description (markdown) <span class="text-signal">*</span></label>
+                      <span class="text-[10px] text-jet/40">184 / 1000</span>
+                    </div>
+                    <textarea rows="4" class="mt-1 w-full px-3 py-2.5 rounded-xl border border-jet/10 text-sm font-mono">Run anywhere. Track on Strava, Garmin, or your phone. Submit a screenshot when you're done — we'll verify and ship the medal to your door.
+
+**Anyone, anywhere.** Just finish the distance before Jun 30.</textarea>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Media: shows the three upload states side-by-side so you can see each design. -->
+              <div class="bg-white border border-jet/10 rounded-2xl p-5">
+                <p class="font-display uppercase text-sm font-bold mb-1">Media</p>
+                <p class="text-[12px] text-jet/55 mb-4">Hero is what runners see on the race page and cards. JPG/PNG/WebP · max 5&nbsp;MB · we crop to 16:9.</p>
+
+                <p class="text-[11px] uppercase tracking-wider text-jet/50 mb-2">Hero image <span class="text-signal">*</span></p>
+
+                <!-- Uploaded (default state when there's already an image) -->
+                <div class="aspect-[16/9] rounded-xl border border-jet/10 bg-gradient-to-br from-signal to-[#8B0F14] relative overflow-hidden group">
+                  <div class="absolute inset-0 grid place-items-end p-4">
+                    <span class="font-display uppercase text-bone font-bold text-2xl leading-tight">Monsoon<br/>Mileage</span>
+                  </div>
+                  <div class="absolute top-2 right-2 text-[10px] uppercase tracking-wider bg-bone/90 px-2 py-0.5 rounded">hero.jpg · 1600×900 · 412 KB</div>
+                  <div class="absolute inset-0 bg-jet/0 group-hover:bg-jet/60 transition flex items-end justify-end gap-1.5 p-3 opacity-0 group-hover:opacity-100">
+                    <button class="text-[11px] px-2.5 py-1 rounded bg-bone text-jet font-medium">Replace</button>
+                    <button class="text-[11px] px-2.5 py-1 rounded bg-signal text-bone font-medium">Remove</button>
+                  </div>
+                </div>
+
+                <p class="text-[11px] uppercase tracking-wider text-jet/50 mt-5 mb-2">Gallery <span class="text-jet/30">· optional, up to 6</span></p>
+                <div class="grid grid-cols-3 sm:grid-cols-6 gap-2">
+
+                  <!-- Slot 1: uploaded -->
+                  <div class="aspect-square rounded-lg bg-gradient-to-br from-gold to-[#7A5F33] relative overflow-hidden group">
+                    <button class="absolute top-1 right-1 w-5 h-5 rounded-full bg-bone/90 grid place-items-center text-[10px] opacity-0 group-hover:opacity-100">✕</button>
+                  </div>
+
+                  <!-- Slot 2: uploading (with progress bar) -->
+                  <div class="aspect-square rounded-lg border border-jet/15 bg-bone relative overflow-hidden">
+                    <div class="absolute inset-0 grid place-items-center">
+                      <div class="text-center">
+                        <div class="text-[10px] text-jet/70 font-medium">Uploading…</div>
+                        <div class="text-[9px] text-jet/40">crowd.jpg · 1.8 MB</div>
+                      </div>
+                    </div>
+                    <div class="absolute bottom-0 left-0 right-0 h-1 bg-jet/[0.08]">
+                      <div class="h-full bg-jet" style="width:62%"></div>
+                    </div>
+                  </div>
+
+                  <!-- Slot 3: error -->
+                  <div class="aspect-square rounded-lg border border-signal bg-signal/5 relative overflow-hidden grid place-items-center text-center p-1">
+                    <div>
+                      <div class="text-signal text-base leading-none">!</div>
+                      <p class="text-[9px] text-signal font-medium mt-0.5 leading-tight">Too large<br/>(8.2 MB)</p>
+                      <button class="text-[9px] mt-1 underline text-jet/60">Retry</button>
+                    </div>
+                  </div>
+
+                  <!-- Slot 4–6: idle drop targets -->
+                  <label class="aspect-square rounded-lg border border-dashed border-jet/20 dotted grid place-items-center text-center text-[10px] text-jet/45 cursor-pointer hover:border-jet hover:text-jet">
+                    <div>
+                      <div class="text-lg leading-none">＋</div>
+                      <p class="mt-0.5">Drop<br/>or click</p>
+                    </div>
+                  </label>
+                  <label class="aspect-square rounded-lg border border-dashed border-jet/20 dotted grid place-items-center text-[10px] text-jet/45 cursor-pointer hover:border-jet hover:text-jet">＋</label>
+                  <label class="aspect-square rounded-lg border border-dashed border-jet/20 dotted grid place-items-center text-[10px] text-jet/45 cursor-pointer hover:border-jet hover:text-jet">＋</label>
+                </div>
+              </div>
+
+              <!-- Windows -->
+              <div class="bg-white border border-jet/10 rounded-2xl p-5">
+                <p class="font-display uppercase text-sm font-bold mb-4">When it runs</p>
+                <div class="grid grid-cols-2 gap-3">
+                  <div>
+                    <label class="text-[11px] uppercase tracking-wider text-jet/50">Registration opens</label>
+                    <input value="2026-05-20 09:00" class="mt-1 w-full px-3 py-2.5 rounded-xl border border-jet/10 text-sm" />
+                  </div>
+                  <div>
+                    <label class="text-[11px] uppercase tracking-wider text-jet/50">Registration closes</label>
+                    <input value="2026-06-12 23:59" class="mt-1 w-full px-3 py-2.5 rounded-xl border border-jet/10 text-sm" />
+                  </div>
+                  <div>
+                    <label class="text-[11px] uppercase tracking-wider text-jet/50">Run window starts</label>
+                    <input value="2026-06-15 00:00" class="mt-1 w-full px-3 py-2.5 rounded-xl border border-jet/10 text-sm" />
+                  </div>
+                  <div>
+                    <label class="text-[11px] uppercase tracking-wider text-jet/50">Run window ends</label>
+                    <input value="2026-06-30 23:59" class="mt-1 w-full px-3 py-2.5 rounded-xl border border-jet/10 text-sm" />
+                  </div>
+                </div>
+                <p class="text-[11px] text-jet/40 mt-3">All times are IST (Asia/Kolkata). Registration must close on or before the run window starts.</p>
+                <div class="mt-3 rounded-xl bg-jet/[0.04] px-3 py-2 text-[11px] text-jet/70 flex items-start gap-2">
+                  <span class="text-jet/40">ℹ</span>
+                  <span>Looks good — registration closes 3 days before runners can start.</span>
+                </div>
+              </div>
+
+              <!-- Sticky footer (visible on mobile too — primary actions always reachable). -->
+              <div class="sticky bottom-0 -mx-4 md:-mx-6 px-4 md:px-6 py-3 bg-bone/95 backdrop-blur border-t border-jet/10 flex items-center justify-between gap-2">
+                <span class="hidden sm:inline-flex items-center gap-1.5 text-[11px] text-jet/55">
+                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 pulse-soft"></span>
+                  Saved
+                </span>
+                <button class="text-xs sm:text-sm text-jet/60 hover:text-jet sm:hidden">Exit</button>
+                <button class="text-xs sm:text-sm text-jet/60 hover:text-jet hidden sm:inline">Save & exit</button>
+                <div class="flex items-center gap-2 ml-auto">
+                  <button class="px-3 sm:px-4 py-2 rounded-lg border border-jet/15 text-xs sm:text-sm">Back</button>
+                  <button class="px-3 sm:px-4 py-2 rounded-lg bg-jet text-bone text-xs sm:text-sm font-medium">Continue →</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ════════════════════════════════════════════════════════ -->
+    <!-- 3 · STEP 2 DISTANCES                                      -->
+    <!-- ════════════════════════════════════════════════════════ -->
+    <section id="s3">
+      <h2 class="font-display uppercase font-bold text-2xl mb-2">3 · Step 2 / 7 · Distances & pricing</h2>
+      <p class="text-sm text-jet/60 mb-5 max-w-2xl">Each row is a sellable SKU. Price, capacity, inclusions per distance. The "Add distance" affordance is the table's last row, not a floating button — keeps the focus on the data.</p>
+
+      <div class="screen-frame">
+        <div class="browser-bar px-4 py-2 flex items-center gap-2">
+          <div class="browser-dot bg-[#FF5F57]"></div>
+          <div class="browser-dot bg-[#FEBC2E]"></div>
+          <div class="browser-dot bg-[#28C840]"></div>
+          <div class="ml-3 text-[11px] text-jet/50">…/events/new/distances</div>
+        </div>
+
+        <div class="bg-bone p-4 sm:p-6 md:p-10">
+          <div class="max-w-5xl mx-auto">
+            <div class="flex items-center gap-2 mb-1 justify-between">
+              <div class="flex items-center gap-2">
+                <span class="text-[10px] px-1.5 py-0.5 rounded bg-jet text-bone font-bold">2</span>
+                <p class="text-[11px] uppercase tracking-wider text-jet/40">Step 2 of 7</p>
+              </div>
+              <span class="inline-flex items-center gap-1.5 text-[11px] text-jet/55 px-2 py-1 rounded-md bg-jet/[0.04]">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 pulse-soft"></span>
+                Saved
+              </span>
+            </div>
+            <h1 class="font-display uppercase text-2xl font-bold">Distances & pricing</h1>
+            <p class="text-sm text-jet/60 mb-6">A virtual race usually sells 3–5 distances. Each one prices and caps independently. At least one is required.</p>
+
+            <!-- Scrolls horizontally on mobile so columns don't crush. -->
+            <div class="bg-white border border-jet/10 rounded-2xl overflow-x-auto">
+              <table class="w-full text-sm min-w-[640px]">
+                <thead class="bg-jet/[0.03] text-[10px] uppercase tracking-wider text-jet/50">
+                  <tr>
+                    <th class="text-left px-4 py-2.5 font-medium">Name</th>
+                    <th class="text-left px-4 py-2.5 font-medium">Distance</th>
+                    <th class="text-left px-4 py-2.5 font-medium">Price</th>
+                    <th class="text-left px-4 py-2.5 font-medium">Cap</th>
+                    <th class="text-left px-4 py-2.5 font-medium">Inclusions</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-jet/5">
+                  <tr>
+                    <td class="px-4 py-3"><input value="5K" class="w-20 px-2 py-1.5 rounded-lg border border-jet/10 text-sm" /></td>
+                    <td class="px-4 py-3"><div class="flex items-center gap-1"><input value="5" class="w-14 px-2 py-1.5 rounded-lg border border-jet/10 text-sm" /><span class="text-xs text-jet/50">km</span></div></td>
+                    <td class="px-4 py-3"><div class="flex items-center gap-1"><span class="text-xs text-jet/50">₹</span><input value="299" class="w-20 px-2 py-1.5 rounded-lg border border-jet/10 text-sm" /></div></td>
+                    <td class="px-4 py-3"><input value="500" class="w-20 px-2 py-1.5 rounded-lg border border-jet/10 text-sm" /></td>
+                    <td class="px-4 py-3">
+                      <div class="flex flex-wrap gap-1">
+                        <span class="text-[10px] px-2 py-0.5 rounded-full bg-jet text-bone">T-shirt</span>
+                        <span class="text-[10px] px-2 py-0.5 rounded-full bg-jet text-bone">Medal</span>
+                        <button class="text-[10px] px-2 py-0.5 rounded-full border border-dashed border-jet/30 text-jet/50">+ Add</button>
+                      </div>
+                    </td>
+                    <td class="px-4 py-3 text-right"><button class="text-jet/40 hover:text-signal text-sm">⋯</button></td>
+                  </tr>
+                  <tr>
+                    <td class="px-4 py-3"><input value="10K" class="w-20 px-2 py-1.5 rounded-lg border border-jet/10 text-sm" /></td>
+                    <td class="px-4 py-3"><div class="flex items-center gap-1"><input value="10" class="w-14 px-2 py-1.5 rounded-lg border border-jet/10 text-sm" /><span class="text-xs text-jet/50">km</span></div></td>
+                    <td class="px-4 py-3"><div class="flex items-center gap-1"><span class="text-xs text-jet/50">₹</span><input value="399" class="w-20 px-2 py-1.5 rounded-lg border border-jet/10 text-sm" /></div></td>
+                    <td class="px-4 py-3"><input value="750" class="w-20 px-2 py-1.5 rounded-lg border border-jet/10 text-sm" /></td>
+                    <td class="px-4 py-3">
+                      <div class="flex flex-wrap gap-1">
+                        <span class="text-[10px] px-2 py-0.5 rounded-full bg-jet text-bone">T-shirt</span>
+                        <span class="text-[10px] px-2 py-0.5 rounded-full bg-jet text-bone">Medal</span>
+                        <span class="text-[10px] px-2 py-0.5 rounded-full bg-jet text-bone">Bib</span>
+                        <button class="text-[10px] px-2 py-0.5 rounded-full border border-dashed border-jet/30 text-jet/50">+ Add</button>
+                      </div>
+                    </td>
+                    <td class="px-4 py-3 text-right"><button class="text-jet/40 hover:text-signal text-sm">⋯</button></td>
+                  </tr>
+                  <tr>
+                    <td class="px-4 py-3"><input value="Half Marathon" class="w-36 px-2 py-1.5 rounded-lg border border-jet/10 text-sm" /></td>
+                    <td class="px-4 py-3"><div class="flex items-center gap-1"><input value="21.1" class="w-14 px-2 py-1.5 rounded-lg border border-jet/10 text-sm" /><span class="text-xs text-jet/50">km</span></div></td>
+                    <td class="px-4 py-3"><div class="flex items-center gap-1"><span class="text-xs text-jet/50">₹</span><input value="599" class="w-20 px-2 py-1.5 rounded-lg border border-jet/10 text-sm" /></div></td>
+                    <td class="px-4 py-3"><input placeholder="—" class="w-20 px-2 py-1.5 rounded-lg border border-jet/10 text-sm" /></td>
+                    <td class="px-4 py-3">
+                      <div class="flex flex-wrap gap-1">
+                        <span class="text-[10px] px-2 py-0.5 rounded-full bg-jet text-bone">T-shirt</span>
+                        <span class="text-[10px] px-2 py-0.5 rounded-full bg-jet text-bone">Medal</span>
+                        <span class="text-[10px] px-2 py-0.5 rounded-full bg-jet text-bone">Bib</span>
+                        <span class="text-[10px] px-2 py-0.5 rounded-full bg-jet text-bone">Tech tee</span>
+                        <button class="text-[10px] px-2 py-0.5 rounded-full border border-dashed border-jet/30 text-jet/50">+ Add</button>
+                      </div>
+                    </td>
+                    <td class="px-4 py-3 text-right"><button class="text-jet/40 hover:text-signal text-sm">⋯</button></td>
+                  </tr>
+                  <tr class="bg-jet/[0.02]">
+                    <td colspan="6" class="px-4 py-3">
+                      <button class="text-sm text-jet/60 hover:text-jet inline-flex items-center gap-2">＋ Add distance</button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="mt-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 text-[12px] text-jet/55">
+              <p>Capacity blank = unlimited. Event-level cap (Step 1) overrides if smaller.</p>
+              <p class="text-jet/70">3 distances · ₹299–₹599</p>
+            </div>
+
+            <div class="mt-6 flex items-center justify-between gap-2">
+              <button class="text-xs sm:text-sm text-jet/60 whitespace-nowrap">Save & exit</button>
+              <div class="flex items-center gap-2">
+                <button class="px-3 sm:px-4 py-2 rounded-lg border border-jet/15 text-xs sm:text-sm">← Back</button>
+                <button class="px-3 sm:px-4 py-2 rounded-lg bg-jet text-bone text-xs sm:text-sm font-medium">Continue →</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ════════════════════════════════════════════════════════ -->
+    <!-- 4 · STEP 3 WHAT WE COLLECT                                -->
+    <!-- ════════════════════════════════════════════════════════ -->
+    <section id="s4">
+      <h2 class="font-display uppercase font-bold text-2xl mb-2">4 · Step 3 / 7 · What we collect</h2>
+      <p class="text-sm text-jet/60 mb-5 max-w-2xl">System-known fields with one toggle each. DOB and gender bind to the user profile so leaderboard categories are always trustworthy. Address auto-enables when "Ships medal" is on.</p>
+
+      <div class="screen-frame">
+        <div class="browser-bar px-4 py-2 flex items-center gap-2">
+          <div class="browser-dot bg-[#FF5F57]"></div>
+          <div class="browser-dot bg-[#FEBC2E]"></div>
+          <div class="browser-dot bg-[#28C840]"></div>
+          <div class="ml-3 text-[11px] text-jet/50">…/events/new/collect</div>
+        </div>
+
+        <div class="bg-bone p-4 sm:p-6 md:p-10">
+          <div class="max-w-3xl mx-auto">
+            <div class="flex items-center gap-2 mb-1 justify-between">
+              <div class="flex items-center gap-2">
+                <span class="text-[10px] px-1.5 py-0.5 rounded bg-jet text-bone font-bold">3</span>
+                <p class="text-[11px] uppercase tracking-wider text-jet/40">Step 3 of 7</p>
+              </div>
+              <span class="inline-flex items-center gap-1.5 text-[11px] text-jet/55 px-2 py-1 rounded-md bg-jet/[0.04]">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 pulse-soft"></span>
+                Saved
+              </span>
+            </div>
+            <h1 class="font-display uppercase text-2xl font-bold">What we collect at checkout</h1>
+            <p class="text-sm text-jet/60 mb-6">These are platform-known fields. Toggle on what your event needs — runners only fill them once and we re-use the answer.</p>
+
+            <!-- DOB -->
+            <div class="bg-white border border-jet/10 rounded-2xl p-5 mb-3 flex items-start gap-4">
+              <div class="flex-1">
+                <div class="flex items-center gap-2 mb-1">
+                  <p class="font-medium text-sm">Date of birth</p>
+                  <span class="text-[10px] px-1.5 py-0.5 rounded-full bg-gold/20 text-gold uppercase tracking-wider font-medium">Required for leaderboard</span>
+                </div>
+                <p class="text-[12px] text-jet/55">Saved to runner's profile. Used to bucket into age groups (M30-39 etc.).</p>
+              </div>
+              <button class="relative w-11 h-6 rounded-full bg-jet">
+                <span class="absolute top-0.5 right-0.5 w-5 h-5 rounded-full bg-bone"></span>
+              </button>
+            </div>
+
+            <!-- Gender -->
+            <div class="bg-white border border-jet/10 rounded-2xl p-5 mb-3 flex items-start gap-4">
+              <div class="flex-1">
+                <div class="flex items-center gap-2 mb-1">
+                  <p class="font-medium text-sm">Gender</p>
+                  <span class="text-[10px] px-1.5 py-0.5 rounded-full bg-gold/20 text-gold uppercase tracking-wider font-medium">Required for leaderboard</span>
+                </div>
+                <p class="text-[12px] text-jet/55">Saved to runner's profile. Options: Male, Female, Non-binary, Prefer not to say.</p>
+              </div>
+              <button class="relative w-11 h-6 rounded-full bg-jet">
+                <span class="absolute top-0.5 right-0.5 w-5 h-5 rounded-full bg-bone"></span>
+              </button>
+            </div>
+
+            <!-- T-shirt -->
+            <div class="bg-white border border-jet/10 rounded-2xl p-5 mb-3">
+              <div class="flex items-start gap-4">
+                <div class="flex-1">
+                  <p class="font-medium text-sm mb-1">T-shirt size</p>
+                  <p class="text-[12px] text-jet/55">Pick the sizes you'll stock.</p>
+                </div>
+                <button class="relative w-11 h-6 rounded-full bg-jet">
+                  <span class="absolute top-0.5 right-0.5 w-5 h-5 rounded-full bg-bone"></span>
+                </button>
+              </div>
+              <div class="mt-3 flex flex-wrap gap-1.5">
+                <label class="text-[11px] px-2.5 py-1 rounded-full bg-jet text-bone cursor-pointer">XS</label>
+                <label class="text-[11px] px-2.5 py-1 rounded-full bg-jet text-bone cursor-pointer">S</label>
+                <label class="text-[11px] px-2.5 py-1 rounded-full bg-jet text-bone cursor-pointer">M</label>
+                <label class="text-[11px] px-2.5 py-1 rounded-full bg-jet text-bone cursor-pointer">L</label>
+                <label class="text-[11px] px-2.5 py-1 rounded-full bg-jet text-bone cursor-pointer">XL</label>
+                <label class="text-[11px] px-2.5 py-1 rounded-full border border-jet/15 text-jet/40 cursor-pointer">XXL</label>
+                <label class="text-[11px] px-2.5 py-1 rounded-full border border-jet/15 text-jet/40 cursor-pointer">XXXL</label>
+              </div>
+            </div>
+
+            <!-- Address -->
+            <div class="bg-white border border-jet/10 rounded-2xl p-5 mb-3 flex items-start gap-4">
+              <div class="flex-1">
+                <div class="flex items-center gap-2 mb-1">
+                  <p class="font-medium text-sm">Shipping address</p>
+                  <span class="text-[10px] px-1.5 py-0.5 rounded-full bg-jet/10 text-jet/60 uppercase tracking-wider font-medium">Auto-on with medal</span>
+                </div>
+                <p class="text-[12px] text-jet/55">Full Indian address with pincode. Used for t-shirt and medal dispatch.</p>
+              </div>
+              <button class="relative w-11 h-6 rounded-full bg-jet">
+                <span class="absolute top-0.5 right-0.5 w-5 h-5 rounded-full bg-bone"></span>
+              </button>
+            </div>
+
+            <!-- Medal -->
+            <div class="bg-white border border-jet/10 rounded-2xl p-5 mb-3 flex items-start gap-4">
+              <div class="flex-1">
+                <p class="font-medium text-sm mb-1">Ship a finisher's medal</p>
+                <p class="text-[12px] text-jet/55">Dispatched after the run is verified.</p>
+              </div>
+              <button class="relative w-11 h-6 rounded-full bg-jet">
+                <span class="absolute top-0.5 right-0.5 w-5 h-5 rounded-full bg-bone"></span>
+              </button>
+            </div>
+
+            <!-- Run proof -->
+            <div class="bg-white border border-jet/10 rounded-2xl p-5 mb-6 flex items-start gap-4">
+              <div class="flex-1">
+                <div class="flex items-center gap-2 mb-1">
+                  <p class="font-medium text-sm">Require run proof</p>
+                  <span class="text-[10px] px-1.5 py-0.5 rounded-full bg-jet/10 text-jet/60 uppercase tracking-wider font-medium">Virtual only</span>
+                </div>
+                <p class="text-[12px] text-jet/55">Screenshot of Strava/Garmin/phone app. We verify before medal dispatch.</p>
+              </div>
+              <button class="relative w-11 h-6 rounded-full bg-jet">
+                <span class="absolute top-0.5 right-0.5 w-5 h-5 rounded-full bg-bone"></span>
+              </button>
+            </div>
+
+            <div class="flex items-center justify-between gap-2">
+              <button class="text-xs sm:text-sm text-jet/60 whitespace-nowrap">Save & exit</button>
+              <div class="flex items-center gap-2">
+                <button class="px-3 sm:px-4 py-2 rounded-lg border border-jet/15 text-xs sm:text-sm">← Back</button>
+                <button class="px-3 sm:px-4 py-2 rounded-lg bg-jet text-bone text-xs sm:text-sm font-medium">Continue →</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ════════════════════════════════════════════════════════ -->
+    <!-- 5 · STEP 4 CUSTOM QUESTIONS                               -->
+    <!-- ════════════════════════════════════════════════════════ -->
+    <section id="s5">
+      <h2 class="font-display uppercase font-bold text-2xl mb-2">5 · Step 4 / 7 · Custom questions</h2>
+      <p class="text-sm text-jet/60 mb-5 max-w-2xl">Same builder as club join forms. Two-column: editor on the left, live preview of the public checkout form on the right.</p>
+
+      <div class="screen-frame">
+        <div class="browser-bar px-4 py-2 flex items-center gap-2">
+          <div class="browser-dot bg-[#FF5F57]"></div>
+          <div class="browser-dot bg-[#FEBC2E]"></div>
+          <div class="browser-dot bg-[#28C840]"></div>
+          <div class="ml-3 text-[11px] text-jet/50">…/events/new/questions</div>
+        </div>
+
+        <div class="bg-bone p-4 sm:p-6 md:p-10">
+          <div class="max-w-6xl mx-auto">
+            <div class="flex items-center gap-2 mb-1 justify-between">
+              <div class="flex items-center gap-2">
+                <span class="text-[10px] px-1.5 py-0.5 rounded bg-jet text-bone font-bold">4</span>
+                <p class="text-[11px] uppercase tracking-wider text-jet/40">Step 4 of 7</p>
+              </div>
+              <span class="inline-flex items-center gap-1.5 text-[11px] text-jet/55 px-2 py-1 rounded-md bg-jet/[0.04]">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 pulse-soft"></span>
+                Saved
+              </span>
+            </div>
+            <h1 class="font-display uppercase text-2xl font-bold">Custom questions</h1>
+            <p class="text-sm text-jet/60 mb-6">Anything extra you want to ask. Three is plenty; ten is too many. On mobile, tap "Preview" to peek at the checkout form.</p>
+
+            <div class="grid grid-cols-12 gap-4 lg:gap-6">
+              <!-- Editor -->
+              <div class="col-span-12 lg:col-span-7 space-y-3">
+
+                <!-- Field 1 -->
+                <div class="bg-white border border-jet/10 rounded-2xl p-4">
+                  <div class="flex items-center gap-2 mb-3">
+                    <span class="text-jet/30 cursor-grab">⠿</span>
+                    <input value="Emergency contact" class="flex-1 px-3 py-2 rounded-lg border border-jet/10 text-sm font-medium" />
+                    <select class="px-2 py-2 rounded-lg border border-jet/10 text-sm">
+                      <option>Short text</option>
+                      <option>Long text</option>
+                      <option>Number</option>
+                      <option>Date</option>
+                      <option>Email</option>
+                      <option>Phone</option>
+                      <option>Picker</option>
+                      <option>Multi-pick</option>
+                    </select>
+                    <button class="text-jet/30 hover:text-signal">✕</button>
+                  </div>
+                  <div class="grid grid-cols-2 gap-2">
+                    <input placeholder="Placeholder" value="Name + phone" class="px-3 py-2 rounded-lg border border-jet/10 text-sm" />
+                    <input placeholder="Help text" value="In case we need to reach someone" class="px-3 py-2 rounded-lg border border-jet/10 text-sm" />
+                  </div>
+                  <div class="mt-3 flex items-center justify-between text-[12px]">
+                    <label class="flex items-center gap-1.5 text-jet/70"><input type="checkbox" checked class="accent-jet" /> Required</label>
+                    <span class="text-jet/40">id: <code class="text-jet/60">emergency_contact</code></span>
+                  </div>
+                </div>
+
+                <!-- Field 2 -->
+                <div class="bg-white border border-jet/10 rounded-2xl p-4">
+                  <div class="flex items-center gap-2 mb-3">
+                    <span class="text-jet/30 cursor-grab">⠿</span>
+                    <input value="How did you hear about us?" class="flex-1 px-3 py-2 rounded-lg border border-jet/10 text-sm font-medium" />
+                    <select class="px-2 py-2 rounded-lg border border-jet/10 text-sm">
+                      <option>Short text</option>
+                      <option>Long text</option>
+                      <option>Number</option>
+                      <option>Date</option>
+                      <option>Email</option>
+                      <option>Phone</option>
+                      <option selected>Picker</option>
+                      <option>Multi-pick</option>
+                    </select>
+                    <button class="text-jet/30 hover:text-signal">✕</button>
+                  </div>
+                  <div class="mt-2">
+                    <p class="text-[11px] uppercase tracking-wider text-jet/50 mb-1.5">Options</p>
+                    <div class="flex flex-wrap gap-1.5 items-center">
+                      <span class="text-[12px] px-2.5 py-1 rounded-full bg-jet/[0.06] inline-flex items-center gap-1.5">Instagram <button class="text-jet/40">✕</button></span>
+                      <span class="text-[12px] px-2.5 py-1 rounded-full bg-jet/[0.06] inline-flex items-center gap-1.5">Friend <button class="text-jet/40">✕</button></span>
+                      <span class="text-[12px] px-2.5 py-1 rounded-full bg-jet/[0.06] inline-flex items-center gap-1.5">Run club <button class="text-jet/40">✕</button></span>
+                      <span class="text-[12px] px-2.5 py-1 rounded-full bg-jet/[0.06] inline-flex items-center gap-1.5">Other <button class="text-jet/40">✕</button></span>
+                      <input placeholder="+ add option" class="text-[12px] px-2.5 py-1 rounded-full border border-dashed border-jet/30 w-32" />
+                    </div>
+                  </div>
+                  <div class="mt-3 flex items-center justify-between text-[12px]">
+                    <label class="flex items-center gap-1.5 text-jet/70"><input type="checkbox" class="accent-jet" /> Required</label>
+                    <span class="text-jet/40">id: <code class="text-jet/60">heard_from</code></span>
+                  </div>
+                </div>
+
+                <!-- Field 3 (with profile bind) -->
+                <div class="bg-white border border-jet/10 rounded-2xl p-4">
+                  <div class="flex items-center gap-2 mb-3">
+                    <span class="text-jet/30 cursor-grab">⠿</span>
+                    <input value="Phone (for race-day SMS)" class="flex-1 px-3 py-2 rounded-lg border border-jet/10 text-sm font-medium" />
+                    <select class="px-2 py-2 rounded-lg border border-jet/10 text-sm">
+                      <option>Short text</option>
+                      <option>Long text</option>
+                      <option>Number</option>
+                      <option>Date</option>
+                      <option>Email</option>
+                      <option selected>Phone</option>
+                    </select>
+                    <button class="text-jet/30 hover:text-signal">✕</button>
+                  </div>
+                  <div class="mt-2 p-2.5 rounded-lg bg-jet/[0.04] border border-jet/10 flex items-center gap-2 text-[12px]">
+                    <span class="text-jet/40">⟳</span>
+                    <span class="text-jet/70">Save to runner's profile as</span>
+                    <select class="px-2 py-1 rounded border border-jet/10 text-[12px] bg-white">
+                      <option>(don't save)</option>
+                      <option selected>phone</option>
+                      <option>email</option>
+                      <option>name</option>
+                    </select>
+                  </div>
+                  <div class="mt-3 flex items-center justify-between text-[12px]">
+                    <label class="flex items-center gap-1.5 text-jet/70"><input type="checkbox" checked class="accent-jet" /> Required</label>
+                    <span class="text-jet/40">id: <code class="text-jet/60">phone_sms</code></span>
+                  </div>
+                </div>
+
+                <button class="w-full py-3 rounded-2xl border border-dashed border-jet/20 text-sm text-jet/60 hover:bg-white">＋ Add question</button>
+              </div>
+
+              <!-- Live preview -->
+              <div class="col-span-12 lg:col-span-5">
+                <div class="sticky top-20">
+                  <p class="text-[10px] uppercase tracking-wider text-jet/40 mb-2">Preview · what runners see</p>
+                  <div class="bg-jet rounded-3xl p-3">
+                    <div class="bg-bone rounded-2xl p-5">
+                      <p class="font-display uppercase font-bold text-lg mb-1">Register</p>
+                      <p class="text-[11px] text-jet/55 mb-4">Monsoon Mileage · 10K · ₹399</p>
+
+                      <p class="text-[10px] uppercase tracking-wider text-jet/50 mt-3 mb-1">Emergency contact <span class="text-signal">*</span></p>
+                      <input placeholder="Name + phone" class="w-full px-3 py-2 rounded-lg border border-jet/10 text-sm bg-white" />
+                      <p class="text-[10px] text-jet/40 mt-1">In case we need to reach someone</p>
+
+                      <p class="text-[10px] uppercase tracking-wider text-jet/50 mt-3 mb-1">How did you hear about us?</p>
+                      <select class="w-full px-3 py-2 rounded-lg border border-jet/10 text-sm bg-white"><option>Pick one…</option></select>
+
+                      <p class="text-[10px] uppercase tracking-wider text-jet/50 mt-3 mb-1">Phone (for race-day SMS) <span class="text-signal">*</span></p>
+                      <input placeholder="+91" class="w-full px-3 py-2 rounded-lg border border-jet/10 text-sm bg-white" />
+
+                      <button class="w-full mt-4 py-2.5 rounded-lg bg-jet text-bone text-sm font-medium">Pay ₹399 →</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-6 flex items-center justify-between gap-2">
+              <button class="text-xs sm:text-sm text-jet/60 whitespace-nowrap">Save & exit</button>
+              <div class="flex items-center gap-2">
+                <button class="px-3 sm:px-4 py-2 rounded-lg border border-jet/15 text-xs sm:text-sm">← Back</button>
+                <button class="px-3 sm:px-4 py-2 rounded-lg bg-jet text-bone text-xs sm:text-sm font-medium">Continue →</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ════════════════════════════════════════════════════════ -->
+    <!-- 6 · STEP 5 COUPONS                                        -->
+    <!-- ════════════════════════════════════════════════════════ -->
+    <section id="s6">
+      <h2 class="font-display uppercase font-bold text-2xl mb-2">6 · Step 5 / 7 · Coupons</h2>
+      <p class="text-sm text-jet/60 mb-5 max-w-2xl">As many coupons as the organiser wants. Each row tracks usage. Status pill makes paused/expired obvious at a glance.</p>
+
+      <div class="screen-frame">
+        <div class="browser-bar px-4 py-2 flex items-center gap-2">
+          <div class="browser-dot bg-[#FF5F57]"></div>
+          <div class="browser-dot bg-[#FEBC2E]"></div>
+          <div class="browser-dot bg-[#28C840]"></div>
+          <div class="ml-3 text-[11px] text-jet/50">…/events/new/coupons</div>
+        </div>
+
+        <div class="bg-bone p-4 sm:p-6 md:p-10">
+          <div class="max-w-5xl mx-auto">
+            <div class="flex items-center gap-2 mb-1 justify-between">
+              <div class="flex items-center gap-2">
+                <span class="text-[10px] px-1.5 py-0.5 rounded bg-jet text-bone font-bold">5</span>
+                <p class="text-[11px] uppercase tracking-wider text-jet/40">Step 5 of 7</p>
+              </div>
+              <span class="inline-flex items-center gap-1.5 text-[11px] text-jet/55 px-2 py-1 rounded-md bg-jet/[0.04]">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 pulse-soft"></span>
+                Saved
+              </span>
+            </div>
+            <h1 class="font-display uppercase text-2xl font-bold">Discount coupons</h1>
+            <p class="text-sm text-jet/60 mb-6">Codes are case-insensitive and stack with nothing else. Optional — skip this step if you don't run promos.</p>
+
+            <div class="bg-white border border-jet/10 rounded-2xl divide-y divide-jet/5">
+              <!-- Coupon 1 (wraps cleanly on mobile) -->
+              <div class="p-4 flex items-center gap-3 sm:gap-4 flex-wrap">
+                <div class="font-mono text-sm font-semibold tracking-wide bg-jet text-bone px-3 py-1.5 rounded-lg">EARLYBIRD30</div>
+                <div class="flex-1 min-w-full sm:min-w-0 grid grid-cols-2 md:grid-cols-4 gap-3 text-[12px]">
+                  <div><p class="text-[10px] uppercase tracking-wider text-jet/40">Discount</p><p class="font-medium">30%</p></div>
+                  <div><p class="text-[10px] uppercase tracking-wider text-jet/40">Used</p><p class="font-medium">87 / 100</p></div>
+                  <div><p class="text-[10px] uppercase tracking-wider text-jet/40">Valid until</p><p class="font-medium">May 25, 2026</p></div>
+                  <div><p class="text-[10px] uppercase tracking-wider text-jet/40">Applies to</p><p class="font-medium">All distances</p></div>
+                </div>
+                <span class="text-[10px] px-1.5 py-0.5 rounded-full bg-emerald-100 text-emerald-700 uppercase tracking-wider font-medium">Active</span>
+                <button class="text-jet/40 hover:text-jet text-sm">⋯</button>
+              </div>
+
+              <!-- Coupon 2 -->
+              <div class="p-4 flex items-center gap-3 sm:gap-4 flex-wrap">
+                <div class="font-mono text-sm font-semibold tracking-wide bg-jet text-bone px-3 py-1.5 rounded-lg">CLUB10</div>
+                <div class="flex-1 min-w-full sm:min-w-0 grid grid-cols-2 md:grid-cols-4 gap-3 text-[12px]">
+                  <div><p class="text-[10px] uppercase tracking-wider text-jet/40">Discount</p><p class="font-medium">10%</p></div>
+                  <div><p class="text-[10px] uppercase tracking-wider text-jet/40">Used</p><p class="font-medium">23 / unlimited</p></div>
+                  <div><p class="text-[10px] uppercase tracking-wider text-jet/40">Valid until</p><p class="font-medium">Jun 12, 2026</p></div>
+                  <div><p class="text-[10px] uppercase tracking-wider text-jet/40">Applies to</p><p class="font-medium">10K, 21K</p></div>
+                </div>
+                <span class="text-[10px] px-1.5 py-0.5 rounded-full bg-emerald-100 text-emerald-700 uppercase tracking-wider font-medium">Active</span>
+                <button class="text-jet/40 hover:text-jet text-sm">⋯</button>
+              </div>
+
+              <!-- Coupon 3 (paused) -->
+              <div class="p-4 flex items-center gap-3 sm:gap-4 flex-wrap opacity-60">
+                <div class="font-mono text-sm font-semibold tracking-wide bg-jet/10 text-jet px-3 py-1.5 rounded-lg">FRIENDS50</div>
+                <div class="flex-1 min-w-full sm:min-w-0 grid grid-cols-2 md:grid-cols-4 gap-3 text-[12px]">
+                  <div><p class="text-[10px] uppercase tracking-wider text-jet/40">Discount</p><p class="font-medium">50%</p></div>
+                  <div><p class="text-[10px] uppercase tracking-wider text-jet/40">Used</p><p class="font-medium">12 / 25</p></div>
+                  <div><p class="text-[10px] uppercase tracking-wider text-jet/40">Valid until</p><p class="font-medium">Jun 30, 2026</p></div>
+                  <div><p class="text-[10px] uppercase tracking-wider text-jet/40">Applies to</p><p class="font-medium">All distances</p></div>
+                </div>
+                <span class="text-[10px] px-1.5 py-0.5 rounded-full bg-jet/10 text-jet/60 uppercase tracking-wider font-medium">Paused</span>
+                <button class="text-jet/40 hover:text-jet text-sm">⋯</button>
+              </div>
+
+              <!-- Add new -->
+              <div class="p-4">
+                <button class="text-sm text-jet/60 hover:text-jet inline-flex items-center gap-2">＋ Add coupon</button>
+              </div>
+            </div>
+
+            <!-- Inline editor for adding (shown expanded for the mockup) -->
+            <div class="bg-white border border-jet/10 rounded-2xl p-5 mt-4">
+              <div class="flex items-baseline justify-between mb-4">
+                <p class="font-display uppercase text-sm font-bold">New coupon</p>
+                <button class="text-jet/40 hover:text-signal text-sm">✕ Cancel</button>
+              </div>
+              <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                <div class="col-span-2 md:col-span-1">
+                  <label class="text-[10px] uppercase tracking-wider text-jet/50">Code <span class="text-signal">*</span></label>
+                  <input value="CLUB10" class="mt-1 w-full px-3 py-2 rounded-lg border border-jet/10 text-sm font-mono uppercase input-error" />
+                  <p class="err-msg">⚠ "CLUB10" already exists for this event</p>
+                </div>
+                <div>
+                  <label class="text-[10px] uppercase tracking-wider text-jet/50">Discount % <span class="text-signal">*</span></label>
+                  <input value="20" type="number" min="1" max="100" class="mt-1 w-full px-3 py-2 rounded-lg border border-jet/10 text-sm" />
+                  <p class="text-[10px] text-jet/40 mt-1">Between 1 and 100</p>
+                </div>
+                <div>
+                  <label class="text-[10px] uppercase tracking-wider text-jet/50">Max uses</label>
+                  <input placeholder="Unlimited" class="mt-1 w-full px-3 py-2 rounded-lg border border-jet/10 text-sm" />
+                </div>
+                <div>
+                  <label class="text-[10px] uppercase tracking-wider text-jet/50">Valid until</label>
+                  <input value="2026-06-12" class="mt-1 w-full px-3 py-2 rounded-lg border border-jet/10 text-sm" />
+                </div>
+              </div>
+              <div class="mt-3">
+                <label class="text-[10px] uppercase tracking-wider text-jet/50">Applies to</label>
+                <div class="mt-1 flex gap-1.5 flex-wrap">
+                  <button class="text-[11px] px-2.5 py-1 rounded-full bg-jet text-bone">All distances</button>
+                  <button class="text-[11px] px-2.5 py-1 rounded-full border border-jet/15">5K</button>
+                  <button class="text-[11px] px-2.5 py-1 rounded-full border border-jet/15">10K</button>
+                  <button class="text-[11px] px-2.5 py-1 rounded-full border border-jet/15">21K</button>
+                </div>
+              </div>
+              <div class="mt-4 flex items-center justify-end gap-2">
+                <button class="px-3 py-1.5 rounded-lg border border-jet/15 text-xs">Cancel</button>
+                <button class="px-3 py-1.5 rounded-lg bg-jet text-bone text-xs font-medium">Add coupon</button>
+              </div>
+            </div>
+
+            <div class="mt-6 flex items-center justify-between gap-2">
+              <button class="text-xs sm:text-sm text-jet/60 whitespace-nowrap">Save & exit</button>
+              <div class="flex items-center gap-2">
+                <button class="px-3 sm:px-4 py-2 rounded-lg border border-jet/15 text-xs sm:text-sm">← Back</button>
+                <button class="px-3 sm:px-4 py-2 rounded-lg bg-jet text-bone text-xs sm:text-sm font-medium">Continue →</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ════════════════════════════════════════════════════════ -->
+    <!-- 7 · STEP 6 POLICIES                                       -->
+    <!-- ════════════════════════════════════════════════════════ -->
+    <section id="s7">
+      <h2 class="font-display uppercase font-bold text-2xl mb-2">7 · Step 6 / 7 · Policies</h2>
+      <p class="text-sm text-jet/60 mb-5 max-w-2xl">Markdown editor on the left, rendered preview on the right. We start each event with a sensible default the organiser can keep or replace.</p>
+
+      <div class="screen-frame">
+        <div class="browser-bar px-4 py-2 flex items-center gap-2">
+          <div class="browser-dot bg-[#FF5F57]"></div>
+          <div class="browser-dot bg-[#FEBC2E]"></div>
+          <div class="browser-dot bg-[#28C840]"></div>
+          <div class="ml-3 text-[11px] text-jet/50">…/events/new/policies</div>
+        </div>
+
+        <div class="bg-bone p-4 sm:p-6 md:p-10">
+          <div class="max-w-6xl mx-auto">
+            <div class="flex items-center gap-2 mb-1 justify-between">
+              <div class="flex items-center gap-2">
+                <span class="text-[10px] px-1.5 py-0.5 rounded bg-jet text-bone font-bold">6</span>
+                <p class="text-[11px] uppercase tracking-wider text-jet/40">Step 6 of 7</p>
+              </div>
+              <span class="inline-flex items-center gap-1.5 text-[11px] text-jet/55 px-2 py-1 rounded-md bg-jet/[0.04]">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 pulse-soft"></span>
+                Saved
+              </span>
+            </div>
+            <h1 class="font-display uppercase text-2xl font-bold">Refund policy & T&Cs</h1>
+            <p class="text-sm text-jet/60 mb-6">Both are markdown. Runners agree to these at checkout. Both required to publish.</p>
+
+            <!-- Refund -->
+            <div class="bg-white border border-jet/10 rounded-2xl p-5 mb-4">
+              <div class="flex items-baseline justify-between mb-3">
+                <p class="font-display uppercase text-sm font-bold">Refund policy</p>
+                <button class="text-[11px] text-jet/50 hover:text-jet underline">Insert default</button>
+              </div>
+              <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                <textarea rows="12" class="px-3 py-2.5 rounded-xl border border-jet/10 text-sm font-mono bg-white">## Refunds
+
+- **Full refund** if you cancel before **Jun 5, 2026** (10 days before the run window opens).
+- **50% refund** until **Jun 10, 2026**.
+- **No refund** after Jun 10 — your medal still ships if you submit a valid run.
+
+If we cancel the event for any reason, we refund **100%** automatically within 7 working days.
+
+Contact `hello@pacingproject.in` to request a cancellation.</textarea>
+                <div class="px-4 py-3 rounded-xl bg-bone border border-jet/5 md-prose overflow-y-auto">
+                  <h2>Refunds</h2>
+                  <ul>
+                    <li><strong>Full refund</strong> if you cancel before <strong>Jun 5, 2026</strong> (10 days before the run window opens).</li>
+                    <li><strong>50% refund</strong> until <strong>Jun 10, 2026</strong>.</li>
+                    <li><strong>No refund</strong> after Jun 10 — your medal still ships if you submit a valid run.</li>
+                  </ul>
+                  <p>If we cancel the event for any reason, we refund <strong>100%</strong> automatically within 7 working days.</p>
+                  <p>Contact <code>hello@pacingproject.in</code> to request a cancellation.</p>
+                </div>
+              </div>
+
+              <!-- Machine-readable rules (the markdown is for humans; these drive the refund engine) -->
+              <div class="mt-4 p-3 rounded-xl bg-jet/[0.03] flex flex-wrap gap-3 sm:gap-4 items-center text-[12px]">
+                <p class="text-[10px] uppercase tracking-wider text-jet/50 w-full sm:w-auto">System refund rules</p>
+                <label class="flex items-center gap-1.5"><input type="checkbox" checked class="accent-jet" /> Auto-refund if event cancelled</label>
+                <label class="flex items-center gap-1.5 flex-wrap">Self-cancellation allowed until <input value="10" class="w-12 px-2 py-1 rounded border border-jet/10" /> days before run</label>
+              </div>
+            </div>
+
+            <!-- T&C -->
+            <div class="bg-white border border-jet/10 rounded-2xl p-5 mb-6">
+              <div class="flex items-baseline justify-between mb-3">
+                <p class="font-display uppercase text-sm font-bold">Terms & conditions</p>
+                <button class="text-[11px] text-jet/50 hover:text-jet underline">Insert default</button>
+              </div>
+              <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                <textarea rows="10" class="px-3 py-2.5 rounded-xl border border-jet/10 text-sm font-mono bg-white">## Terms
+
+By registering you agree to:
+
+1. Run the full distance you registered for within the run window.
+2. Submit a single valid screenshot from Strava, Garmin, Apple Health, or Google Fit.
+3. We may **reject** submissions that look edited, look like indoor treadmill runs, or that don't match your registered distance within ±2%.
+4. Medals are shipped only to verified finishers, to the address you entered at checkout.</textarea>
+                <div class="px-4 py-3 rounded-xl bg-bone border border-jet/5 md-prose overflow-y-auto">
+                  <h2>Terms</h2>
+                  <p>By registering you agree to:</p>
+                  <ul>
+                    <li>Run the full distance you registered for within the run window.</li>
+                    <li>Submit a single valid screenshot from Strava, Garmin, Apple Health, or Google Fit.</li>
+                    <li>We may <strong>reject</strong> submissions that look edited, look like indoor treadmill runs, or that don't match your registered distance within ±2%.</li>
+                    <li>Medals are shipped only to verified finishers, to the address you entered at checkout.</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <div class="flex items-center justify-between gap-2">
+              <button class="text-xs sm:text-sm text-jet/60 whitespace-nowrap">Save & exit</button>
+              <div class="flex items-center gap-2">
+                <button class="px-3 sm:px-4 py-2 rounded-lg border border-jet/15 text-xs sm:text-sm">← Back</button>
+                <button class="px-3 sm:px-4 py-2 rounded-lg bg-jet text-bone text-xs sm:text-sm font-medium">Continue →</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ════════════════════════════════════════════════════════ -->
+    <!-- 8 · STEP 7 REVIEW & PUBLISH                               -->
+    <!-- ════════════════════════════════════════════════════════ -->
+    <section id="s8">
+      <h2 class="font-display uppercase font-bold text-2xl mb-2">8 · Step 7 / 7 · Review & publish</h2>
+      <p class="text-sm text-jet/60 mb-5 max-w-2xl">A single page that summarises every step with a "✎ Edit" inline. Validation errors block publish; warnings don't. Right column shows the public race page exactly as runners will see it.</p>
+
+      <div class="screen-frame">
+        <div class="browser-bar px-4 py-2 flex items-center gap-2">
+          <div class="browser-dot bg-[#FF5F57]"></div>
+          <div class="browser-dot bg-[#FEBC2E]"></div>
+          <div class="browser-dot bg-[#28C840]"></div>
+          <div class="ml-3 text-[11px] text-jet/50">…/events/new/review</div>
+        </div>
+
+        <div class="bg-bone p-4 sm:p-6 md:p-10">
+          <div class="max-w-6xl mx-auto">
+            <div class="flex items-center gap-2 mb-1 justify-between">
+              <div class="flex items-center gap-2">
+                <span class="text-[10px] px-1.5 py-0.5 rounded bg-jet text-bone font-bold">7</span>
+                <p class="text-[11px] uppercase tracking-wider text-jet/40">Step 7 of 7</p>
+              </div>
+              <span class="inline-flex items-center gap-1.5 text-[11px] text-jet/55 px-2 py-1 rounded-md bg-jet/[0.04]">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 pulse-soft"></span>
+                Saved
+              </span>
+            </div>
+            <h1 class="font-display uppercase text-2xl font-bold">Review & publish</h1>
+            <p class="text-sm text-jet/60 mb-6">Last look. You can edit anything after publishing, but pricing can't change once registrations start.</p>
+
+            <div class="grid grid-cols-12 gap-4 lg:gap-6">
+              <!-- Summary -->
+              <div class="col-span-12 lg:col-span-7 space-y-3">
+
+                <div class="bg-white border border-jet/10 rounded-2xl p-4">
+                  <div class="flex items-baseline justify-between mb-2">
+                    <p class="font-display uppercase text-sm font-bold">Basics</p>
+                    <a href="#s2" class="text-[11px] text-jet/50 hover:text-jet underline">✎ Edit</a>
+                  </div>
+                  <dl class="grid grid-cols-3 gap-x-3 gap-y-1 text-[12px]">
+                    <dt class="text-jet/40">Format</dt><dd class="col-span-2">Virtual</dd>
+                    <dt class="text-jet/40">Title</dt><dd class="col-span-2">Monsoon Mileage · Virtual 10K</dd>
+                    <dt class="text-jet/40">Slug</dt><dd class="col-span-2">/races/monsoon-mileage-2026</dd>
+                    <dt class="text-jet/40">Registration</dt><dd class="col-span-2">May 20 – Jun 12, 2026</dd>
+                    <dt class="text-jet/40">Run window</dt><dd class="col-span-2">Jun 15 – Jun 30, 2026</dd>
+                    <dt class="text-jet/40">Hero</dt><dd class="col-span-2"><span class="text-emerald-700">✓ uploaded</span> · 5 gallery slots empty</dd>
+                  </dl>
+                </div>
+
+                <div class="bg-white border border-jet/10 rounded-2xl p-4">
+                  <div class="flex items-baseline justify-between mb-2">
+                    <p class="font-display uppercase text-sm font-bold">Distances · 3</p>
+                    <a href="#s3" class="text-[11px] text-jet/50 hover:text-jet underline">✎ Edit</a>
+                  </div>
+                  <ul class="text-[12px] space-y-1">
+                    <li class="flex justify-between"><span>5K</span><span class="text-jet/55">₹299 · cap 500 · T-shirt, Medal</span></li>
+                    <li class="flex justify-between"><span>10K</span><span class="text-jet/55">₹399 · cap 750 · T-shirt, Medal, Bib</span></li>
+                    <li class="flex justify-between"><span>Half Marathon</span><span class="text-jet/55">₹599 · unlimited · T-shirt, Medal, Bib, Tech tee</span></li>
+                  </ul>
+                </div>
+
+                <div class="bg-white border border-jet/10 rounded-2xl p-4">
+                  <div class="flex items-baseline justify-between mb-2">
+                    <p class="font-display uppercase text-sm font-bold">What we collect</p>
+                    <a href="#s4" class="text-[11px] text-jet/50 hover:text-jet underline">✎ Edit</a>
+                  </div>
+                  <div class="flex flex-wrap gap-1.5 text-[11px]">
+                    <span class="px-2 py-0.5 rounded-full bg-jet text-bone">DOB</span>
+                    <span class="px-2 py-0.5 rounded-full bg-jet text-bone">Gender</span>
+                    <span class="px-2 py-0.5 rounded-full bg-jet text-bone">T-shirt size</span>
+                    <span class="px-2 py-0.5 rounded-full bg-jet text-bone">Address</span>
+                    <span class="px-2 py-0.5 rounded-full bg-jet text-bone">Ships medal</span>
+                    <span class="px-2 py-0.5 rounded-full bg-jet text-bone">Run proof</span>
+                  </div>
+                </div>
+
+                <div class="bg-white border border-jet/10 rounded-2xl p-4">
+                  <div class="flex items-baseline justify-between mb-2">
+                    <p class="font-display uppercase text-sm font-bold">Custom questions · 3</p>
+                    <a href="#s5" class="text-[11px] text-jet/50 hover:text-jet underline">✎ Edit</a>
+                  </div>
+                  <ul class="text-[12px] space-y-1 text-jet/70">
+                    <li>Emergency contact <span class="text-signal">*</span></li>
+                    <li>How did you hear about us?</li>
+                    <li>Phone (for race-day SMS) <span class="text-signal">*</span> · saved to profile</li>
+                  </ul>
+                </div>
+
+                <div class="bg-white border border-jet/10 rounded-2xl p-4">
+                  <div class="flex items-baseline justify-between mb-2">
+                    <p class="font-display uppercase text-sm font-bold">Coupons · 3</p>
+                    <a href="#s6" class="text-[11px] text-jet/50 hover:text-jet underline">✎ Edit</a>
+                  </div>
+                  <ul class="text-[12px] space-y-1 text-jet/70">
+                    <li><code>EARLYBIRD30</code> · 30% · 87/100 used</li>
+                    <li><code>CLUB10</code> · 10% · 23 used · 10K, 21K only</li>
+                    <li><code>FRIENDS50</code> · 50% · paused</li>
+                  </ul>
+                </div>
+
+                <div class="bg-white border border-jet/10 rounded-2xl p-4">
+                  <div class="flex items-baseline justify-between mb-2">
+                    <p class="font-display uppercase text-sm font-bold">Policies</p>
+                    <a href="#s7" class="text-[11px] text-jet/50 hover:text-jet underline">✎ Edit</a>
+                  </div>
+                  <p class="text-[12px] text-jet/70"><span class="text-emerald-700">✓</span> Refund policy · 138 words</p>
+                  <p class="text-[12px] text-jet/70"><span class="text-emerald-700">✓</span> Terms & conditions · 92 words</p>
+                </div>
+
+                <!-- Warnings -->
+                <div class="rounded-2xl border border-gold/40 bg-gold/10 p-4">
+                  <p class="text-[11px] uppercase tracking-wider text-gold font-bold mb-1">2 warnings (won't block publish)</p>
+                  <ul class="text-[12px] text-jet/75 list-disc pl-5">
+                    <li>Only 1 hero image uploaded — galleries with 3+ images convert ~12% better.</li>
+                    <li>Half Marathon has no participant cap. Set one if shipping is constrained.</li>
+                  </ul>
+                </div>
+              </div>
+
+              <!-- Public preview -->
+              <div class="col-span-12 lg:col-span-5">
+                <div class="sticky top-20">
+                  <p class="text-[10px] uppercase tracking-wider text-jet/40 mb-2">Public race page · preview</p>
+                  <div class="rounded-2xl overflow-hidden border border-jet/10 bg-white">
+                    <div class="aspect-[16/9] bg-gradient-to-br from-signal to-[#8B0F14] relative">
+                      <div class="absolute inset-0 grid place-items-end p-4">
+                        <span class="font-display uppercase text-bone font-bold text-2xl leading-tight">Monsoon<br/>Mileage</span>
+                      </div>
+                      <div class="absolute top-3 left-3 inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-bone/95 text-[10px] uppercase tracking-wider font-bold">Virtual · 10K</div>
+                    </div>
+                    <div class="p-4">
+                      <p class="font-display uppercase font-bold text-base leading-tight">Monsoon Mileage · Virtual 10K</p>
+                      <p class="text-[11px] text-jet/55 mt-0.5">By Pacing Project · Jun 15–30, 2026</p>
+                      <div class="flex flex-wrap gap-1 mt-2 text-[10px]">
+                        <span class="px-2 py-0.5 rounded-full bg-jet/[0.06]">5K ₹299</span>
+                        <span class="px-2 py-0.5 rounded-full bg-jet/[0.06]">10K ₹399</span>
+                        <span class="px-2 py-0.5 rounded-full bg-jet/[0.06]">21K ₹599</span>
+                      </div>
+                      <button class="w-full mt-3 py-2 rounded-lg bg-jet text-bone text-sm font-medium">Register →</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Publish bar -->
+            <div class="mt-6 p-4 rounded-2xl bg-jet text-bone flex items-center justify-between gap-3 flex-wrap">
+              <div class="min-w-0">
+                <p class="font-display uppercase font-bold text-sm">Ready to publish</p>
+                <p class="text-[11px] text-bone/60">First-time organisers go through a 24-hour Endorfin review before going live.</p>
+              </div>
+              <div class="flex items-center gap-2 flex-wrap w-full sm:w-auto">
+                <button class="px-3 sm:px-4 py-2 rounded-lg border border-bone/20 text-xs sm:text-sm">Save draft</button>
+                <button class="px-3 sm:px-4 py-2 rounded-lg border border-bone/20 text-xs sm:text-sm">Preview</button>
+                <button class="px-4 sm:px-5 py-2 rounded-lg bg-bone text-jet text-xs sm:text-sm font-bold ml-auto sm:ml-0">Submit for review →</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ════════════════════════════════════════════════════════ -->
+    <!-- 9 · MANAGE EVENT · OVERVIEW                               -->
+    <!-- ════════════════════════════════════════════════════════ -->
+    <section id="s9">
+      <h2 class="font-display uppercase font-bold text-2xl mb-2">9 · Manage event · Overview</h2>
+      <p class="text-sm text-jet/60 mb-5 max-w-2xl">After publish, this is the home for a single event. Numbers up top, registrations table below, sub-tabs to dive into specifics.</p>
+
+      <div class="screen-frame">
+        <div class="browser-bar px-4 py-2 flex items-center gap-2">
+          <div class="browser-dot bg-[#FF5F57]"></div>
+          <div class="browser-dot bg-[#FEBC2E]"></div>
+          <div class="browser-dot bg-[#28C840]"></div>
+          <div class="ml-3 text-[11px] text-jet/50">…/organiser/events/monsoon-mileage-2026</div>
+        </div>
+
+        <div class="bg-bone">
+          <!-- Event header (wraps on mobile, no horizontal overflow). -->
+          <div class="bg-white border-b border-jet/10 px-4 sm:px-6 py-4">
+            <div class="max-w-6xl mx-auto flex items-center gap-3 sm:gap-4 flex-wrap">
+              <a class="text-xs text-jet/50 hover:text-jet whitespace-nowrap">← Home</a>
+              <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-signal to-[#8B0F14] flex-shrink-0"></div>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-2 flex-wrap">
+                  <p class="font-medium text-sm truncate">Monsoon Mileage · Virtual 10K</p>
+                  <span class="text-[10px] px-1.5 py-0.5 rounded-full bg-signal text-bone uppercase tracking-wider font-medium shrink-0">Live</span>
+                </div>
+                <p class="text-[11px] text-jet/50">Jun 15 → Jun 30 · 3 distances · Virtual · Closes Jun 12</p>
+              </div>
+              <div class="flex items-center gap-2 ml-auto">
+                <button class="text-xs px-3 py-1.5 rounded-lg border border-jet/15 hover:bg-jet/5 whitespace-nowrap">View public ↗</button>
+                <button class="text-xs px-3 py-1.5 rounded-lg bg-jet text-bone">Edit</button>
+              </div>
+            </div>
+            <!-- Sub-tabs: scroll horizontally on mobile. -->
+            <div class="max-w-6xl mx-auto mt-4 scroll-x">
+              <div class="flex items-center gap-1 min-w-max">
+                <button class="px-3 py-2 text-sm font-medium border-b-2 border-jet whitespace-nowrap">Overview</button>
+                <button class="px-3 py-2 text-sm text-jet/60 hover:text-jet whitespace-nowrap">Registrations · 482</button>
+                <button class="px-3 py-2 text-sm text-jet/60 hover:text-jet whitespace-nowrap">Verifications · 18</button>
+                <button class="px-3 py-2 text-sm text-jet/60 hover:text-jet whitespace-nowrap">Coupons</button>
+                <button class="px-3 py-2 text-sm text-jet/60 hover:text-jet whitespace-nowrap">Communications</button>
+                <button class="px-3 py-2 text-sm text-jet/60 hover:text-jet whitespace-nowrap">Settings</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="max-w-6xl mx-auto px-4 sm:px-6 py-6 space-y-4">
+
+            <!-- Stat row -->
+            <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
+              <div class="bg-white rounded-2xl border border-jet/10 p-4">
+                <p class="text-[10px] uppercase tracking-wider text-jet/50">Registrations</p>
+                <p class="font-display text-2xl font-bold mt-1">482</p>
+                <p class="text-[11px] text-jet/40">of 1,500 cap</p>
+              </div>
+              <div class="bg-white rounded-2xl border border-jet/10 p-4">
+                <p class="text-[10px] uppercase tracking-wider text-jet/50">Revenue</p>
+                <p class="font-display text-2xl font-bold mt-1">₹1,44,600</p>
+                <p class="text-[11px] text-emerald-700">+₹38,400 last 7d</p>
+              </div>
+              <div class="bg-white rounded-2xl border border-jet/10 p-4">
+                <p class="text-[10px] uppercase tracking-wider text-jet/50">Discount given</p>
+                <p class="font-display text-2xl font-bold mt-1">₹18,200</p>
+                <p class="text-[11px] text-jet/40">EARLYBIRD30 · 87 uses</p>
+              </div>
+              <div class="bg-white rounded-2xl border border-jet/10 p-4">
+                <p class="text-[10px] uppercase tracking-wider text-jet/50">Verified</p>
+                <p class="font-display text-2xl font-bold mt-1">62</p>
+                <p class="text-[11px] text-jet/40">18 pending review</p>
+              </div>
+              <div class="bg-white rounded-2xl border border-jet/10 p-4">
+                <p class="text-[10px] uppercase tracking-wider text-jet/50">Medals shipped</p>
+                <p class="font-display text-2xl font-bold mt-1">44</p>
+                <p class="text-[11px] text-jet/40">18 in dispatch queue</p>
+              </div>
+            </div>
+
+            <!-- Distance breakdown -->
+            <div class="bg-white border border-jet/10 rounded-2xl p-5">
+              <div class="flex items-baseline justify-between mb-3">
+                <p class="font-display uppercase text-sm font-bold">By distance</p>
+                <a class="text-[11px] text-jet/50 hover:text-jet">Export CSV ↓</a>
+              </div>
+              <div class="space-y-3">
+                <div>
+                  <div class="flex items-center justify-between text-[12px] mb-1"><span>5K</span><span class="text-jet/55">198 / 500 · ₹59,202</span></div>
+                  <div class="h-2 rounded-full bg-jet/[0.06] overflow-hidden"><div class="h-full bg-jet" style="width:39%"></div></div>
+                </div>
+                <div>
+                  <div class="flex items-center justify-between text-[12px] mb-1"><span>10K</span><span class="text-jet/55">216 / 750 · ₹61,800</span></div>
+                  <div class="h-2 rounded-full bg-jet/[0.06] overflow-hidden"><div class="h-full bg-jet" style="width:29%"></div></div>
+                </div>
+                <div>
+                  <div class="flex items-center justify-between text-[12px] mb-1"><span>Half Marathon</span><span class="text-jet/55">68 · unlimited · ₹23,598</span></div>
+                  <div class="h-2 rounded-full bg-jet/[0.06] overflow-hidden"><div class="h-full bg-jet" style="width:14%"></div></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Latest registrations -->
+            <div class="bg-white border border-jet/10 rounded-2xl">
+              <div class="px-5 py-3 flex items-baseline justify-between border-b border-jet/5">
+                <p class="font-display uppercase text-sm font-bold">Latest registrations</p>
+                <a class="text-[11px] text-jet/50 hover:text-jet">See all 482 →</a>
+              </div>
+              <div class="overflow-x-auto rounded-b-2xl">
+              <table class="w-full text-sm min-w-[680px]">
+                <thead class="text-[10px] uppercase tracking-wider text-jet/50 bg-jet/[0.02]">
+                  <tr>
+                    <th class="text-left px-5 py-2.5 font-medium">Runner</th>
+                    <th class="text-left px-3 py-2.5 font-medium">Distance</th>
+                    <th class="text-left px-3 py-2.5 font-medium">Paid</th>
+                    <th class="text-left px-3 py-2.5 font-medium">Coupon</th>
+                    <th class="text-left px-3 py-2.5 font-medium">Status</th>
+                    <th class="text-left px-3 py-2.5 font-medium">When</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-jet/5">
+                  <tr>
+                    <td class="px-5 py-2.5">
+                      <div class="flex items-center gap-2">
+                        <div class="w-7 h-7 rounded-full bg-jet text-bone grid place-items-center text-[10px] font-semibold">AR</div>
+                        <div>
+                          <p class="text-[12px] font-medium leading-tight">Anjali Rao</p>
+                          <p class="text-[10px] text-jet/50">F · 32 · Mumbai</p>
+                        </div>
+                      </div>
+                    </td>
+                    <td class="px-3 py-2.5 text-[12px]">10K</td>
+                    <td class="px-3 py-2.5 text-[12px]">₹279</td>
+                    <td class="px-3 py-2.5 text-[12px]"><code class="text-[11px]">EARLYBIRD30</code></td>
+                    <td class="px-3 py-2.5"><span class="text-[10px] px-1.5 py-0.5 rounded-full bg-gold/20 text-gold uppercase tracking-wider font-medium">Awaiting proof</span></td>
+                    <td class="px-3 py-2.5 text-[11px] text-jet/55">2 min ago</td>
+                  </tr>
+                  <tr>
+                    <td class="px-5 py-2.5">
+                      <div class="flex items-center gap-2">
+                        <div class="w-7 h-7 rounded-full bg-signal text-bone grid place-items-center text-[10px] font-semibold">VK</div>
+                        <div>
+                          <p class="text-[12px] font-medium leading-tight">Vikram Kohli</p>
+                          <p class="text-[10px] text-jet/50">M · 41 · Bengaluru</p>
+                        </div>
+                      </div>
+                    </td>
+                    <td class="px-3 py-2.5 text-[12px]">Half Marathon</td>
+                    <td class="px-3 py-2.5 text-[12px]">₹599</td>
+                    <td class="px-3 py-2.5 text-[12px] text-jet/40">—</td>
+                    <td class="px-3 py-2.5"><span class="text-[10px] px-1.5 py-0.5 rounded-full bg-emerald-100 text-emerald-700 uppercase tracking-wider font-medium">Verified</span></td>
+                    <td class="px-3 py-2.5 text-[11px] text-jet/55">11 min ago</td>
+                  </tr>
+                  <tr>
+                    <td class="px-5 py-2.5">
+                      <div class="flex items-center gap-2">
+                        <div class="w-7 h-7 rounded-full bg-gold text-bone grid place-items-center text-[10px] font-semibold">PS</div>
+                        <div>
+                          <p class="text-[12px] font-medium leading-tight">Priya Sharma</p>
+                          <p class="text-[10px] text-jet/50">F · 27 · Pune</p>
+                        </div>
+                      </div>
+                    </td>
+                    <td class="px-3 py-2.5 text-[12px]">5K</td>
+                    <td class="px-3 py-2.5 text-[12px]">₹299</td>
+                    <td class="px-3 py-2.5 text-[12px] text-jet/40">—</td>
+                    <td class="px-3 py-2.5"><span class="text-[10px] px-1.5 py-0.5 rounded-full bg-jet/10 text-jet/60 uppercase tracking-wider font-medium">Registered</span></td>
+                    <td class="px-3 py-2.5 text-[11px] text-jet/55">28 min ago</td>
+                  </tr>
+                  <tr>
+                    <td class="px-5 py-2.5">
+                      <div class="flex items-center gap-2">
+                        <div class="w-7 h-7 rounded-full bg-slate text-bone grid place-items-center text-[10px] font-semibold">RK</div>
+                        <div>
+                          <p class="text-[12px] font-medium leading-tight">Rohit Kumar</p>
+                          <p class="text-[10px] text-jet/50">M · 35 · Delhi</p>
+                        </div>
+                      </div>
+                    </td>
+                    <td class="px-3 py-2.5 text-[12px]">10K</td>
+                    <td class="px-3 py-2.5 text-[12px]">₹359</td>
+                    <td class="px-3 py-2.5 text-[12px]"><code class="text-[11px]">CLUB10</code></td>
+                    <td class="px-3 py-2.5"><span class="text-[10px] px-1.5 py-0.5 rounded-full bg-signal/15 text-signal uppercase tracking-wider font-medium">Rejected</span></td>
+                    <td class="px-3 py-2.5 text-[11px] text-jet/55">1 hr ago</td>
+                  </tr>
+                </tbody>
+              </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer class="text-center text-[11px] text-jet/40 pt-4 pb-2">
+      Static HTML mockup · Endorfin Studio Organiser · Tailwind via CDN
+    </footer>
+  </main>
+
+</body>
+</html>
