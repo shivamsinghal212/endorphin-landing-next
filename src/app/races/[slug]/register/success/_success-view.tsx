@@ -3,7 +3,7 @@
 import { useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useMyRegistration } from '@/lib/runner-hooks';
-import { APP_STORE_URL, PLAY_STORE_URL } from '@/lib/store-links';
+import { AppStoreButtons } from '@/components/AppStoreButtons';
 import type { MyRegistrationItem } from '@/lib/runner-api';
 
 const IST = 'Asia/Kolkata';
@@ -219,36 +219,18 @@ function PaidView({ data }: { data: MyRegistrationItem }) {
         )}
       </div>
 
-      {/* Install-the-app nudge. Virtual events route runs through the
-       *  mobile app for tracking; physical events benefit from the
-       *  reminders + bib-on-lock-screen flow. */}
-      <div className="bg-jet text-bone rounded-2xl p-5 md:p-6 mb-6">
-        <p className="font-display uppercase text-sm font-bold mb-2">
+      {/* Install-the-app nudge. Uses the site-wide AppStoreButtons so it
+       *  matches the homepage CTA, footer, and other install touchpoints. */}
+      <div className="bg-jet text-bone rounded-2xl px-5 md:px-6 py-7 mb-6 text-center">
+        <p className="font-display uppercase text-base md:text-lg font-bold mb-2">
           Get the Endorfin app
         </p>
-        <p className="text-sm text-bone/75 mb-4 leading-relaxed">
+        <p className="text-sm text-bone/70 mb-5 leading-relaxed max-w-md mx-auto">
           {data.event.eventFormat === 'virtual'
             ? 'Track your run and upload the result directly from the app. Faster than emailing screenshots.'
             : 'Race-day reminders, bib on your lock screen, and a record of every event you’ve done.'}
         </p>
-        <div className="flex flex-wrap gap-2">
-          <a
-            href={APP_STORE_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center px-3 py-1.5 rounded-lg bg-bone text-jet text-xs font-medium hover:bg-white"
-          >
-            App Store
-          </a>
-          <a
-            href={PLAY_STORE_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center px-3 py-1.5 rounded-lg bg-bone text-jet text-xs font-medium hover:bg-white"
-          >
-            Google Play
-          </a>
-        </div>
+        <AppStoreButtons variant="dark" />
       </div>
 
       <div className="flex flex-wrap gap-3">

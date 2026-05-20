@@ -186,23 +186,21 @@ export default async function RaceDetailPage({ params }: PageProps) {
         }}
       />
       <Header />
-      {/* Wrap in RunnerProviders when the runner is signed in so the
-       *  detail view can call useMyRegistrations() and swap the CTA to
-       *  "You're in" for events they've already paid for. Anonymous
-       *  visitors get the lighter wrap (just the view, no React Query). */}
-      {token ? (
-        <RaceDetailWithRunnerContext event={event} isAuthed={true} />
-      ) : (
-        <RaceDetailView event={event} isAuthed={false} />
-      )}
+      {/* Always wrap in RunnerProviders so RaceDetailView can call
+       *  runner hooks (useMyRegistrations) safely. Pass studio=null for
+       *  anonymous visitors; the hooks no-op via their `enabled: !!token`
+       *  guard. Without this wrap, anonymous renders crashed with
+       *  "No QueryClient set". */}
+      <RaceDetailWithRunnerContext event={event} isAuthed={!!token} />
       <Footer />
     </main>
   );
 }
 
-/** Mounts RunnerProviders so RaceDetailView can call runner hooks
- *  (useMyRegistrations) for the "Already registered" swap. Server
- *  component — resolves the marketing-session JWT via getStudioAuth(). */
+/** Mounts RunnerProviders unconditionally so RaceDetailView can safely
+ *  call runner hooks (useMyRegistrations). For anonymous visitors the
+ *  studio resolves to null and hooks no-op via their `enabled: !!token`
+ *  guard — no crash, no leaked queries. */
 async function RaceDetailWithRunnerContext({
   event,
   isAuthed,
@@ -211,9 +209,6 @@ async function RaceDetailWithRunnerContext({
   isAuthed: boolean;
 }) {
   const studio = await getStudioAuth();
-  if (!studio) {
-    return <RaceDetailView event={event} isAuthed={isAuthed} />;
-  }
   return (
     <RunnerProviders studio={studio}>
       <RaceDetailView event={event} isAuthed={isAuthed} />

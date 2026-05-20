@@ -124,20 +124,18 @@ export default async function RegisterPage({ params }: PageProps) {
     <main id="main-content" className="overflow-x-hidden bg-bone min-h-screen text-jet">
       <Header />
       <RunnerProviders studio={studio}>
+        {/* The header for this page is owned by RegistrationForm so it
+         *  can render the right hierarchy for both states — "Register
+         *  for X" when the form is shown, and "See you at the start
+         *  line" when the runner is already registered. Hardcoding
+         *  "Register" here showed the wrong heading for the already-
+         *  registered case. */}
         <div className="max-w-5xl mx-auto px-4 md:px-6 py-8 md:py-12">
-          <nav className="text-xs text-jet/50 mb-3">
+          <nav className="text-xs text-jet/50 mb-6">
             <Link href={`/races/${event.slug || event.id}`} className="hover:underline">
               ← {event.title}
             </Link>
           </nav>
-          <h1 className="font-display uppercase text-3xl md:text-4xl font-bold leading-tight text-jet mb-2">
-            Register
-          </h1>
-          <p className="text-sm text-jet/60 mb-8 max-w-2xl">
-            You&rsquo;re registering for <strong className="text-jet">{event.title}</strong>
-            {event.locationName ? ` in ${event.locationName}` : ''}. Payment is processed
-            securely via Razorpay.
-          </p>
           <RegistrationForm bundle={{ event, extras }} />
         </div>
       </RunnerProviders>

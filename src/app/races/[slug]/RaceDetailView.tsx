@@ -71,6 +71,9 @@ export default function RaceDetailView({
   // Pending registrationUrl to open in a new tab once the post-login
   // refresh commits — same popup-safe pattern as /races listing.
   const pendingUrlRef = useRef<string | null>(null);
+  // Pending internal route to push (same tab) — used by the organiser
+  // event Register CTA so the runner stays on-site through login.
+  const pendingInternalPathRef = useRef<string | null>(null);
   const postLoginRef = useRef(false);
   useEffect(() => setMounted(true), []);
   useEffect(() => {
@@ -157,18 +160,25 @@ export default function RaceDetailView({
     });
   }, [router]);
 
-  // Once the post-login refresh commits, close the modal and pop the
-  // stashed registration URL in a new tab — staying close to the
-  // original click gesture keeps most popup blockers happy.
+  // Once the post-login refresh commits, close the modal and either
+  // navigate to the stashed internal path (same tab) or pop the
+  // external URL in a new tab — staying close to the original click
+  // gesture keeps most popup blockers happy.
   useEffect(() => {
     if (!isFinalizingLogin && postLoginRef.current) {
       postLoginRef.current = false;
-      const pending = pendingUrlRef.current;
+      const internal = pendingInternalPathRef.current;
+      const external = pendingUrlRef.current;
+      pendingInternalPathRef.current = null;
       pendingUrlRef.current = null;
       setLoginOpen(false);
-      if (pending) window.open(pending, '_blank', 'noopener,noreferrer');
+      if (internal) {
+        router.push(internal);
+      } else if (external) {
+        window.open(external, '_blank', 'noopener,noreferrer');
+      }
     }
-  }, [isFinalizingLogin]);
+  }, [isFinalizingLogin, router]);
 
   return (
     <div className="v1rd-page">
@@ -263,24 +273,50 @@ export default function RaceDetailView({
 
           <div className="v1rd-cta-row">
             {isAlreadyRegistered ? (
-              // Runner has an active paid registration — replace the
-              // Register CTA with a confirmation badge linking back to
-              // the registration page (which shows AlreadyRegisteredView
-              // with bib + app-install nudge).
+              // Mini-bib chip — visually mirrors the full bib card.
+              // Red header band reading "YOU'RE IN" + bone body with the
+              // bib number, wrapped by the same 2px jet border the full
+              // bib carries. Click → opens the full bib + share view.
               <Link
-                className="v1rd-btn v1rd-btn-primary"
                 href={`/races/${event.slug || event.id}/register`}
-                style={{ background: '#059669' }}
+                className="group inline-flex items-stretch border-2 border-jet rounded-md overflow-hidden hover:shadow-[0_8px_24px_-12px_rgba(10,10,10,0.45)] transition-shadow no-underline"
+                style={{ textDecoration: 'none' }}
               >
-                ✓ You’re in · Bib {myActiveRegistration!.bibNumber ?? '—'}
+                <span className="bg-signal text-bone px-3 py-1 flex items-center">
+                  <span className="font-display uppercase font-bold text-[10px] tracking-widest leading-none">
+                    You’re in
+                  </span>
+                </span>
+                <span className="bg-bone px-4 py-1.5 flex items-center gap-2">
+                  <span className="font-display uppercase font-bold text-base text-jet leading-none tracking-tight">
+                    {myActiveRegistration!.bibNumber ?? '—'}
+                  </span>
+                  <span className="text-jet/40 text-sm group-hover:text-jet group-hover:translate-x-0.5 transition-all">
+                    →
+                  </span>
+                </span>
               </Link>
             ) : event.eventSourceType === 'organizer' ? (
-              // Endorfin-hosted paid event — runs through our internal
-              // checkout flow (Razorpay lands in a later stream; today
-              // /races/{slug}/register surfaces the registration form).
+              // Endorfin-hosted paid event — uses the internal /register
+              // route. When the runner isn't signed in, we intercept the
+              // click and open the login modal in-place so they don't
+              // get bounced to homepage by the server-side auth redirect.
               <Link
                 className="v1rd-btn v1rd-btn-primary"
                 href={`/races/${event.slug || event.id}/register`}
+                onClick={(e) => {
+                  posthog.capture('race_register_clicked', {
+                    race_id: event.id,
+                    race_slug: event.slug,
+                    race_title: event.title,
+                    source: 'detail',
+                  });
+                  if (!isAuthed) {
+                    e.preventDefault();
+                    pendingInternalPathRef.current = `/races/${event.slug || event.id}/register`;
+                    setLoginOpen(true);
+                  }
+                }}
               >
                 Register →
               </Link>

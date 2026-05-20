@@ -18,7 +18,7 @@ import {
   useMyRegistrations,
   usePatchMe,
 } from '@/lib/runner-hooks';
-import { APP_STORE_URL, PLAY_STORE_URL } from '@/lib/store-links';
+import { AppStoreButtons } from '@/components/AppStoreButtons';
 import type { ShippingAddress } from '@/lib/runner-api';
 import {
   missingProfileFields,
@@ -362,6 +362,12 @@ export function RegistrationForm({ bundle }: { bundle: RegistrationEventBundle }
       r.registrationStatus !== 'cancelled' &&
       (r.paymentStatus === 'paid' || r.paymentStatus === 'free'),
   );
+  // Hold the page in a skeleton until we know whether the runner is
+  // already registered. Without this gate the form flashes for ~2s
+  // before being replaced by AlreadyRegisteredView, which felt buggy.
+  if (myRegsQ.isLoading) {
+    return <RegistrationFormSkeleton />;
+  }
   if (existingPaid) {
     return <AlreadyRegisteredView reg={existingPaid} eventSlug={event.slug || event.id} />;
   }
@@ -394,6 +400,22 @@ export function RegistrationForm({ bundle }: { bundle: RegistrationEventBundle }
         onLoad={() => setSdkReady(true)}
         onReady={() => setSdkReady(true)}
       />
+
+      {/* Form-mode page header. AlreadyRegisteredView renders its own
+       *  hero ("See you at the start line") so this only appears when
+       *  the runner is actually registering. */}
+      <header className="mb-8">
+        <p className="text-[11px] uppercase tracking-widest text-signal mb-2 font-semibold">
+          Register
+        </p>
+        <h1 className="font-display uppercase text-3xl md:text-4xl font-bold leading-tight text-jet mb-2">
+          {event.title}
+        </h1>
+        <p className="text-sm text-jet/60 max-w-2xl">
+          {event.locationName ? `${event.locationName} · ` : ''}Payment is
+          processed securely via Razorpay.
+        </p>
+      </header>
 
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-6 items-start">
         <form
@@ -625,8 +647,7 @@ function fmtFullDate(iso: string) {
 
 /** Rendered when the runner lands on the registration page but already
  *  has a paid + non-cancelled registration for this event. We replace
- *  the form with a celebratory confirmation and push the mobile app —
- *  registration management lives there, not in the marketing site. */
+ *  the form with a real bib design + share actions + app install push. */
 function AlreadyRegisteredView({
   reg,
   eventSlug,
@@ -634,99 +655,351 @@ function AlreadyRegisteredView({
   reg: import('@/lib/runner-api').MyRegistrationItem;
   eventSlug: string;
 }) {
+  // The runner viewing this is the one who registered (the parent query
+  // already filtered to my-registrations), so `useMe()` is the right
+  // source for their name.
+  const meQ = useMe();
+  const participantName = meQ.data?.name ?? '';
   const isVirtual = reg.event?.eventFormat === 'virtual';
-  const windowStart = reg.event?.resultWindowStart;
-  const windowEnd = reg.event?.resultWindowEnd;
+  const eventTitle = reg.event?.title ?? 'this event';
+  const bibNumber = reg.bibNumber ?? '—';
+  const distance = reg.distance?.fullTitle ?? reg.distance?.categoryName ?? '';
+
   return (
-    <div className="max-w-2xl">
-      <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-medium uppercase tracking-wider mb-3">
-        <span aria-hidden>✓</span> You’re already in
+    <div className="max-w-xl mx-auto text-center">
+      <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-medium uppercase tracking-wider mb-4">
+        <span aria-hidden>✓</span> You’re in
       </div>
       <h1 className="font-display uppercase text-3xl md:text-4xl font-bold leading-tight mb-3">
         See you at the start line
       </h1>
-      <p className="text-sm text-jet/70 mb-6 max-w-md">
-        Here’s your bib for <strong>{reg.event?.title ?? 'this event'}</strong>.
-        Track the run and upload your result from the Endorfin app.
+      <p className="text-sm text-jet/65 mb-7 mx-auto max-w-md">
+        Here’s your race bib for <strong>{eventTitle}</strong>. Screenshot it,
+        share it, and use the Endorfin app to track your run.
       </p>
 
-      {/* Dark bib card — mirrors the success view's PaidView card. */}
-      <div className="bg-jet text-bone rounded-2xl p-6 md:p-8 mb-6">
-        <p className="text-xs uppercase tracking-widest text-bone/60 mb-2">Bib</p>
-        <p className="font-display uppercase text-5xl md:text-6xl font-bold leading-none">
-          {reg.bibNumber ?? '—'}
-        </p>
-        <div className="mt-6 grid grid-cols-2 gap-4 text-sm">
-          <div>
-            <p className="text-bone/60 text-[11px] uppercase tracking-wider mb-0.5">Event</p>
-            <p className="font-medium">{reg.event?.title ?? '—'}</p>
-          </div>
-          <div>
-            <p className="text-bone/60 text-[11px] uppercase tracking-wider mb-0.5">Distance</p>
-            <p className="font-medium">
-              {reg.distance?.fullTitle ?? reg.distance?.categoryName ?? '—'}
-            </p>
-          </div>
-          {windowStart && (
-            <div>
-              <p className="text-bone/60 text-[11px] uppercase tracking-wider mb-0.5">
-                {isVirtual ? 'Run window' : 'Event date'}
-              </p>
-              <p className="font-medium leading-snug">
-                {fmtFullDate(windowStart)}
-                {isVirtual && windowEnd ? ` – ${fmtFullDate(windowEnd)}` : ''}
-              </p>
-            </div>
-          )}
-          <div>
-            <p className="text-bone/60 text-[11px] uppercase tracking-wider mb-0.5">Format</p>
-            <p className="font-medium capitalize">
-              {(reg.event?.eventFormat ?? 'event').replace('_', ' ')}
-            </p>
-          </div>
-        </div>
-      </div>
+      <BibCard
+        eventTitle={eventTitle}
+        bibNumber={bibNumber}
+        participantName={participantName}
+        distance={distance}
+      />
 
-      {/* Primary action: download the app. Web-based registration
-       *  management is intentionally deemphasised — the app is the home
-       *  for "my events", run uploads, and race-day reminders. */}
-      <div className="bg-bone border border-jet/10 rounded-2xl p-5 md:p-6 mb-5">
-        <p className="font-display uppercase text-sm font-bold mb-2">
-          Get the Endorfin app to manage your registration
+      <ShareRow
+        eventTitle={eventTitle}
+        bibNumber={bibNumber}
+        distance={distance}
+        eventSlug={eventSlug}
+      />
+
+      {/* App install nudge — primary path for "manage my registration"
+       *  lives in the app. Uses the site-wide AppStoreButtons so it
+       *  matches the homepage CTA, footer, and other install touchpoints. */}
+      <div className="mt-8 bg-jet text-bone rounded-2xl px-5 md:px-6 py-7 text-center">
+        <p className="font-display uppercase text-base md:text-lg font-bold mb-2">
+          Get the Endorfin app
         </p>
-        <p className="text-sm text-jet/70 mb-4 leading-relaxed">
+        <p className="text-sm text-bone/70 mb-5 leading-relaxed max-w-md mx-auto">
           {isVirtual
-            ? 'Track your run and upload the result directly from the app — that’s how you collect your medal.'
-            : 'Bib on your lock screen, race-day reminders, and a record of every event you’ve done.'}
+            ? 'Track your run and upload your result directly from the app — that’s how you collect your medal.'
+            : 'Bib on your lock screen, race-day reminders, and a record of every event you’ve run.'}
         </p>
-        <div className="flex flex-wrap gap-2">
-          <a
-            href={APP_STORE_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center px-4 py-2.5 rounded-lg bg-jet text-bone text-sm font-medium hover:bg-jet/90"
-          >
-            App Store
-          </a>
-          <a
-            href={PLAY_STORE_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center px-4 py-2.5 rounded-lg bg-jet text-bone text-sm font-medium hover:bg-jet/90"
-          >
-            Google Play
-          </a>
-        </div>
+        <AppStoreButtons variant="dark" />
       </div>
 
-      <div>
+      <div className="mt-6">
         <Link
           href={`/races/${encodeURIComponent(eventSlug)}`}
-          className="text-sm text-jet/60 hover:text-jet underline-offset-2 hover:underline"
+          className="text-sm text-jet/55 hover:text-jet underline-offset-2 hover:underline"
         >
           ← Back to event details
         </Link>
       </div>
+    </div>
+  );
+}
+
+/** Race bib visual.
+ *  Real-bib feel: red header band, participant name on top, BIG bib
+ *  number filling the body in a single line, dashed divider with the
+ *  distance chip and a faux timing-barcode on the right edge for
+ *  print-poster character. Heavy jet border + corner perforations
+ *  carry the chest-pinned-paper look. */
+function BibCard({
+  eventTitle,
+  bibNumber,
+  participantName,
+  distance,
+}: {
+  eventTitle: string;
+  bibNumber: string;
+  participantName: string;
+  distance: string;
+}) {
+  // Strip "10K · 10 km" → "10 km" (or just first segment if no dot).
+  // Organiser-stored fullTitle is "10K · 10 km"; categoryName is "10K".
+  // We want the most concise human label.
+  const distanceLabel = (() => {
+    const raw = (distance || '').trim();
+    if (!raw) return '';
+    const segments = raw.split('·').map((s) => s.trim()).filter(Boolean);
+    if (segments.length === 0) return raw;
+    // Prefer the segment with a km/mi unit if present.
+    const withUnit = segments.find((s) => /(km|mi)\b/i.test(s));
+    return withUnit ?? segments[segments.length - 1];
+  })();
+
+  const year = new Date().getFullYear();
+
+  return (
+    <div
+      className="relative bg-bone border-2 border-jet rounded-xl mx-auto max-w-md shadow-[0_18px_40px_-16px_rgba(10,10,10,0.45)] overflow-hidden"
+    >
+      {/* Corner perforations */}
+      <span aria-hidden className="absolute top-2 left-2 w-2 h-2 rounded-full bg-jet z-10" />
+      <span aria-hidden className="absolute top-2 right-2 w-2 h-2 rounded-full bg-jet z-10" />
+      <span aria-hidden className="absolute bottom-2 left-2 w-2 h-2 rounded-full bg-jet z-10" />
+      <span aria-hidden className="absolute bottom-2 right-2 w-2 h-2 rounded-full bg-jet z-10" />
+
+      {/* Header band — Endorfin lockup + event title + year */}
+      <div className="relative bg-signal text-bone px-6 py-3.5 border-b-2 border-jet overflow-hidden">
+        {/* Decorative diagonal stripes — adds texture to the red band */}
+        <div
+          aria-hidden
+          className="absolute inset-0 opacity-15 pointer-events-none"
+          style={{
+            backgroundImage:
+              'repeating-linear-gradient(45deg, transparent 0 8px, rgba(245,240,235,0.6) 8px 9px)',
+          }}
+        />
+        <div className="relative flex items-center justify-between gap-3">
+          <span className="font-display uppercase text-[10px] tracking-[0.18em] text-bone/85 leading-none">
+            Endorfin
+          </span>
+          <span className="font-display uppercase text-[10px] tracking-[0.18em] text-bone/85 leading-none">
+            #{year}
+          </span>
+        </div>
+        <p className="relative font-display uppercase font-bold text-lg md:text-xl mt-1 leading-tight text-center truncate">
+          {eventTitle}
+        </p>
+      </div>
+
+      {/* Body */}
+      <div className="px-6 pt-5 pb-5">
+        {/* Participant name */}
+        <p className="text-[9px] uppercase tracking-[0.2em] text-jet/45 text-center">
+          Participant
+        </p>
+        <p className="font-display uppercase font-bold text-jet text-lg md:text-xl text-center leading-tight mt-0.5 truncate">
+          {participantName || '—'}
+        </p>
+
+        {/* Hairline divider */}
+        <div className="my-4 flex items-center gap-2">
+          <span aria-hidden className="flex-1 h-px bg-jet/20" />
+          <span aria-hidden className="w-1 h-1 rounded-full bg-jet/30" />
+          <span aria-hidden className="flex-1 h-px bg-jet/20" />
+        </div>
+
+        {/* The number — single line, fluid sizing that respects the
+         *  bib width so 8-char numbers like END-0002 never wrap. */}
+        <p className="text-[9px] uppercase tracking-[0.2em] text-jet/45 text-center">
+          Bib number
+        </p>
+        <p
+          className="font-display font-bold text-jet text-center leading-[0.95] tracking-tight whitespace-nowrap mt-1"
+          style={{ fontSize: 'clamp(48px, 14vw, 80px)' }}
+        >
+          {bibNumber}
+        </p>
+      </div>
+
+      {/* Dashed divider — looks like a perforated tear line */}
+      <div
+        aria-hidden
+        className="border-t-2 border-dashed border-jet/60 mx-4"
+      />
+
+      {/* Footer — distance pill + faux barcode for character */}
+      <div className="px-6 py-3 flex items-center justify-between gap-3">
+        <div className="inline-flex items-center gap-2">
+          <span className="inline-flex items-center px-2.5 py-1 rounded-md bg-jet text-bone font-display uppercase text-xs font-bold tracking-wider leading-none">
+            {distanceLabel || 'Distance'}
+          </span>
+        </div>
+        {/* Faux timing barcode — pure decoration, evokes the timing-chip
+         *  strip on real race bibs. Random-looking, deterministic stripes. */}
+        <span
+          aria-hidden
+          className="inline-flex items-center gap-[2px] opacity-80"
+        >
+          {[2, 1, 3, 1, 2, 1, 4, 1, 2, 1, 3, 1, 2, 1, 2].map((w, i) => (
+            <span
+              key={i}
+              className="bg-jet"
+              style={{ width: `${w}px`, height: '20px' }}
+            />
+          ))}
+        </span>
+      </div>
+    </div>
+  );
+}
+
+/** Sharing toolbar — Web Share API as the primary action (mobile-native),
+ *  with explicit WhatsApp/Instagram/Copy fallbacks for desktop. */
+/** Skeleton shown while we resolve whether the runner is already
+ *  registered. Without this gate the form mounts, then immediately
+ *  swaps to the AlreadyRegisteredView once useMyRegistrations resolves,
+ *  which reads as a flash bug. Match the basic shape of either branch
+ *  so layout doesn't jump on resolve. */
+function RegistrationFormSkeleton() {
+  return (
+    <div className="animate-pulse">
+      <div className="mb-8">
+        <div className="h-3 w-24 bg-jet/10 rounded mb-3" />
+        <div className="h-8 w-72 bg-jet/15 rounded mb-2" />
+        <div className="h-4 w-96 max-w-full bg-jet/10 rounded" />
+      </div>
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-6">
+        <div className="space-y-4">
+          <div className="bg-white border border-jet/10 rounded-2xl p-6 h-32" />
+          <div className="bg-white border border-jet/10 rounded-2xl p-6 h-48" />
+        </div>
+        <div className="bg-jet/[0.04] border border-jet/10 rounded-2xl p-6 h-64" />
+      </div>
+    </div>
+  );
+}
+
+function ShareRow({
+  eventTitle,
+  bibNumber,
+  distance,
+  eventSlug,
+}: {
+  eventTitle: string;
+  bibNumber: string;
+  distance: string;
+  eventSlug: string;
+}) {
+  const buildShareText = () => {
+    const distancePart = distance ? ` (${distance})` : '';
+    return `Just registered for ${eventTitle}${distancePart} on @Endorfin 🏃 My bib is ${bibNumber}.`;
+  };
+  const buildShareUrl = () => {
+    if (typeof window === 'undefined') return '';
+    return `${window.location.origin}/races/${encodeURIComponent(eventSlug)}`;
+  };
+
+  const handleNativeShare = async () => {
+    const url = buildShareUrl();
+    const text = buildShareText();
+    // Web Share API — works on iOS Safari, Android Chrome, modern desktop
+    // Chrome. Hands the user a sheet with WhatsApp / Instagram / Messages
+    // / Copy / etc. depending on the OS.
+    if (typeof navigator !== 'undefined' && (navigator as Navigator & { share?: (data: ShareData) => Promise<void> }).share) {
+      try {
+        await (navigator as Navigator & { share: (data: ShareData) => Promise<void> }).share({
+          title: eventTitle,
+          text,
+          url,
+        });
+      } catch {
+        /* user dismissed — no-op */
+      }
+    } else {
+      // Desktop fallback: copy to clipboard.
+      void copyLink();
+    }
+  };
+
+  const whatsAppUrl = () => {
+    const text = `${buildShareText()} ${buildShareUrl()}`;
+    return `https://wa.me/?text=${encodeURIComponent(text)}`;
+  };
+
+  const copyLink = async () => {
+    const text = `${buildShareText()} ${buildShareUrl()}`;
+    try {
+      await navigator.clipboard.writeText(text);
+      toast.success('Copied — paste it anywhere');
+    } catch {
+      toast.error('Couldn’t copy. Long-press to copy from the address bar.');
+    }
+  };
+
+  const openInstagram = () => {
+    // Instagram doesn't accept text prefill from web. We open the app
+    // (mobile) or web (desktop) and copy the share text so the runner can
+    // paste it into their story / post.
+    void copyLink();
+    if (typeof window === 'undefined') return;
+    // Try the app intent on mobile; falls through to the web profile on
+    // desktop, which is the best we can do without a server-side image.
+    window.open('https://www.instagram.com/', '_blank', 'noopener');
+  };
+
+  return (
+    <div className="mt-6">
+      <p className="text-[10px] uppercase tracking-widest text-jet/45 mb-2">
+        Share your bib
+      </p>
+      <div className="flex flex-wrap justify-center gap-2">
+        <button
+          type="button"
+          onClick={handleNativeShare}
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-jet text-bone text-sm font-medium hover:bg-jet/90"
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+            <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" />
+            <polyline points="16 6 12 2 8 6" />
+            <line x1="12" y1="2" x2="12" y2="15" />
+          </svg>
+          Share
+        </button>
+        <a
+          href={whatsAppUrl()}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-jet/15 text-jet text-sm font-medium hover:bg-jet/5"
+          aria-label="Share on WhatsApp"
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+            <path d="M20.52 3.48A11.94 11.94 0 0 0 12.04 0C5.43 0 .07 5.36.07 11.97c0 2.11.55 4.16 1.6 5.98L0 24l6.2-1.62a11.96 11.96 0 0 0 5.84 1.49h.01c6.6 0 11.96-5.36 11.96-11.97 0-3.2-1.24-6.2-3.49-8.42zM12.04 21.7h-.01a9.7 9.7 0 0 1-4.95-1.36l-.36-.21-3.68.97.98-3.6-.23-.37a9.7 9.7 0 0 1-1.49-5.17c0-5.36 4.36-9.72 9.74-9.72 2.6 0 5.04 1.01 6.88 2.85a9.66 9.66 0 0 1 2.85 6.87c0 5.37-4.36 9.73-9.73 9.73zm5.34-7.28c-.29-.15-1.74-.86-2-.96-.27-.1-.47-.15-.66.15-.2.29-.76.96-.93 1.15-.17.2-.34.22-.63.07-.29-.14-1.24-.46-2.36-1.46-.87-.78-1.46-1.74-1.63-2.03-.17-.29-.02-.45.13-.6.13-.13.29-.34.44-.51.14-.17.19-.29.29-.49.1-.2.05-.36-.02-.51-.07-.15-.66-1.6-.91-2.18-.24-.57-.49-.5-.66-.51l-.56-.01c-.2 0-.51.07-.78.36-.27.29-1.02 1-1.02 2.44 0 1.44 1.04 2.83 1.19 3.03.15.2 2.06 3.14 4.99 4.4.7.3 1.24.48 1.66.62.7.22 1.33.19 1.84.12.56-.08 1.74-.71 1.98-1.4.24-.69.24-1.28.17-1.4-.07-.12-.27-.2-.56-.34z" />
+          </svg>
+          WhatsApp
+        </a>
+        <button
+          type="button"
+          onClick={openInstagram}
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-jet/15 text-jet text-sm font-medium hover:bg-jet/5"
+          aria-label="Share on Instagram (copies caption)"
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+            <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
+            <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+            <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
+          </svg>
+          Instagram
+        </button>
+        <button
+          type="button"
+          onClick={copyLink}
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-jet/15 text-jet text-sm font-medium hover:bg-jet/5"
+          aria-label="Copy share link"
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+            <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+          </svg>
+          Copy
+        </button>
+      </div>
+      <p className="mt-2 text-[11px] text-jet/40">
+        Instagram doesn’t accept pre-filled posts — the caption is copied so you can paste it.
+      </p>
     </div>
   );
 }

@@ -9,7 +9,9 @@ export function StudioAuthProvider({
   value,
   children,
 }: {
-  value: StudioAuth;
+  /** Pass null for anonymous visitors — context just resolves to null
+   *  and `useStudioAuth()` callers fall back. */
+  value: StudioAuth | null;
   children: React.ReactNode;
 }) {
   // Safety net: clear any body scroll-lock leftover from Radix Dialog

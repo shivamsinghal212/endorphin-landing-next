@@ -41,7 +41,10 @@ export function RunnerProviders({
   studio,
   children,
 }: {
-  studio: StudioAuth;
+  /** Pass null for anonymous visitors — providers still mount so runner
+   *  hooks (useMyRegistrations etc.) can be called safely; they just
+   *  return undefined data because `enabled: !!token` evaluates false. */
+  studio: StudioAuth | null;
   children: React.ReactNode;
 }) {
   const [client] = useState(

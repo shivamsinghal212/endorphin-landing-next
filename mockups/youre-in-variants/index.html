@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>"You're in" CTA variants</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&family=Poppins:wght@300;400;500;600&family=Fraunces:opsz,wght@9..144,400;9..144,700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            display: ['Oswald', 'sans-serif'],
+            body: ['Poppins', 'sans-serif'],
+            serif: ['Fraunces', 'Georgia', 'serif'],
+          },
+          colors: {
+            jet: '#0A0A0A',
+            signal: '#E6232A',
+            bone: '#F5F0EB',
+          },
+        },
+      },
+    };
+  </script>
+  <style>
+    body { font-family: 'Poppins', sans-serif; background: #F5F0EB; color: #0A0A0A; }
+    .font-display { font-family: 'Oswald', sans-serif; }
+    .font-serif { font-family: 'Fraunces', Georgia, serif; }
+  </style>
+</head>
+<body class="min-h-screen">
+
+  <header class="bg-jet text-bone px-6 py-3">
+    <div class="max-w-5xl mx-auto flex items-center justify-between">
+      <p class="font-display uppercase font-bold">"You're in" CTA — 4 variants</p>
+      <p class="text-[12px] text-bone/60">Pick one</p>
+    </div>
+  </header>
+
+  <main class="max-w-5xl mx-auto px-6 py-10 space-y-12">
+
+    <!-- Mock race detail context so each variant sits where it actually renders -->
+
+    <!-- ─── V1 — Mini-bib chip ─────────────────────────────────────────────── -->
+    <section>
+      <div class="flex items-baseline gap-3 mb-3">
+        <span class="inline-flex items-center justify-center w-7 h-7 rounded-full bg-jet text-bone text-xs font-bold">1</span>
+        <h2 class="font-display uppercase font-bold text-xl">Mini bib chip</h2>
+        <span class="text-[11px] text-jet/50">— Directly references the full bib card. Strong brand link.</span>
+      </div>
+      <div class="bg-bone rounded-2xl p-8">
+        <p class="font-serif italic text-3xl mb-1">Virtual 5K</p>
+        <p class="text-[11px] uppercase tracking-wider text-jet/40 mb-6">10K · ₹100 · Virtual</p>
+        <!-- VARIANT -->
+        <a href="#" class="group inline-flex items-stretch border-2 border-jet rounded-md overflow-hidden hover:shadow-[0_8px_24px_-12px_rgba(10,10,10,0.45)] transition-shadow no-underline">
+          <div class="bg-signal text-bone px-3 py-1 flex items-center">
+            <span class="font-display uppercase font-bold text-[10px] tracking-widest leading-none">You're in</span>
+          </div>
+          <div class="bg-bone px-4 py-1.5 flex items-center gap-2">
+            <span class="font-display uppercase font-bold text-base text-jet leading-none tracking-tight">END-0002</span>
+            <span class="text-jet/40 text-sm group-hover:text-jet group-hover:translate-x-0.5 transition-all">→</span>
+          </div>
+        </a>
+      </div>
+    </section>
+
+    <!-- ─── V2 — Jet ticket stub ───────────────────────────────────────────── -->
+    <section>
+      <div class="flex items-baseline gap-3 mb-3">
+        <span class="inline-flex items-center justify-center w-7 h-7 rounded-full bg-jet text-bone text-xs font-bold">2</span>
+        <h2 class="font-display uppercase font-bold text-xl">Jet ticket stub</h2>
+        <span class="text-[11px] text-jet/50">— Dark inverted pill with serrated divider. Feels like a torn ticket.</span>
+      </div>
+      <div class="bg-bone rounded-2xl p-8">
+        <p class="font-serif italic text-3xl mb-1">Virtual 5K</p>
+        <p class="text-[11px] uppercase tracking-wider text-jet/40 mb-6">10K · ₹100 · Virtual</p>
+        <!-- VARIANT -->
+        <a href="#" class="group inline-flex items-center bg-jet text-bone rounded-full overflow-hidden hover:bg-jet/90 transition-colors no-underline">
+          <span class="pl-4 pr-2 py-2 inline-flex items-center gap-2">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="text-signal"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            <span class="font-display uppercase font-bold text-[11px] tracking-widest leading-none">You're in</span>
+          </span>
+          <!-- Perforation dots between the two segments -->
+          <span class="flex flex-col gap-1 px-1.5 opacity-30">
+            <span class="w-1 h-1 rounded-full bg-bone"></span>
+            <span class="w-1 h-1 rounded-full bg-bone"></span>
+            <span class="w-1 h-1 rounded-full bg-bone"></span>
+          </span>
+          <span class="pl-2 pr-4 py-2 inline-flex items-center gap-2">
+            <span class="font-display uppercase font-bold text-sm leading-none">END-0002</span>
+            <span class="text-bone/60 text-sm group-hover:translate-x-0.5 transition-transform">→</span>
+          </span>
+        </a>
+      </div>
+    </section>
+
+    <!-- ─── V3 — Meta cell (slots into the existing strip) ─────────────────── -->
+    <section>
+      <div class="flex items-baseline gap-3 mb-3">
+        <span class="inline-flex items-center justify-center w-7 h-7 rounded-full bg-jet text-bone text-xs font-bold">3</span>
+        <h2 class="font-display uppercase font-bold text-xl">Meta cell extension</h2>
+        <span class="text-[11px] text-jet/50">— Replaces the "Registered" meta cell. Most native to the page.</span>
+      </div>
+      <div class="bg-bone rounded-2xl p-8">
+        <p class="font-serif italic text-3xl mb-1">Virtual 5K</p>
+        <p class="text-[11px] uppercase tracking-wider text-jet/40 mb-6">10K · ₹100 · Virtual</p>
+        <!-- Faux meta strip to show context -->
+        <div class="border-t border-b border-jet/15 py-4 grid grid-cols-4 gap-6 text-sm mb-5">
+          <div>
+            <p class="text-[10px] uppercase tracking-widest text-jet/45 mb-1">Race day</p>
+            <p class="font-display uppercase font-bold text-jet leading-tight">Tue, 19 May 2026</p>
+          </div>
+          <div>
+            <p class="text-[10px] uppercase tracking-widest text-jet/45 mb-1">Where</p>
+            <p class="font-display uppercase font-bold text-jet leading-tight">Virtual · run anywhere</p>
+          </div>
+          <div>
+            <p class="text-[10px] uppercase tracking-widest text-jet/45 mb-1">From</p>
+            <p class="font-display uppercase font-bold text-jet leading-tight">₹100</p>
+          </div>
+          <!-- VARIANT — sits in 4th cell -->
+          <a href="#" class="group block no-underline -my-1 px-2 -mx-2 rounded-md hover:bg-jet/[0.04] transition-colors">
+            <p class="text-[10px] uppercase tracking-widest text-signal mb-1 font-semibold">Your bib</p>
+            <p class="font-display uppercase font-bold text-jet leading-tight flex items-baseline gap-1.5">
+              END-0002
+              <span class="text-jet/40 group-hover:text-jet text-xs">→</span>
+            </p>
+          </a>
+        </div>
+        <!-- And the CTA row below has nothing — the meta cell IS the indicator -->
+        <p class="text-[12px] text-jet/55">
+          <a href="#" class="underline-offset-2 hover:underline">View your bib & share →</a>
+        </p>
+      </div>
+    </section>
+
+    <!-- ─── V4 — Stamped strip with red flag accent ────────────────────────── -->
+    <section>
+      <div class="flex items-baseline gap-3 mb-3">
+        <span class="inline-flex items-center justify-center w-7 h-7 rounded-full bg-jet text-bone text-xs font-bold">4</span>
+        <h2 class="font-display uppercase font-bold text-xl">Stamped strip</h2>
+        <span class="text-[11px] text-jet/50">— Bone strip with red flag accent left and jet number right. Print-poster feel.</span>
+      </div>
+      <div class="bg-bone rounded-2xl p-8">
+        <p class="font-serif italic text-3xl mb-1">Virtual 5K</p>
+        <p class="text-[11px] uppercase tracking-wider text-jet/40 mb-6">10K · ₹100 · Virtual</p>
+        <!-- VARIANT -->
+        <a href="#" class="group inline-flex items-stretch bg-bone border border-jet/15 rounded-md overflow-hidden hover:border-jet transition-colors no-underline">
+          <!-- Red vertical accent bar -->
+          <span class="w-1.5 bg-signal" aria-hidden></span>
+          <div class="pl-3 pr-4 py-2 flex items-center gap-3">
+            <div class="leading-tight">
+              <p class="text-[9px] uppercase tracking-widest text-jet/50 font-semibold">Registered</p>
+              <p class="font-display uppercase font-bold text-base text-jet leading-none tracking-tight">
+                Bib END-0002
+              </p>
+            </div>
+            <span class="text-jet/40 text-sm group-hover:text-jet group-hover:translate-x-0.5 transition-all">→</span>
+          </div>
+        </a>
+      </div>
+    </section>
+
+    <!-- ─── Side-by-side small preview ────────────────────────────────────── -->
+    <section class="border-t border-jet/10 pt-8">
+      <h3 class="font-display uppercase text-sm font-bold mb-4 text-jet/60">All four, side by side</h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+        <div class="bg-bone border border-jet/10 rounded-xl p-5">
+          <p class="text-[10px] uppercase tracking-widest text-jet/40 mb-3">V1 · Mini bib</p>
+          <a href="#" class="group inline-flex items-stretch border-2 border-jet rounded-md overflow-hidden no-underline">
+            <div class="bg-signal text-bone px-3 py-1 flex items-center">
+              <span class="font-display uppercase font-bold text-[10px] tracking-widest leading-none">You're in</span>
+            </div>
+            <div class="bg-bone px-4 py-1.5 flex items-center gap-2">
+              <span class="font-display uppercase font-bold text-base text-jet leading-none">END-0002</span>
+              <span class="text-jet/40 text-sm">→</span>
+            </div>
+          </a>
+        </div>
+
+        <div class="bg-bone border border-jet/10 rounded-xl p-5">
+          <p class="text-[10px] uppercase tracking-widest text-jet/40 mb-3">V2 · Ticket stub</p>
+          <a href="#" class="inline-flex items-center bg-jet text-bone rounded-full no-underline">
+            <span class="pl-4 pr-2 py-2 inline-flex items-center gap-2">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="text-signal"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              <span class="font-display uppercase font-bold text-[11px] tracking-widest leading-none">You're in</span>
+            </span>
+            <span class="flex flex-col gap-1 px-1.5 opacity-30">
+              <span class="w-1 h-1 rounded-full bg-bone"></span>
+              <span class="w-1 h-1 rounded-full bg-bone"></span>
+              <span class="w-1 h-1 rounded-full bg-bone"></span>
+            </span>
+            <span class="pl-2 pr-4 py-2 inline-flex items-center gap-2">
+              <span class="font-display uppercase font-bold text-sm leading-none">END-0002</span>
+              <span class="text-bone/60 text-sm">→</span>
+            </span>
+          </a>
+        </div>
+
+        <div class="bg-bone border border-jet/10 rounded-xl p-5">
+          <p class="text-[10px] uppercase tracking-widest text-jet/40 mb-3">V3 · Meta cell</p>
+          <div class="leading-tight">
+            <p class="text-[10px] uppercase tracking-widest text-signal mb-1 font-semibold">Your bib</p>
+            <p class="font-display uppercase font-bold text-jet flex items-baseline gap-1.5">
+              END-0002 <span class="text-jet/40 text-xs">→</span>
+            </p>
+          </div>
+        </div>
+
+        <div class="bg-bone border border-jet/10 rounded-xl p-5">
+          <p class="text-[10px] uppercase tracking-widest text-jet/40 mb-3">V4 · Stamped strip</p>
+          <a href="#" class="inline-flex items-stretch bg-bone border border-jet/15 rounded-md overflow-hidden no-underline">
+            <span class="w-1.5 bg-signal" aria-hidden></span>
+            <div class="pl-3 pr-4 py-2 flex items-center gap-3">
+              <div class="leading-tight">
+                <p class="text-[9px] uppercase tracking-widest text-jet/50 font-semibold">Registered</p>
+                <p class="font-display uppercase font-bold text-base text-jet leading-none">Bib END-0002</p>
+              </div>
+              <span class="text-jet/40 text-sm">→</span>
+            </div>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <footer class="text-center text-[11px] text-jet/40 pt-8 pb-2">
+      Tell me which variant to ship.
+    </footer>
+
+  </main>
+</body>
+</html>
