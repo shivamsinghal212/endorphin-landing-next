@@ -77,13 +77,22 @@ export interface RegistrationLike {
   registrationStatus: 'registered' | 'cancelled' | 'disqualified' | 'completed';
 }
 
-/** Smart label + pill class for the registrations status column. */
+/** Smart label + pill class for the registrations status column.
+ *  Registration-level cancellation wins over result/payment states —
+ *  a cancelled row shouldn't show as "Verified" or "Registered" even if
+ *  the underlying payment was once captured. */
 export function statusChip(reg: RegistrationLike): {
   label: string;
   className: string;
 } {
   const base =
     'inline-block text-[10px] px-1.5 py-0.5 rounded-full uppercase tracking-wider font-medium';
+  if (reg.registrationStatus === 'cancelled') {
+    return { label: 'Cancelled', className: `${base} bg-jet/10 text-jet/40` };
+  }
+  if (reg.registrationStatus === 'disqualified') {
+    return { label: 'Disqualified', className: `${base} bg-signal/15 text-signal` };
+  }
   if (reg.resultStatus === 'verified') {
     return { label: 'Verified', className: `${base} bg-emerald-100 text-emerald-700` };
   }
@@ -93,12 +102,12 @@ export function statusChip(reg: RegistrationLike): {
   if (reg.resultStatus === 'submitted') {
     return { label: 'Awaiting proof', className: `${base} bg-gold/20 text-gold` };
   }
-  // not_submitted
+  // not_submitted — show the payment lane
   if (reg.paymentStatus === 'paid' || reg.paymentStatus === 'free') {
     return { label: 'Registered', className: `${base} bg-jet/10 text-jet/60` };
   }
   if (reg.paymentStatus === 'pending') {
-    return { label: 'Payment pending', className: `${base} bg-jet/10 text-jet/60` };
+    return { label: 'Payment pending', className: `${base} bg-gold/20 text-gold` };
   }
   if (reg.paymentStatus === 'refunded') {
     return { label: 'Refunded', className: `${base} bg-jet/10 text-jet/60` };

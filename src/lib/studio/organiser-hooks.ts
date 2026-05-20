@@ -13,7 +13,10 @@ import {
   type OrganiserEventCreate,
   type OrganiserEventUpdate,
   type OrganiserUpdate,
+  type PendingReviewEvent,
   type RegistrationsFilters,
+  approveEvent,
+  cancelRegistration,
   createCoupon,
   createOrganiserEvent,
   deleteCoupon,
@@ -24,7 +27,9 @@ import {
   listCoupons,
   listEventRegistrations,
   listOrganiserEvents,
+  listPendingReviewEvents,
   onboardOrganiser,
+  rejectEvent,
   submitEventForReview,
   updateCoupon,
   updateMyOrganiser,
@@ -208,6 +213,27 @@ export function useInitiateRefund(eventId: string) {
     onSuccess: () => {
       // Invalidate all registration queries for this event (filter hash is
       // opaque from here — invalidate by event id prefix instead).
+      qc.invalidateQueries({
+        predicate: (q) =>
+          Array.isArray(q.queryKey) &&
+          q.queryKey[0] === 'organiser' &&
+          q.queryKey[1] === 'registrations' &&
+          q.queryKey[2] === eventId,
+      });
+    },
+  });
+}
+
+export function useCancelRegistration(eventId: string) {
+  const token = useAdminToken();
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({
+      registrationId,
+      reason,
+    }: { registrationId: string; reason?: string }) =>
+      cancelRegistration(token!, eventId, registrationId, reason),
+    onSuccess: () => {
       qc.invalidateQueries({
         predicate: (q) =>
           Array.isArray(q.queryKey) &&

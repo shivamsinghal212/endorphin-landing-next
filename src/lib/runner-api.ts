@@ -37,7 +37,7 @@ async function runnerFetch<T = unknown>(
   return res.json();
 }
 
-// ── User profile (PATCH /users/me) ────────────────────────────────────────
+// ── User profile (PUT /users/me) ──────────────────────────────────────────
 
 export type Gender = 'male' | 'female' | 'other' | 'prefer_not_to_say';
 
@@ -53,8 +53,10 @@ export interface MeProfile {
 }
 
 export interface MeUpdate {
+  // Backend's UserUpdateRequest accepts these. Email stays signup-only
+  // (not editable here); phone now has its own column on `users` and
+  // flows through to Razorpay Checkout's prefill.contact.
   name?: string;
-  email?: string;
   phone?: string;
   birthdate?: string; // YYYY-MM-DD
   gender?: Gender | string;
@@ -65,7 +67,7 @@ export const getMe = (token: string) =>
 
 export const patchMe = (token: string, body: MeUpdate) =>
   runnerFetch<MeProfile>('/users/me', token, {
-    method: 'PATCH',
+    method: 'PUT',
     body: JSON.stringify(body),
   });
 

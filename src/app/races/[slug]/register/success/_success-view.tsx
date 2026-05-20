@@ -3,6 +3,7 @@
 import { useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useMyRegistration } from '@/lib/runner-hooks';
+import { APP_STORE_URL, PLAY_STORE_URL } from '@/lib/store-links';
 import type { MyRegistrationItem } from '@/lib/runner-api';
 
 const IST = 'Asia/Kolkata';
@@ -34,9 +35,12 @@ export function SuccessView({
   registrationId: string;
   slug: string;
 }) {
-  // While the row is `pending` (likely race between confirm POST + webhook),
-  // poll every 5s for up to 60s.
+  // While the row is `pending` (race between confirm POST + payment.captured
+  // webhook), poll every 5s. After 120s of being stuck pending we stop the
+  // auto-poll and let the runner trigger refresh manually — Razorpay test
+  // payments sometimes take longer than this; that's not an error.
   const pollStart = useRef<number | null>(null);
+  const POLL_BUDGET_MS = 120_000;
   const reg = useMyRegistration(registrationId, { refetchIntervalMs: 5_000 });
   const data = reg.data;
 
@@ -48,7 +52,8 @@ export function SuccessView({
 
   const stillPolling =
     data?.paymentStatus === 'pending' &&
-    (pollStart.current == null || Date.now() - (pollStart.current ?? 0) < 60_000);
+    (pollStart.current == null ||
+      Date.now() - (pollStart.current ?? 0) < POLL_BUDGET_MS);
 
   if (reg.isLoading) {
     return <Wrap>Loading your registration…</Wrap>;
@@ -117,14 +122,24 @@ export function SuccessView({
       <p className="text-sm text-jet/70 mb-6">
         {stillPolling
           ? 'Hold tight — Razorpay sometimes takes a few seconds to settle. This page will update automatically.'
-          : 'Still pending. The payment provider hasn&rsquo;t reported back yet — you can leave this page; we&rsquo;ll email you once it&rsquo;s captured.'}
+          : 'Still pending. The payment provider hasn’t reported back yet. Try refreshing — if nothing changes you can safely leave; we’ll email when it captures.'}
       </p>
-      <Link
-        href="/me/registrations"
-        className="inline-flex items-center px-4 py-2 rounded-lg border border-jet/15 text-jet text-sm hover:bg-jet/5"
-      >
-        Open My Events
-      </Link>
+      <div className="flex flex-wrap gap-3">
+        <button
+          type="button"
+          onClick={() => reg.refetch()}
+          disabled={reg.isFetching}
+          className="inline-flex items-center px-4 py-2 rounded-lg bg-jet text-bone text-sm hover:bg-jet/90 disabled:opacity-50"
+        >
+          {reg.isFetching ? 'Checking…' : 'Refresh status'}
+        </button>
+        <Link
+          href="/me/registrations"
+          className="inline-flex items-center px-4 py-2 rounded-lg border border-jet/15 text-jet text-sm hover:bg-jet/5"
+        >
+          Open My Events
+        </Link>
+      </div>
     </Wrap>
   );
 }
@@ -134,9 +149,9 @@ function PaidView({ data }: { data: MyRegistrationItem }) {
   const endTime = data.event.resultWindowEnd;
   return (
     <Wrap>
-      <p className="text-xs uppercase tracking-widest text-signal mb-2">
-        You&rsquo;re in
-      </p>
+      <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-medium uppercase tracking-wider mb-3">
+        <span aria-hidden>✓</span> Registration confirmed
+      </div>
       <h1 className="font-display uppercase text-3xl md:text-5xl font-bold leading-tight mb-4">
         See you at the start line
       </h1>
@@ -202,6 +217,38 @@ function PaidView({ data }: { data: MyRegistrationItem }) {
             on venue and start times are on the event page.
           </p>
         )}
+      </div>
+
+      {/* Install-the-app nudge. Virtual events route runs through the
+       *  mobile app for tracking; physical events benefit from the
+       *  reminders + bib-on-lock-screen flow. */}
+      <div className="bg-jet text-bone rounded-2xl p-5 md:p-6 mb-6">
+        <p className="font-display uppercase text-sm font-bold mb-2">
+          Get the Endorfin app
+        </p>
+        <p className="text-sm text-bone/75 mb-4 leading-relaxed">
+          {data.event.eventFormat === 'virtual'
+            ? 'Track your run and upload the result directly from the app. Faster than emailing screenshots.'
+            : 'Race-day reminders, bib on your lock screen, and a record of every event you’ve done.'}
+        </p>
+        <div className="flex flex-wrap gap-2">
+          <a
+            href={APP_STORE_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center px-3 py-1.5 rounded-lg bg-bone text-jet text-xs font-medium hover:bg-white"
+          >
+            App Store
+          </a>
+          <a
+            href={PLAY_STORE_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center px-3 py-1.5 rounded-lg bg-bone text-jet text-xs font-medium hover:bg-white"
+          >
+            Google Play
+          </a>
+        </div>
       </div>
 
       <div className="flex flex-wrap gap-3">

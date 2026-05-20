@@ -3,11 +3,14 @@
 import { useMemo } from 'react';
 import type { MeProfile } from '@/lib/runner-api';
 
-export type ProfileFieldKey = 'name' | 'email' | 'phone' | 'birthdate' | 'gender';
+// Backend's PUT /users/me accepts these. Email is set at signup and
+// isn't editable here. Phone has its own column on `users` now and is
+// used for Razorpay Checkout prefill so the runner doesn't get asked
+// for it on every event.
+export type ProfileFieldKey = 'name' | 'phone' | 'birthdate' | 'gender';
 
 export interface ProfileDraft {
   name: string;
-  email: string;
   phone: string;
   birthdate: string; // YYYY-MM-DD
   gender: string;
@@ -17,7 +20,6 @@ export function missingProfileFields(me: MeProfile | null | undefined): ProfileF
   if (!me) return [];
   const out: ProfileFieldKey[] = [];
   if (!me.name?.trim()) out.push('name');
-  if (!me.email?.trim()) out.push('email');
   if (!me.phone?.trim()) out.push('phone');
   if (!me.birthdate) out.push('birthdate');
   if (!me.gender) out.push('gender');
@@ -27,7 +29,6 @@ export function missingProfileFields(me: MeProfile | null | undefined): ProfileF
 export function profileDraftFromMe(me: MeProfile | null | undefined): ProfileDraft {
   return {
     name: me?.name ?? '',
-    email: me?.email ?? '',
     phone: me?.phone ?? '',
     birthdate: me?.birthdate ?? '',
     gender: (me?.gender as string) ?? '',
@@ -36,7 +37,6 @@ export function profileDraftFromMe(me: MeProfile | null | undefined): ProfileDra
 
 const FIELD_LABEL: Record<ProfileFieldKey, string> = {
   name: 'Full name',
-  email: 'Email',
   phone: 'Phone (10 digits)',
   birthdate: 'Date of birth',
   gender: 'Gender',
@@ -83,18 +83,6 @@ export function ProfileGate({
               value={draft.name}
               onChange={(e) => update('name', e.target.value)}
               autoComplete="name"
-              required
-              className={inputCls}
-            />
-          </Field>
-        )}
-        {missingSet.has('email') && (
-          <Field label={FIELD_LABEL.email}>
-            <input
-              type="email"
-              value={draft.email}
-              onChange={(e) => update('email', e.target.value)}
-              autoComplete="email"
               required
               className={inputCls}
             />

@@ -429,3 +429,57 @@ export const deleteCoupon = (token: string, eventId: string, couponId: string) =
   orgFetch<void>(`/organiser/events/${eventId}/coupons/${couponId}`, token, {
     method: 'DELETE',
   });
+
+// ── Super-admin review (event_status transitions) ─────────────────────────
+
+/** Slim shape from GET /admin/events/pending — backend returns the full
+ *  EventResponse, but the studio review queue only needs these fields. */
+export interface PendingReviewEvent {
+  id: string;
+  slug: string | null;
+  title: string;
+  eventFormat: 'virtual' | 'in_person' | null;
+  coverImageUrl: string | null;
+  imageUrl: string | null;
+  description: string | null;
+  organiserId: string | null;
+  registrationOpenAt: string | null;
+  createdAt: string;
+}
+
+export const listPendingReviewEvents = (token: string) =>
+  orgFetch<PendingReviewEvent[]>(`/admin/events/pending`, token);
+
+export const approveEvent = (token: string, eventId: string) =>
+  orgFetch<OrganiserEvent>(`/admin/events/${eventId}/approve`, token, {
+    method: 'POST',
+  });
+
+export const rejectEvent = (token: string, eventId: string, reason?: string) =>
+  orgFetch<OrganiserEvent>(`/admin/events/${eventId}/reject`, token, {
+    method: 'POST',
+    body: JSON.stringify({ reason: reason ?? null }),
+  });
+
+// ── Mark registration as failed (organiser cleanup of stuck rows) ─────────
+
+export interface CancelRegistrationResponse {
+  id: string;
+  paymentStatus: RegistrationRow['paymentStatus'];
+  registrationStatus: RegistrationRow['registrationStatus'];
+}
+
+export const cancelRegistration = (
+  token: string,
+  eventId: string,
+  registrationId: string,
+  reason?: string,
+) =>
+  orgFetch<CancelRegistrationResponse>(
+    `/organiser/events/${eventId}/registrations/${registrationId}/cancel`,
+    token,
+    {
+      method: 'POST',
+      body: JSON.stringify({ reason: reason ?? null }),
+    },
+  );

@@ -8,7 +8,12 @@ import {
   SecondaryButton,
   TextInput,
 } from '@/app/admin/studio/_components/form';
-import { useCoupons, useEventRegistrations } from '@/lib/studio/organiser-hooks';
+import {
+  describeOrganiserError,
+  useCancelRegistration,
+  useCoupons,
+  useEventRegistrations,
+} from '@/lib/studio/organiser-hooks';
 import type { Coupon, OrganiserEvent, RegistrationRow } from '@/lib/organiser-api';
 import {
   describeRunner,
@@ -108,6 +113,30 @@ export function Registrations({
     event?.distanceCategories?.find((d) => d.id === row.distanceCategoryId)
       ?.categoryName ?? '—';
 
+  // Mark-as-failed action. Available on non-paid rows (paid rows must use
+  // the Refund action so we don't silently lose captured money).
+  const cancelMut = useCancelRegistration(eventId);
+  const [cancellingIds, setCancellingIds] = useState<Set<string>>(() => new Set());
+  const handleCancel = async (row: RegistrationRow) => {
+    const ok = window.confirm(
+      `Mark ${row.user?.name || 'this registration'} as failed? They'll be removed from the event roster. This can't be undone here.`,
+    );
+    if (!ok) return;
+    setCancellingIds((prev) => new Set(prev).add(row.id));
+    try {
+      await cancelMut.mutateAsync({ registrationId: row.id });
+      toast.success('Registration marked as failed');
+    } catch (e) {
+      toast.error(describeOrganiserError(e));
+    } finally {
+      setCancellingIds((prev) => {
+        const next = new Set(prev);
+        next.delete(row.id);
+        return next;
+      });
+    }
+  };
+
   return (
     <>
       <div className="bg-white border border-jet/10 rounded-2xl p-4">
@@ -191,6 +220,8 @@ export function Registrations({
                     couponsById={couponsById}
                     refundPending={pendingRefundIds.has(row.id)}
                     onRefund={() => setRefundTarget(row)}
+                    onCancel={() => handleCancel(row)}
+                    cancelPending={cancellingIds.has(row.id)}
                   />
                 ))}
               </tbody>
@@ -264,12 +295,16 @@ function Row({
   couponsById,
   refundPending,
   onRefund,
+  onCancel,
+  cancelPending,
 }: {
   row: RegistrationRow;
   distances: OrganiserEvent['distanceCategories'] | null;
   couponsById: Map<string, Coupon>;
   refundPending: boolean;
   onRefund: () => void;
+  onCancel: () => void;
+  cancelPending: boolean;
 }) {
   const distance =
     distances?.find((d) => d.id === row.distanceCategoryId)?.categoryName ?? '—';
@@ -279,6 +314,9 @@ function Row({
   const couponCode = row.couponId ? couponsById.get(row.couponId)?.code : null;
   const refundEligible =
     row.paymentStatus === 'paid' && row.registrationStatus !== 'cancelled';
+  // Cancel-eligible = not paid (paid must go through refund) and not already cancelled.
+  const cancelEligible =
+    row.paymentStatus !== 'paid' && row.registrationStatus !== 'cancelled';
 
   return (
     <tr>
@@ -337,7 +375,7 @@ function Row({
               Verify
             </button>
           )}
-          {refundEligible ? (
+          {refundEligible && (
             <button
               type="button"
               onClick={onRefund}
@@ -346,17 +384,19 @@ function Row({
             >
               {refundPending ? 'Refund queued' : 'Refund'}
             </button>
-          ) : (
+          )}
+          {cancelEligible && (
             <button
               type="button"
-              disabled
-              title="Only paid registrations can be refunded"
-              className="text-[11px] px-2.5 py-1 rounded-md border border-jet/10 text-jet/30 whitespace-nowrap cursor-not-allowed"
+              onClick={onCancel}
+              disabled={cancelPending}
+              title="Cancel this registration (use Refund for paid rows)"
+              className="text-[11px] px-2.5 py-1 rounded-md border border-jet/15 text-jet/70 hover:bg-signal hover:text-bone hover:border-signal whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
-              Refund
+              {cancelPending ? 'Cancelling…' : 'Mark failed'}
             </button>
           )}
-          {!showVerifyAction && !refundEligible && (
+          {!showVerifyAction && !refundEligible && !cancelEligible && (
             <span className="sr-only">No actions available</span>
           )}
         </div>
