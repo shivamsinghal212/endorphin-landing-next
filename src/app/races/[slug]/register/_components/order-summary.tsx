@@ -1,5 +1,6 @@
 'use client';
 
+import type { ReactNode } from 'react';
 import type { DistanceCategory } from '@/lib/api';
 import type { CouponPreviewResponse } from '@/lib/runner-api';
 
@@ -55,12 +56,21 @@ export function OrderSummary({
   onPay,
   disabled,
   loading,
+  coupon,
+  error,
 }: {
   data: OrderSummaryData;
   payLabel?: string;
   onPay: () => void;
   disabled?: boolean;
   loading?: boolean;
+  /** Coupon input slot — rendered inside the summary on a bone-coloured
+   *  card so it visually belongs to the order, not the form column. */
+  coupon?: ReactNode;
+  /** Cross-cutting error (network, payment, sold-out) — sits above the
+   *  Pay button. Field-level validation errors do NOT come through here;
+   *  they render inline next to the offending field. */
+  error?: string | null;
 }) {
   const totals = deriveTotals(data);
   const baseDisplay =
@@ -95,7 +105,7 @@ export function OrderSummary({
                 <span className="text-bone/50"> ({data.coupon.discountPercent}%)</span>
               )}
             </dt>
-            <dd className="text-signal font-medium">−{fmtRupees(totals.discountPaise)}</dd>
+            <dd className="text-emerald-300 font-medium">−{fmtRupees(totals.discountPaise)}</dd>
           </div>
         )}
         <div className="border-t border-bone/15 pt-3 mt-3 flex justify-between text-base">
@@ -103,6 +113,24 @@ export function OrderSummary({
           <dd className="font-display uppercase font-bold">{finalDisplay}</dd>
         </div>
       </dl>
+
+      {/* Coupon slot is rendered inline (embedded variant) inside the
+       *  dark Order Summary, so it doesn't visually compete with the
+       *  rest of the card. The CouponInput renders its own collapsed
+       *  "+ Add coupon code" link → expanded input — no extra spacing
+       *  needed here. */}
+      {coupon}
+
+      {error && (
+        <div
+          role="alert"
+          className="mt-4 rounded-xl border border-signal/50 bg-signal/15 px-3 py-2 text-sm text-bone flex items-start gap-2"
+        >
+          <span aria-hidden>⚠</span>
+          <p className="leading-snug">{error}</p>
+        </div>
+      )}
+
       <button
         type="button"
         onClick={onPay}
@@ -115,7 +143,11 @@ export function OrderSummary({
             <path className="opacity-90" fill="currentColor" d="M4 12a8 8 0 018-8v3a5 5 0 00-5 5H4z" />
           </svg>
         )}
-        {loading ? 'Opening checkout…' : payCta}
+        {/* `payLabel` is phase-aware (Saving profile… / Creating order… /
+         *  Opening payment… / Confirming…). Use it directly instead of a
+         *  hard-coded "Opening checkout…" so the runner sees which step
+         *  is actually running. */}
+        {payCta}
       </button>
       <p className="mt-3 text-[11px] text-bone/50 leading-relaxed">
         You&rsquo;ll be charged via Razorpay (cards, UPI, netbanking). Refunds

@@ -15,8 +15,10 @@ import {
   useConfirmRegistration,
   useCreateRegistration,
   useMe,
+  useMyRegistrations,
   usePatchMe,
 } from '@/lib/runner-hooks';
+import { APP_STORE_URL, PLAY_STORE_URL } from '@/lib/store-links';
 import type { ShippingAddress } from '@/lib/runner-api';
 import {
   missingProfileFields,
@@ -98,9 +100,15 @@ export function RegistrationForm({ bundle }: { bundle: RegistrationEventBundle }
   type PayPhase = 'idle' | 'saving_profile' | 'creating_order' | 'opening_modal' | 'confirming';
   const [payPhase, setPayPhase] = useState<PayPhase>('idle');
   const submitting = payPhase !== 'idle';
-  // Persistent inline error rendered above the Pay button. Cleared on
-  // any successful step. Toasts still fire for short notifications.
+  // Inline error rendered NEXT TO the section that failed. Sidebar
+  // banner was confusing — runner couldn't tell which field needed
+  // fixing. Backend / payment failures still surface as a global
+  // formError because they aren't tied to a single field.
+  type FieldKey = 'distance' | 'profile' | 'customQuestions' | 'tshirt' | 'shipping';
+  type FieldErrors = Partial<Record<FieldKey, string>>;
+  const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
   const [formError, setFormError] = useState<string | null>(null);
+  const sectionRefs = useRef<Partial<Record<FieldKey, HTMLElement | null>>>({});
   // Track Razorpay SDK readiness so we can disable Pay until the script
   // has actually attached `window.Razorpay`. Initial value polls in case
   // the script was already loaded by a prior visit (browser cache).
@@ -194,6 +202,20 @@ export function RegistrationForm({ bundle }: { bundle: RegistrationEventBundle }
     return raw;
   };
 
+  /** Section-level failure: marks the field, scrolls to it, resets the
+   *  pay phase. Used for client-side validation errors. */
+  const failField = (key: FieldKey, msg: string) => {
+    setFieldErrors({ [key]: msg });
+    setPayPhase('idle');
+    // Scroll to the section so the runner sees the error pill.
+    const el = sectionRefs.current[key];
+    if (el && typeof el.scrollIntoView === 'function') {
+      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  };
+
+  /** Cross-cutting failure (network, payment, sold-out) — rendered in the
+   *  sidebar above the Pay button. Not field-specific. */
   const fail = (msg: string) => {
     setFormError(msg);
     setPayPhase('idle');
@@ -202,36 +224,37 @@ export function RegistrationForm({ bundle }: { bundle: RegistrationEventBundle }
   const onSubmit = async () => {
     if (submitting) return;
     setFormError(null);
+    setFieldErrors({});
 
     // 1. Distance
     if (!distanceId) {
-      fail('Pick a distance to continue.');
+      failField('distance', 'Pick a distance to continue.');
       return;
     }
     // 2. Profile completeness — validate the inline draft.
     const stillMissing = profileDraftValidate(profile, missing);
     if (stillMissing) {
-      fail(`Please fill in ${stillMissing}.`);
+      failField('profile', `Please fill in ${stillMissing}.`);
       return;
     }
     // 3. Custom questions
     const customCheck = validateCustomQuestions(customFields, customData);
     if (!customCheck.ok) {
-      fail('Please answer the required questions.');
+      failField('customQuestions', 'Please answer the required questions.');
       const el = document.getElementById(`field-${customCheck.firstMissingId}`);
       el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
       return;
     }
     // 4. T-shirt
     if (needsTshirt && tshirtSizes.length > 0 && !tshirt) {
-      fail('Please pick a T-shirt size.');
+      failField('tshirt', 'Please pick a T-shirt size.');
       return;
     }
     // 5. Shipping
     if (needsShipping) {
       const s = validateShipping(shipping);
       if (!s.ok) {
-        fail(s.reason);
+        failField('shipping', s.reason);
         return;
       }
     }
@@ -295,28 +318,29 @@ export function RegistrationForm({ bundle }: { bundle: RegistrationEventBundle }
         return;
       }
 
-      // Confirm with backend.
-      setPayPhase('confirming');
-      try {
-        await confirmReg.mutateAsync({
+      // Confirm with backend — fire-and-forget. We don't `await` because
+      // /confirm can do non-trivial work (signature verify, FOR UPDATE
+      // locks, bib generation, email send) and the runner shouldn't sit
+      // on the form waiting. The success page polls /me/registrations
+      // and the webhook also marks paid, so worst-case we converge there.
+      void confirmReg
+        .mutateAsync({
           registrationId: created.registrationId,
           body: {
             razorpayPaymentId: result.payload.razorpay_payment_id,
             razorpayOrderId: result.payload.razorpay_order_id,
             razorpaySignature: result.payload.razorpay_signature,
           },
+        })
+        .then(() => {
+          // Clear the saved draft on durable success — row is paid.
+          try { window.localStorage.removeItem(draftKey); } catch {}
+        })
+        .catch((e) => {
+          console.warn('Registration confirm failed; webhook will reconcile', e);
         });
-        toast.success('You’re registered!');
-        // Clear the saved draft on durable success — the row is paid.
-        try { window.localStorage.removeItem(draftKey); } catch {}
-      } catch (e) {
-        // /confirm failed but Razorpay says they paid. Webhook will
-        // eventually mark paid via payment.captured. Land them on the
-        // success page which polls + offers a Refresh button.
-        console.warn('Registration confirm failed; polling on success page', e);
-        toast.info('Payment received — confirming with the platform…');
-      }
 
+      toast.success('Payment received — confirming…');
       const slug = event.slug || event.id;
       router.push(
         `/races/${encodeURIComponent(slug)}/register/success?id=${encodeURIComponent(created.registrationId)}`,
@@ -325,6 +349,22 @@ export function RegistrationForm({ bundle }: { bundle: RegistrationEventBundle }
       fail(friendlyError(describeRunnerError(e)));
     }
   };
+
+  // Block the form when the runner already has an active (paid + non-
+  // cancelled) registration for this event. The partial unique index
+  // would 409 anyway, but it's a bad first impression to show a Pay
+  // button to someone who's already registered. Send them to their
+  // existing bib instead.
+  const myRegsQ = useMyRegistrations();
+  const existingPaid = myRegsQ.data?.items.find(
+    (r) =>
+      r.eventId === event.id &&
+      r.registrationStatus !== 'cancelled' &&
+      (r.paymentStatus === 'paid' || r.paymentStatus === 'free'),
+  );
+  if (existingPaid) {
+    return <AlreadyRegisteredView reg={existingPaid} eventSlug={event.slug || event.id} />;
+  }
 
   if (distances.length === 0) {
     return (
@@ -363,25 +403,54 @@ export function RegistrationForm({ bundle }: { bundle: RegistrationEventBundle }
           }}
           className="min-w-0"
         >
-          <ProfileGate draft={profile} setDraft={setProfile} missing={missing} />
+        {/* `<fieldset disabled>` natively disables every nested input,
+            select, textarea and button. We pair it with reduced opacity
+            so the lock is visually obvious — runner can't edit fields
+            mid-payment and desync from the in-flight request. */}
+        <fieldset
+          disabled={submitting}
+          className={`contents ${submitting ? 'opacity-60' : ''}`}
+        >
+          <div ref={(el) => { sectionRefs.current.profile = el; }}>
+            <ProfileGate draft={profile} setDraft={setProfile} missing={missing} />
+            <InlineFieldError error={fieldErrors.profile} />
+          </div>
 
-          <DistancePicker
-            distances={distances}
-            value={distanceId}
-            onChange={setDistanceId}
-            currency={event.currency}
-          />
+          <div ref={(el) => { sectionRefs.current.distance = el; }}>
+            <DistancePicker
+              distances={distances}
+              value={distanceId}
+              onChange={(v) => {
+                setDistanceId(v);
+                if (fieldErrors.distance) setFieldErrors((p) => ({ ...p, distance: undefined }));
+              }}
+              currency={event.currency}
+            />
+            <InlineFieldError error={fieldErrors.distance} />
+          </div>
 
           {customFields.length > 0 && (
-            <CustomQuestions
-              fields={customFields}
-              values={customData}
-              onChange={setCustomData}
-            />
+            <div ref={(el) => { sectionRefs.current.customQuestions = el; }}>
+              <CustomQuestions
+                fields={customFields}
+                values={customData}
+                onChange={(next) => {
+                  setCustomData(next);
+                  if (fieldErrors.customQuestions)
+                    setFieldErrors((p) => ({ ...p, customQuestions: undefined }));
+                }}
+              />
+              <InlineFieldError error={fieldErrors.customQuestions} />
+            </div>
           )}
 
           {needsTshirt && tshirtSizes.length > 0 && (
-            <section className="bg-white border border-jet/10 rounded-2xl p-5 md:p-6 mb-4">
+            <section
+              ref={(el) => { sectionRefs.current.tshirt = el; }}
+              className={`bg-white border rounded-2xl p-5 md:p-6 mb-4 ${
+                fieldErrors.tshirt ? 'border-signal' : 'border-jet/10'
+              }`}
+            >
               <p className="font-display uppercase text-sm font-bold text-jet mb-3">
                 T-shirt size
               </p>
@@ -392,7 +461,11 @@ export function RegistrationForm({ bundle }: { bundle: RegistrationEventBundle }
                     <button
                       key={s}
                       type="button"
-                      onClick={() => setTshirt(s)}
+                      onClick={() => {
+                        setTshirt(s);
+                        if (fieldErrors.tshirt)
+                          setFieldErrors((p) => ({ ...p, tshirt: undefined }));
+                      }}
                       className={`px-4 py-2 rounded-full text-sm border transition-colors ${
                         selected
                           ? 'bg-jet text-bone border-jet'
@@ -404,45 +477,41 @@ export function RegistrationForm({ bundle }: { bundle: RegistrationEventBundle }
                   );
                 })}
               </div>
+              {fieldErrors.tshirt && (
+                <p
+                  role="alert"
+                  className="mt-3 text-xs text-signal flex items-center gap-1.5 leading-snug"
+                >
+                  <span aria-hidden className="text-[11px]">⚠</span>
+                  {fieldErrors.tshirt}
+                </p>
+              )}
             </section>
           )}
 
           {needsShipping && (
-            <ShippingAddressFields
-              value={shipping}
-              onChange={setShipping}
-              title={extras.shipsMedal ? 'Medal shipping address' : 'Shipping address'}
-              hint={
-                extras.shipsMedal
-                  ? 'We&rsquo;ll ship your finisher medal here after the event.'
-                  : undefined
-              }
-            />
+            <div ref={(el) => { sectionRefs.current.shipping = el; }}>
+              <ShippingAddressFields
+                value={shipping}
+                onChange={(next) => {
+                  setShipping(next);
+                  if (fieldErrors.shipping)
+                    setFieldErrors((p) => ({ ...p, shipping: undefined }));
+                }}
+                title={extras.shipsMedal ? 'Medal shipping address' : 'Shipping address'}
+                hint={
+                  extras.shipsMedal
+                    ? 'We&rsquo;ll ship your finisher medal here after the event.'
+                    : undefined
+                }
+              />
+              <InlineFieldError error={fieldErrors.shipping} />
+            </div>
           )}
-
-          {distanceId && (
-            <CouponInput
-              eventId={event.id}
-              distanceCategoryId={distanceId}
-              applied={coupon}
-              onApplied={setCoupon}
-              onCleared={() => setCoupon(null)}
-            />
-          )}
+        </fieldset>
         </form>
 
         <aside className="lg:sticky lg:top-24">
-          {/* Persistent inline error — toasts auto-dismiss; this stays
-              visible until the runner takes another action. */}
-          {formError && (
-            <div
-              role="alert"
-              className="mb-3 rounded-xl border border-signal/40 bg-signal/5 px-4 py-3 text-sm text-signal flex items-start gap-2"
-            >
-              <span aria-hidden>⚠</span>
-              <p className="leading-snug">{formError}</p>
-            </div>
-          )}
           <OrderSummary
             data={{
               distance: selectedDistance,
@@ -473,6 +542,24 @@ export function RegistrationForm({ bundle }: { bundle: RegistrationEventBundle }
             onPay={onSubmit}
             disabled={!distanceId || !sdkReady}
             loading={submitting || !sdkReady}
+            // Coupon lives inside the order summary so the runner sees
+            // the discount line item and the "Apply" button in the same
+            // box where they decide to pay.
+            coupon={
+              distanceId ? (
+                <CouponInput
+                  variant="embedded"
+                  eventId={event.id}
+                  distanceCategoryId={distanceId}
+                  applied={coupon}
+                  onApplied={setCoupon}
+                  onCleared={() => setCoupon(null)}
+                />
+              ) : null
+            }
+            // Backend / payment failures still surface here in the sidebar
+            // — they're cross-cutting, not tied to a single form field.
+            error={formError}
           />
           <p className="mt-3 text-xs text-jet/50 text-center">
             <Link
@@ -511,4 +598,135 @@ function profileDraftValidate(
     }
   }
   return null;
+}
+
+/** Inline field-level error. Lightweight: small red text right under the
+ *  failing section, no chunky card. Tucks visually into the section
+ *  above via a negative top margin so the two read as a single unit. */
+function InlineFieldError({ error }: { error: string | undefined }) {
+  if (!error) return null;
+  return (
+    <p
+      role="alert"
+      className="-mt-3 mb-4 px-1 text-xs text-signal flex items-start gap-1.5 leading-snug"
+    >
+      <span aria-hidden className="text-[11px]">⚠</span>
+      <span>{error}</span>
+    </p>
+  );
+}
+
+const IST = 'Asia/Kolkata';
+function fmtFullDate(iso: string) {
+  return new Date(iso).toLocaleString('en-GB', {
+    weekday: 'short', day: 'numeric', month: 'long', year: 'numeric', timeZone: IST,
+  });
+}
+
+/** Rendered when the runner lands on the registration page but already
+ *  has a paid + non-cancelled registration for this event. We replace
+ *  the form with a celebratory confirmation and push the mobile app —
+ *  registration management lives there, not in the marketing site. */
+function AlreadyRegisteredView({
+  reg,
+  eventSlug,
+}: {
+  reg: import('@/lib/runner-api').MyRegistrationItem;
+  eventSlug: string;
+}) {
+  const isVirtual = reg.event?.eventFormat === 'virtual';
+  const windowStart = reg.event?.resultWindowStart;
+  const windowEnd = reg.event?.resultWindowEnd;
+  return (
+    <div className="max-w-2xl">
+      <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-medium uppercase tracking-wider mb-3">
+        <span aria-hidden>✓</span> You’re already in
+      </div>
+      <h1 className="font-display uppercase text-3xl md:text-4xl font-bold leading-tight mb-3">
+        See you at the start line
+      </h1>
+      <p className="text-sm text-jet/70 mb-6 max-w-md">
+        Here’s your bib for <strong>{reg.event?.title ?? 'this event'}</strong>.
+        Track the run and upload your result from the Endorfin app.
+      </p>
+
+      {/* Dark bib card — mirrors the success view's PaidView card. */}
+      <div className="bg-jet text-bone rounded-2xl p-6 md:p-8 mb-6">
+        <p className="text-xs uppercase tracking-widest text-bone/60 mb-2">Bib</p>
+        <p className="font-display uppercase text-5xl md:text-6xl font-bold leading-none">
+          {reg.bibNumber ?? '—'}
+        </p>
+        <div className="mt-6 grid grid-cols-2 gap-4 text-sm">
+          <div>
+            <p className="text-bone/60 text-[11px] uppercase tracking-wider mb-0.5">Event</p>
+            <p className="font-medium">{reg.event?.title ?? '—'}</p>
+          </div>
+          <div>
+            <p className="text-bone/60 text-[11px] uppercase tracking-wider mb-0.5">Distance</p>
+            <p className="font-medium">
+              {reg.distance?.fullTitle ?? reg.distance?.categoryName ?? '—'}
+            </p>
+          </div>
+          {windowStart && (
+            <div>
+              <p className="text-bone/60 text-[11px] uppercase tracking-wider mb-0.5">
+                {isVirtual ? 'Run window' : 'Event date'}
+              </p>
+              <p className="font-medium leading-snug">
+                {fmtFullDate(windowStart)}
+                {isVirtual && windowEnd ? ` – ${fmtFullDate(windowEnd)}` : ''}
+              </p>
+            </div>
+          )}
+          <div>
+            <p className="text-bone/60 text-[11px] uppercase tracking-wider mb-0.5">Format</p>
+            <p className="font-medium capitalize">
+              {(reg.event?.eventFormat ?? 'event').replace('_', ' ')}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Primary action: download the app. Web-based registration
+       *  management is intentionally deemphasised — the app is the home
+       *  for "my events", run uploads, and race-day reminders. */}
+      <div className="bg-bone border border-jet/10 rounded-2xl p-5 md:p-6 mb-5">
+        <p className="font-display uppercase text-sm font-bold mb-2">
+          Get the Endorfin app to manage your registration
+        </p>
+        <p className="text-sm text-jet/70 mb-4 leading-relaxed">
+          {isVirtual
+            ? 'Track your run and upload the result directly from the app — that’s how you collect your medal.'
+            : 'Bib on your lock screen, race-day reminders, and a record of every event you’ve done.'}
+        </p>
+        <div className="flex flex-wrap gap-2">
+          <a
+            href={APP_STORE_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center px-4 py-2.5 rounded-lg bg-jet text-bone text-sm font-medium hover:bg-jet/90"
+          >
+            App Store
+          </a>
+          <a
+            href={PLAY_STORE_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center px-4 py-2.5 rounded-lg bg-jet text-bone text-sm font-medium hover:bg-jet/90"
+          >
+            Google Play
+          </a>
+        </div>
+      </div>
+
+      <div>
+        <Link
+          href={`/races/${encodeURIComponent(eventSlug)}`}
+          className="text-sm text-jet/60 hover:text-jet underline-offset-2 hover:underline"
+        >
+          ← Back to event details
+        </Link>
+      </div>
+    </div>
+  );
 }

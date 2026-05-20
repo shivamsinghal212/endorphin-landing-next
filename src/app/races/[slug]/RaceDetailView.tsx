@@ -11,6 +11,7 @@ import LoginModal from '@/components/LoginModal';
 import RaceCouponContext from '@/components/RaceCouponContext';
 import { couponCta } from '@/lib/coupon-cta';
 import type { Event, DistanceCategory } from '@/lib/api';
+import { useMyRegistrations } from '@/lib/runner-hooks';
 
 // Pin to IST so SSR (UTC server) and the client (any TZ) render identical
 // text — without an explicit timeZone, locale formatting uses the runtime's
@@ -87,6 +88,22 @@ export default function RaceDetailView({
   const dateStr = fmtFullDate(event.startTime);
   const timeStr = fmtTime(event.startTime);
   const priceStr = fmtPrice(event.priceMin, event.currency) || 'Free';
+
+  // Detect whether the signed-in runner already has an active paid
+  // registration for this event. We swap the Register CTA for a "You're
+  // in" badge + bib, and surface the bib in the "Registered" meta cell.
+  // The hook returns `undefined` for anonymous visitors (no RunnerProviders),
+  // which keeps this a no-op for the public path.
+  const myRegsQ = useMyRegistrations();
+  const myActiveRegistration = isAuthed
+    ? myRegsQ.data?.items.find(
+        (r) =>
+          r.eventId === event.id &&
+          r.registrationStatus !== 'cancelled' &&
+          (r.paymentStatus === 'paid' || r.paymentStatus === 'free'),
+      )
+    : undefined;
+  const isAlreadyRegistered = !!myActiveRegistration;
   const tags = distanceTags(event);
   const mapUrl =
     event.latitude != null && event.longitude != null
@@ -219,9 +236,16 @@ export default function RaceDetailView({
               </div>
             </div>
             <div className="v1rd-ms-cell">
-              <div className="v1rd-l">{event.goingCount > 0 ? 'Going' : 'Registered'}</div>
+              <div className="v1rd-l">
+                {isAlreadyRegistered ? 'Your bib' : event.goingCount > 0 ? 'Going' : 'Registered'}
+              </div>
               <div className="v1rd-v">
-                {event.goingCount > 0 ? (
+                {isAlreadyRegistered ? (
+                  <>
+                    {myActiveRegistration!.bibNumber ?? '—'}
+                    <small>You’re in</small>
+                  </>
+                ) : event.goingCount > 0 ? (
                   <>
                     {event.goingCount} {event.goingCount === 1 ? 'runner' : 'runners'}
                     {event.totalTicketsSold != null && event.totalTicketsSold > 0 && (
@@ -238,7 +262,19 @@ export default function RaceDetailView({
           </div>
 
           <div className="v1rd-cta-row">
-            {event.eventSourceType === 'organizer' ? (
+            {isAlreadyRegistered ? (
+              // Runner has an active paid registration — replace the
+              // Register CTA with a confirmation badge linking back to
+              // the registration page (which shows AlreadyRegisteredView
+              // with bib + app-install nudge).
+              <Link
+                className="v1rd-btn v1rd-btn-primary"
+                href={`/races/${event.slug || event.id}/register`}
+                style={{ background: '#059669' }}
+              >
+                ✓ You’re in · Bib {myActiveRegistration!.bibNumber ?? '—'}
+              </Link>
+            ) : event.eventSourceType === 'organizer' ? (
               // Endorfin-hosted paid event — runs through our internal
               // checkout flow (Razorpay lands in a later stream; today
               // /races/{slug}/register surfaces the registration form).

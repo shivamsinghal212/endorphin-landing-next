@@ -4,6 +4,8 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { eventsApi, ApiError, type Event } from '@/lib/api';
 import { getSessionToken } from '@/lib/session';
+import { getStudioAuth } from '@/lib/studio/server-auth';
+import { RunnerProviders } from './register/_components/runner-providers';
 import RaceDetailView from './RaceDetailView';
 import './race-detail.css';
 
@@ -184,8 +186,37 @@ export default async function RaceDetailPage({ params }: PageProps) {
         }}
       />
       <Header />
-      <RaceDetailView event={event} isAuthed={!!token} />
+      {/* Wrap in RunnerProviders when the runner is signed in so the
+       *  detail view can call useMyRegistrations() and swap the CTA to
+       *  "You're in" for events they've already paid for. Anonymous
+       *  visitors get the lighter wrap (just the view, no React Query). */}
+      {token ? (
+        <RaceDetailWithRunnerContext event={event} isAuthed={true} />
+      ) : (
+        <RaceDetailView event={event} isAuthed={false} />
+      )}
       <Footer />
     </main>
+  );
+}
+
+/** Mounts RunnerProviders so RaceDetailView can call runner hooks
+ *  (useMyRegistrations) for the "Already registered" swap. Server
+ *  component — resolves the marketing-session JWT via getStudioAuth(). */
+async function RaceDetailWithRunnerContext({
+  event,
+  isAuthed,
+}: {
+  event: Event;
+  isAuthed: boolean;
+}) {
+  const studio = await getStudioAuth();
+  if (!studio) {
+    return <RaceDetailView event={event} isAuthed={isAuthed} />;
+  }
+  return (
+    <RunnerProviders studio={studio}>
+      <RaceDetailView event={event} isAuthed={isAuthed} />
+    </RunnerProviders>
   );
 }

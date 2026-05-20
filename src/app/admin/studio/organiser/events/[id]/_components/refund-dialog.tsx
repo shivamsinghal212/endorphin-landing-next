@@ -85,7 +85,9 @@ export function RefundDialog({
     if (reason.trim()) payload.reason = reason.trim().slice(0, 280);
     try {
       await mutation.mutateAsync(payload);
-      toast.success('Refund queued — Razorpay will confirm within 5–10 days');
+      toast.success(
+        'Registration cancelled and refund queued — Razorpay will confirm within 5–10 days',
+      );
       onRefundQueued(registration.id);
       onClose();
     } catch (err) {
@@ -108,7 +110,7 @@ export function RefundDialog({
     >
       <div className="p-5">
         <p className="font-display uppercase text-sm font-bold mb-1">
-          Refund registration
+          Cancel & refund
         </p>
         <div className="text-[12px] text-jet/60 mb-4">
           <p>
@@ -117,6 +119,10 @@ export function RefundDialog({
             {distanceLabel}
             {' · '}
             Paid {formatINR(amountPaid)}
+          </p>
+          <p className="mt-2 leading-snug">
+            This cancels the registration and queues a Razorpay refund. The
+            runner can re-register for the same distance afterwards.
           </p>
         </div>
 
@@ -190,7 +196,7 @@ export function RefundDialog({
             disabled={!canSubmit}
             loading={mutation.isPending}
           >
-            Refund
+            Cancel & refund
           </PrimaryButton>
         </div>
       </div>
