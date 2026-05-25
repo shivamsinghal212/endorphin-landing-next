@@ -155,7 +155,7 @@
 
 .v1rd-page .v1rd-hero-img {
   margin: 36px calc(-1 * var(--v1rd-gutter)) 0;
-  aspect-ratio: 21 / 9;
+  aspect-ratio: 16 / 9;
   background-size: cover;
   background-position: center;
   position: relative;
@@ -188,7 +188,7 @@
 
 .v1rd-page .v1rd-hero-slide {
   flex: 0 0 100%;
-  aspect-ratio: 21 / 9;
+  aspect-ratio: 16 / 9;
   background-size: cover;
   background-position: center;
   scroll-snap-align: start;
