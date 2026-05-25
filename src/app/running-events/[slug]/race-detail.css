@@ -156,16 +156,12 @@
 .v1rd-page .v1rd-hero-img {
   margin: 36px calc(-1 * var(--v1rd-gutter)) 0;
   aspect-ratio: 16 / 9;
-  background-size: cover;
+  background-color: var(--v1rd-cream);
+  background-size: contain;
   background-position: center;
+  background-repeat: no-repeat;
   position: relative;
   filter: contrast(1.05);
-}
-.v1rd-page .v1rd-hero-img::after {
-  content: '';
-  position: absolute; inset: 0;
-  background: linear-gradient(180deg, transparent 60%, rgba(245, 240, 235, 0.4) 100%);
-  pointer-events: none;
 }
 
 /* Hero carousel — used when an event has more than one image */
@@ -189,18 +185,14 @@
 .v1rd-page .v1rd-hero-slide {
   flex: 0 0 100%;
   aspect-ratio: 16 / 9;
-  background-size: cover;
+  background-color: var(--v1rd-cream);
+  background-size: contain;
   background-position: center;
+  background-repeat: no-repeat;
   scroll-snap-align: start;
   scroll-snap-stop: always;
   filter: contrast(1.05);
   position: relative;
-}
-.v1rd-page .v1rd-hero-slide::after {
-  content: '';
-  position: absolute; inset: 0;
-  background: linear-gradient(180deg, transparent 60%, rgba(245, 240, 235, 0.4) 100%);
-  pointer-events: none;
 }
 
 .v1rd-page .v1rd-hero-nav {
