@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useCallback, useEffect, useRef, useState, useTransition } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, useTransition } from 'react';
 import { createPortal } from 'react-dom';
 import ReactMarkdown from 'react-markdown';
 import posthog from 'posthog-js';
@@ -55,6 +55,96 @@ function distanceTags(event: Event): string[] {
 
 function hasAnyPrice(cats: DistanceCategory[]): boolean {
   return cats.some((d) => (d.discountedPrice ?? d.price) != null);
+}
+
+function HeroCarousel({ slides }: { slides: string[] }) {
+  const trackRef = useRef<HTMLDivElement | null>(null);
+  const [activeIndex, setActiveIndex] = useState(0);
+
+  const scrollTo = useCallback((i: number) => {
+    const track = trackRef.current;
+    if (!track) return;
+    track.scrollTo({ left: track.clientWidth * i, behavior: 'smooth' });
+  }, []);
+
+  const onScroll = useCallback(() => {
+    const track = trackRef.current;
+    if (!track || !track.clientWidth) return;
+    const i = Math.round(track.scrollLeft / track.clientWidth);
+    setActiveIndex((prev) => (prev === i ? prev : i));
+  }, []);
+
+  const onKeyDown: React.KeyboardEventHandler<HTMLDivElement> = (e) => {
+    if (e.key === 'ArrowRight') {
+      e.preventDefault();
+      scrollTo(Math.min(activeIndex + 1, slides.length - 1));
+    } else if (e.key === 'ArrowLeft') {
+      e.preventDefault();
+      scrollTo(Math.max(activeIndex - 1, 0));
+    }
+  };
+
+  return (
+    <div
+      className="v1rd-hero-carousel"
+      role="region"
+      aria-roledescription="carousel"
+      aria-label="Event photos"
+      tabIndex={0}
+      onKeyDown={onKeyDown}
+    >
+      <div ref={trackRef} className="v1rd-hero-track" onScroll={onScroll}>
+        {slides.map((src, i) => (
+          <div
+            key={`${src}-${i}`}
+            className="v1rd-hero-slide"
+            style={{ backgroundImage: `url('${src}')` }}
+            role="group"
+            aria-roledescription="slide"
+            aria-label={`Photo ${i + 1} of ${slides.length}`}
+          />
+        ))}
+      </div>
+
+      {activeIndex > 0 && (
+        <button
+          type="button"
+          className="v1rd-hero-nav v1rd-hero-nav--prev"
+          aria-label="Previous photo"
+          onClick={() => scrollTo(activeIndex - 1)}
+        >
+          <span aria-hidden>‹</span>
+        </button>
+      )}
+      {activeIndex < slides.length - 1 && (
+        <button
+          type="button"
+          className="v1rd-hero-nav v1rd-hero-nav--next"
+          aria-label="Next photo"
+          onClick={() => scrollTo(activeIndex + 1)}
+        >
+          <span aria-hidden>›</span>
+        </button>
+      )}
+
+      <div className="v1rd-hero-counter" aria-live="polite">
+        {activeIndex + 1} / {slides.length}
+      </div>
+
+      <div className="v1rd-hero-dots">
+        {slides.map((_, i) => (
+          <button
+            key={i}
+            type="button"
+            className={`v1rd-hero-dot${i === activeIndex ? ' is-active' : ''}`}
+            onClick={() => scrollTo(i)}
+            aria-label={`Go to photo ${i + 1}`}
+            aria-current={i === activeIndex ? 'true' : undefined}
+          />
+        ))}
+      </div>
+    </div>
+  );
 }
 
 export default function RaceDetailView({
@@ -112,6 +202,15 @@ export default function RaceDetailView({
     event.latitude != null && event.longitude != null
       ? `https://maps.google.com/?q=${event.latitude},${event.longitude}`
       : null;
+
+  const heroSlides = useMemo(() => {
+    const out: string[] = [];
+    if (event.imageUrl) out.push(event.imageUrl);
+    for (const url of event.galleryImages ?? []) {
+      if (url && !out.includes(url)) out.push(url);
+    }
+    return out;
+  }, [event.imageUrl, event.galleryImages]);
 
   const cta = couponCta(event);
   const heroCtaLabel = showCoupon
@@ -340,13 +439,14 @@ export default function RaceDetailView({
             )}
           </div>
 
-          {event.imageUrl && (
+          {heroSlides.length === 1 && (
             <div
               className="v1rd-hero-img"
-              style={{ backgroundImage: `url('${event.imageUrl}')` }}
+              style={{ backgroundImage: `url('${heroSlides[0]}')` }}
               aria-hidden
             />
           )}
+          {heroSlides.length > 1 && <HeroCarousel slides={heroSlides} />}
         </div>
       </section>
 

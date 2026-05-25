@@ -168,6 +168,117 @@
   pointer-events: none;
 }
 
+/* Hero carousel — used when an event has more than one image */
+.v1rd-page .v1rd-hero-carousel {
+  position: relative;
+  margin: 36px calc(-1 * var(--v1rd-gutter)) 0;
+  outline: none;
+}
+.v1rd-page .v1rd-hero-track {
+  display: flex;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.v1rd-page .v1rd-hero-track::-webkit-scrollbar { display: none; }
+
+.v1rd-page .v1rd-hero-slide {
+  flex: 0 0 100%;
+  aspect-ratio: 21 / 9;
+  background-size: cover;
+  background-position: center;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+  filter: contrast(1.05);
+  position: relative;
+}
+.v1rd-page .v1rd-hero-slide::after {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(180deg, transparent 60%, rgba(245, 240, 235, 0.4) 100%);
+  pointer-events: none;
+}
+
+.v1rd-page .v1rd-hero-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 44px; height: 44px;
+  display: grid; place-items: center;
+  background: rgba(20, 20, 20, 0.55);
+  color: var(--v1rd-bone);
+  border: 0;
+  border-radius: 999px;
+  font-size: 30px;
+  line-height: 1;
+  cursor: pointer;
+  z-index: 2;
+  transition: background 0.15s ease, transform 0.15s ease;
+}
+.v1rd-page .v1rd-hero-nav:hover {
+  background: rgba(20, 20, 20, 0.85);
+}
+.v1rd-page .v1rd-hero-nav:focus-visible {
+  outline: 2px solid var(--v1rd-bone);
+  outline-offset: 2px;
+}
+.v1rd-page .v1rd-hero-nav--prev { left: 16px; }
+.v1rd-page .v1rd-hero-nav--next { right: 16px; }
+.v1rd-page .v1rd-hero-nav span { transform: translateY(-2px); }
+
+.v1rd-page .v1rd-hero-counter {
+  position: absolute;
+  top: 14px; right: 16px;
+  font-family: 'Oswald', sans-serif;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--v1rd-bone);
+  background: rgba(20, 20, 20, 0.55);
+  padding: 5px 10px;
+  border-radius: 999px;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.v1rd-page .v1rd-hero-dots {
+  position: absolute;
+  left: 50%; bottom: 14px;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 6px;
+  z-index: 2;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: rgba(20, 20, 20, 0.35);
+}
+.v1rd-page .v1rd-hero-dot {
+  width: 6px; height: 6px;
+  border-radius: 999px;
+  background: rgba(245, 240, 235, 0.55);
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  transition: background 0.2s ease, width 0.2s ease;
+}
+.v1rd-page .v1rd-hero-dot.is-active {
+  background: var(--v1rd-bone);
+  width: 18px;
+}
+.v1rd-page .v1rd-hero-dot:focus-visible {
+  outline: 2px solid var(--v1rd-bone);
+  outline-offset: 2px;
+}
+
+/* On touch-only devices hide the chevrons — swipe + dots is plenty. */
+@media (hover: none) {
+  .v1rd-page .v1rd-hero-nav { display: none; }
+}
+
 /* Sections */
 .v1rd-page .v1rd-block {
   padding: 56px 0;
