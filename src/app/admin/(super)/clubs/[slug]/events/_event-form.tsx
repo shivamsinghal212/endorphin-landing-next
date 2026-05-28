@@ -17,7 +17,22 @@ import {
 import { Card } from '../../_components/card';
 import { CheckboxField, Field } from '../../_components/field';
 import { ImageUploadField, ImageGalleryField } from '../../_components/image-upload';
+import { TagsField } from '../../_components/tags-field';
 import { VideoUploadField } from '../../_components/video-upload';
+
+// Stay in sync with the EventType Literal in
+// EndorphinBackend/app/schemas/club_event.py. ``race_event`` is the legacy
+// race-import value and stays visible so admins can audit pre-scrape rows;
+// the scraper itself only emits the ``club_*`` family.
+const EVENT_TYPE_OPTIONS: { value: ClubEventType; label: string }[] = [
+  { value: 'club_run', label: 'Club run' },
+  { value: 'club_race', label: 'Club race' },
+  { value: 'club_workshop', label: 'Workshop' },
+  { value: 'club_social', label: 'Social' },
+  { value: 'club_meetup', label: 'Meetup' },
+  { value: 'club_cross_train', label: 'Cross-train' },
+  { value: 'race_event', label: 'Race event (legacy)' },
+];
 
 interface EventFormState {
   title: string;
@@ -30,6 +45,10 @@ interface EventFormState {
   coverImageUrl: string;
   distanceKm: string;
   eventType: ClubEventType;
+  // Scrape-derived; editable here.
+  tagline: string;
+  secondaryActivities: string[];
+  sponsorsSeen: string[];
 
   hasRecap: boolean;
   recapSummary: string;
@@ -52,6 +71,9 @@ function emptyState(): EventFormState {
     coverImageUrl: '',
     distanceKm: '',
     eventType: 'club_run',
+    tagline: '',
+    secondaryActivities: [],
+    sponsorsSeen: [],
     hasRecap: false,
     recapSummary: '',
     recapShowedUp: '',
@@ -74,6 +96,9 @@ function fromEvent(e: ClubEvent): EventFormState {
     coverImageUrl: e.coverImageUrl ?? '',
     distanceKm: e.distanceKm?.toString() ?? '',
     eventType: e.eventType,
+    tagline: e.tagline ?? '',
+    secondaryActivities: e.secondaryActivities ?? [],
+    sponsorsSeen: e.sponsorsSeen ?? [],
     hasRecap: !!e.recap,
     recapSummary: e.recap?.summary ?? '',
     recapShowedUp: e.recap?.showedUp?.toString() ?? '',
@@ -129,6 +154,9 @@ function buildPayload(form: EventFormState): Record<string, unknown> {
     coverImageUrl: form.coverImageUrl.trim() || null,
     distanceKm: form.distanceKm ? Number(form.distanceKm) : null,
     eventType: form.eventType,
+    tagline: form.tagline.trim() || null,
+    secondaryActivities: form.secondaryActivities.map((t) => t.trim()).filter(Boolean),
+    sponsorsSeen: form.sponsorsSeen.map((t) => t.trim()).filter(Boolean),
     recap,
   };
 }
@@ -267,8 +295,11 @@ export function EventFormContent({
                   onChange={(e) => update('eventType', e.target.value as ClubEventType)}
                   className="w-full px-3 py-2 rounded-lg border border-jet/10 font-body text-sm text-jet focus:outline-none focus:border-signal/30 transition-colors"
                 >
-                  <option value="club_run">Club run</option>
-                  <option value="race_event">Race event</option>
+                  {EVENT_TYPE_OPTIONS.map((opt) => (
+                    <option key={opt.value} value={opt.value}>
+                      {opt.label}
+                    </option>
+                  ))}
                 </select>
               </div>
               <Field
@@ -302,6 +333,23 @@ export function EventFormContent({
               onChange={(v) => update('description', v)}
               textarea
               rows={4}
+            />
+            <Field
+              label="Tagline"
+              value={form.tagline}
+              onChange={(v) => update('tagline', v)}
+              placeholder="RUN & SMASH"
+              hint="Short tagline pulled off the flyer by the scraper. Editable."
+            />
+            <TagsField
+              label="Secondary activities"
+              value={form.secondaryActivities}
+              onChange={(v) => update('secondaryActivities', v)}
+            />
+            <TagsField
+              label="Sponsors seen"
+              value={form.sponsorsSeen}
+              onChange={(v) => update('sponsorsSeen', v)}
             />
           </Card>
 
@@ -395,6 +443,52 @@ export function EventFormContent({
               <p className="font-body text-xs text-jet/50">
                 Created {new Date(initialEvent.createdAt).toLocaleString()}
               </p>
+            </Card>
+          )}
+
+          {!isNew && initialEvent && initialEvent.source === 'instagram_scrape' && (
+            <Card title="Instagram scrape">
+              {initialEvent.sourcePostUrl && (
+                <p className="font-body text-xs text-jet/50">
+                  Sourced from{' '}
+                  <a
+                    href={initialEvent.sourcePostUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-jet hover:underline break-all"
+                  >
+                    {initialEvent.sourcePostUrl.replace(/^https?:\/\//, '')}
+                  </a>
+                </p>
+              )}
+              {initialEvent.topComments && initialEvent.topComments.length > 0 && (
+                <div className="mt-3">
+                  <p className="font-body text-xs font-medium text-jet/50 mb-2">
+                    Top comments ({initialEvent.topComments.length})
+                  </p>
+                  <ul className="space-y-2 max-h-72 overflow-y-auto pr-1">
+                    {initialEvent.topComments.map((c, i) => (
+                      <li
+                        key={`${c.user ?? 'anon'}-${i}`}
+                        className="rounded-lg border border-jet/10 p-2 font-body text-xs"
+                      >
+                        <div className="flex items-center justify-between gap-2 mb-1">
+                          <span className="font-medium text-jet truncate">
+                            @{c.user ?? 'anonymous'}
+                          </span>
+                          {c.likes > 0 && (
+                            <span className="text-jet/40 shrink-0">♥ {c.likes}</span>
+                          )}
+                        </div>
+                        <div className="text-jet/70 break-words">{c.text ?? ''}</div>
+                      </li>
+                    ))}
+                  </ul>
+                  <p className="mt-2 font-body text-xs text-jet/40">
+                    Captured at scrape time; refreshed on next run.
+                  </p>
+                </div>
+              )}
             </Card>
           )}
         </div>

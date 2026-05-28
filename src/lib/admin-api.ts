@@ -298,6 +298,17 @@ export interface JoinFormField {
   placeholder?: string | null;
 }
 
+export interface ClubCollaboration {
+  id: string;
+  brandName: string;
+  role: string | null;
+  handle: string | null;
+  logoUrl: string | null;
+  evidencePostUrl: string | null;
+  firstSeenAt: string;
+  lastSeenAt: string;
+}
+
 export interface Club {
   id: string;
   slug: string;
@@ -322,6 +333,15 @@ export interface Club {
   isClaimed: boolean;
   stats: ClubStats;
   admins: ClubAdminPerson[];
+  // Populated by the Instagram scrape pipeline. Editable by admins; if the
+  // form omits them on save they're preserved (the backend's POST /clubs
+  // uses exclude_unset semantics on update).
+  tagline: string | null;
+  postRunActivities: string[];
+  lastScrapedAt: string | null;
+  // Joined on /clubs/{slug} only. List endpoints leave this empty to keep
+  // the sitemap query N+1-free.
+  collaborations: ClubCollaboration[];
   createdAt: string;
   updatedAt: string;
 }
@@ -349,7 +369,25 @@ export interface ClubEventRecap {
   videos: ClubEventRecapVideo[];
 }
 
-export type ClubEventType = 'club_run' | 'race_event';
+// Stay in sync with the EventType Literal in
+// EndorphinBackend/app/schemas/club_event.py.
+export type ClubEventType =
+  | 'club_run'
+  | 'club_race'
+  | 'club_workshop'
+  | 'club_social'
+  | 'club_meetup'
+  | 'club_cross_train'
+  | 'race_event';
+
+export type ClubEventSource = 'manual' | 'instagram_scrape';
+
+export interface ClubEventComment {
+  user: string | null;
+  text: string | null;
+  likes: number;
+  date: string | null;
+}
 
 export interface ClubEvent {
   id: string;
@@ -367,7 +405,18 @@ export interface ClubEvent {
   distanceKm: number | null;
   eventType: ClubEventType;
   recap: ClubEventRecap | null;
-  createdBy: string;
+  // Scrape-derived but admin-editable.
+  secondaryActivities: string[];
+  sponsorsSeen: string[];
+  tagline: string | null;
+  topComments: ClubEventComment[] | null;
+  // Read-only system fields. ``source='instagram_scrape'`` flags rows that
+  // re-scrapes will upsert against ``sourcePostUrl``; admin-created rows are
+  // ``source='manual'`` with a null sourcePostUrl and stay invisible to the
+  // scraper.
+  source: ClubEventSource;
+  sourcePostUrl: string | null;
+  createdBy: string | null;
   createdAt: string;
   updatedAt: string;
   goingCount: number;
