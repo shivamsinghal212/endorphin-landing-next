@@ -119,47 +119,90 @@ function UpcomingRow({
   const tagLabel = isRace ? 'Race event' : 'Club run';
   const meta = [event.locationName, fmtTime(event.startTime)].filter(Boolean).join(' · ');
 
+  // Only render the expand affordance if there's something worth showing
+  // beyond what the compact row already covers.
+  const description = event.description?.trim();
+  const hasExtra = !!event.coverImageUrl || !!description;
+  const [expanded, setExpanded] = useState(false);
+
   return (
     <div
-      className={`upcoming-row${hidden ? ' upcoming-row--hidden' : ''}`}
+      className={`upcoming-row-wrapper${hidden ? ' upcoming-row--hidden' : ''}${expanded ? ' is-expanded' : ''}`}
       aria-hidden={hidden ? 'true' : undefined}
     >
-      <div>
-        <div className="row-date">{fmtDayNum(event.startTime)}</div>
-        <div className="kicker row-date-sub">
-          {fmtDay(event.startTime)} · {fmtMonth(event.startTime)}
+      <div className="upcoming-row">
+        <button
+          type="button"
+          className="upcoming-row-trigger"
+          aria-expanded={expanded}
+          aria-controls={hasExtra ? `event-${event.id}-details` : undefined}
+          onClick={() => hasExtra && setExpanded((x) => !x)}
+          disabled={!hasExtra}
+        >
+          <div>
+            <div className="row-date">{fmtDayNum(event.startTime)}</div>
+            <div className="kicker row-date-sub">
+              {fmtDay(event.startTime)} · {fmtMonth(event.startTime)}
+            </div>
+          </div>
+          <div>
+            <span className={`row-type ${isRace ? 'row-type-race' : 'row-type-club'}`}>
+              {tagLabel}
+            </span>
+            <div className="row-title">
+              {event.title}
+              {hasExtra && (
+                <span className="row-chevron" aria-hidden="true">
+                  {expanded ? '▾' : '▸'}
+                </span>
+              )}
+            </div>
+            <div className="row-meta" data-going={event.goingCount}>
+              {meta}
+            </div>
+          </div>
+        </button>
+        <div className="row-actions">
+          {event.goingCount > 0 && (
+            <span className="going-pill">{event.goingCount} going</span>
+          )}
+          {isRace ? (
+            <button className="btn btn-ghost" type="button">
+              Details
+            </button>
+          ) : (
+            <RsvpButton
+              slug={slug}
+              clubName={clubName}
+              eventId={event.id}
+              joinForm={joinForm}
+              requiresApproval={requiresApproval}
+              isAuthed={isAuthed}
+              myMembership={myMembership}
+              variant="primary"
+            />
+          )}
         </div>
       </div>
-      <div>
-        <span className={`row-type ${isRace ? 'row-type-race' : 'row-type-club'}`}>
-          {tagLabel}
-        </span>
-        <div className="row-title">{event.title}</div>
-        <div className="row-meta" data-going={event.goingCount}>
-          {meta}
+      {hasExtra && expanded && (
+        <div
+          id={`event-${event.id}-details`}
+          className="upcoming-row-details"
+        >
+          {event.coverImageUrl && (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              className="upcoming-row-flyer"
+              src={event.coverImageUrl}
+              alt=""
+              loading="lazy"
+            />
+          )}
+          {description && (
+            <p className="upcoming-row-description">{description}</p>
+          )}
         </div>
-      </div>
-      <div className="row-actions">
-        {event.goingCount > 0 && (
-          <span className="going-pill">{event.goingCount} going</span>
-        )}
-        {isRace ? (
-          <button className="btn btn-ghost" type="button">
-            Details
-          </button>
-        ) : (
-          <RsvpButton
-            slug={slug}
-            clubName={clubName}
-            eventId={event.id}
-            joinForm={joinForm}
-            requiresApproval={requiresApproval}
-            isAuthed={isAuthed}
-            myMembership={myMembership}
-            variant="primary"
-          />
-        )}
-      </div>
+      )}
     </div>
   );
 }

@@ -733,13 +733,77 @@
   letter-spacing: -0.005em;
 }
 .club-page .upcoming-count { color: var(--text-secondary); }
+.club-page .upcoming-row-wrapper {
+  border-bottom: 0.5px solid var(--hairline);
+}
 .club-page .upcoming-row {
   display: grid;
-  grid-template-columns: 72px minmax(0, 1fr) auto;
+  grid-template-columns: minmax(0, 1fr) auto;
   gap: 20px;
   padding: 20px 0;
   align-items: center;
-  border-bottom: 0.5px solid var(--hairline);
+}
+/* The clickable left portion is its own button so the RSVP button on
+   the right keeps working independently. Reset native button styles so
+   it looks the same as the old non-clickable row. */
+.club-page .upcoming-row-trigger {
+  display: grid;
+  grid-template-columns: 72px minmax(0, 1fr);
+  gap: 20px;
+  align-items: center;
+  text-align: left;
+  background: transparent;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  min-width: 0;
+}
+.club-page .upcoming-row-trigger:disabled {
+  cursor: default;
+}
+.club-page .upcoming-row-trigger:not(:disabled):hover .row-title {
+  color: var(--red);
+}
+.club-page .row-chevron {
+  display: inline-block;
+  margin-left: 10px;
+  font-size: 14px;
+  color: var(--text-secondary);
+  transition: transform 120ms ease;
+}
+.club-page .upcoming-row-wrapper.is-expanded .row-chevron {
+  transform: translateY(-1px);
+}
+.club-page .upcoming-row-details {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+  padding: 0 0 24px 92px; /* 72px date col + 20px gap */
+  animation: upcomingRowReveal 160ms ease-out;
+}
+.club-page .upcoming-row-flyer {
+  width: 220px;
+  max-width: 40%;
+  height: auto;
+  border-radius: 6px;
+  object-fit: cover;
+  background: rgba(10,10,10,0.04);
+}
+.club-page .upcoming-row-description {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--text-secondary);
+  white-space: pre-line;
+  flex: 1;
+  min-width: 0;
+}
+@keyframes upcomingRowReveal {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 /* Overflow rows are rendered in HTML for crawler/SEO coverage but
    collapsed visually until the Show-more toggle reveals them. */
@@ -797,7 +861,10 @@
 @media (max-width: 860px) {
   .club-page .upcoming { padding: 36px 20px 24px; }
   .club-page .upcoming-title { font-size: 24px; }
-  .club-page .upcoming-row { grid-template-columns: 56px minmax(0, 1fr) auto; gap: 14px; padding: 16px 0; }
+  .club-page .upcoming-row { grid-template-columns: minmax(0, 1fr) auto; gap: 14px; padding: 16px 0; }
+  .club-page .upcoming-row-trigger { grid-template-columns: 56px minmax(0, 1fr); gap: 14px; }
+  .club-page .upcoming-row-details { padding-left: 70px; flex-wrap: wrap; }
+  .club-page .upcoming-row-flyer { width: 100%; max-width: 100%; }
   /* Going-pill is inlined into the meta line on mobile to save the
      vertical space; the .row-actions cell stays right-aligned with
      just the RSVP button visible. */
