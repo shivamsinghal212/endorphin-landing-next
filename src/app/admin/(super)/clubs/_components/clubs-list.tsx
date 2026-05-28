@@ -14,6 +14,14 @@ import {
   type Club,
   type ClubScrapeRun,
 } from '@/lib/admin-api';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
 
 function SortHeader({
   label,
@@ -252,7 +260,7 @@ export function ClubsListContent() {
   };
 
   return (
-    <div>
+    <div className="min-w-0">
       <div className="flex items-center justify-between mb-6 gap-3 flex-wrap">
         <h1 className="font-display text-xl font-bold uppercase text-jet">Clubs</h1>
         <form onSubmit={submitNewClubScrape} className="flex items-center gap-2 flex-wrap min-w-0">
@@ -398,66 +406,56 @@ export function ClubsListContent() {
 
       {/* Table */}
       <div className="bg-white rounded-xl border border-jet/10 overflow-hidden">
-        <table className="w-full table-auto border-collapse">
-          <colgroup>
-            <col className="w-[80px]" />
-            <col />
-            <col className="w-[1%]" />
-            <col className="w-[1%]" />
-            <col className="w-[1%]" />
-            <col className="w-[1%]" />
-            <col className="w-[1%]" />
-            <col className="w-[1%]" />
-          </colgroup>
-          <thead>
-            <tr className="border-b border-jet/10 font-body text-xs font-medium text-jet/40 uppercase tracking-wider">
-              <th className="px-4 py-3 text-left font-medium">Cover</th>
-              <th className="px-4 py-3 text-left font-medium">Club</th>
-              <th className="hidden sm:table-cell px-4 py-3 text-right font-medium">
+        <Table className="font-body">
+          <TableHeader>
+            <TableRow className="hover:bg-transparent border-b border-jet/10">
+              <TableHead className="w-[80px] text-jet/40 uppercase tracking-wider text-xs">Cover</TableHead>
+              <TableHead className="text-jet/40 uppercase tracking-wider text-xs">Club</TableHead>
+              <TableHead className="hidden sm:table-cell text-right text-jet/40 uppercase tracking-wider text-xs">
                 <SortHeader
                   label="Members"
                   active={sortKey === 'members'}
                   dir={sortDir}
                   onClick={() => cycleSort('members')}
-                  className="inline-flex"
+                  className="inline-flex ml-auto"
                 />
-              </th>
-              <th className="hidden md:table-cell px-4 py-3 text-right font-medium">
+              </TableHead>
+              <TableHead className="hidden md:table-cell text-right text-jet/40 uppercase tracking-wider text-xs">
                 <SortHeader
                   label="Updated"
                   active={sortKey === 'updated'}
                   dir={sortDir}
                   onClick={() => cycleSort('updated')}
-                  className="inline-flex"
+                  className="inline-flex ml-auto"
                 />
-              </th>
-              <th className="hidden md:table-cell px-4 py-3 text-right font-medium">
+              </TableHead>
+              <TableHead className="hidden md:table-cell text-right text-jet/40 uppercase tracking-wider text-xs">
                 <SortHeader
                   label="Scraped"
                   active={sortKey === 'lastScraped'}
                   dir={sortDir}
                   onClick={() => cycleSort('lastScraped')}
-                  className="inline-flex"
+                  className="inline-flex ml-auto"
                 />
-              </th>
-              <th className="px-4 py-3 text-center font-medium">Status</th>
-              <th className="px-4 py-3 text-center font-medium">Featured</th>
-              <th className="px-4 py-3 text-center font-medium">Scrape</th>
-            </tr>
-          </thead>
-          <tbody>
+              </TableHead>
+              <TableHead className="text-center text-jet/40 uppercase tracking-wider text-xs">Status</TableHead>
+              <TableHead className="text-center text-jet/40 uppercase tracking-wider text-xs">Featured</TableHead>
+              <TableHead className="text-center text-jet/40 uppercase tracking-wider text-xs">Scrape</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
             {loading && clubs.length === 0 ? (
-              <tr>
-                <td colSpan={8} className="px-4 py-12 text-center font-body text-sm text-jet/50">
+              <TableRow className="hover:bg-transparent">
+                <TableCell colSpan={8} className="py-12 text-center text-jet/50">
                   Loading clubs…
-                </td>
-              </tr>
+                </TableCell>
+              </TableRow>
             ) : visible.length === 0 ? (
-              <tr>
-                <td colSpan={8} className="px-4 py-12 text-center font-body text-sm text-jet/50">
+              <TableRow className="hover:bg-transparent">
+                <TableCell colSpan={8} className="py-12 text-center text-jet/50">
                   {clubs.length === 0 ? 'No clubs yet.' : 'No clubs match.'}
-                </td>
-              </tr>
+                </TableCell>
+              </TableRow>
             ) : (
               visible.map((c) => {
                 const cover = c.headerImageUrl || c.logoUrl;
@@ -486,11 +484,8 @@ export function ClubsListContent() {
                   ? `Last scraped ${lastFinished.toLocaleString('en-IN')}`
                   : `Scrape @${handle}`;
                 return (
-                  <tr
-                    key={c.slug}
-                    className="border-b border-jet/5 last:border-b-0 hover:bg-jet/[0.015] transition-colors"
-                  >
-                    <td className="px-4 py-3 align-middle">
+                  <TableRow key={c.slug} className="border-b border-jet/5 hover:bg-jet/[0.015]">
+                    <TableCell>
                       <Link
                         href={`/admin/clubs/${encodeURIComponent(c.slug)}`}
                         className="block w-16 h-10 rounded-md overflow-hidden bg-jet/5 border border-jet/10"
@@ -504,35 +499,35 @@ export function ClubsListContent() {
                           </div>
                         )}
                       </Link>
-                    </td>
-                    <td className="px-4 py-3 align-middle min-w-0">
+                    </TableCell>
+                    <TableCell className="min-w-0 max-w-[280px]">
                       <Link href={`/admin/clubs/${encodeURIComponent(c.slug)}`} className="block min-w-0">
                         <div className="flex items-center gap-1.5">
-                          <span className="font-body text-sm font-medium text-jet truncate">{c.name}</span>
+                          <span className="text-sm font-medium text-jet truncate">{c.name}</span>
                           {c.isVerified && <BadgeCheck className="w-3.5 h-3.5 text-blue-500 flex-shrink-0" />}
                         </div>
-                        <div className="font-body text-xs text-jet/50 truncate">
+                        <div className="text-xs text-jet/50 truncate">
                           {c.slug} · {c.city}
                         </div>
                       </Link>
-                    </td>
-                    <td className="hidden sm:table-cell px-4 py-3 align-middle text-right font-body text-sm text-jet/70 tabular-nums whitespace-nowrap">
+                    </TableCell>
+                    <TableCell className="hidden sm:table-cell text-right text-sm text-jet/70 tabular-nums whitespace-nowrap">
                       {c.stats?.members?.toLocaleString('en-IN') ?? 0}
-                    </td>
-                    <td className="hidden md:table-cell px-4 py-3 align-middle text-right font-body text-xs text-jet/50 whitespace-nowrap">
+                    </TableCell>
+                    <TableCell className="hidden md:table-cell text-right text-xs text-jet/50 whitespace-nowrap">
                       {updated}
-                    </td>
-                    <td
-                      className="hidden md:table-cell px-4 py-3 align-middle text-right font-body text-xs text-jet/50 whitespace-nowrap"
+                    </TableCell>
+                    <TableCell
+                      className="hidden md:table-cell text-right text-xs text-jet/50 whitespace-nowrap"
                       title={lastScrapedTitle}
                     >
                       {lastScraped}
-                    </td>
-                    <td className="px-4 py-3 align-middle text-center">
+                    </TableCell>
+                    <TableCell className="text-center">
                       <button
                         onClick={() => togglePublished(c.slug, !isPublished)}
                         disabled={publishingSlug === c.slug}
-                        className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-body font-medium uppercase tracking-wide transition-colors disabled:opacity-50 cursor-pointer ${
+                        className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium uppercase tracking-wide transition-colors disabled:opacity-50 cursor-pointer ${
                           isPublished
                             ? 'bg-green-100 text-green-800 hover:bg-green-200'
                             : 'bg-jet/5 text-jet/60 hover:bg-jet/10'
@@ -549,8 +544,8 @@ export function ClubsListContent() {
                         )}
                         {isPublished ? 'Published' : 'Draft'}
                       </button>
-                    </td>
-                    <td className="px-4 py-3 align-middle text-center">
+                    </TableCell>
+                    <TableCell className="text-center">
                       <button
                         onClick={() => toggleFeatured(c.slug, !c.isFeatured)}
                         disabled={togglingSlug === c.slug}
@@ -564,8 +559,8 @@ export function ClubsListContent() {
                       >
                         <Star className={`w-4 h-4 ${c.isFeatured ? 'fill-current' : ''}`} />
                       </button>
-                    </td>
-                    <td className="px-4 py-3 align-middle text-center">
+                    </TableCell>
+                    <TableCell className="text-center">
                       <button
                         onClick={() => scrapeClub(c.instagramUrl, handle ?? undefined)}
                         disabled={!c.instagramUrl || isScrapePending}
@@ -585,13 +580,13 @@ export function ClubsListContent() {
                           <Download className="w-4 h-4" />
                         )}
                       </button>
-                    </td>
-                  </tr>
+                    </TableCell>
+                  </TableRow>
                 );
               })
             )}
-          </tbody>
-        </table>
+          </TableBody>
+        </Table>
       </div>
 
       <p className="mt-4 font-body text-xs text-jet/40">
