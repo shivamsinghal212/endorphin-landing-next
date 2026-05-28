@@ -398,164 +398,200 @@ export function ClubsListContent() {
 
       {/* Table */}
       <div className="bg-white rounded-xl border border-jet/10 overflow-hidden">
-        <div className="grid grid-cols-[64px_minmax(180px,1fr)_auto_auto_auto_auto_auto_auto] gap-3 px-4 py-3 border-b border-jet/10 font-body text-xs font-medium text-jet/40 uppercase tracking-wider">
-          <span>Cover</span>
-          <span>Club</span>
-          <SortHeader
-            label="Members"
-            active={sortKey === 'members'}
-            dir={sortDir}
-            onClick={() => cycleSort('members')}
-            className="hidden sm:inline-flex justify-self-end"
-          />
-          <SortHeader
-            label="Updated"
-            active={sortKey === 'updated'}
-            dir={sortDir}
-            onClick={() => cycleSort('updated')}
-            className="hidden md:inline-flex justify-self-end"
-          />
-          <SortHeader
-            label="Scraped"
-            active={sortKey === 'lastScraped'}
-            dir={sortDir}
-            onClick={() => cycleSort('lastScraped')}
-            className="hidden md:inline-flex justify-self-end"
-          />
-          <span className="justify-self-center">Status</span>
-          <span className="justify-self-center">Featured</span>
-          <span className="justify-self-center">Scrape</span>
-        </div>
-        {loading && clubs.length === 0 ? (
-          <div className="px-4 py-12 text-center font-body text-sm text-jet/50">
-            Loading clubs…
-          </div>
-        ) : visible.length === 0 ? (
-          <div className="px-4 py-12 text-center font-body text-sm text-jet/50">
-            {clubs.length === 0 ? 'No clubs yet.' : 'No clubs match.'}
-          </div>
-        ) : (
-          visible.map((c) => {
-            const cover = c.headerImageUrl || c.logoUrl;
-            const updated = c.updatedAt ? new Date(c.updatedAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }) : '—';
-            const lastScraped = c.lastScrapedAt
-              ? new Date(c.lastScrapedAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })
-              : '—';
-            const lastScrapedTitle = c.lastScrapedAt
-              ? new Date(c.lastScrapedAt).toLocaleString('en-IN')
-              : 'Never scraped';
-            const isPublished = !!c.publishedAt;
-            return (
-              <div
-                key={c.slug}
-                className="grid grid-cols-[64px_minmax(180px,1fr)_auto_auto_auto_auto_auto_auto] gap-3 items-center px-4 py-3 border-b border-jet/5 last:border-b-0 hover:bg-jet/[0.015] transition-colors"
-              >
-                <Link
-                  href={`/admin/clubs/${encodeURIComponent(c.slug)}`}
-                  className="block w-16 h-10 rounded-md overflow-hidden bg-jet/5 border border-jet/10"
-                >
-                  {cover ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={cover} alt="" className="w-full h-full object-cover" />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center text-jet/30 text-[10px]">
-                      {c.name.slice(0, 2).toUpperCase()}
-                    </div>
-                  )}
-                </Link>
-                <Link href={`/admin/clubs/${encodeURIComponent(c.slug)}`} className="min-w-0">
-                  <div className="flex items-center gap-1.5">
-                    <span className="font-body text-sm font-medium text-jet truncate">{c.name}</span>
-                    {c.isVerified && <BadgeCheck className="w-3.5 h-3.5 text-blue-500 flex-shrink-0" />}
-                  </div>
-                  <div className="font-body text-xs text-jet/50 truncate">
-                    {c.slug} · {c.city}
-                  </div>
-                </Link>
-                <span className="hidden sm:block font-body text-sm text-jet/70 tabular-nums justify-self-end">
-                  {c.stats?.members?.toLocaleString('en-IN') ?? 0}
-                </span>
-                <span className="hidden md:block font-body text-xs text-jet/50 justify-self-end">{updated}</span>
-                <span
-                  className="hidden md:block font-body text-xs text-jet/50 justify-self-end"
-                  title={lastScrapedTitle}
-                >
-                  {lastScraped}
-                </span>
-                <button
-                  onClick={() => togglePublished(c.slug, !isPublished)}
-                  disabled={publishingSlug === c.slug}
-                  className={`justify-self-center inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-body font-medium uppercase tracking-wide transition-colors disabled:opacity-50 cursor-pointer ${
-                    isPublished
-                      ? 'bg-green-100 text-green-800 hover:bg-green-200'
-                      : 'bg-jet/5 text-jet/60 hover:bg-jet/10'
-                  }`}
-                  aria-label={isPublished ? 'Unpublish' : 'Publish'}
-                  title={isPublished ? 'Published — click to unpublish' : 'Draft — click to publish'}
-                >
-                  {publishingSlug === c.slug ? (
-                    <Loader2 className="w-3 h-3 animate-spin" />
-                  ) : isPublished ? (
-                    <Eye className="w-3 h-3" />
-                  ) : (
-                    <EyeOff className="w-3 h-3" />
-                  )}
-                  {isPublished ? 'Published' : 'Draft'}
-                </button>
-                <button
-                  onClick={() => toggleFeatured(c.slug, !c.isFeatured)}
-                  disabled={togglingSlug === c.slug}
-                  className={`justify-self-center p-1.5 rounded-md transition-colors disabled:opacity-50 cursor-pointer ${
-                    c.isFeatured
-                      ? 'text-yellow-500 hover:bg-yellow-50'
-                      : 'text-jet/30 hover:text-jet hover:bg-jet/5'
-                  }`}
-                  aria-label={c.isFeatured ? 'Unfeature' : 'Feature'}
-                  title={c.isFeatured ? 'Featured — click to unfeature' : 'Click to feature'}
-                >
-                  <Star className={`w-4 h-4 ${c.isFeatured ? 'fill-current' : ''}`} />
-                </button>
-                {(() => {
-                  const handle = usernameFromUrl(c.instagramUrl);
-                  const run = handle ? latestRunByUsername.get(handle) : null;
-                  const isStarting = handle ? scrapingUsernames.has(handle) : false;
-                  const isPending = isStarting || run?.status === 'pending';
-                  const lastFinished = run?.finishedAt ? new Date(run.finishedAt) : null;
-                  const title = !c.instagramUrl
-                    ? 'No Instagram URL set on this club'
-                    : isPending
-                    ? `Scraping @${handle}…`
-                    : run?.status === 'failed'
-                    ? `Last scrape failed: ${run.errorMessage ?? 'unknown error'}`
-                    : lastFinished
-                    ? `Last scraped ${lastFinished.toLocaleString('en-IN')}`
-                    : `Scrape @${handle}`;
-                  return (
-                    <button
-                      onClick={() => scrapeClub(c.instagramUrl, handle ?? undefined)}
-                      disabled={!c.instagramUrl || isPending}
-                      className={`justify-self-center p-1.5 rounded-md transition-colors disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer ${
-                        run?.status === 'failed'
-                          ? 'text-red-500 hover:bg-red-50'
-                          : isPending
-                          ? 'text-blue-500'
-                          : 'text-jet/40 hover:text-jet hover:bg-jet/5'
-                      }`}
-                      aria-label="Scrape Instagram"
-                      title={title}
+        <table className="w-full table-auto border-collapse">
+          <colgroup>
+            <col className="w-[80px]" />
+            <col />
+            <col className="w-[1%]" />
+            <col className="w-[1%]" />
+            <col className="w-[1%]" />
+            <col className="w-[1%]" />
+            <col className="w-[1%]" />
+            <col className="w-[1%]" />
+          </colgroup>
+          <thead>
+            <tr className="border-b border-jet/10 font-body text-xs font-medium text-jet/40 uppercase tracking-wider">
+              <th className="px-4 py-3 text-left font-medium">Cover</th>
+              <th className="px-4 py-3 text-left font-medium">Club</th>
+              <th className="hidden sm:table-cell px-4 py-3 text-right font-medium">
+                <SortHeader
+                  label="Members"
+                  active={sortKey === 'members'}
+                  dir={sortDir}
+                  onClick={() => cycleSort('members')}
+                  className="inline-flex"
+                />
+              </th>
+              <th className="hidden md:table-cell px-4 py-3 text-right font-medium">
+                <SortHeader
+                  label="Updated"
+                  active={sortKey === 'updated'}
+                  dir={sortDir}
+                  onClick={() => cycleSort('updated')}
+                  className="inline-flex"
+                />
+              </th>
+              <th className="hidden md:table-cell px-4 py-3 text-right font-medium">
+                <SortHeader
+                  label="Scraped"
+                  active={sortKey === 'lastScraped'}
+                  dir={sortDir}
+                  onClick={() => cycleSort('lastScraped')}
+                  className="inline-flex"
+                />
+              </th>
+              <th className="px-4 py-3 text-center font-medium">Status</th>
+              <th className="px-4 py-3 text-center font-medium">Featured</th>
+              <th className="px-4 py-3 text-center font-medium">Scrape</th>
+            </tr>
+          </thead>
+          <tbody>
+            {loading && clubs.length === 0 ? (
+              <tr>
+                <td colSpan={8} className="px-4 py-12 text-center font-body text-sm text-jet/50">
+                  Loading clubs…
+                </td>
+              </tr>
+            ) : visible.length === 0 ? (
+              <tr>
+                <td colSpan={8} className="px-4 py-12 text-center font-body text-sm text-jet/50">
+                  {clubs.length === 0 ? 'No clubs yet.' : 'No clubs match.'}
+                </td>
+              </tr>
+            ) : (
+              visible.map((c) => {
+                const cover = c.headerImageUrl || c.logoUrl;
+                const updated = c.updatedAt
+                  ? new Date(c.updatedAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })
+                  : '—';
+                const lastScraped = c.lastScrapedAt
+                  ? new Date(c.lastScrapedAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })
+                  : '—';
+                const lastScrapedTitle = c.lastScrapedAt
+                  ? new Date(c.lastScrapedAt).toLocaleString('en-IN')
+                  : 'Never scraped';
+                const isPublished = !!c.publishedAt;
+                const handle = usernameFromUrl(c.instagramUrl);
+                const run = handle ? latestRunByUsername.get(handle) : null;
+                const isStarting = handle ? scrapingUsernames.has(handle) : false;
+                const isScrapePending = isStarting || run?.status === 'pending';
+                const lastFinished = run?.finishedAt ? new Date(run.finishedAt) : null;
+                const scrapeTitle = !c.instagramUrl
+                  ? 'No Instagram URL set on this club'
+                  : isScrapePending
+                  ? `Scraping @${handle}…`
+                  : run?.status === 'failed'
+                  ? `Last scrape failed: ${run.errorMessage ?? 'unknown error'}`
+                  : lastFinished
+                  ? `Last scraped ${lastFinished.toLocaleString('en-IN')}`
+                  : `Scrape @${handle}`;
+                return (
+                  <tr
+                    key={c.slug}
+                    className="border-b border-jet/5 last:border-b-0 hover:bg-jet/[0.015] transition-colors"
+                  >
+                    <td className="px-4 py-3 align-middle">
+                      <Link
+                        href={`/admin/clubs/${encodeURIComponent(c.slug)}`}
+                        className="block w-16 h-10 rounded-md overflow-hidden bg-jet/5 border border-jet/10"
+                      >
+                        {cover ? (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img src={cover} alt="" className="w-full h-full object-cover" />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center text-jet/30 text-[10px]">
+                            {c.name.slice(0, 2).toUpperCase()}
+                          </div>
+                        )}
+                      </Link>
+                    </td>
+                    <td className="px-4 py-3 align-middle min-w-0">
+                      <Link href={`/admin/clubs/${encodeURIComponent(c.slug)}`} className="block min-w-0">
+                        <div className="flex items-center gap-1.5">
+                          <span className="font-body text-sm font-medium text-jet truncate">{c.name}</span>
+                          {c.isVerified && <BadgeCheck className="w-3.5 h-3.5 text-blue-500 flex-shrink-0" />}
+                        </div>
+                        <div className="font-body text-xs text-jet/50 truncate">
+                          {c.slug} · {c.city}
+                        </div>
+                      </Link>
+                    </td>
+                    <td className="hidden sm:table-cell px-4 py-3 align-middle text-right font-body text-sm text-jet/70 tabular-nums whitespace-nowrap">
+                      {c.stats?.members?.toLocaleString('en-IN') ?? 0}
+                    </td>
+                    <td className="hidden md:table-cell px-4 py-3 align-middle text-right font-body text-xs text-jet/50 whitespace-nowrap">
+                      {updated}
+                    </td>
+                    <td
+                      className="hidden md:table-cell px-4 py-3 align-middle text-right font-body text-xs text-jet/50 whitespace-nowrap"
+                      title={lastScrapedTitle}
                     >
-                      {isPending ? (
-                        <Loader2 className="w-4 h-4 animate-spin" />
-                      ) : (
-                        <Download className="w-4 h-4" />
-                      )}
-                    </button>
-                  );
-                })()}
-              </div>
-            );
-          })
-        )}
+                      {lastScraped}
+                    </td>
+                    <td className="px-4 py-3 align-middle text-center">
+                      <button
+                        onClick={() => togglePublished(c.slug, !isPublished)}
+                        disabled={publishingSlug === c.slug}
+                        className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-body font-medium uppercase tracking-wide transition-colors disabled:opacity-50 cursor-pointer ${
+                          isPublished
+                            ? 'bg-green-100 text-green-800 hover:bg-green-200'
+                            : 'bg-jet/5 text-jet/60 hover:bg-jet/10'
+                        }`}
+                        aria-label={isPublished ? 'Unpublish' : 'Publish'}
+                        title={isPublished ? 'Published — click to unpublish' : 'Draft — click to publish'}
+                      >
+                        {publishingSlug === c.slug ? (
+                          <Loader2 className="w-3 h-3 animate-spin" />
+                        ) : isPublished ? (
+                          <Eye className="w-3 h-3" />
+                        ) : (
+                          <EyeOff className="w-3 h-3" />
+                        )}
+                        {isPublished ? 'Published' : 'Draft'}
+                      </button>
+                    </td>
+                    <td className="px-4 py-3 align-middle text-center">
+                      <button
+                        onClick={() => toggleFeatured(c.slug, !c.isFeatured)}
+                        disabled={togglingSlug === c.slug}
+                        className={`p-1.5 rounded-md transition-colors disabled:opacity-50 cursor-pointer ${
+                          c.isFeatured
+                            ? 'text-yellow-500 hover:bg-yellow-50'
+                            : 'text-jet/30 hover:text-jet hover:bg-jet/5'
+                        }`}
+                        aria-label={c.isFeatured ? 'Unfeature' : 'Feature'}
+                        title={c.isFeatured ? 'Featured — click to unfeature' : 'Click to feature'}
+                      >
+                        <Star className={`w-4 h-4 ${c.isFeatured ? 'fill-current' : ''}`} />
+                      </button>
+                    </td>
+                    <td className="px-4 py-3 align-middle text-center">
+                      <button
+                        onClick={() => scrapeClub(c.instagramUrl, handle ?? undefined)}
+                        disabled={!c.instagramUrl || isScrapePending}
+                        className={`p-1.5 rounded-md transition-colors disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer ${
+                          run?.status === 'failed'
+                            ? 'text-red-500 hover:bg-red-50'
+                            : isScrapePending
+                            ? 'text-blue-500'
+                            : 'text-jet/40 hover:text-jet hover:bg-jet/5'
+                        }`}
+                        aria-label="Scrape Instagram"
+                        title={scrapeTitle}
+                      >
+                        {isScrapePending ? (
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                        ) : (
+                          <Download className="w-4 h-4" />
+                        )}
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })
+            )}
+          </tbody>
+        </table>
       </div>
 
       <p className="mt-4 font-body text-xs text-jet/40">
