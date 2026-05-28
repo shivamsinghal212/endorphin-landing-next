@@ -49,7 +49,6 @@ export function UpcomingList({
 }) {
   const [expanded, setExpanded] = useState(false);
   const overflow = events.length > INITIAL_VISIBLE;
-  const visible = expanded || !overflow ? events : events.slice(0, INITIAL_VISIBLE);
   const hiddenCount = events.length - INITIAL_VISIBLE;
 
   return (
@@ -61,18 +60,25 @@ export function UpcomingList({
         </span>
       </div>
 
-      {visible.map((event) => (
-        <UpcomingRow
-          key={event.id}
-          event={event}
-          slug={slug}
-          clubName={clubName}
-          joinForm={joinForm}
-          requiresApproval={requiresApproval}
-          isAuthed={isAuthed}
-          myMembership={myMembership}
-        />
-      ))}
+      {/* Render every row in HTML so Googlebot and AI crawlers index all
+          upcoming events without needing client hydration. Overflow rows
+          beyond INITIAL_VISIBLE are hidden via CSS until the user expands. */}
+      {events.map((event, i) => {
+        const isOverflow = overflow && i >= INITIAL_VISIBLE && !expanded;
+        return (
+          <UpcomingRow
+            key={event.id}
+            event={event}
+            hidden={isOverflow}
+            slug={slug}
+            clubName={clubName}
+            joinForm={joinForm}
+            requiresApproval={requiresApproval}
+            isAuthed={isAuthed}
+            myMembership={myMembership}
+          />
+        );
+      })}
 
       {overflow && (
         <div className="upcoming-more">
@@ -92,6 +98,7 @@ export function UpcomingList({
 
 function UpcomingRow({
   event,
+  hidden = false,
   slug,
   clubName,
   joinForm,
@@ -100,6 +107,7 @@ function UpcomingRow({
   myMembership,
 }: {
   event: ClubEvent;
+  hidden?: boolean;
   slug: string;
   clubName: string;
   joinForm: Club['joinForm'];
@@ -112,7 +120,10 @@ function UpcomingRow({
   const meta = [event.locationName, fmtTime(event.startTime)].filter(Boolean).join(' · ');
 
   return (
-    <div className="upcoming-row">
+    <div
+      className={`upcoming-row${hidden ? ' upcoming-row--hidden' : ''}`}
+      aria-hidden={hidden ? 'true' : undefined}
+    >
       <div>
         <div className="row-date">{fmtDayNum(event.startTime)}</div>
         <div className="kicker row-date-sub">

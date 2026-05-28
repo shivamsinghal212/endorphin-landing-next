@@ -21,6 +21,19 @@ const nextConfig: NextConfig = {
           { key: 'Strict-Transport-Security', value: 'max-age=63072000; includeSubDomains; preload' },
         ],
       },
+      {
+        // Club detail pages are ISR'd with revalidate=60. Emit an
+        // explicit CDN-friendly Cache-Control so any non-Vercel host
+        // (or downstream proxy) caches the HTML for ~1m and serves the
+        // stale-while-revalidate copy for up to an hour.
+        source: '/clubs/:slug*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, s-maxage=60, stale-while-revalidate=3600',
+          },
+        ],
+      },
     ];
   },
   async rewrites() {

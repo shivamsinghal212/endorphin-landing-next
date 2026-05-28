@@ -86,7 +86,10 @@ type PageProps = { params: Promise<{ slug: string }> };
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
-  const club = await getClub(slug).catch(() => null);
+  const [club, events] = await Promise.all([
+    getClub(slug).catch(() => null),
+    getClubEvents(slug),
+  ]);
   if (!club || !club.publishedAt) {
     return { title: 'Club not found', robots: { index: false, follow: false } };
   }
@@ -94,20 +97,29 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const url = `https://www.endorfin.run/clubs/${club.slug}`;
   const title = `${club.name} — Running Club in ${club.city}`;
 
-  // SEO best practice: description between 110–160 chars. Prefer the longer
-  // of subtitle/description; pad with generated context if still short.
-  let description = (club.description || '').trim();
-  if (description.length < 80 && club.subtitle) {
-    description = description
-      ? `${club.subtitle} · ${description}`
-      : club.subtitle.trim();
-  }
-  if (description.length < 110) {
-    const prefix = description ? `${description} · ` : '';
-    description = `${prefix}${club.name} is a running community in ${club.city}. Join Club on Endorfin.`;
+  // SEO best practice: description between 110-160 chars, front-loaded
+  // with city + a sub-locality so SERP previews never truncate the value
+  // prop. Pull distinct sub-localities from the past-events locations and
+  // fall back to the description / subtitle / generic context as needed.
+  const subLocalities = uniqueNeighborhoods(events).slice(0, 2);
+  const localityPhrase =
+    subLocalities.length > 0
+      ? `Weekend runs in ${subLocalities.join(' and ')}`
+      : `Run club based out of ${club.city}`;
+  const membersPhrase =
+    club.stats?.members && club.stats.members >= 100
+      ? `${shortNum(club.stats.members)}+ members`
+      : '';
+
+  let description = `${club.name} — ${club.city}'s run club. ${localityPhrase}.`;
+  if (membersPhrase) description += ` ${membersPhrase}.`;
+  if (description.length < 110 && (club.description || club.subtitle)) {
+    const extra = (club.description || club.subtitle || '').trim();
+    description = `${description} ${extra}`.trim();
   }
   if (description.length > 160) {
-    description = description.slice(0, 157).trimEnd() + '…';
+    // Trim on word boundary, preserve a clean period.
+    description = description.slice(0, 157).replace(/[\s.,;]+$/, '') + '…';
   }
 
   // `images` is deliberately omitted — Next's file convention at
@@ -117,6 +129,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   return {
     title,
     description,
+    keywords: club.tags && club.tags.length > 0 ? club.tags.join(', ') : undefined,
     alternates: { canonical: url },
     robots: { index: true, follow: true, 'max-image-preview': 'large' },
     openGraph: {
@@ -133,6 +146,70 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       description,
     },
   };
+}
+
+// Compact numeric formatter — turns 11205 → "11k", 2350 → "2.3k", <1000 → bare.
+function shortNum(n: number): string {
+  if (n < 1000) return String(n);
+  if (n < 10000) return `${(n / 1000).toFixed(1).replace(/\.0$/, '')}k`;
+  return `${Math.round(n / 1000)}k`;
+}
+
+// Tier-1 Indian city → state lookup used to enrich PostalAddress
+// (addressRegion) and SERP/AI locality context. Falls back to undefined
+// when the city isn't known so we never emit a wrong region.
+const CITY_TO_STATE: Record<string, string> = {
+  Mumbai: 'Maharashtra',
+  Thane: 'Maharashtra',
+  'Navi Mumbai': 'Maharashtra',
+  Pune: 'Maharashtra',
+  Nagpur: 'Maharashtra',
+  Nashik: 'Maharashtra',
+  Bangalore: 'Karnataka',
+  Bengaluru: 'Karnataka',
+  Mysore: 'Karnataka',
+  Mysuru: 'Karnataka',
+  Hyderabad: 'Telangana',
+  Chennai: 'Tamil Nadu',
+  Coimbatore: 'Tamil Nadu',
+  Delhi: 'Delhi',
+  'New Delhi': 'Delhi',
+  Gurgaon: 'Haryana',
+  Gurugram: 'Haryana',
+  Noida: 'Uttar Pradesh',
+  Lucknow: 'Uttar Pradesh',
+  Kolkata: 'West Bengal',
+  Ahmedabad: 'Gujarat',
+  Surat: 'Gujarat',
+  Vadodara: 'Gujarat',
+  Jaipur: 'Rajasthan',
+  Jodhpur: 'Rajasthan',
+  Udaipur: 'Rajasthan',
+  Kochi: 'Kerala',
+  Thiruvananthapuram: 'Kerala',
+  Chandigarh: 'Chandigarh',
+  Indore: 'Madhya Pradesh',
+  Bhopal: 'Madhya Pradesh',
+};
+
+// Pull a deduped, deduped-by-primary-token list of neighborhoods/areas
+// from the events list. Used for "Where we run" rendering, meta
+// description and JSON-LD `areaServed` enrichment.
+function uniqueNeighborhoods(events: ClubEvent[]): string[] {
+  const seen = new Set<string>();
+  const out: string[] = [];
+  for (const e of events) {
+    const raw = (e.locationAddress || e.locationName || '').trim();
+    if (!raw) continue;
+    // Use the first comma segment as the canonical area label.
+    const primary = raw.split(',')[0].trim();
+    if (!primary) continue;
+    const key = primary.toLowerCase();
+    if (seen.has(key)) continue;
+    seen.add(key);
+    out.push(primary);
+  }
+  return out;
 }
 
 // ─── page ───────────────────────────────────────────
@@ -153,11 +230,22 @@ export default async function ClubPage({ params }: PageProps) {
   const { nextEvent, upcomingEvents, pastEvents } = splitEvents(events);
   const isAuthed = !!token;
 
+  // Locality + activity context derived from existing event data so we
+  // can enrich every metadata surface (JSON-LD, "Where we run" section,
+  // FAQ answers) without needing new backend fields.
+  const futureEvents = [nextEvent, ...upcomingEvents].filter(
+    Boolean,
+  ) as ClubEvent[];
+  const neighborhoods = uniqueNeighborhoods(pastEvents);
+  const totalRunsHosted = pastEvents.length;
+
   return (
     <main id="main-content" className="overflow-x-hidden">
       <ClubIcons />
-      <ClubJsonLd club={club} />
+      <ClubJsonLd club={club} totalRunsHosted={totalRunsHosted} />
       <ClubBreadcrumbJsonLd club={club} />
+      <ClubEventsJsonLd club={club} events={futureEvents} />
+      <ClubFaqJsonLd club={club} neighborhoods={neighborhoods} />
       <Header />
       <div className="club-page">
         <Hero
@@ -168,6 +256,7 @@ export default async function ClubPage({ params }: PageProps) {
         />
         <Ribbon />
         <Stats club={club} />
+        <WhereWeRun city={club.city} neighborhoods={neighborhoods} />
         <NextRun
           event={nextEvent}
           club={club}
@@ -198,20 +287,36 @@ export default async function ClubPage({ params }: PageProps) {
 
 // ─── JSON-LD ─────────────────────────────────────────
 
-function ClubJsonLd({ club }: { club: Club }) {
+function ClubJsonLd({
+  club,
+  totalRunsHosted,
+}: {
+  club: Club;
+  totalRunsHosted: number;
+}) {
   const url = `https://www.endorfin.run/clubs/${club.slug}`;
-  const sameAs = [club.instagramUrl, club.stravaUrl, club.whatsappUrl].filter(Boolean);
+  // WhatsApp invite links are ephemeral (they rotate / expire) and carry
+  // no entity-disambiguation value for the Knowledge Graph. Only
+  // Instagram + Strava belong in sameAs.
+  const sameAs = [club.instagramUrl, club.stravaUrl].filter(Boolean);
+
+  // Prefer the longer description for AI/LLM citation quality; fall back
+  // to the one-line subtitle only if description is empty.
+  const description = (club.description || club.subtitle || '').trim() || undefined;
+
+  const addressRegion = CITY_TO_STATE[club.city];
 
   const data: Record<string, unknown> = {
     '@context': 'https://schema.org',
     '@type': 'SportsClub',
     name: club.name,
     url,
-    description: club.subtitle || club.description || undefined,
+    description,
     sport: 'Running',
     address: {
       '@type': 'PostalAddress',
       addressLocality: club.city,
+      ...(addressRegion ? { addressRegion } : {}),
       addressCountry: 'IN',
     },
   };
@@ -225,9 +330,197 @@ function ClubJsonLd({ club }: { club: Club }) {
   if (sameAs.length > 0) {
     data.sameAs = sameAs;
   }
-  if (club.stats.members) {
-    data.numberOfEmployees = { '@type': 'QuantitativeValue', value: club.stats.members };
+  if (club.stats?.members) {
+    // `numberOfMembers` is the semantically correct property for a club's
+    // community size on Organization/SportsClub. `numberOfEmployees`
+    // (previously used) implies paid staff and was a misuse.
+    data.numberOfMembers = {
+      '@type': 'QuantitativeValue',
+      value: club.stats.members,
+    };
   }
+  if (totalRunsHosted > 0) {
+    // Cumulative event count strengthens the "active entity" signal AI
+    // assistants use to score citation candidates.
+    data.event = {
+      '@type': 'QuantitativeValue',
+      value: totalRunsHosted,
+      description: 'runs hosted',
+    };
+  }
+  if (club.tags && club.tags.length > 0) {
+    data.keywords = club.tags.join(', ');
+  }
+  if (club.admins && club.admins.length > 0) {
+    const members = club.admins
+      .filter((a) => a.name)
+      .map((a) => {
+        const member: Record<string, unknown> = {
+          '@type': 'Person',
+          name: a.name,
+        };
+        const memberSameAs = [
+          a.instagramUrl,
+          a.stravaUrl,
+          a.whatsappUrl,
+        ].filter(Boolean);
+        if (memberSameAs.length > 0) member.sameAs = memberSameAs;
+        if (a.role) member.jobTitle = a.role;
+        return member;
+      });
+    if (members.length > 0) data.member = members;
+  }
+  // Recency signals — AI assistants (Perplexity, Google AIO, Bing
+  // Copilot) all rank by freshness; we already have the timestamps on
+  // every Club row, so emit them.
+  if (club.publishedAt) data.datePublished = club.publishedAt;
+  if (club.updatedAt) data.dateModified = club.updatedAt;
+
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }}
+    />
+  );
+}
+
+// One JSON-LD block per upcoming event so each future run is eligible
+// for Google's Event rich-result carousel. Past events are deliberately
+// excluded — Google demotes Events whose date has passed.
+function ClubEventsJsonLd({
+  club,
+  events,
+}: {
+  club: Club;
+  events: ClubEvent[];
+}) {
+  if (events.length === 0) return null;
+  const clubUrl = `https://www.endorfin.run/clubs/${club.slug}`;
+  const addressRegion = CITY_TO_STATE[club.city];
+
+  return (
+    <>
+      {events.map((e) => {
+        // Map the API event-type taxonomy to the most specific
+        // Schema.org type that's still indexable by Google:
+        //   workshop → EducationEvent
+        //   social   → SocialEvent
+        //   anything else (run / race / meetup / cross-train) → SportsEvent
+        const t = e.eventType as string;
+        const schemaType =
+          t === 'club_workshop'
+            ? 'EducationEvent'
+            : t === 'club_social'
+              ? 'SocialEvent'
+              : 'SportsEvent';
+
+        const item: Record<string, unknown> = {
+          '@context': 'https://schema.org',
+          '@type': schemaType,
+          name: e.title,
+          startDate: e.startTime,
+          eventStatus: 'https://schema.org/EventScheduled',
+          eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
+          organizer: {
+            '@type': 'SportsClub',
+            name: club.name,
+            url: clubUrl,
+          },
+        };
+        if (e.endTime) item.endDate = e.endTime;
+        if (e.description) item.description = e.description;
+        if (e.coverImageUrl) item.image = e.coverImageUrl;
+        if (e.locationName || e.locationAddress) {
+          item.location = {
+            '@type': 'Place',
+            name: e.locationName || e.locationAddress,
+            address: {
+              '@type': 'PostalAddress',
+              streetAddress: e.locationAddress || undefined,
+              addressLocality: club.city,
+              ...(addressRegion ? { addressRegion } : {}),
+              addressCountry: 'IN',
+            },
+          };
+        }
+        if (schemaType === 'SportsEvent') {
+          item.sport = 'Running';
+        }
+        // Free events — explicit `Offer` with price 0 unlocks the
+        // "Free" badge in event rich results.
+        item.offers = {
+          '@type': 'Offer',
+          price: 0,
+          priceCurrency: 'INR',
+          availability: 'https://schema.org/InStock',
+          url: clubUrl,
+        };
+
+        return (
+          <script
+            key={e.id}
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{ __html: JSON.stringify(item) }}
+          />
+        );
+      })}
+    </>
+  );
+}
+
+// 2-3 Q&A pairs that directly answer the high-intent queries this page
+// can realistically rank for. Google restricted FAQ rich results to
+// gov/healthcare in Aug 2023, but AI assistants (Perplexity, ChatGPT
+// Browse, Bing Copilot) still extract answers from FAQPage markup.
+function ClubFaqJsonLd({
+  club,
+  neighborhoods,
+}: {
+  club: Club;
+  neighborhoods: string[];
+}) {
+  const qas: { q: string; a: string }[] = [];
+
+  // Where do they meet?
+  const where =
+    neighborhoods.length > 0
+      ? `${club.name} meets at venues across ${club.city} including ${neighborhoods.slice(0, 3).join(', ')}.`
+      : `${club.name} meets in and around ${club.city} for weekend community runs.`;
+  qas.push({ q: `Where does ${club.name} meet?`, a: where });
+
+  // What do they do after runs?
+  if (club.postRunActivities && club.postRunActivities.length > 0) {
+    qas.push({
+      q: `What activities does ${club.name} organise after runs?`,
+      a: `Post-run activities include ${club.postRunActivities
+        .slice(0, 5)
+        .join(', ')}.`,
+    });
+  }
+
+  // How do I join?
+  if (club.joinUrl || club.whatsappUrl || club.instagramUrl) {
+    const channels: string[] = [];
+    if (club.whatsappUrl) channels.push('the WhatsApp group');
+    if (club.instagramUrl) channels.push('Instagram');
+    if (club.joinUrl) channels.push('the sign-up form');
+    qas.push({
+      q: `How do I join ${club.name}?`,
+      a: `Tap "Join club" on this page and you'll be connected via ${channels.join(', ')}. Most clubs are free and beginner-friendly.`,
+    });
+  }
+
+  if (qas.length === 0) return null;
+
+  const data = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: qas.map((p) => ({
+      '@type': 'Question',
+      name: p.q,
+      acceptedAnswer: { '@type': 'Answer', text: p.a },
+    })),
+  };
 
   return (
     <script
@@ -310,8 +603,19 @@ function Hero({
     <section className={`hero ${club.headerImageUrl ? 'has-cover' : ''}`}>
       {club.headerImageUrl && (
         <div className="hero-cover" aria-hidden="true">
+          {/* Cover is the LCP element on mobile; declare intrinsic
+              dimensions so the browser reserves space (kills CLS) and
+              fetchpriority="high" so it doesn't queue behind other
+              media. eslint-disable: external CDN, no Next/Image. */}
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={club.headerImageUrl} alt="" loading="eager" />
+          <img
+            src={club.headerImageUrl}
+            alt=""
+            loading="eager"
+            fetchPriority="high"
+            width={1600}
+            height={900}
+          />
         </div>
       )}
       <div className="hero-grid">
@@ -320,8 +624,15 @@ function Hero({
           <div className="hero-ident">
             {club.logoUrl && (
               <div className="club-logo hero-logo">
+                {/* Fixed-size square (CSS clamps the displayed size).
+                    Declaring the intrinsic dimensions kills CLS. */}
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={club.logoUrl} alt={`${club.name} logo`} />
+                <img
+                  src={club.logoUrl}
+                  alt={`${club.name} logo`}
+                  width={160}
+                  height={160}
+                />
               </div>
             )}
             <HeroName name={club.name} isVerified={club.isVerified} />
@@ -384,6 +695,34 @@ function Hero({
   );
 }
 
+// Static HTML chip list of distinct neighborhoods this club runs in,
+// derived from event locationAddress / locationName. Crawler-readable
+// locality coverage — Googlebot and AI assistants can answer
+// "running clubs in <neighborhood>" queries without needing to
+// hydrate the upcoming/previous-runs lists.
+function WhereWeRun({
+  city,
+  neighborhoods,
+}: {
+  city: string;
+  neighborhoods: string[];
+}) {
+  if (neighborhoods.length < 2) return null;
+  const visible = neighborhoods.slice(0, 10);
+  return (
+    <section className="where-we-run" aria-label="Where this club runs">
+      <span className="kicker where-we-run-kicker">Where we run in {city}</span>
+      <ul className="where-we-run-list">
+        {visible.map((n) => (
+          <li key={n} className="where-we-run-chip">
+            {n}
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+}
+
 function Ribbon() {
   const words = [
     '5K', '·', '10K', '·', 'Half Marathon', '·', 'Marathon', '·', 'Ultra', '·',
@@ -437,7 +776,12 @@ function proxyAvatar(url: string): string {
 }
 
 function CommentsSay({ events }: { events: ClubEvent[] }) {
-  // Pick one standout comment per event (highest likes), cap at 6, skip empties.
+  // Pick one standout comment per event for the roller. Two-pass
+  // selection so AI assistants get citable prose, not "🔥🔥":
+  //   1. Prefer comments with >=20 characters of text, sorted by likes.
+  //   2. Fall back to the most-liked emoji/short comment only if no
+  //      substantive comment exists for that event.
+  const MIN_TEXT_LEN = 20;
   const quotes: {
     text: string;
     user: string;
@@ -447,9 +791,13 @@ function CommentsSay({ events }: { events: ClubEvent[] }) {
   for (const e of events) {
     const cs = e.topComments;
     if (!cs || cs.length === 0) continue;
-    const top = [...cs]
-      .filter((c) => c.text && c.text.trim().length > 0)
-      .sort((a, b) => (b.likes || 0) - (a.likes || 0))[0];
+    const nonEmpty = cs.filter((c) => c.text && c.text.trim().length > 0);
+    if (nonEmpty.length === 0) continue;
+    const substantive = nonEmpty.filter(
+      (c) => (c.text || '').trim().length >= MIN_TEXT_LEN,
+    );
+    const pool = substantive.length > 0 ? substantive : nonEmpty;
+    const top = [...pool].sort((a, b) => (b.likes || 0) - (a.likes || 0))[0];
     if (!top || !top.text) continue;
     quotes.push({
       text: top.text.trim(),

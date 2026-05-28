@@ -93,7 +93,19 @@ export function NextRun({
         {hasImage ? (
           <div className="nr-photo" style={fgStyle}>
             <div className="nr-photo-bg" aria-hidden="true" />
-            <div className="nr-photo-fg" aria-hidden="true" />
+            {/* Real <img> for the flyer so Google Images can index it
+                (CSS background-image is not crawlable). Decorative for
+                screen readers — the event title + meta convey the same
+                info in text below. */}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              className="nr-photo-img"
+              src={event.coverImageUrl as string}
+              alt=""
+              loading="lazy"
+              width={1200}
+              height={1500}
+            />
             <div className="nr-photo-scrim" aria-hidden="true" />
           </div>
         ) : (

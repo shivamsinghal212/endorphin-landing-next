@@ -135,6 +135,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           type="font/woff2"
           crossOrigin=""
         />
+        {/* Image proxies used by the comment roller on /clubs/[slug].
+            Pre-warm the connection so the first avatar fetch isn't
+            blocked on DNS + TCP + TLS handshake. */}
+        <link rel="preconnect" href="https://images.weserv.nl" crossOrigin="" />
+        <link rel="dns-prefetch" href="https://unavatar.io" />
         <meta property="og:logo" content="https://www.endorfin.run/logo.png" />
         {/* JSON-LD: native <script type="application/ld+json"> per Next 16 docs.
             type="application/ld+json" is non-executable so React doesn't try to

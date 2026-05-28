@@ -531,6 +531,47 @@
   .club-page .join-pill-icons .icon-dot svg { width: 14px; height: 14px; }
 }
 
+/* ─── Where we run (neighborhood chip strip) ────── */
+.club-page .where-we-run {
+  background: var(--bone);
+  padding-top: 22px;
+  padding-bottom: 22px;
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 14px 18px;
+  border-bottom: 0.5px solid var(--hairline);
+}
+.club-page .where-we-run-kicker {
+  flex: none;
+  color: var(--text-secondary);
+}
+.club-page .where-we-run-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.club-page .where-we-run-chip {
+  font-family: var(--font-oswald), sans-serif;
+  font-weight: 500;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  line-height: 1;
+  padding: 7px 11px 6px;
+  border-radius: 100px;
+  background: var(--cream);
+  color: var(--jet);
+  border: 0.5px solid var(--hairline);
+}
+@media (max-width: 640px) {
+  .club-page .where-we-run { padding-top: 16px; padding-bottom: 16px; gap: 10px 14px; }
+  .club-page .where-we-run-chip { font-size: 10.5px; padding: 6px 10px 5px; }
+}
+
 /* ─── Marquee ribbon ────────────────────────────── */
 .club-page .ribbon {
   background: var(--jet);
@@ -740,6 +781,11 @@
   padding: 20px 0;
   align-items: center;
   border-bottom: 0.5px solid var(--hairline);
+}
+/* Overflow rows are rendered in HTML for crawler/SEO coverage but
+   collapsed visually until the Show-more toggle reveals them. */
+.club-page .upcoming-row--hidden {
+  display: none;
 }
 /* Going-pill + RSVP button bundled in one right-aligned cell so the
    button never wraps to a new line when the going-pill is missing. */
@@ -1431,6 +1477,7 @@
 /* ─── Content container — fluid gutter matching home/running-events/clubs ── */
 .club-page .hero,
 .club-page .nr-section,
+.club-page .where-we-run,
 .club-page .upcoming,
 .club-page .previous-runs,
 .club-page .say,
@@ -1456,6 +1503,7 @@
 @media (max-width: 640px) {
   .club-page .hero,
   .club-page .nr-section,
+  .club-page .where-we-run,
   .club-page .upcoming,
   .club-page .previous-runs,
   .club-page .say,
@@ -1508,6 +1556,17 @@
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center;
+}
+/* Real <img> replaces the .nr-photo-fg background so Google Images
+   can crawl the flyer. Same contain-fit + centered positioning. */
+.club-page .nr-photo-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center;
+  display: block;
 }
 .club-page .nr-photo-scrim {
   position: absolute; inset: 0;
