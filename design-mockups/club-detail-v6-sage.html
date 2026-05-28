@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Club Detail · V6 Soft Sage · Endorfin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@1,9..144,400;1,9..144,500&family=Inter:wght@400;500;600&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --ink:#1F1D1A;
+    --ink-soft:#5C5953;
+    --mute:#928D85;
+    --cream:#F4EFE6;
+    --paper:#FBF8F2;
+    --card:#FFFFFF;
+    --sage:#6E8A75;
+    --sage-deep:#4F6857;
+    --signal:#D85647;       /* warm coral instead of pure red */
+    --hair:rgba(31,29,26,0.07);
+    --hair-strong:rgba(31,29,26,0.12);
+    --gutter:clamp(20px,4vw,40px);
+    --container:1080px;
+  }
+  *,*::before,*::after{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    font-family:'Inter',sans-serif;
+    background:var(--cream);color:var(--ink);
+    -webkit-font-smoothing:antialiased;
+    font-size:15px;line-height:1.55;
+  }
+  a{color:inherit;text-decoration:none}
+  img{display:block;max-width:100%}
+  .wrap{max-width:var(--container);margin:0 auto;padding:0 var(--gutter)}
+
+  .variant-banner{
+    background:var(--ink);color:var(--cream);
+    padding:11px var(--gutter);display:flex;justify-content:space-between;align-items:center;
+    font-family:'Inter',sans-serif;font-size:11px;letter-spacing:.1em;text-transform:uppercase;
+  }
+  .variant-banner b{font-weight:600;letter-spacing:.04em;font-size:13px}
+  .variant-banner span{color:rgba(244,239,230,.55)}
+
+  .serif{font-family:'Instrument Serif',serif;font-style:italic;font-weight:400}
+  .label{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--mute);font-weight:500}
+
+  /* Top bar */
+  .topbar{
+    padding:18px 0;
+    position:sticky;top:0;z-index:30;
+    background:rgba(244,239,230,.85);
+    backdrop-filter:saturate(180%) blur(10px);
+    border-bottom:1px solid var(--hair);
+  }
+  .topbar-inner{display:flex;align-items:center;justify-content:space-between;gap:16px}
+  .brand{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--ink-soft);font-weight:500}
+  .brand .logo{
+    width:28px;height:28px;border-radius:50%;overflow:hidden;background:var(--ink);
+  }
+  .brand .logo img{width:100%;height:100%;object-fit:cover}
+  .brand a{color:var(--mute)}
+  .brand a:hover{color:var(--ink)}
+  .brand .sep{color:var(--hair-strong)}
+
+  .btn{
+    font-family:'Inter',sans-serif;font-weight:500;font-size:13.5px;letter-spacing:-.005em;
+    padding:10px 18px;border-radius:999px;
+    transition:all .18s ease;cursor:pointer;border:0;
+    display:inline-flex;align-items:center;gap:7px;
+  }
+  .btn-primary{background:var(--ink);color:var(--cream)}
+  .btn-primary:hover{background:var(--sage-deep)}
+  .btn-ghost{background:transparent;color:var(--ink);border:1px solid var(--hair-strong)}
+  .btn-ghost:hover{background:var(--ink);color:var(--cream);border-color:var(--ink)}
+  .btn-sm{padding:7px 13px;font-size:12px}
+
+  /* ─────────── HERO ─────────── */
+  .hero{padding:56px 0 24px}
+  .hero-top{display:flex;align-items:center;gap:18px}
+  .hero-avatar{
+    width:76px;height:76px;border-radius:22px;overflow:hidden;
+    background:var(--card);border:1px solid var(--hair);flex:none;
+    box-shadow:0 4px 18px rgba(31,29,26,.04);
+  }
+  .hero-avatar img{width:100%;height:100%;object-fit:cover}
+  .hero-meta{min-width:0}
+  .hero-tag{
+    display:inline-flex;align-items:center;gap:7px;
+    font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--sage-deep);font-weight:500;
+    margin-bottom:6px;
+  }
+  .hero-tag .dot{width:5px;height:5px;border-radius:50%;background:var(--sage);display:inline-block}
+  .hero-name{
+    margin:0;font-family:'Instrument Serif',serif;font-weight:400;
+    font-size:clamp(34px,5vw,46px);line-height:1.05;color:var(--ink);letter-spacing:-.01em;
+  }
+  .hero-name em{font-style:italic;color:var(--sage-deep)}
+
+  .hero-line{
+    margin-top:20px;
+    display:grid;grid-template-columns:1fr auto;gap:20px;align-items:center;
+  }
+  .hero-desc{
+    margin:0;font-size:15.5px;color:var(--ink-soft);line-height:1.6;max-width:54ch;
+  }
+  .hero-actions{display:flex;gap:8px;flex:none}
+
+  .hero-stats{
+    margin-top:26px;
+    display:grid;grid-template-columns:repeat(4,1fr);
+    background:var(--paper);border:1px solid var(--hair);
+    border-radius:18px;overflow:hidden;
+  }
+  .hs{
+    padding:18px 20px;border-right:1px solid var(--hair);
+    display:flex;flex-direction:column;gap:4px;
+  }
+  .hs:last-child{border-right:0}
+  .hs .v{
+    font-size:24px;font-weight:600;letter-spacing:-.015em;line-height:1;font-variant-numeric:tabular-nums;
+  }
+  .hs .v .u{font-size:13px;color:var(--mute);font-weight:500;margin-left:2px}
+  .hs .l{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--mute);font-weight:500}
+
+  /* ─────────── SECTION ─────────── */
+  .section{padding:48px 0}
+  .section + .section{border-top:1px solid var(--hair)}
+  .section-head{
+    display:flex;align-items:baseline;justify-content:space-between;gap:16px;margin-bottom:24px;
+  }
+  .section-head h2{
+    margin:0;font-family:'Instrument Serif',serif;font-weight:400;font-style:italic;
+    font-size:28px;line-height:1.1;letter-spacing:-.01em;color:var(--ink);
+  }
+  .section-head .meta{font-size:13px;color:var(--mute)}
+  .section-head .meta a{color:var(--ink);border-bottom:1px solid var(--hair-strong);padding-bottom:1px}
+
+  /* ─────────── NEXT RUNS (2 cards) ─────────── */
+  .next-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .next-card{
+    background:var(--card);border:1px solid var(--hair);
+    border-radius:18px;padding:22px;
+    transition:transform .18s ease,box-shadow .18s ease;
+    cursor:pointer;
+  }
+  .next-card:hover{transform:translateY(-2px);box-shadow:0 18px 40px rgba(31,29,26,.06);border-color:var(--hair-strong)}
+  .next-card.featured{
+    background:var(--sage-deep);color:var(--cream);border-color:transparent;
+  }
+  .next-card.featured .meta-row,
+  .next-card.featured .next-when{color:rgba(244,239,230,.7)}
+  .next-card.featured .next-title{color:#fff}
+  .next-card.featured .next-loc{color:rgba(244,239,230,.85)}
+  .next-card.featured .pin{background:#fff;color:var(--sage-deep)}
+  .meta-row{
+    display:flex;align-items:center;gap:8px;
+    font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--mute);font-weight:500;
+    margin-bottom:14px;
+  }
+  .pin{
+    display:inline-block;background:var(--signal);color:#fff;
+    padding:2px 8px;border-radius:999px;font-size:9.5px;letter-spacing:.18em;
+  }
+  .next-when{font-size:13px;color:var(--mute);margin-bottom:6px}
+  .next-when b{color:var(--ink);font-weight:600}
+  .next-title{
+    margin:0 0 6px;font-family:'Inter',sans-serif;font-weight:600;font-size:18.5px;letter-spacing:-.005em;line-height:1.3;
+  }
+  .next-loc{font-size:13.5px;color:var(--ink-soft)}
+  .next-foot{
+    margin-top:18px;padding-top:14px;border-top:1px solid var(--hair);
+    display:flex;align-items:center;justify-content:space-between;gap:10px;
+  }
+  .next-card.featured .next-foot{border-color:rgba(244,239,230,.18)}
+  .next-foot .arrow{
+    width:32px;height:32px;border-radius:50%;
+    background:var(--paper);color:var(--ink);
+    display:inline-flex;align-items:center;justify-content:center;
+    transition:all .18s ease;
+  }
+  .next-card.featured .next-foot .arrow{background:rgba(255,255,255,.16);color:#fff}
+  .next-card:hover .arrow{background:var(--ink);color:var(--cream);transform:translateX(2px)}
+  .next-card.featured:hover .arrow{background:#fff;color:var(--sage-deep)}
+  .next-foot .going{
+    font-size:12.5px;color:var(--ink-soft);
+  }
+  .next-card.featured .next-foot .going{color:rgba(244,239,230,.75)}
+
+  /* ─────────── PAST RUNS (image-forward 3-col) ─────────── */
+  .past-grid{
+    display:grid;grid-template-columns:repeat(3,1fr);gap:14px;
+  }
+  .past-card{
+    position:relative;border-radius:18px;overflow:hidden;
+    aspect-ratio:4/5;cursor:pointer;
+    background:var(--paper);
+    transition:transform .25s ease;
+  }
+  .past-card:hover{transform:translateY(-3px)}
+  .past-card img{
+    width:100%;height:100%;object-fit:cover;
+    transition:transform .5s ease;
+  }
+  .past-card:hover img{transform:scale(1.04)}
+  .past-card::after{
+    content:'';position:absolute;inset:auto 0 0 0;height:55%;
+    background:linear-gradient(180deg,transparent 0,rgba(31,29,26,.78) 100%);
+    pointer-events:none;
+  }
+  .past-info{
+    position:absolute;left:16px;right:16px;bottom:14px;color:var(--cream);z-index:2;
+  }
+  .past-info .when{
+    display:inline-flex;align-items:center;gap:6px;
+    font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;font-weight:500;color:rgba(244,239,230,.85);
+    margin-bottom:5px;
+  }
+  .past-info .when .km{
+    background:rgba(255,255,255,.22);backdrop-filter:blur(8px);
+    padding:2px 7px;border-radius:999px;font-variant-numeric:tabular-nums;
+  }
+  .past-info .when .km.tag{background:var(--signal);color:#fff}
+  .past-info .t{
+    margin:0;font-family:'Instrument Serif',serif;font-style:italic;font-weight:400;
+    font-size:18px;line-height:1.2;color:#fff;
+  }
+  .past-card .source{
+    position:absolute;top:12px;right:12px;z-index:2;
+    width:30px;height:30px;border-radius:50%;
+    background:rgba(255,255,255,.18);backdrop-filter:blur(10px);
+    display:inline-flex;align-items:center;justify-content:center;color:#fff;
+    transition:all .18s ease;opacity:0;
+  }
+  .past-card:hover .source{opacity:1}
+  .past-card .source:hover{background:#fff;color:var(--ink)}
+  .past-card .source svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:1.7}
+
+  .past-more{margin-top:18px;text-align:center}
+
+  /* ─────────── WHAT PEOPLE ARE SAYING (rotating quote) ─────────── */
+  .saying{
+    background:var(--sage-deep);
+    border-radius:24px;
+    padding:48px 36px;
+    color:var(--cream);
+    position:relative;overflow:hidden;
+    text-align:center;
+  }
+  .saying::before{
+    content:'';position:absolute;top:-40px;left:-40px;
+    width:180px;height:180px;border-radius:50%;
+    background:rgba(255,255,255,.04);
+  }
+  .saying::after{
+    content:'';position:absolute;bottom:-60px;right:-30px;
+    width:240px;height:240px;border-radius:50%;
+    background:rgba(255,255,255,.04);
+  }
+  .saying .label{color:rgba(244,239,230,.65);margin-bottom:18px;display:block;position:relative;z-index:1}
+  .saying-stage{
+    position:relative;height:120px;
+    z-index:1;
+  }
+  .quote{
+    position:absolute;inset:0;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;
+    opacity:0;
+    animation:quoteCycle 20s infinite;
+  }
+  .quote .q{
+    font-family:'Instrument Serif',serif;font-style:italic;font-weight:400;
+    font-size:clamp(22px,3.2vw,30px);line-height:1.3;color:#fff;
+    max-width:30ch;
+  }
+  .quote .who{
+    font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:rgba(244,239,230,.7);font-weight:500;
+  }
+  .quote:nth-child(1){animation-delay:0s}
+  .quote:nth-child(2){animation-delay:4s}
+  .quote:nth-child(3){animation-delay:8s}
+  .quote:nth-child(4){animation-delay:12s}
+  .quote:nth-child(5){animation-delay:16s}
+  @keyframes quoteCycle{
+    0%, 2%   { opacity:0; transform:translateY(14px) }
+    5%, 18%  { opacity:1; transform:translateY(0) }
+    22%, 100%{ opacity:0; transform:translateY(-14px) }
+  }
+  .saying-dots{
+    margin-top:24px;display:flex;justify-content:center;gap:6px;position:relative;z-index:1;
+  }
+  .saying-dots span{
+    width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,.25);
+    animation:dotCycle 20s infinite;
+  }
+  .saying-dots span:nth-child(1){animation-delay:0s}
+  .saying-dots span:nth-child(2){animation-delay:4s}
+  .saying-dots span:nth-child(3){animation-delay:8s}
+  .saying-dots span:nth-child(4){animation-delay:12s}
+  .saying-dots span:nth-child(5){animation-delay:16s}
+  @keyframes dotCycle{
+    0%, 2%   { background:rgba(255,255,255,.25); transform:scale(1) }
+    5%, 18%  { background:#fff; transform:scale(1.4) }
+    22%, 100%{ background:rgba(255,255,255,.25); transform:scale(1) }
+  }
+
+  /* ─────────── BRANDS (subtle inline strip) ─────────── */
+  .brands{
+    margin-top:24px;
+    display:flex;flex-wrap:wrap;gap:6px;align-items:center;justify-content:center;
+  }
+  .brands .pre{
+    font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--mute);font-weight:500;
+    margin-right:8px;
+  }
+  .brand-chip{
+    display:inline-flex;align-items:center;gap:6px;
+    padding:6px 12px;border-radius:999px;
+    background:var(--paper);border:1px solid var(--hair);
+    font-size:12.5px;color:var(--ink);font-weight:500;
+    transition:all .16s ease;
+  }
+  .brand-chip:hover{background:var(--ink);color:var(--cream);border-color:var(--ink)}
+  .brand-chip svg{width:10px;height:10px;fill:currentColor;opacity:.5}
+
+  /* ─────────── ACTIVITIES ─────────── */
+  .activities{display:flex;flex-wrap:wrap;gap:7px}
+  .a-pill{
+    padding:7px 14px;border-radius:999px;
+    background:var(--card);border:1px solid var(--hair);
+    font-size:13px;color:var(--ink);
+  }
+  .a-pill.fill{background:var(--ink);color:var(--cream);border-color:var(--ink)}
+
+  /* ─────────── FOOT CTA ─────────── */
+  .cta{
+    margin-top:32px;
+    background:var(--paper);border:1px solid var(--hair);
+    border-radius:22px;padding:32px;
+    display:grid;grid-template-columns:1fr auto;gap:20px;align-items:center;
+  }
+  .cta h3{margin:0;font-family:'Instrument Serif',serif;font-style:italic;font-weight:400;font-size:24px;line-height:1.2}
+  .cta p{margin:6px 0 0;color:var(--ink-soft);font-size:14px;max-width:40ch}
+  .cta-buttons{display:flex;gap:8px}
+
+  .foot{padding:24px 0 36px;color:var(--mute);text-align:center;font-size:12px}
+
+  @media (max-width:760px){
+    .hero{padding:32px 0 16px}
+    .hero-line{grid-template-columns:1fr;gap:16px}
+    .hero-actions{order:2}
+    .hero-stats{grid-template-columns:repeat(2,1fr)}
+    .hs{border-bottom:1px solid var(--hair)}
+    .hs:nth-child(2){border-right:0}
+    .hs:nth-child(3),.hs:nth-child(4){border-bottom:0}
+
+    .next-grid{grid-template-columns:1fr}
+    .past-grid{grid-template-columns:repeat(2,1fr);gap:10px}
+    .past-info .t{font-size:15px}
+
+    .saying{padding:32px 22px}
+    .saying-stage{height:160px}
+
+    .cta{grid-template-columns:1fr;padding:24px 20px}
+    .cta-buttons{width:100%}
+    .cta-buttons .btn{flex:1;justify-content:center}
+  }
+</style>
+</head>
+<body>
+
+<div class="variant-banner">
+  <b>V6 · Soft Sage</b>
+  <span>Editorial · Sage accent · Rotating quote · Image-forward past runs</span>
+</div>
+
+<div class="topbar">
+  <div class="wrap topbar-inner">
+    <div class="brand">
+      <div class="logo"><img src="https://elnsymmgbfgawysakohc.supabase.co/storage/v1/object/public/avatars/clubs/rukna-manahai/logo.jpg" alt=""/></div>
+      <a href="/clubs">Clubs</a>
+      <span class="sep">/</span>
+      <span>Thane</span>
+    </div>
+    <button class="btn btn-primary btn-sm">Join the club</button>
+  </div>
+</div>
+
+<main class="wrap">
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-top">
+      <div class="hero-avatar">
+        <img src="https://elnsymmgbfgawysakohc.supabase.co/storage/v1/object/public/avatars/clubs/rukna-manahai/logo.jpg" alt="Rukna Mana Hai logo"/>
+      </div>
+      <div class="hero-meta">
+        <div class="hero-tag"><span class="dot"></span>Thane · Run. Connect. Repeat.</div>
+        <h1 class="hero-name">Rukna Mana Hai <em>Run Club</em></h1>
+      </div>
+    </div>
+
+    <div class="hero-line">
+      <p class="hero-desc">
+        A weekend run community out of Thane. Beginner-friendly distances, and post-run pickleball, badminton or dance cardio depending on the mood.
+      </p>
+      <div class="hero-actions">
+        <button class="btn btn-ghost">Follow</button>
+        <button class="btn btn-primary">Join</button>
+      </div>
+    </div>
+
+    <div class="hero-stats">
+      <div class="hs"><span class="v">11,205</span><span class="l">Members</span></div>
+      <div class="hs"><span class="v">3</span><span class="l">Runs this month</span></div>
+      <div class="hs"><span class="v">15<span class="u">km</span></span><span class="l">Distance · May</span></div>
+      <div class="hs"><span class="v">17</span><span class="l">Total hosted</span></div>
+    </div>
+  </section>
+
+  <!-- NEXT RUNS -->
+  <section class="section">
+    <div class="section-head">
+      <h2>Next runs</h2>
+      <span class="meta">2 scheduled · this weekend</span>
+    </div>
+
+    <div class="next-grid">
+      <article class="next-card featured">
+        <div class="meta-row"><span class="pin">Next</span> Club run · 5 km</div>
+        <div class="next-when"><b>Sat 30 May</b> · 10:30 pm</div>
+        <h3 class="next-title">Night Run &amp; Pickleball</h3>
+        <div class="next-loc">Subway, Pawar Nagar</div>
+        <div class="next-foot">
+          <span class="going">Pickleball after</span>
+          <span class="arrow">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </span>
+        </div>
+      </article>
+
+      <article class="next-card">
+        <div class="meta-row">Social · Invite-only</div>
+        <div class="next-when"><b>Sun 31 May</b> · 5:00 pm</div>
+        <h3 class="next-title">Pickleball Socials</h3>
+        <div class="next-loc">Lake Shore Mall, Thane</div>
+        <div class="next-foot">
+          <span class="going">Founders &amp; creators</span>
+          <span class="arrow">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </span>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <!-- AFTER THE RUN -->
+  <section class="section">
+    <div class="section-head">
+      <h2>What we do after</h2>
+      <span class="meta">7 ways to hang out</span>
+    </div>
+    <div class="activities">
+      <span class="a-pill fill">Pickleball</span>
+      <span class="a-pill">Badminton</span>
+      <span class="a-pill">Dance cardio</span>
+      <span class="a-pill">Pool party</span>
+      <span class="a-pill">Coffee</span>
+      <span class="a-pill">Brunch</span>
+      <span class="a-pill">Calisthenics</span>
+    </div>
+  </section>
+
+  <!-- PAST RUNS -->
+  <section class="section">
+    <div class="section-head">
+      <h2>Where they've been</h2>
+      <span class="meta"><a href="#">All 15 runs ›</a></span>
+    </div>
+
+    <div class="past-grid">
+      <article class="past-card">
+        <img src="https://elnsymmgbfgawysakohc.supabase.co/storage/v1/object/public/media/clubs/rukna-manahai/events/DXzWivKjE4N/cover.jpg" loading="lazy" alt=""/>
+        <a href="https://www.instagram.com/p/DXzWivKjE4N/" target="_blank" rel="noopener" class="source" aria-label="View source">
+          <svg viewBox="0 0 24 24"><path d="M14 3h7v7M10 14L21 3M21 14v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5"/></svg>
+        </a>
+        <div class="past-info">
+          <div class="when"><span class="km tag">Pool party</span> 10 May</div>
+          <h3 class="t">RMH Pool Party</h3>
+        </div>
+      </article>
+
+      <article class="past-card">
+        <img src="https://elnsymmgbfgawysakohc.supabase.co/storage/v1/object/public/media/clubs/rukna-manahai/events/DYUvKwhMMmU/cover.jpg" loading="lazy" alt=""/>
+        <a href="https://www.instagram.com/p/DYUvKwhMMmU/" target="_blank" rel="noopener" class="source">
+          <svg viewBox="0 0 24 24"><path d="M14 3h7v7M10 14L21 3M21 14v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5"/></svg>
+        </a>
+        <div class="past-info">
+          <div class="when"><span class="km">5 km</span> 17 May</div>
+          <h3 class="t">Week 46 Sunday Run</h3>
+        </div>
+      </article>
+
+      <article class="past-card">
+        <img src="https://elnsymmgbfgawysakohc.supabase.co/storage/v1/object/public/media/clubs/rukna-manahai/events/DXJqQHpjG8w/cover.jpg" loading="lazy" alt=""/>
+        <a href="https://www.instagram.com/p/DXJqQHpjG8w/" target="_blank" rel="noopener" class="source">
+          <svg viewBox="0 0 24 24"><path d="M14 3h7v7M10 14L21 3M21 14v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5"/></svg>
+        </a>
+        <div class="past-info">
+          <div class="when"><span class="km">6 km</span> 19 Apr</div>
+          <h3 class="t">Run &amp; Pickleball</h3>
+        </div>
+      </article>
+
+      <article class="past-card">
+        <img src="https://elnsymmgbfgawysakohc.supabase.co/storage/v1/object/public/media/clubs/rukna-manahai/events/DXtZ0FXDI10/cover.jpg" loading="lazy" alt=""/>
+        <a href="https://www.instagram.com/p/DXtZ0FXDI10/" target="_blank" rel="noopener" class="source">
+          <svg viewBox="0 0 24 24"><path d="M14 3h7v7M10 14L21 3M21 14v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5"/></svg>
+        </a>
+        <div class="past-info">
+          <div class="when"><span class="km">5 km</span> 3 May</div>
+          <h3 class="t">Run &amp; Smash</h3>
+        </div>
+      </article>
+
+      <article class="past-card">
+        <img src="https://elnsymmgbfgawysakohc.supabase.co/storage/v1/object/public/media/clubs/rukna-manahai/events/DXKOqOWDHsI/cover.jpg" loading="lazy" alt=""/>
+        <a href="https://www.instagram.com/p/DXKOqOWDHsI/" target="_blank" rel="noopener" class="source">
+          <svg viewBox="0 0 24 24"><path d="M14 3h7v7M10 14L21 3M21 14v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5"/></svg>
+        </a>
+        <div class="past-info">
+          <div class="when"><span class="km tag">Workshop</span> 18 Apr</div>
+          <h3 class="t">CPR &amp; Injury Prevention</h3>
+        </div>
+      </article>
+
+      <article class="past-card">
+        <img src="https://elnsymmgbfgawysakohc.supabase.co/storage/v1/object/public/media/clubs/rukna-manahai/events/DXejHl6DPl-/cover.jpg" loading="lazy" alt=""/>
+        <a href="https://www.instagram.com/p/DXejHl6DPl-/" target="_blank" rel="noopener" class="source">
+          <svg viewBox="0 0 24 24"><path d="M14 3h7v7M10 14L21 3M21 14v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5"/></svg>
+        </a>
+        <div class="past-info">
+          <div class="when"><span class="km">5 km</span> 26 Apr</div>
+          <h3 class="t">Week 43 · Dance Cardio</h3>
+        </div>
+      </article>
+    </div>
+
+    <div class="past-more">
+      <button class="btn btn-ghost btn-sm">Show all 15 runs</button>
+    </div>
+  </section>
+
+  <!-- WHAT PEOPLE ARE SAYING -->
+  <section class="section">
+    <div class="saying">
+      <span class="label">What people are saying</span>
+      <div class="saying-stage">
+        <div class="quote">
+          <div class="q">"Getting the best networking vibes already 🫂"</div>
+          <div class="who">@prathameshhshetye · Pickleball Socials</div>
+        </div>
+        <div class="quote">
+          <div class="q">"Any membership we need to take to join this community?"</div>
+          <div class="who">@suyog_patne · Run &amp; Smash Sunday</div>
+        </div>
+        <div class="quote">
+          <div class="q">"Love thissssssssssss :)"</div>
+          <div class="who">@iambhavyamehta · Pickleball Socials</div>
+        </div>
+        <div class="quote">
+          <div class="q">"WHY on a Saturday — was waiting for one of your Sunday runs!"</div>
+          <div class="who">@puja_nvogue · Exclusive Run</div>
+        </div>
+        <div class="quote">
+          <div class="q">"Let's gooo!! 🔥🔥🔥"</div>
+          <div class="who">@vinitsikariya · Run Lift Vibe</div>
+        </div>
+      </div>
+      <div class="saying-dots">
+        <span></span><span></span><span></span><span></span><span></span>
+      </div>
+    </div>
+
+    <!-- Brands strip subtle -->
+    <div class="brands">
+      <span class="pre">Seen with</span>
+      <a href="#" class="brand-chip">Reebok</a>
+      <a href="#" class="brand-chip">KIMS Hospitals</a>
+      <a href="#" class="brand-chip">Pickledeck</a>
+      <a href="#" class="brand-chip">Nitrro Sport</a>
+      <a href="#" class="brand-chip">Wholy</a>
+      <a href="#" class="brand-chip">Playo</a>
+      <a href="#" class="brand-chip">+ 9 more</a>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta">
+    <div>
+      <h3>Get reminders for RMH runs</h3>
+      <p>Install Endorfin to RSVP, get notified, and track your training.</p>
+    </div>
+    <div class="cta-buttons">
+      <a href="#" class="btn btn-ghost">App Store</a>
+      <a href="#" class="btn btn-primary">Google Play</a>
+    </div>
+  </section>
+
+  <div class="foot">© Endorfin · /clubs/rukna-manahai</div>
+</main>
+
+</body>
+</html>

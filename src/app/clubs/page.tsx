@@ -52,6 +52,14 @@ export interface ClubEventRecap {
   videos: ClubEventRecapVideo[];
 }
 
+export interface ClubEventComment {
+  user: string | null;
+  text: string | null;
+  likes: number;
+  date: string | null;
+  userPictureUrl?: string | null;
+}
+
 export interface ClubEvent {
   id: string;
   clubId: string;
@@ -68,6 +76,8 @@ export interface ClubEvent {
   distanceKm: number | null;
   eventType: 'club_run' | 'race_event';
   recap: ClubEventRecap | null;
+  topComments?: ClubEventComment[] | null;
+  sourcePostUrl?: string | null;
   createdBy: string;
   createdAt: string;
   updatedAt: string;

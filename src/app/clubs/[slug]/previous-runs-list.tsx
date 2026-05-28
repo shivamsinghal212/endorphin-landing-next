@@ -96,14 +96,33 @@ function RunRow({ event }: { event: ClubEvent }) {
   );
 }
 
+const INITIAL_VISIBLE = 5;
+
 export function PreviousRunsList({ events }: { events: ClubEvent[] }) {
+  const [expanded, setExpanded] = useState(false);
   if (events.length === 0) return null;
+  const overflow = events.length > INITIAL_VISIBLE;
+  const visible = expanded || !overflow ? events : events.slice(0, INITIAL_VISIBLE);
+  const hiddenCount = events.length - INITIAL_VISIBLE;
+
   return (
     <div className="prev-rows">
       <div className="prev-rows-hint kicker">Click any run to expand</div>
       <div className="prev-rows-list">
-        {events.map((e) => <RunRow key={e.id} event={e} />)}
+        {visible.map((e) => <RunRow key={e.id} event={e} />)}
       </div>
+      {overflow && (
+        <div className="prev-rows-more">
+          <button
+            type="button"
+            className="btn btn-ghost-light"
+            onClick={() => setExpanded((x) => !x)}
+            aria-expanded={expanded}
+          >
+            {expanded ? 'Show less' : `Show ${hiddenCount} more`}
+          </button>
+        </div>
+      )}
     </div>
   );
 }

@@ -9,11 +9,11 @@ import type { ClubEvent } from '../page';
 import { ClaimClubLink } from './claim-club-link';
 import { ClubIcons } from './club-icons';
 import { JoinClubButton } from './join-club-button';
-import { RsvpButton } from './rsvp-button';
 import { RunGallery } from './run-gallery';
 import { PreviousRunsList } from './previous-runs-list';
 import { ExpandableDescription } from './expandable-description';
 import { NextRun } from './next-run';
+import { UpcomingList } from './upcoming-list';
 import './club-page.css';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE || 'https://api.endorfin.run';
@@ -65,31 +65,6 @@ function parseDate(iso: string | null | undefined): Date | null {
   if (!iso) return null;
   const d = new Date(iso.includes('T') ? iso : `${iso}T00:00:00`);
   return Number.isNaN(d.getTime()) ? null : d;
-}
-
-function fmtDay(iso: string | null | undefined) {
-  const d = parseDate(iso);
-  return d ? d.toLocaleString('en', { weekday: 'short' }) : '';
-}
-
-function fmtDayNum(iso: string | null | undefined) {
-  const d = parseDate(iso);
-  return d ? String(d.getDate()).padStart(2, '0') : '';
-}
-
-function fmtMonth(iso: string | null | undefined) {
-  const d = parseDate(iso);
-  return d ? d.toLocaleString('en', { month: 'short' }) : '';
-}
-
-function fmtTime12hFromIso(iso: string | null | undefined) {
-  const d = parseDate(iso);
-  if (!d) return '';
-  let h = d.getHours();
-  const m = String(d.getMinutes()).padStart(2, '0');
-  const ampm = h >= 12 ? 'pm' : 'am';
-  h = h % 12 || 12;
-  return `${h}:${m} ${ampm}`;
 }
 
 function fmtLastRunKickerDate(iso: string | null | undefined) {
@@ -200,7 +175,7 @@ export default async function ClubPage({ params }: PageProps) {
           myMembership={myMembership}
         />
         {upcomingEvents.length > 0 && (
-          <Upcoming
+          <UpcomingList
             events={upcomingEvents}
             slug={club.slug}
             clubName={club.name}
@@ -211,6 +186,8 @@ export default async function ClubPage({ params }: PageProps) {
           />
         )}
         {pastEvents.length > 0 && <PreviousRuns events={pastEvents} />}
+        <CommentsSay events={pastEvents} />
+        <BrandsStrip collaborations={club.collaborations} />
         {club.admins.length > 0 && <LedBy admins={club.admins} />}
         <CtaFooter club={club} />
       </div>
@@ -357,9 +334,9 @@ function Hero({
               ))}
             </div>
           )}
+          {club.description && <ExpandableDescription text={club.description} />}
         </div>
         <aside className="hero-right">
-          {club.description && <ExpandableDescription text={club.description} />}
           <div className="hero-cta-stack">
             <div className="join-pill" aria-label="Share and join">
               <div className="join-pill-icons">
@@ -424,125 +401,170 @@ function Ribbon() {
 
 function Stats({ club }: { club: Club }) {
   const s = club.stats;
+  // Only render tiles whose value is meaningful (> 0). If nothing
+  // qualifies, skip the entire band so we don't show an empty grid.
+  const tiles = [
+    { v: s.members, l: 'Members' },
+    { v: s.runsThisMonth, l: 'Runs this month' },
+    { v: s.kmThisMonth, l: 'KM this month' },
+    { v: s.yearsRunning, l: 'Years running' },
+  ].filter((t) => t.v > 0);
+
+  if (tiles.length === 0) return null;
+
   return (
     <section className="stats" aria-label="Club stats">
-      <div className="stat">
-        <div className="stat-value">{s.members.toLocaleString('en-IN')}</div>
-        <div className="stat-label kicker">Members</div>
-      </div>
-      <div className="stat">
-        <div className="stat-value">{s.runsThisMonth.toLocaleString('en-IN')}</div>
-        <div className="stat-label kicker">Runs this month</div>
-      </div>
-      <div className="stat">
-        <div className="stat-value">{s.kmThisMonth.toLocaleString('en-IN')}</div>
-        <div className="stat-label kicker">KM this month</div>
-      </div>
-      <div className="stat">
-        <div className="stat-value">{s.yearsRunning.toLocaleString('en-IN')}</div>
-        <div className="stat-label kicker">Years running</div>
-      </div>
-    </section>
-  );
-}
-
-function Upcoming({
-  events,
-  slug,
-  clubName,
-  joinForm,
-  requiresApproval,
-  isAuthed,
-  myMembership,
-}: {
-  events: ClubEvent[];
-  slug: string;
-  clubName: string;
-  joinForm: Club['joinForm'];
-  requiresApproval: boolean;
-  isAuthed: boolean;
-  myMembership: MyMembership | null;
-}) {
-  return (
-    <section className="upcoming">
-      <div className="upcoming-header">
-        <h2 className="upcoming-title">Upcoming</h2>
-        <span className="kicker upcoming-count">{events.length} {events.length === 1 ? 'run' : 'runs'} scheduled</span>
-      </div>
-
-      {events.map((event) => (
-        <UpcomingRow
-          key={event.id}
-          event={event}
-          slug={slug}
-          clubName={clubName}
-          joinForm={joinForm}
-          requiresApproval={requiresApproval}
-          isAuthed={isAuthed}
-          myMembership={myMembership}
-        />
+      {tiles.map((t) => (
+        <div className="stat" key={t.l}>
+          <div className="stat-value">{t.v.toLocaleString('en-IN')}</div>
+          <div className="stat-label kicker">{t.l}</div>
+        </div>
       ))}
-
-      {events.length > 3 && (
-        <div className="upcoming-more">
-          <button className="btn btn-ghost" type="button">See all {events.length} runs</button>
-        </div>
-      )}
     </section>
   );
 }
 
-function UpcomingRow({
-  event,
-  slug,
-  clubName,
-  joinForm,
-  requiresApproval,
-  isAuthed,
-  myMembership,
-}: {
-  event: ClubEvent;
-  slug: string;
-  clubName: string;
-  joinForm: Club['joinForm'];
-  requiresApproval: boolean;
-  isAuthed: boolean;
-  myMembership: MyMembership | null;
-}) {
-  const isRace = event.eventType === 'race_event';
-  const tagLabel = isRace ? 'Race event' : 'Club run';
-  const meta = [event.locationName, fmtTime12hFromIso(event.startTime)].filter(Boolean).join(' · ');
+// Wrap a remote image URL in the images.weserv.nl proxy so the browser
+// always gets a proper image/* response with permissive CORS headers.
+// Without this, Instagram's CDN occasionally returns an HTML error page
+// (expired token, geo-block, rate-limit) which trips CORB and leaves
+// the avatar broken. weserv re-fetches server-side and re-emits as
+// JPEG. The `default=` param renders a neutral gray placeholder if the
+// upstream URL itself 404s, so the avatar circle never goes empty.
+function proxyAvatar(url: string): string {
+  const cleaned = url.replace(/^https?:\/\//, '');
+  return `https://images.weserv.nl/?url=${encodeURIComponent(cleaned)}&w=80&h=80&fit=cover&output=jpg&default=eeeae3`;
+}
+
+function CommentsSay({ events }: { events: ClubEvent[] }) {
+  // Pick one standout comment per event (highest likes), cap at 6, skip empties.
+  const quotes: {
+    text: string;
+    user: string;
+    from: string;
+    avatar: string | null;
+  }[] = [];
+  for (const e of events) {
+    const cs = e.topComments;
+    if (!cs || cs.length === 0) continue;
+    const top = [...cs]
+      .filter((c) => c.text && c.text.trim().length > 0)
+      .sort((a, b) => (b.likes || 0) - (a.likes || 0))[0];
+    if (!top || !top.text) continue;
+    quotes.push({
+      text: top.text.trim(),
+      user: top.user || 'someone',
+      from: e.title,
+      avatar: top.userPictureUrl || null,
+    });
+    if (quotes.length >= 6) break;
+  }
+  if (quotes.length === 0) return null;
 
   return (
-    <div className="upcoming-row">
-      <div>
-        <div className="row-date">{fmtDayNum(event.startTime)}</div>
-        <div className="kicker row-date-sub">
-          {fmtDay(event.startTime)} · {fmtMonth(event.startTime)}
+    <section className="say">
+      <div className="say-head">
+        <h2 className="say-title">What people are saying</h2>
+      </div>
+      <div className="say-window" aria-live="polite">
+        <div
+          className="say-track"
+          // Step timing: ~2.5s per comment — quick enough to feel like
+          // a live feed but slow enough to read short replies.
+          style={{ animationDuration: `${quotes.length * 2.5}s` }}
+        >
+          {[...quotes, ...quotes].map((q, i) => (
+            <div className="say-row" key={i} aria-hidden={i >= quotes.length}>
+              <span className="say-row-av" aria-hidden="true">
+                {/* Primary: scraped Instagram picture URL. We push every
+                    avatar through the images.weserv.nl proxy so the
+                    browser always sees an image/* response (Instagram's
+                    raw CDN occasionally returns HTML, which trips
+                    CORB). weserv's own `default=` param hands off to
+                    unavatar when the IG URL itself fails. */}
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={proxyAvatar(
+                    q.avatar ||
+                      `https://unavatar.io/instagram/${encodeURIComponent(q.user)}`,
+                  )}
+                  alt=""
+                  width={40}
+                  height={40}
+                  loading="lazy"
+                  referrerPolicy="no-referrer"
+                />
+              </span>
+              <div className="say-row-body">
+                <p className="say-row-text">{q.text}</p>
+                <div className="say-row-head">
+                  <span className="say-row-who">@{q.user}</span>
+                  <span className="say-row-sep" aria-hidden="true">·</span>
+                  <span className="say-row-where">{q.from}</span>
+                </div>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
-      <div>
-        <span className={`row-type ${isRace ? 'row-type-race' : 'row-type-club'}`}>{tagLabel}</span>
-        <div className="row-title">{event.title}</div>
-        <div className="row-meta" data-going={event.goingCount}>{meta}</div>
+    </section>
+  );
+}
+
+function BrandsStrip({
+  collaborations,
+}: {
+  collaborations: Club['collaborations'];
+}) {
+  if (!collaborations || collaborations.length === 0) return null;
+  // De-dupe by brand name (some brands appear at multiple posts); keep the
+  // most recent evidence link per brand.
+  const seen = new Map<
+    string,
+    { name: string; role: string | null; href: string | null }
+  >();
+  for (const c of collaborations) {
+    const key = c.brandName.trim().toLowerCase();
+    if (seen.has(key)) continue;
+    seen.set(key, {
+      name: c.brandName,
+      role: c.role,
+      href: c.evidencePostUrl,
+    });
+  }
+  const list = Array.from(seen.values());
+
+  return (
+    <section className="brands">
+      <div className="brands-head">
+        <h2 className="brands-title">Brand collaborations</h2>
+        <span className="kicker brands-count">
+          {list.length} {list.length === 1 ? 'partner' : 'partners'}
+        </span>
       </div>
-      <span className="going-pill">{event.goingCount} going</span>
-      <div className="row-cta">
-        {isRace ? (
-          <button className="btn btn-ghost" type="button">Details</button>
-        ) : (
-          <RsvpButton
-            slug={slug}
-            clubName={clubName}
-            eventId={event.id}
-            joinForm={joinForm}
-            requiresApproval={requiresApproval}
-            isAuthed={isAuthed}
-            myMembership={myMembership}
-          />
+      <div className="brands-grid">
+        {list.map((b) =>
+          b.href ? (
+            <a
+              key={b.name}
+              href={b.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="brand-cell"
+              title={b.role ? `${b.name} · ${b.role}` : b.name}
+            >
+              <div className="brand-name">{b.name}</div>
+              <div className="brand-role">{b.role || 'Partner'}</div>
+            </a>
+          ) : (
+            <div key={b.name} className="brand-cell brand-cell-static">
+              <div className="brand-name">{b.name}</div>
+              <div className="brand-role">{b.role || 'Partner'}</div>
+            </div>
+          ),
         )}
       </div>
-    </div>
+    </section>
   );
 }
 

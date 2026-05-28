@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Club Detail · V9 Mocha · Endorfin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;1,9..144,400;1,9..144,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --ink:#2A1F18;
+    --ink-soft:#5C4B3D;
+    --mute:#9B8978;
+    --cream:#F4ECDF;
+    --paper:#FBF6EC;
+    --card:#FFFEF9;
+    --mocha:#7A5638;
+    --mocha-deep:#5A3F28;
+    --signal:#C1572C;
+    --hair:rgba(42,31,24,0.08);
+    --hair-strong:rgba(42,31,24,0.14);
+    --gutter:clamp(20px,4vw,48px);
+    --container:1140px;
+  }
+  *,*::before,*::after{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    font-family:'Inter',sans-serif;
+    background:var(--cream);color:var(--ink);
+    -webkit-font-smoothing:antialiased;
+    font-size:15.5px;line-height:1.55;
+  }
+  a{color:inherit;text-decoration:none}
+  img{display:block;max-width:100%}
+  .wrap{max-width:var(--container);margin:0 auto;padding:0 var(--gutter)}
+
+  .variant-banner{
+    background:var(--ink);color:var(--cream);
+    padding:11px var(--gutter);display:flex;justify-content:space-between;align-items:center;
+    font-family:'Inter',sans-serif;font-size:11px;letter-spacing:.1em;text-transform:uppercase;
+  }
+  .variant-banner b{font-weight:600;letter-spacing:.04em;font-size:13px}
+  .variant-banner span{color:rgba(244,236,223,.6)}
+
+  .serif{font-family:'Fraunces',serif;font-style:italic;font-weight:500}
+  .label{font-size:11.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--mute);font-weight:500}
+  .label-mocha{color:var(--mocha)}
+
+  /* Top */
+  .topbar{
+    position:sticky;top:0;z-index:30;
+    background:rgba(244,236,223,.88);backdrop-filter:saturate(180%) blur(10px);
+    padding:14px 0;border-bottom:1px solid var(--hair);
+  }
+  .topbar-inner{display:flex;align-items:center;justify-content:space-between}
+  .crumb{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--ink-soft);font-weight:500}
+  .crumb .sep{color:var(--hair-strong)}
+  .crumb a:hover{color:var(--ink)}
+
+  .btn{
+    font-family:'Inter',sans-serif;font-weight:500;font-size:13.5px;
+    padding:10px 18px;border-radius:999px;border:0;cursor:pointer;
+    transition:all .2s ease;letter-spacing:-.005em;
+    display:inline-flex;align-items:center;justify-content:center;gap:7px;
+  }
+  .btn-primary{background:var(--ink);color:var(--cream)}
+  .btn-primary:hover{background:var(--mocha-deep)}
+  .btn-ghost{background:transparent;color:var(--ink);border:1px solid var(--hair-strong)}
+  .btn-ghost:hover{background:var(--ink);color:var(--cream);border-color:var(--ink)}
+  .btn-sm{padding:8px 14px;font-size:12px}
+
+  /* ─────────── HERO (asymmetric) ─────────── */
+  .hero{padding:48px 0 24px}
+  .hero-grid{
+    display:grid;grid-template-columns:1.1fr 1fr;gap:48px;align-items:center;
+  }
+  .hero-left{min-width:0}
+  .hero-label{margin-bottom:16px;display:block}
+  .hero-name{
+    margin:0 0 18px;font-family:'Fraunces',serif;font-weight:500;
+    font-size:clamp(36px,5vw,56px);line-height:1.02;letter-spacing:-.015em;color:var(--ink);
+  }
+  .hero-name em{font-style:italic;color:var(--mocha);font-weight:500}
+  .hero-desc{
+    margin:0 0 24px;font-size:16px;color:var(--ink-soft);line-height:1.6;max-width:48ch;
+  }
+  .hero-actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  .hero-actions .who-runs{
+    margin-left:6px;display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--ink-soft);
+  }
+  .av-stack{display:flex}
+  .av-stack .av{
+    width:26px;height:26px;border-radius:50%;border:2px solid var(--cream);
+    background:var(--mocha);color:#fff;font-size:10.5px;font-weight:600;
+    display:inline-flex;align-items:center;justify-content:center;margin-left:-7px;
+  }
+  .av-stack .av:first-child{margin-left:0}
+  .av-stack .av.b{background:var(--ink)}
+  .av-stack .av.c{background:#7A8970}
+
+  /* Right hero photo with stats overlay */
+  .hero-photo{
+    position:relative;aspect-ratio:4/5;border-radius:24px;overflow:hidden;
+    background:var(--paper);border:1px solid var(--hair);
+  }
+  .hero-photo img{width:100%;height:100%;object-fit:cover}
+  .hero-photo::after{
+    content:'';position:absolute;inset:auto 0 0 0;height:50%;
+    background:linear-gradient(180deg,transparent,rgba(42,31,24,.55));pointer-events:none;
+  }
+  .hero-photo .stamp{
+    position:absolute;top:18px;left:18px;
+    background:rgba(255,254,249,.92);backdrop-filter:blur(8px);
+    padding:8px 14px;border-radius:999px;
+    font-size:11.5px;color:var(--ink);font-weight:500;letter-spacing:-.005em;
+    display:flex;align-items:center;gap:7px;
+  }
+  .hero-photo .stamp .dot{width:6px;height:6px;border-radius:50%;background:var(--signal);animation:pulse 2s infinite}
+  @keyframes pulse{
+    0%,100%{opacity:1;transform:scale(1)}
+    50%{opacity:.4;transform:scale(1.4)}
+  }
+  .hero-photo .stats-overlay{
+    position:absolute;left:18px;right:18px;bottom:18px;z-index:2;color:#fff;
+    display:grid;grid-template-columns:repeat(2,1fr);gap:12px;
+  }
+  .hero-photo .ss{
+    background:rgba(255,255,255,.14);backdrop-filter:blur(14px);
+    border:1px solid rgba(255,255,255,.18);
+    border-radius:14px;padding:11px 14px;
+  }
+  .hero-photo .ss .v{
+    font-size:20px;font-weight:600;letter-spacing:-.015em;line-height:1;
+    font-variant-numeric:tabular-nums;color:#fff;
+  }
+  .hero-photo .ss .v .u{font-size:11.5px;color:rgba(255,255,255,.75);margin-left:2px;font-weight:500}
+  .hero-photo .ss .l{font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.75);font-weight:500;margin-top:3px}
+
+  /* ─────────── SECTION ─────────── */
+  .section{padding:56px 0}
+  .section + .section{border-top:1px solid var(--hair)}
+  .section-head{
+    margin-bottom:28px;display:grid;grid-template-columns:1fr auto;gap:20px;align-items:end;
+  }
+  .section-head .lhs .lab{display:block;margin-bottom:6px}
+  .section-head .lhs h2{
+    margin:0;font-family:'Fraunces',serif;font-weight:500;font-size:30px;letter-spacing:-.01em;line-height:1.1;
+  }
+  .section-head .lhs h2 em{font-style:italic;color:var(--mocha)}
+  .section-head .rhs{font-size:13px;color:var(--mute);text-align:right}
+  .section-head .rhs a{color:var(--ink);border-bottom:1px solid var(--hair-strong);padding-bottom:1px}
+
+  /* ─────────── NEXT RUNS — asymmetric cards ─────────── */
+  .next-grid{
+    display:grid;grid-template-columns:1.3fr 1fr;gap:14px;
+  }
+  .next-card{
+    background:var(--card);border:1px solid var(--hair);border-radius:20px;
+    padding:24px;cursor:pointer;
+    transition:all .2s ease;
+  }
+  .next-card:hover{transform:translateY(-2px);box-shadow:0 14px 36px rgba(42,31,24,.06);border-color:var(--hair-strong)}
+  .next-card.feat{background:var(--ink);color:var(--cream);border-color:var(--ink)}
+  .next-card.feat .when,.next-card.feat .loc{color:rgba(244,236,223,.7)}
+  .next-card.feat .pin{background:var(--signal);color:#fff}
+
+  .next-card .meta-line{
+    display:flex;align-items:center;gap:8px;margin-bottom:14px;
+    font-size:11px;letter-spacing:.16em;text-transform:uppercase;font-weight:500;color:var(--mute);
+  }
+  .next-card.feat .meta-line{color:rgba(244,236,223,.6)}
+  .next-card .pin{
+    display:inline-flex;align-items:center;gap:5px;
+    background:var(--mocha);color:#fff;
+    padding:3px 9px;border-radius:999px;font-size:9.5px;letter-spacing:.18em;
+  }
+  .next-card .pin .live{width:5px;height:5px;border-radius:50%;background:#fff;animation:pulse 2s infinite}
+  .next-card .when{font-size:13px;color:var(--ink-soft);margin-bottom:6px}
+  .next-card .when b{color:var(--ink);font-weight:600}
+  .next-card.feat .when b{color:#fff}
+  .next-card h3{
+    margin:0 0 6px;font-family:'Fraunces',serif;font-style:italic;font-weight:500;
+    font-size:24px;line-height:1.15;letter-spacing:-.005em;
+  }
+  .next-card .loc{font-size:13.5px;color:var(--ink-soft)}
+  .next-card .row{
+    margin-top:20px;padding-top:14px;border-top:1px solid var(--hair);
+    display:flex;align-items:center;justify-content:space-between;gap:10px;
+  }
+  .next-card.feat .row{border-color:rgba(244,236,223,.18)}
+  .next-card .row .secondary{font-size:12.5px;color:var(--ink-soft)}
+  .next-card.feat .row .secondary{color:rgba(244,236,223,.7)}
+  .next-card .row .btn{background:var(--signal);color:#fff}
+  .next-card .row .btn:hover{background:#a04420}
+  .next-card .row .arrow{
+    width:34px;height:34px;border-radius:50%;background:var(--paper);
+    display:inline-flex;align-items:center;justify-content:center;color:var(--ink);
+  }
+  .next-card.feat .row .arrow{background:rgba(255,255,255,.14);color:#fff}
+  .next-card .row .arrow svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.8}
+
+  /* ─────────── ACTIVITIES ─────────── */
+  .activities{display:flex;flex-wrap:wrap;gap:7px}
+  .a-pill{
+    padding:8px 14px;border-radius:999px;
+    background:var(--card);border:1px solid var(--hair);
+    font-size:13.5px;color:var(--ink);
+  }
+  .a-pill.fill{background:var(--mocha);color:#fff;border-color:var(--mocha)}
+
+  /* ─────────── PAST RUNS — masonry ─────────── */
+  .masonry{
+    display:grid;grid-template-columns:repeat(3,1fr);gap:14px;
+    grid-auto-flow:dense;
+  }
+  .m-card{
+    position:relative;border-radius:18px;overflow:hidden;cursor:pointer;
+    background:var(--paper);
+    transition:transform .25s ease;
+    aspect-ratio:4/5;
+  }
+  .m-card.tall{aspect-ratio:4/6.5;grid-row:span 2}
+  .m-card.wide{aspect-ratio:auto}
+  .m-card:hover{transform:translateY(-3px)}
+  .m-card img{width:100%;height:100%;object-fit:cover;transition:transform .5s ease}
+  .m-card:hover img{transform:scale(1.04)}
+  .m-card::after{
+    content:'';position:absolute;inset:auto 0 0 0;height:50%;
+    background:linear-gradient(180deg,transparent,rgba(42,31,24,.78));pointer-events:none;
+  }
+  .m-card .badge{
+    position:absolute;top:12px;left:12px;z-index:2;
+    background:rgba(255,254,249,.92);backdrop-filter:blur(8px);
+    padding:4px 10px;border-radius:999px;
+    font-size:10.5px;color:var(--ink);font-weight:500;letter-spacing:-.005em;
+    font-variant-numeric:tabular-nums;
+  }
+  .m-card .badge.tag{background:var(--signal);color:#fff}
+  .m-card .src{
+    position:absolute;top:12px;right:12px;z-index:2;
+    width:30px;height:30px;border-radius:50%;
+    background:rgba(255,254,249,.85);backdrop-filter:blur(10px);
+    display:inline-flex;align-items:center;justify-content:center;color:var(--ink);
+    opacity:0;transition:opacity .2s ease;
+  }
+  .m-card:hover .src{opacity:1}
+  .m-card .src svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:1.7}
+  .m-card .cap{
+    position:absolute;left:16px;right:16px;bottom:16px;z-index:2;color:#fff;
+  }
+  .m-card .cap .when{font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.8);font-weight:500;margin-bottom:4px}
+  .m-card .cap h3{
+    margin:0;font-family:'Fraunces',serif;font-style:italic;font-weight:500;
+    font-size:18px;line-height:1.2;color:#fff;
+  }
+  .m-card.tall .cap h3{font-size:22px}
+
+  .masonry-more{margin-top:18px;text-align:center}
+
+  /* ─────────── COMMENTS — STACKED CARDS ─────────── */
+  .saying-wrap{
+    display:grid;grid-template-columns:1fr 1.2fr;gap:48px;align-items:center;
+  }
+  .saying-text h2{
+    margin:0;font-family:'Fraunces',serif;font-weight:500;
+    font-size:36px;line-height:1.05;letter-spacing:-.01em;
+  }
+  .saying-text h2 em{font-style:italic;color:var(--mocha)}
+  .saying-text p{
+    margin:14px 0 0;color:var(--ink-soft);font-size:15px;max-width:32ch;
+  }
+  .saying-text .label{margin-bottom:8px;display:block}
+
+  .cards-stage{
+    position:relative;height:280px;
+  }
+  .scard{
+    position:absolute;inset:0;
+    background:var(--card);border:1px solid var(--hair);
+    border-radius:20px;padding:24px;
+    box-shadow:0 12px 40px rgba(42,31,24,.05);
+    display:flex;flex-direction:column;justify-content:space-between;gap:16px;
+    opacity:0;
+    animation:cardSwap 25s infinite;
+    transform-origin:center bottom;
+  }
+  .scard .q{
+    font-family:'Fraunces',serif;font-style:italic;font-weight:500;
+    font-size:22px;line-height:1.3;color:var(--ink);
+  }
+  .scard .by{
+    display:flex;align-items:center;gap:10px;
+    border-top:1px solid var(--hair);padding-top:14px;
+  }
+  .scard .by .av{
+    width:34px;height:34px;border-radius:50%;flex:none;
+    background:var(--mocha);color:#fff;font-size:13px;font-weight:600;
+    display:inline-flex;align-items:center;justify-content:center;
+  }
+  .scard .by .av.b{background:var(--ink)}
+  .scard .by .av.c{background:#7A8970}
+  .scard .by .av.d{background:var(--mocha-deep)}
+  .scard .by .av.e{background:var(--signal)}
+  .scard .by .info{display:flex;flex-direction:column;gap:1px;min-width:0}
+  .scard .by .who{font-size:13.5px;font-weight:600;color:var(--ink);letter-spacing:-.005em}
+  .scard .by .where{font-size:11.5px;color:var(--mute);letter-spacing:.04em}
+
+  .scard:nth-child(1){animation-delay:0s}
+  .scard:nth-child(2){animation-delay:5s}
+  .scard:nth-child(3){animation-delay:10s}
+  .scard:nth-child(4){animation-delay:15s}
+  .scard:nth-child(5){animation-delay:20s}
+
+  @keyframes cardSwap{
+    0%, 1%   { opacity:0; transform:translateY(40px) scale(.92) rotate(-2deg) }
+    5%       { opacity:1; transform:translateY(0) scale(1) rotate(0) }
+    18%      { opacity:1; transform:translateY(0) scale(1) rotate(0) }
+    22%      { opacity:0; transform:translateY(-30px) scale(.96) rotate(3deg) }
+    23%, 100%{ opacity:0 }
+  }
+
+  /* ─────────── BRANDS — subtle ─────────── */
+  .brands{
+    margin-top:36px;
+    background:var(--paper);border:1px solid var(--hair);
+    border-radius:18px;padding:18px 22px;
+    display:flex;align-items:center;gap:14px;flex-wrap:wrap;
+  }
+  .brands .label{flex:none}
+  .brands .row{display:flex;flex-wrap:wrap;gap:6px}
+  .brand-chip{
+    display:inline-flex;align-items:center;gap:5px;
+    padding:6px 12px;border-radius:999px;background:var(--card);
+    font-size:12.5px;color:var(--ink);font-weight:500;
+    transition:all .15s ease;
+  }
+  .brand-chip:hover{background:var(--ink);color:var(--cream)}
+  .brand-chip svg{width:10px;height:10px;stroke:currentColor;fill:none;stroke-width:1.7;opacity:.5}
+
+  /* ─────────── CTA ─────────── */
+  .cta{
+    margin-top:48px;
+    background:var(--ink);color:var(--cream);
+    border-radius:22px;padding:36px 32px;
+    display:grid;grid-template-columns:1fr auto;gap:22px;align-items:center;
+  }
+  .cta h3{margin:0;font-family:'Fraunces',serif;font-style:italic;font-weight:500;font-size:28px;line-height:1.15;letter-spacing:-.005em}
+  .cta h3 em{color:var(--signal)}
+  .cta p{margin:8px 0 0;color:rgba(244,236,223,.65);font-size:14px;max-width:44ch}
+  .cta-btns{display:flex;gap:8px}
+  .cta-btns .btn{background:rgba(255,255,255,.12);color:#fff}
+  .cta-btns .btn:hover{background:rgba(255,255,255,.2)}
+  .cta-btns .btn.primary{background:var(--cream);color:var(--ink)}
+
+  .foot{padding:24px 0 36px;color:var(--mute);text-align:center;font-size:12px}
+
+  @media (max-width:860px){
+    .hero{padding:32px 0 16px}
+    .hero-grid{grid-template-columns:1fr;gap:28px}
+    .hero-photo{aspect-ratio:16/13}
+
+    .next-grid{grid-template-columns:1fr;gap:10px}
+
+    .masonry{grid-template-columns:repeat(2,1fr);gap:10px}
+    .m-card.tall{grid-row:span 1;aspect-ratio:4/5}
+
+    .saying-wrap{grid-template-columns:1fr;gap:24px}
+    .saying-text h2{font-size:28px}
+    .cards-stage{height:240px}
+
+    .cta{grid-template-columns:1fr;padding:28px 22px}
+    .cta-btns{width:100%}
+    .cta-btns .btn{flex:1}
+  }
+</style>
+</head>
+<body>
+
+<div class="variant-banner">
+  <b>V9 · Mocha Editorial</b>
+  <span>Asymmetric · Warm mocha accent · Card-swap comments · Masonry past runs</span>
+</div>
+
+<div class="topbar">
+  <div class="wrap topbar-inner">
+    <nav class="crumb">
+      <a href="/clubs">Clubs</a>
+      <span class="sep">·</span>
+      <a href="/clubs?city=Thane">Thane</a>
+      <span class="sep">·</span>
+      <span>Rukna Mana Hai</span>
+    </nav>
+    <button class="btn btn-primary btn-sm">Join the club</button>
+  </div>
+</div>
+
+<main class="wrap">
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-grid">
+      <div class="hero-left">
+        <span class="label label-mocha hero-label">Run. Connect. Repeat. · Thane</span>
+        <h1 class="hero-name">Rukna Mana Hai, <em>Thane's own run club.</em></h1>
+        <p class="hero-desc">
+          A weekend running community that turns into a pickleball court, a brunch table, or a pool deck the moment the run ends. Beginner-friendly distances. No pressure pace.
+        </p>
+        <div class="hero-actions">
+          <button class="btn btn-primary">Join the club</button>
+          <button class="btn btn-ghost">Follow</button>
+          <div class="who-runs">
+            <span class="av-stack">
+              <span class="av">V</span>
+              <span class="av b">A</span>
+              <span class="av c">S</span>
+            </span>
+            <span>+ 11.2k members</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="hero-photo">
+        <img src="https://elnsymmgbfgawysakohc.supabase.co/storage/v1/object/public/media/clubs/rukna-manahai/events/DXJqQHpjG8w/cover.jpg" alt=""/>
+        <div class="stamp"><span class="dot"></span>Active this weekend</div>
+        <div class="stats-overlay">
+          <div class="ss"><div class="v">3</div><div class="l">Runs · May</div></div>
+          <div class="ss"><div class="v">15<span class="u">km</span></div><div class="l">Distance</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- NEXT RUNS -->
+  <section class="section">
+    <div class="section-head">
+      <div class="lhs">
+        <span class="label">This weekend</span>
+        <h2>Next <em>runs</em></h2>
+      </div>
+      <div class="rhs">2 events scheduled</div>
+    </div>
+
+    <div class="next-grid">
+      <article class="next-card feat">
+        <div class="meta-line"><span class="pin"><span class="live"></span>Next</span> Club run · 5 km</div>
+        <div class="when"><b>Sat 30 May</b> · 10:30 pm</div>
+        <h3>Night Run &amp; Pickleball</h3>
+        <div class="loc">Subway, Pawar Nagar</div>
+        <div class="row">
+          <span class="secondary">Pickleball after</span>
+          <button class="btn">I'm in</button>
+        </div>
+      </article>
+
+      <article class="next-card">
+        <div class="meta-line">Social · Invite-only</div>
+        <div class="when"><b>Sun 31 May</b> · 5:00 pm</div>
+        <h3>Pickleball Socials</h3>
+        <div class="loc">Lake Shore Mall, Thane</div>
+        <div class="row">
+          <span class="secondary">Founders &amp; creators</span>
+          <a href="#" class="arrow"><svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg></a>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <!-- AFTER -->
+  <section class="section">
+    <div class="section-head">
+      <div class="lhs">
+        <span class="label">Post-run vibe</span>
+        <h2>What we do <em>after</em></h2>
+      </div>
+      <div class="rhs">7 hangouts</div>
+    </div>
+    <div class="activities">
+      <span class="a-pill fill">Pickleball</span>
+      <span class="a-pill">Badminton</span>
+      <span class="a-pill">Dance cardio</span>
+      <span class="a-pill">Pool party</span>
+      <span class="a-pill">Coffee</span>
+      <span class="a-pill">Brunch</span>
+      <span class="a-pill">Calisthenics</span>
+    </div>
+  </section>
+
+  <!-- PAST RUNS — MASONRY -->
+  <section class="section">
+    <div class="section-head">
+      <div class="lhs">
+        <span class="label">The Archive</span>
+        <h2>Where they've <em>been</em></h2>
+      </div>
+      <div class="rhs"><a href="#">All 15 runs ›</a></div>
+    </div>
+
+    <div class="masonry">
+      <article class="m-card tall">
+        <img src="https://elnsymmgbfgawysakohc.supabase.co/storage/v1/object/public/media/clubs/rukna-manahai/events/DXzWivKjE4N/cover.jpg" loading="lazy" alt=""/>
+        <span class="badge tag">Pool party</span>
+        <a href="https://www.instagram.com/p/DXzWivKjE4N/" target="_blank" rel="noopener" class="src">
+          <svg viewBox="0 0 24 24"><path d="M14 3h7v7M10 14L21 3M21 14v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5"/></svg>
+        </a>
+        <div class="cap">
+          <div class="when">10 May</div>
+          <h3>RMH Pool Party</h3>
+        </div>
+      </article>
+
+      <article class="m-card">
+        <img src="https://elnsymmgbfgawysakohc.supabase.co/storage/v1/object/public/media/clubs/rukna-manahai/events/DYUvKwhMMmU/cover.jpg" loading="lazy" alt=""/>
+        <span class="badge">5 km</span>
+        <a href="https://www.instagram.com/p/DYUvKwhMMmU/" target="_blank" rel="noopener" class="src">
+          <svg viewBox="0 0 24 24"><path d="M14 3h7v7M10 14L21 3M21 14v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5"/></svg>
+        </a>
+        <div class="cap">
+          <div class="when">17 May</div>
+          <h3>Week 46 Sunday Run</h3>
+        </div>
+      </article>
+
+      <article class="m-card">
+        <img src="https://elnsymmgbfgawysakohc.supabase.co/storage/v1/object/public/media/clubs/rukna-manahai/events/DXJqQHpjG8w/cover.jpg" loading="lazy" alt=""/>
+        <span class="badge">6 km</span>
+        <a href="https://www.instagram.com/p/DXJqQHpjG8w/" target="_blank" rel="noopener" class="src">
+          <svg viewBox="0 0 24 24"><path d="M14 3h7v7M10 14L21 3M21 14v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5"/></svg>
+        </a>
+        <div class="cap">
+          <div class="when">19 Apr</div>
+          <h3>Run &amp; Pickleball</h3>
+        </div>
+      </article>
+
+      <article class="m-card">
+        <img src="https://elnsymmgbfgawysakohc.supabase.co/storage/v1/object/public/media/clubs/rukna-manahai/events/DXtZ0FXDI10/cover.jpg" loading="lazy" alt=""/>
+        <span class="badge">5 km</span>
+        <a href="https://www.instagram.com/p/DXtZ0FXDI10/" target="_blank" rel="noopener" class="src">
+          <svg viewBox="0 0 24 24"><path d="M14 3h7v7M10 14L21 3M21 14v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5"/></svg>
+        </a>
+        <div class="cap">
+          <div class="when">3 May</div>
+          <h3>Run &amp; Smash</h3>
+        </div>
+      </article>
+
+      <article class="m-card tall">
+        <img src="https://elnsymmgbfgawysakohc.supabase.co/storage/v1/object/public/media/clubs/rukna-manahai/events/DXKOqOWDHsI/cover.jpg" loading="lazy" alt=""/>
+        <span class="badge tag">Workshop</span>
+        <a href="https://www.instagram.com/p/DXKOqOWDHsI/" target="_blank" rel="noopener" class="src">
+          <svg viewBox="0 0 24 24"><path d="M14 3h7v7M10 14L21 3M21 14v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5"/></svg>
+        </a>
+        <div class="cap">
+          <div class="when">18 Apr</div>
+          <h3>CPR &amp; Injury Prevention</h3>
+        </div>
+      </article>
+
+      <article class="m-card">
+        <img src="https://elnsymmgbfgawysakohc.supabase.co/storage/v1/object/public/media/clubs/rukna-manahai/events/DXejHl6DPl-/cover.jpg" loading="lazy" alt=""/>
+        <span class="badge">5 km</span>
+        <a href="https://www.instagram.com/p/DXejHl6DPl-/" target="_blank" rel="noopener" class="src">
+          <svg viewBox="0 0 24 24"><path d="M14 3h7v7M10 14L21 3M21 14v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5"/></svg>
+        </a>
+        <div class="cap">
+          <div class="when">26 Apr</div>
+          <h3>Week 43 · Dance Cardio</h3>
+        </div>
+      </article>
+
+      <article class="m-card">
+        <img src="https://elnsymmgbfgawysakohc.supabase.co/storage/v1/object/public/media/clubs/rukna-manahai/events/DW8HXz3k8ql/cover.jpg" loading="lazy" alt=""/>
+        <span class="badge">7 km</span>
+        <a href="https://www.instagram.com/p/DW8HXz3k8ql/" target="_blank" rel="noopener" class="src">
+          <svg viewBox="0 0 24 24"><path d="M14 3h7v7M10 14L21 3M21 14v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5"/></svg>
+        </a>
+        <div class="cap">
+          <div class="when">12 Apr</div>
+          <h3>Week 41 Sunday Run</h3>
+        </div>
+      </article>
+    </div>
+
+    <div class="masonry-more">
+      <button class="btn btn-ghost btn-sm">Show 8 more runs</button>
+    </div>
+  </section>
+
+  <!-- COMMENTS — STACKED CARDS -->
+  <section class="section">
+    <div class="saying-wrap">
+      <div class="saying-text">
+        <span class="label label-mocha">From the community</span>
+        <h2>What people <em>are saying.</em></h2>
+        <p>Real reactions pulled from RMH's Instagram comments — updating with every run.</p>
+      </div>
+
+      <div class="cards-stage">
+        <div class="scard">
+          <div class="q">"Getting the best networking vibes already 🫂🤌🏻"</div>
+          <div class="by">
+            <span class="av">P</span>
+            <div class="info">
+              <span class="who">@prathameshhshetye</span>
+              <span class="where">PICKLEBALL SOCIALS</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="scard">
+          <div class="q">"Any membership we need to take to join this community?"</div>
+          <div class="by">
+            <span class="av b">S</span>
+            <div class="info">
+              <span class="who">@suyog_patne</span>
+              <span class="where">RUN &amp; SMASH SUNDAY</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="scard">
+          <div class="q">"Love thissssssssssss :)"</div>
+          <div class="by">
+            <span class="av c">B</span>
+            <div class="info">
+              <span class="who">@iambhavyamehta</span>
+              <span class="where">PICKLEBALL SOCIALS</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="scard">
+          <div class="q">"WHY on a Saturday 😅 — was waiting for one of your Sunday runs!"</div>
+          <div class="by">
+            <span class="av d">P</span>
+            <div class="info">
+              <span class="who">@puja_nvogue</span>
+              <span class="where">EXCLUSIVE RUN</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="scard">
+          <div class="q">"Let's gooo!! 🔥🔥🔥"</div>
+          <div class="by">
+            <span class="av e">V</span>
+            <div class="info">
+              <span class="who">@vinitsikariya</span>
+              <span class="where">RUN LIFT VIBE</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Brands subtle row -->
+    <div class="brands">
+      <span class="label">Seen with</span>
+      <div class="row">
+        <a href="#" class="brand-chip">Reebok <svg viewBox="0 0 24 24"><path d="M7 17L17 7M7 7h10v10"/></svg></a>
+        <a href="#" class="brand-chip">KIMS Hospitals <svg viewBox="0 0 24 24"><path d="M7 17L17 7M7 7h10v10"/></svg></a>
+        <a href="#" class="brand-chip">Pickledeck <svg viewBox="0 0 24 24"><path d="M7 17L17 7M7 7h10v10"/></svg></a>
+        <a href="#" class="brand-chip">Nitrro Sport <svg viewBox="0 0 24 24"><path d="M7 17L17 7M7 7h10v10"/></svg></a>
+        <a href="#" class="brand-chip">Wholy <svg viewBox="0 0 24 24"><path d="M7 17L17 7M7 7h10v10"/></svg></a>
+        <a href="#" class="brand-chip">Playo <svg viewBox="0 0 24 24"><path d="M7 17L17 7M7 7h10v10"/></svg></a>
+        <a href="#" class="brand-chip">+ 9 more</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta">
+    <div>
+      <h3>Get reminders for <em>RMH</em> runs.</h3>
+      <p>Install Endorfin to RSVP, get notified, and track your training.</p>
+    </div>
+    <div class="cta-btns">
+      <a href="#" class="btn">App Store</a>
+      <a href="#" class="btn primary">Google Play</a>
+    </div>
+  </section>
+
+  <div class="foot">© Endorfin · /clubs/rukna-manahai</div>
+</main>
+
+</body>
+</html>

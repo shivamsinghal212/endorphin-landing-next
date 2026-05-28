@@ -240,22 +240,23 @@
 .club-page .hero-name-lastline { white-space: nowrap; }
 .club-page .hero-grid {
   display: grid;
-  grid-template-columns: 1.5fr 1fr;
-  gap: 40px;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 32px;
   align-items: end;
 }
 .club-page .hero-name {
   font-family: var(--font-fraunces), "Times New Roman", serif;
   font-optical-sizing: auto;
+  /* Drop bold weight — italic Fraunces at 400 reads as an editorial
+     name, not a marketing headline. */
   font-variation-settings: "opsz" 144, "SOFT" 50, "WONK" 0;
-  font-weight: 700;
+  font-weight: 400;
   font-style: italic;
-  font-size: 96px;
-  line-height: 1;
-  letter-spacing: -0.02em;
-  margin-top: 18px;
+  font-size: clamp(36px, 4.8vw, 58px);
+  line-height: 1.04;
+  letter-spacing: -0.015em;
+  margin-top: 12px;
   color: var(--bone);
-  text-shadow: 0 2px 24px rgba(0, 0, 0, 0.35);
 }
 .club-page .hero-tags { margin-top: 20px; display: flex; flex-wrap: wrap; gap: 6px; }
 
@@ -287,22 +288,51 @@
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  gap: 20px;
+  gap: 16px;
+  align-self: end;
 }
+/* Description now lives below the name+tags in the main column.
+   Reads left-aligned at body width; not pinned to the right rail.
+   The inner .hero-description-text span is the clamp target on
+   mobile so the View more/less button can sit outside the clamp. */
 .club-page .hero-description {
-  max-width: 380px;
-  font-size: 16px;
-  line-height: 1.65;
+  margin-top: 18px;
+  max-width: 60ch;
+  font-size: 14.5px;
+  line-height: 1.6;
   color: var(--bone);
-  text-align: right;
+  opacity: 0.9;
+  text-align: left;
   white-space: pre-line;
   text-shadow: 0 1px 12px rgba(0, 0, 0, 0.4);
+}
+.club-page .hero-description-text {
+  display: inline;
+}
+@media (max-width: 640px) {
+  .club-page .hero-description {
+    font-size: 13px;
+    margin-top: 14px;
+  }
+  /* When collapsed on mobile, clamp the text to 2 lines and drop the
+     toggle button onto a new line below it. */
+  .club-page .hero-description--expandable[data-expanded="false"] .hero-description-text {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    white-space: normal;
+  }
+  .club-page .hero-description--expandable[data-expanded="false"] .hero-description-toggle {
+    display: block;
+    margin: 8px 0 0;
+  }
 }
 .club-page .hero-description-toggle {
   background: none;
   border: 0;
   padding: 0;
-  margin: 0;
+  margin: 0 0 0 8px;
   font: inherit;
   font-size: 13px;
   color: var(--red);
@@ -441,45 +471,53 @@
 .club-page .hero-ident {
   display: flex;
   align-items: center;
-  gap: 28px;
-  margin-top: 18px;
+  gap: 18px;
+  margin-top: 10px;
 }
 .club-page .hero-logo {
-  width: 128px; height: 128px;
+  width: 80px; height: 80px;
   flex-shrink: 0;
 }
 .club-page .hero-ident .hero-name {
   margin-top: 0;
-  font-size: 88px;
+  font-size: clamp(32px, 4.4vw, 52px);
+  font-weight: 400;
   /* Allow the h1 to shrink below its content width so long names wrap
      at the column edge instead of overflowing past the logo column. */
   min-width: 0;
   flex: 1;
 }
 .club-page .club-subtitle {
-  margin-top: 20px;
+  margin-top: 12px;
   font-family: var(--font-fraunces), "Georgia", serif;
   font-optical-sizing: auto;
   font-variation-settings: "opsz" 144;
   font-weight: 400;
   font-style: italic;
-  font-size: 26px;
-  line-height: 1.3;
+  font-size: 17px;
+  line-height: 1.4;
   letter-spacing: -0.005em;
   color: var(--bone);
-  opacity: 0.85;
-  max-width: 32ch;
-  text-shadow: 0 1px 12px rgba(0, 0, 0, 0.35);
+  opacity: 0.75;
+  max-width: 48ch;
+}
+.club-page .hero-tags {
+  margin-top: 14px;
+}
+.club-page .hero-description {
+  margin-top: 14px;
+  opacity: 0.78;
 }
 
 @media (max-width: 860px) {
-  .club-page .hero { padding: 36px 0 28px; }
-  .club-page .hero-grid { grid-template-columns: 1fr; gap: 28px; align-items: start; }
-  .club-page .hero-name { font-size: 56px; line-height: 1; letter-spacing: -0.01em; }
-  .club-page .hero-ident { gap: 16px; margin-top: 14px; }
-  .club-page .hero-logo { width: 72px; height: 72px; }
-  .club-page .hero-ident .hero-name { font-size: 48px; }
-  .club-page .club-subtitle { font-size: 17px; margin-top: 14px; max-width: none; }
+  .club-page .hero { padding: 32px 0 24px; }
+  .club-page .hero-grid { grid-template-columns: 1fr; gap: 22px; align-items: start; }
+  .club-page .hero .kicker { font-size: 12px; letter-spacing: 0.18em; }
+  .club-page .hero-ident { gap: 14px; margin-top: 10px; }
+  .club-page .hero-logo { width: 64px; height: 64px; }
+  /* Let the responsive clamp() decide the size on small screens — no
+     hard pixel override here so the name keeps a consistent rhythm. */
+  .club-page .club-subtitle { font-size: 16px; margin-top: 10px; max-width: none; }
   .club-page .hero-right { align-items: stretch; }
   .club-page .hero-description { text-align: left; max-width: none; font-size: 15px; }
   .club-page .hero-cta-stack {
@@ -529,36 +567,56 @@
 }
 
 /* ─── Stats strip ──────────────────────────────── */
+/* Flex + center keeps the row balanced no matter how many tiles render
+   (Stats hides any tile whose value is 0). 4 tiles fill the band; 3 or
+   fewer get centered with even whitespace on both sides. */
 .club-page .stats {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  display: flex;
+  justify-content: center;
+  align-items: stretch;
+  flex-wrap: wrap;
   background: var(--jet);
   color: var(--bone);
   border-bottom: 1px solid rgba(245, 240, 235, 0.14);
 }
 .club-page .stat {
-  padding: 28px 32px;
+  flex: 1 1 0;
+  /* Cap each tile so 1-2 tiles don't sprawl across the full band. */
+  max-width: 280px;
+  min-width: 160px;
+  padding: 22px 28px;
   border-right: 0.5px solid rgba(245, 240, 235, 0.14);
 }
 .club-page .stat:last-child { border-right: 0; }
 .club-page .stat-value {
   font-family: var(--font-oswald), sans-serif;
   font-weight: 600;
-  font-size: 44px;
+  font-size: 30px;
   line-height: 1;
   color: var(--bone);
+  letter-spacing: -0.005em;
+  font-variant-numeric: tabular-nums;
 }
 .club-page .stats .stat-label {
   margin-top: 8px;
   color: rgba(245, 240, 235, 0.55);
 }
 @media (max-width: 640px) {
-  .club-page .stats { grid-template-columns: repeat(2, 1fr); }
-  .club-page .stat { padding: 20px 22px; border-bottom: 0.5px solid rgba(245, 240, 235, 0.14); }
-  .club-page .stat:nth-child(odd) { border-right: 0.5px solid rgba(245, 240, 235, 0.14); }
+  /* On phones each tile becomes a half-width card; wrapping centers
+     any odd remainder. Reset right-borders so the wrap doesn't show
+     dangling dividers at row ends. */
+  .club-page .stat {
+    flex: 1 1 calc(50% - 1px);
+    min-width: 0;
+    max-width: none;
+    padding: 16px 20px;
+    border-right: 0.5px solid rgba(245, 240, 235, 0.14);
+    border-bottom: 0.5px solid rgba(245, 240, 235, 0.14);
+  }
   .club-page .stat:nth-child(even) { border-right: 0; }
+  .club-page .stat:last-child { border-right: 0; }
   .club-page .stat:nth-last-child(-n+2) { border-bottom: 0; }
-  .club-page .stat-value { font-size: 36px; }
+  .club-page .stat-value { font-size: 26px; }
 }
 
 /* ─── Next Run ─────────────────────────────────── */
@@ -677,11 +735,20 @@
 .club-page .upcoming-count { color: var(--text-secondary); }
 .club-page .upcoming-row {
   display: grid;
-  grid-template-columns: 80px 1fr 100px 110px;
+  grid-template-columns: 72px minmax(0, 1fr) auto;
   gap: 20px;
   padding: 20px 0;
   align-items: center;
   border-bottom: 0.5px solid var(--hairline);
+}
+/* Going-pill + RSVP button bundled in one right-aligned cell so the
+   button never wraps to a new line when the going-pill is missing. */
+.club-page .row-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  flex-wrap: wrap;
 }
 .club-page .row-date {
   font-family: var(--font-oswald), sans-serif;
@@ -719,23 +786,33 @@
   line-height: 1.5;
   color: var(--text-secondary);
 }
-.club-page .row-cta .btn { width: 100%; height: 44px; padding: 0 14px; font-size: 13px; letter-spacing: 0.14em; }
+.club-page .row-actions .btn { height: 42px; padding: 0 18px; font-size: 12px; letter-spacing: 0.1em; white-space: nowrap; }
+.club-page .row-cta .btn { height: 42px; padding: 0 18px; font-size: 12px; letter-spacing: 0.1em; white-space: nowrap; }
 .club-page .upcoming-more { display: flex; justify-content: center; padding-top: 24px; }
 @media (max-width: 860px) {
   .club-page .upcoming { padding: 36px 20px 24px; }
   .club-page .upcoming-title { font-size: 24px; }
-  .club-page .upcoming-row { grid-template-columns: 64px 1fr 76px; gap: 12px; padding: 16px 0; }
-  .club-page .upcoming-row .going-pill { display: none; }
+  .club-page .upcoming-row { grid-template-columns: 56px minmax(0, 1fr) auto; gap: 14px; padding: 16px 0; }
+  /* Going-pill is inlined into the meta line on mobile to save the
+     vertical space; the .row-actions cell stays right-aligned with
+     just the RSVP button visible. */
+  .club-page .row-actions .going-pill { display: none; }
   .club-page .upcoming-row .row-meta::after {
     content: ' · ' attr(data-going) ' going';
     color: var(--green);
+  }
+  /* Don't pollute the meta with "· 0 going" when nobody has RSVPed yet. */
+  .club-page .upcoming-row .row-meta[data-going="0"]::after,
+  .club-page .upcoming-row .row-meta:not([data-going])::after {
+    content: none;
   }
   .club-page .row-date { font-size: 20px; }
   .club-page .row-date-sub { font-size: 12px; letter-spacing: 0.1em; margin-top: 4px; }
   .club-page .row-type { font-size: 10px; padding: 3px 7px 2px; margin-bottom: 6px; letter-spacing: 0.1em; }
   .club-page .row-title { font-size: 16px; }
   .club-page .row-meta { font-size: 13px; margin-top: 4px; line-height: 1.45; }
-  .club-page .row-cta .btn { padding: 0 8px; font-size: 11px; letter-spacing: 0.08em; height: 40px; }
+  .club-page .row-actions .btn,
+  .club-page .row-cta .btn { padding: 0 14px; font-size: 11px; letter-spacing: 0.08em; height: 38px; white-space: nowrap; }
 }
 
 /* ─── Last run — photo reel ────────────────────── */
@@ -1074,6 +1151,11 @@
 .club-page .prev-rows-list {
   border-top: 1px solid rgba(245, 240, 235, 0.22);
 }
+.club-page .prev-rows-more {
+  display: flex;
+  justify-content: center;
+  padding-top: 24px;
+}
 
 .club-page .prev-row {
   padding-left: 32px;
@@ -1348,20 +1430,14 @@
 
 /* ─── Content container — fluid gutter matching home/running-events/clubs ── */
 .club-page .hero,
-.club-page .next-run,
+.club-page .nr-section,
 .club-page .upcoming,
 .club-page .previous-runs,
+.club-page .say,
+.club-page .brands,
 .club-page .led-by,
 .club-page .cta-footer {
   padding-left: max(28px, calc((100% - var(--container-max)) / 2));
-  padding-right: max(28px, calc((100% - var(--container-max)) / 2));
-}
-/* Next run is a full-bleed dark section; only the right column has the
-   gutter so the flyer can bleed all the way to the left edge. */
-.club-page .nr-empty {
-  padding-left: max(28px, calc((100% - var(--container-max)) / 2));
-}
-.club-page .nr-content {
   padding-right: max(28px, calc((100% - var(--container-max)) / 2));
 }
 /* Stats is now a full-bleed dark band — internal padding centers the
@@ -1379,18 +1455,14 @@
 
 @media (max-width: 640px) {
   .club-page .hero,
-  .club-page .next-run,
+  .club-page .nr-section,
   .club-page .upcoming,
   .club-page .previous-runs,
+  .club-page .say,
+  .club-page .brands,
   .club-page .led-by,
   .club-page .cta-footer {
     padding-left: max(20px, calc((100% - var(--container-max)) / 2));
-    padding-right: max(20px, calc((100% - var(--container-max)) / 2));
-  }
-  .club-page .nr-empty {
-    padding-left: max(20px, calc((100% - var(--container-max)) / 2));
-  }
-  .club-page .nr-content {
     padding-right: max(20px, calc((100% - var(--container-max)) / 2));
   }
 }
@@ -1400,7 +1472,10 @@
 .club-page .nr-section {
   background: var(--bone);
   color: var(--jet);
-  padding: 0;
+  /* horizontal padding is set by the shared gutter rule above so
+     the inner grid aligns with the rest of the page sections. */
+  padding-top: 0;
+  padding-bottom: 0;
   border-top: 1px solid var(--hairline);
 }
 .club-page .nr-inner {
@@ -1519,9 +1594,11 @@
   margin-top: auto;
 }
 
-/* Right column */
+/* Right column — horizontal padding is handled by the section gutter on
+   the right. Inner padding-left separates the content from the photo
+   column; padding-right is 0 so text aligns to the page grid edge. */
 .club-page .nr-content {
-  padding: 48px 48px 40px;
+  padding: 48px 0 40px 48px;
   display: flex;
   flex-direction: column;
   gap: 20px;
@@ -1544,43 +1621,47 @@
   font-family: var(--font-fraunces), Georgia, "Times New Roman", serif;
   font-style: italic;
   font-weight: 700;
-  font-size: 64px;
-  line-height: 0.98;
-  letter-spacing: -0.025em;
+  font-size: clamp(32px, 3.8vw, 44px);
+  line-height: 1.02;
+  letter-spacing: -0.02em;
   color: var(--jet);
 }
 .club-page .nr-summary {
   font-family: var(--font-poppins), sans-serif;
-  font-size: 15px;
+  font-size: 14.5px;
   line-height: 1.6;
   color: var(--text-secondary);
-  max-width: 52ch;
+  max-width: 56ch;
   margin-top: -2px;
   white-space: pre-line;
 }
 .club-page .nr-meta {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-  gap: 22px;
-  padding: 22px 0;
+  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+  gap: 18px 24px;
+  padding: 18px 0;
   border-top: 0.5px solid var(--hairline);
   border-bottom: 0.5px solid var(--hairline);
 }
+.club-page .nr-meta > div { min-width: 0; }
 .club-page .nr-meta dt {
   font-family: var(--font-oswald), sans-serif;
   font-size: 10px;
-  letter-spacing: 0.24em;
+  letter-spacing: 0.22em;
   text-transform: uppercase;
   color: var(--text-secondary);
-  margin-bottom: 6px;
+  margin-bottom: 5px;
 }
 .club-page .nr-meta dd {
   font-family: var(--font-oswald), sans-serif;
-  font-size: 19px;
+  font-size: 16px;
   font-weight: 600;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.02em;
   color: var(--jet);
   font-variant-numeric: tabular-nums;
+  line-height: 1.25;
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 .club-page .nr-cta {
   display: flex;
@@ -1644,7 +1725,9 @@
     padding: 5px 10px 4px;
   }
   .club-page .nr-content {
-    padding: 28px 24px 26px;
+    /* On mobile the grid stacks, so horizontal padding comes from the
+       section gutter — no extra inner inset needed. */
+    padding: 28px 0 26px;
     gap: 16px;
   }
   .club-page .nr-title { font-size: 40px; }
@@ -1658,4 +1741,262 @@
   .club-page .nr-meta dt { font-size: 9px; letter-spacing: 0.2em; margin-bottom: 4px; }
   .club-page .nr-meta dd { font-size: 16px; }
   .club-page .nr-cta { gap: 12px; }
+}
+
+/* ════════════════════════════════════════════════════════════
+   ─── What people are saying — stepped roller ───
+   Flat against the page bg (no card boundary). A taller window
+   keeps a comment centered for ~3.5s, then snaps up to the next
+   one with a brief slide. Reads as a live feed where new comments
+   are appearing in real time. List is duplicated in JSX so the
+   loop reset is seamless.
+   ════════════════════════════════════════════════════════════ */
+/* Sits between two jet sections — keep it on the same dark surface
+   so the page reads as one continuous band. */
+.club-page .say {
+  background: var(--jet);
+  color: var(--bone);
+  padding-top: 48px;
+  padding-bottom: 48px;
+}
+.club-page .say-head {
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  /* Light hairline so the underline reads on the jet section,
+     mirroring .upcoming-header which uses the dark hairline on bone. */
+  border-bottom: 1px solid rgba(245, 240, 235, 0.18);
+  display: flex;
+  align-items: baseline;
+  justify-content: flex-start;
+  gap: 12px;
+}
+/* Section title — matches .brands-title / .upcoming-title in family,
+   weight, casing and tracking so this section reads as a peer. */
+.club-page .say-title {
+  margin: 0;
+  font-family: var(--font-oswald), sans-serif;
+  font-weight: 600;
+  font-size: 24px;
+  line-height: 1;
+  letter-spacing: -0.005em;
+  text-transform: uppercase;
+  color: var(--bone);
+}
+
+.club-page .say-window {
+  position: relative;
+  height: 320px;
+  overflow: hidden;
+  /* Gentle top/bottom fade — keep visible rows fully readable. */
+  -webkit-mask-image: linear-gradient(180deg, transparent 0%, #000 18%, #000 82%, transparent 100%);
+          mask-image: linear-gradient(180deg, transparent 0%, #000 18%, #000 82%, transparent 100%);
+}
+.club-page .say-track {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 22px;
+  animation-name: club-say-step;
+  animation-iteration-count: infinite;
+  animation-timing-function: cubic-bezier(0.65, 0, 0.35, 1);
+  will-change: transform;
+}
+.club-page .say-window:hover .say-track {
+  animation-play-state: paused;
+}
+
+/* Stepped keyframes — 6 holds, smooth slide between each.
+   Tracks duplicated in JSX so the -50% endpoint == 0% visually. */
+@keyframes club-say-step {
+  0%,   14%   { transform: translateY(0); }
+  16.67%, 30.67% { transform: translateY(-8.333%); }
+  33.33%, 47.33% { transform: translateY(-16.667%); }
+  50%,    64%   { transform: translateY(-25%); }
+  66.67%, 80.67% { transform: translateY(-33.333%); }
+  83.33%, 97.33% { transform: translateY(-41.667%); }
+  100%          { transform: translateY(-50%); }
+}
+
+/* Comment row — centered card on the dark section. The card uses a
+   subtly lighter jet so it still reads as a discrete bubble against
+   the section bg, with a light hairline rim for definition. */
+.club-page .say-row {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  flex-shrink: 0;
+  width: 100%;
+  max-width: 560px;
+  padding: 16px 18px;
+  background: rgba(245, 240, 235, 0.05);
+  border-radius: 16px;
+  border: 0.5px solid rgba(245, 240, 235, 0.10);
+}
+.club-page .say-row-av {
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: rgba(245, 240, 235, 0.08);
+  flex: none;
+  box-shadow: inset 0 0 0 0.5px rgba(245, 240, 235, 0.18);
+}
+.club-page .say-row-av img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.club-page .say-row-body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.club-page .say-row-text {
+  margin: 0;
+  font-family: var(--font-poppins), sans-serif;
+  font-weight: 500;
+  font-size: 15px;
+  line-height: 1.45;
+  color: var(--bone);
+  word-wrap: break-word;
+}
+.club-page .say-row-head {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  flex-wrap: wrap;
+  font-size: 11.5px;
+  line-height: 1.4;
+}
+.club-page .say-row-who {
+  font-family: var(--font-poppins), sans-serif;
+  font-weight: 600;
+  color: var(--bone);
+}
+.club-page .say-row-sep { color: rgba(245, 240, 235, 0.35); }
+.club-page .say-row-where {
+  font-family: var(--font-oswald), sans-serif;
+  font-weight: 500;
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(245, 240, 235, 0.55);
+}
+
+@media (max-width: 640px) {
+  .club-page .say { padding-top: 36px; padding-bottom: 36px; }
+  .club-page .say-title { font-size: 20px; }
+  .club-page .say-window { height: 280px; }
+  .club-page .say-track { gap: 16px; }
+  .club-page .say-row { padding: 12px 14px; }
+  .club-page .say-row-av { width: 34px; height: 34px; }
+  .club-page .say-row-text { font-size: 14.5px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .club-page .say-track { animation: none; }
+  .club-page .say-window {
+    height: auto;
+    -webkit-mask-image: none;
+            mask-image: none;
+  }
+}
+
+/* ════════════════════════════════════════════════════════════
+   ─── Seen with — full-bleed dark section ───
+   Entire section sits on jet so heading + grid read as one dark
+   band on the bone page. Cells hover → red.
+   ════════════════════════════════════════════════════════════ */
+.club-page .brands {
+  background: var(--jet);
+  color: var(--bone);
+  padding-top: 48px;
+  padding-bottom: 56px;
+}
+.club-page .brands-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  /* Underline rule, light hairline on the jet section — mirrors
+     .upcoming-header's dark border-bottom on bone. */
+  border-bottom: 1px solid rgba(245, 240, 235, 0.18);
+}
+.club-page .brands-title {
+  margin: 0;
+  font-family: var(--font-oswald), sans-serif;
+  font-weight: 600;
+  font-size: 24px;
+  line-height: 1;
+  letter-spacing: -0.005em;
+  text-transform: uppercase;
+  color: var(--bone);
+}
+.club-page .brands-count {
+  color: rgba(245, 240, 235, 0.5);
+  font-size: 11px;
+}
+
+/* Jet cells by default, red on hover. The section already provides
+   the dark surface, so the grid itself is transparent — just light
+   hairlines between cells. */
+.club-page .brands-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  border-top: 0.5px solid rgba(245, 240, 235, 0.14);
+  border-left: 0.5px solid rgba(245, 240, 235, 0.14);
+}
+.club-page .brand-cell {
+  padding: 18px 20px;
+  border-right: 0.5px solid rgba(245, 240, 235, 0.10);
+  border-bottom: 0.5px solid rgba(245, 240, 235, 0.10);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-height: 80px;
+  justify-content: center;
+  background: var(--jet);
+  color: var(--bone);
+  transition: background-color 160ms ease, color 160ms ease;
+  position: relative;
+}
+.club-page .brand-cell:hover {
+  background: var(--red);
+}
+.club-page .brand-cell:hover .brand-name { color: #fff; }
+.club-page .brand-cell:hover .brand-role { color: rgba(255, 255, 255, 0.78); }
+.club-page .brand-cell-static { cursor: default; }
+.club-page .brand-cell-static:hover { background: var(--jet); }
+.club-page .brand-cell-static:hover .brand-name { color: var(--bone); }
+.club-page .brand-cell-static:hover .brand-role { color: rgba(245, 240, 235, 0.55); }
+
+.club-page .brand-name {
+  font-family: var(--font-oswald), sans-serif;
+  font-weight: 600;
+  font-size: 16px;
+  letter-spacing: -0.005em;
+  text-transform: uppercase;
+  color: var(--bone);
+  line-height: 1.15;
+}
+.club-page .brand-role {
+  font-family: var(--font-oswald), sans-serif;
+  font-weight: 500;
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(245, 240, 235, 0.55);
+}
+@media (max-width: 640px) {
+  .club-page .brands { padding-bottom: 40px; }
+  .club-page .brands-title { font-size: 20px; }
+  .club-page .brands-grid {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  }
+  .club-page .brand-cell { padding: 14px 16px; min-height: 68px; }
+  .club-page .brand-name { font-size: 14px; }
 }

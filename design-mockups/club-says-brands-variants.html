@@ -1,0 +1,926 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Says + Seen with · 4 variants · Endorfin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@1,9..144,400;1,9..144,500;1,9..144,700&family=Oswald:wght@400;500;600;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --bone:#F5F0EB;
+    --cream:#EDE7E0;
+    --paper:#FBF8F2;
+    --jet:#0A0A0A;
+    --red:#E6232A;
+    --red-dim:#c41e24;
+    --text-secondary:#8A8278;
+    --text-muted:#B0A89E;
+    --hairline:rgba(10,10,10,0.12);
+    --hairline-strong:rgba(10,10,10,0.24);
+    --hair-light:rgba(245,240,235,0.18);
+    --hair-light-strong:rgba(245,240,235,0.30);
+    --gutter:max(28px, calc((100% - 1280px) / 2));
+  }
+  *,*::before,*::after{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    font-family:'Poppins',sans-serif;
+    background:var(--bone);color:var(--jet);
+    -webkit-font-smoothing:antialiased;
+    font-size:15px;line-height:1.6;
+  }
+  img{display:block;max-width:100%}
+  a{color:inherit;text-decoration:none}
+
+  .variant-banner{
+    background:var(--jet);color:var(--bone);
+    padding:14px 28px;display:flex;justify-content:space-between;align-items:center;
+    font-family:'Oswald',sans-serif;font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+  }
+  .variant-banner b{font-weight:600;font-size:13px}
+  .variant-banner span{color:rgba(245,240,235,.55)}
+
+  /* Reusable kicker */
+  .kicker{
+    font-family:'Oswald',sans-serif;font-weight:500;
+    font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--text-secondary);
+  }
+
+  /* ════════════════════════════════════════════════════════════
+     V1 — MAGAZINE PULL-QUOTE on jet + MARQUEE brands on bone
+     ════════════════════════════════════════════════════════════ */
+  .v1 .say{
+    background:var(--jet);color:var(--bone);
+    padding:72px var(--gutter) 64px;
+    position:relative;overflow:hidden;
+    border-top:1px solid var(--jet);
+  }
+  .v1 .say::before{
+    content:'\201C';
+    position:absolute;top:-20px;left:32px;
+    font-family:'Fraunces',Georgia,serif;font-style:italic;font-weight:700;
+    font-size:280px;line-height:1;color:var(--red);opacity:.14;
+    pointer-events:none;user-select:none;
+  }
+  .v1 .say::after{
+    content:'';position:absolute;inset:0;
+    background:radial-gradient(circle at 80% 30%, rgba(230,35,42,0.10) 0%, transparent 55%);
+    pointer-events:none;
+  }
+  .v1 .say-inner{position:relative;z-index:1}
+  .v1 .say-head{
+    display:flex;align-items:center;gap:10px;margin-bottom:32px;
+  }
+  .v1 .say-head .pulse{
+    width:8px;height:8px;border-radius:50%;background:var(--red);
+    animation:v1-pulse 2s infinite;
+  }
+  .v1 .say-head .lbl{
+    font-family:'Oswald',sans-serif;font-weight:500;font-size:11px;letter-spacing:.22em;text-transform:uppercase;
+    color:rgba(245,240,235,.65);
+  }
+  @keyframes v1-pulse{
+    0%,100%{opacity:1;transform:scale(1)}
+    50%{opacity:.4;transform:scale(1.5)}
+  }
+
+  .v1 .say-stage{
+    position:relative;
+    min-height:200px;
+    max-width:880px;
+  }
+  .v1 .quote{
+    position:absolute;inset:0;
+    display:flex;flex-direction:column;justify-content:center;gap:24px;
+    opacity:0;
+    animation:v1-cycle 25s infinite cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .v1 .quote blockquote{
+    margin:0;font-family:'Fraunces',serif;font-optical-sizing:auto;
+    font-variation-settings:"opsz" 144;
+    font-style:italic;font-weight:400;
+    font-size:clamp(28px, 3.6vw, 42px);
+    line-height:1.18;letter-spacing:-0.015em;color:var(--bone);
+  }
+  .v1 .quote figcaption{
+    display:flex;align-items:center;gap:14px;
+    padding-top:18px;border-top:0.5px solid var(--hair-light-strong);
+  }
+  .v1 .quote .av{
+    width:44px;height:44px;border-radius:50%;flex:none;
+    background:var(--red);color:#fff;
+    display:flex;align-items:center;justify-content:center;
+    font-family:'Oswald',sans-serif;font-weight:600;font-size:16px;
+  }
+  .v1 .quote .av.b{background:#3f3f3f}
+  .v1 .quote .av.c{background:#7a4d3a}
+  .v1 .quote .av.d{background:#2a4a3a}
+  .v1 .quote .av.e{background:#7a3a3a}
+  .v1 .quote .meta{
+    font-family:'Oswald',sans-serif;font-weight:500;font-size:11px;letter-spacing:.18em;text-transform:uppercase;
+    color:rgba(245,240,235,.6);line-height:1.5;
+  }
+  .v1 .quote .meta b{color:var(--bone);font-weight:600;display:block;margin-bottom:2px}
+
+  .v1 .quote:nth-child(1){animation-delay:0s}
+  .v1 .quote:nth-child(2){animation-delay:5s}
+  .v1 .quote:nth-child(3){animation-delay:10s}
+  .v1 .quote:nth-child(4){animation-delay:15s}
+  .v1 .quote:nth-child(5){animation-delay:20s}
+  @keyframes v1-cycle{
+    0%,1%   {opacity:0;transform:translateY(20px)}
+    4%,18%  {opacity:1;transform:translateY(0)}
+    21%,100%{opacity:0;transform:translateY(-20px)}
+  }
+
+  .v1 .say-dots{
+    margin-top:36px;display:flex;gap:8px;align-items:center;
+  }
+  .v1 .say-dots .dot{
+    width:30px;height:2px;background:rgba(245,240,235,.18);
+    animation:v1-dot 25s infinite linear;
+  }
+  .v1 .say-dots .dot:nth-child(1){animation-delay:0s}
+  .v1 .say-dots .dot:nth-child(2){animation-delay:5s}
+  .v1 .say-dots .dot:nth-child(3){animation-delay:10s}
+  .v1 .say-dots .dot:nth-child(4){animation-delay:15s}
+  .v1 .say-dots .dot:nth-child(5){animation-delay:20s}
+  @keyframes v1-dot{
+    0%,2%,22%,100%{background:rgba(245,240,235,.18);height:2px}
+    6%,18%       {background:var(--red);height:3px}
+  }
+
+  /* Brands marquee — full-bleed bone ribbon style */
+  .v1 .brands{
+    background:var(--bone);
+    border-top:1px solid var(--hairline);
+    border-bottom:1px solid var(--hairline);
+    padding:18px 0;
+    overflow:hidden;
+    position:relative;
+  }
+  .v1 .brands-label{
+    position:absolute;left:var(--gutter);top:50%;transform:translateY(-50%);
+    z-index:2;background:var(--bone);padding-right:18px;
+    font-family:'Oswald',sans-serif;font-weight:600;font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--text-secondary);
+  }
+  .v1 .brands-label::after{
+    content:'';position:absolute;left:100%;top:0;width:60px;height:100%;
+    background:linear-gradient(90deg,var(--bone),transparent);pointer-events:none;
+  }
+  .v1 .brands-track{
+    display:flex;gap:36px;white-space:nowrap;
+    animation:v1-scroll 60s linear infinite;
+    will-change:transform;
+    padding-left:140px;
+  }
+  .v1 .brands-track .brand{
+    font-family:'Oswald',sans-serif;font-weight:600;font-size:22px;letter-spacing:.04em;text-transform:uppercase;
+    color:var(--jet);
+    flex-shrink:0;
+    transition:color .18s ease;
+  }
+  .v1 .brands-track .brand:hover{color:var(--red)}
+  .v1 .brands-track .sep{
+    width:6px;height:6px;border-radius:50%;background:var(--red);align-self:center;flex-shrink:0;
+  }
+  @keyframes v1-scroll{
+    from{transform:translateX(0)}
+    to{transform:translateX(-50%)}
+  }
+
+  /* ════════════════════════════════════════════════════════════
+     V2 — INSTAGRAM COMMENTS FEED + AVATAR brand chips
+     ════════════════════════════════════════════════════════════ */
+  .v2 .say{
+    background:var(--bone);
+    padding:56px var(--gutter) 24px;
+    border-top:1px solid var(--hairline);
+  }
+  .v2 .say-head{
+    display:flex;align-items:baseline;justify-content:space-between;margin-bottom:18px;
+  }
+  .v2 .say-head h2{
+    margin:0;font-family:'Oswald',sans-serif;font-weight:600;font-size:24px;letter-spacing:-.005em;text-transform:uppercase;
+  }
+
+  .v2 .feed{
+    background:var(--paper);border:0.5px solid var(--hairline);
+    border-radius:18px;
+    padding:8px 0;
+    max-width:640px;
+    position:relative;overflow:hidden;
+    min-height:280px;
+  }
+  .v2 .feed::after{
+    content:'';position:absolute;left:0;right:0;top:0;height:32px;
+    background:linear-gradient(180deg,var(--paper),transparent);
+    pointer-events:none;z-index:2;
+  }
+  .v2 .feed-stage{
+    position:relative;min-height:264px;
+  }
+  .v2 .comment{
+    position:absolute;left:0;right:0;
+    padding:10px 22px;
+    display:flex;gap:12px;align-items:flex-start;
+    opacity:0;
+    animation:v2-bubble 25s infinite cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .v2 .comment .av{
+    width:36px;height:36px;border-radius:50%;flex:none;
+    background:var(--red);color:#fff;
+    display:flex;align-items:center;justify-content:center;
+    font-family:'Oswald',sans-serif;font-weight:600;font-size:13px;
+  }
+  .v2 .comment .av.b{background:var(--jet)}
+  .v2 .comment .av.c{background:#7a4d3a}
+  .v2 .comment .av.d{background:#2a4a3a}
+  .v2 .comment .av.e{background:#7a3a3a}
+  .v2 .comment .body{flex:1;min-width:0}
+  .v2 .comment .who{
+    font-family:'Poppins',sans-serif;font-weight:600;font-size:13px;color:var(--jet);
+  }
+  .v2 .comment .who .time{
+    font-family:'Poppins',sans-serif;font-weight:400;color:var(--text-secondary);margin-left:8px;
+    font-size:12px;
+  }
+  .v2 .comment .text{
+    font-size:14px;line-height:1.5;color:var(--jet);margin-top:2px;
+  }
+  .v2 .comment .meta{
+    font-family:'Oswald',sans-serif;font-weight:500;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--text-secondary);
+    margin-top:6px;
+  }
+  .v2 .comment .meta .heart{color:var(--red);margin-right:5px}
+
+  .v2 .comment:nth-child(1){animation-delay:0s}
+  .v2 .comment:nth-child(2){animation-delay:5s}
+  .v2 .comment:nth-child(3){animation-delay:10s}
+  .v2 .comment:nth-child(4){animation-delay:15s}
+  .v2 .comment:nth-child(5){animation-delay:20s}
+  @keyframes v2-bubble{
+    0%,1%   {opacity:0;transform:translateY(28px) scale(.98)}
+    4%,18%  {opacity:1;transform:translateY(0) scale(1)}
+    20%,21% {opacity:1;transform:translateY(-8px) scale(1)}
+    24%,100%{opacity:0;transform:translateY(-32px) scale(.98)}
+  }
+
+  .v2 .typing{
+    margin:6px 22px 4px;
+    display:inline-flex;align-items:center;gap:6px;
+    background:var(--cream);padding:8px 14px;border-radius:14px 14px 14px 4px;
+    width:fit-content;
+  }
+  .v2 .typing .dot{
+    width:5px;height:5px;border-radius:50%;background:var(--text-secondary);
+    animation:v2-typing 1.4s infinite ease-in-out;
+  }
+  .v2 .typing .dot:nth-child(2){animation-delay:.2s}
+  .v2 .typing .dot:nth-child(3){animation-delay:.4s}
+  @keyframes v2-typing{
+    0%,80%,100%{transform:translateY(0);opacity:.4}
+    40%       {transform:translateY(-4px);opacity:1}
+  }
+
+  /* Brand "@-chips" */
+  .v2 .brands{
+    background:var(--bone);
+    padding:24px var(--gutter) 40px;
+  }
+  .v2 .brands-head{
+    display:flex;align-items:baseline;justify-content:space-between;margin-bottom:16px;
+  }
+  .v2 .brands-row{display:flex;flex-wrap:wrap;gap:8px}
+  .v2 .brand-chip{
+    display:inline-flex;align-items:center;gap:8px;
+    padding:5px 14px 5px 5px;border-radius:999px;
+    background:var(--paper);border:0.5px solid var(--hairline);
+    font-family:'Poppins',sans-serif;font-weight:500;font-size:13px;color:var(--jet);
+    transition:all 160ms ease;
+  }
+  .v2 .brand-chip:hover{background:var(--jet);color:var(--bone);border-color:var(--jet)}
+  .v2 .brand-chip .av{
+    width:26px;height:26px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    font-family:'Oswald',sans-serif;font-weight:700;font-size:11px;color:#fff;
+    background:var(--red);
+  }
+  .v2 .brand-chip .av.b{background:var(--jet)}
+  .v2 .brand-chip .av.c{background:#7a4d3a}
+  .v2 .brand-chip .av.d{background:#2a4a3a}
+  .v2 .brand-chip .av.e{background:#7a3a3a}
+  .v2 .brand-chip .av.f{background:#3a5a7a}
+  .v2 .brand-chip .av.g{background:#a04420}
+  .v2 .brand-chip:hover .av{background:var(--red)}
+
+  /* ════════════════════════════════════════════════════════════
+     V3 — EDITORIAL DUET (split panel) + STRUCTURED brand grid
+     ════════════════════════════════════════════════════════════ */
+  .v3 .say{
+    background:var(--bone);
+    padding:64px var(--gutter) 40px;
+    border-top:1px solid var(--hairline);
+  }
+  .v3 .say-card{
+    background:var(--cream);border-radius:20px;
+    overflow:hidden;
+    display:grid;grid-template-columns:1fr 240px;
+    min-height:260px;
+    position:relative;
+  }
+  .v3 .say-card::before{
+    content:'';position:absolute;left:50%;top:32px;bottom:32px;
+    width:0.5px;background:var(--hairline-strong);
+  }
+  @media (max-width:780px){
+    .v3 .say-card{grid-template-columns:1fr}
+    .v3 .say-card::before{display:none}
+  }
+  .v3 .say-quote-col{
+    padding:44px 44px;position:relative;
+    display:flex;flex-direction:column;justify-content:center;
+  }
+  .v3 .say-quote-col .kicker{margin-bottom:18px}
+  .v3 .stage{position:relative;min-height:140px}
+  .v3 .q{
+    position:absolute;inset:0;
+    margin:0;
+    font-family:'Fraunces',serif;font-style:italic;font-weight:400;
+    font-optical-sizing:auto;
+    font-variation-settings:"opsz" 144;
+    font-size:clamp(22px, 2.8vw, 32px);
+    line-height:1.22;letter-spacing:-.01em;color:var(--jet);
+    opacity:0;
+    animation:v3-fade 25s infinite cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .v3 .q::before{
+    content:'\201C';position:absolute;top:-32px;left:-6px;
+    color:var(--red);font-size:80px;line-height:1;opacity:.5;
+  }
+  .v3 .q:nth-child(1){animation-delay:0s}
+  .v3 .q:nth-child(2){animation-delay:5s}
+  .v3 .q:nth-child(3){animation-delay:10s}
+  .v3 .q:nth-child(4){animation-delay:15s}
+  .v3 .q:nth-child(5){animation-delay:20s}
+  @keyframes v3-fade{
+    0%,2%   {opacity:0;transform:translateX(20px)}
+    6%,18%  {opacity:1;transform:translateX(0)}
+    22%,100%{opacity:0;transform:translateX(-20px)}
+  }
+
+  .v3 .credit-col{
+    padding:32px 28px;
+    display:flex;flex-direction:column;justify-content:center;align-items:flex-start;
+    background:var(--paper);
+  }
+  .v3 .credit-stage{position:relative;min-height:120px;width:100%}
+  .v3 .credit{
+    position:absolute;inset:0;
+    display:flex;flex-direction:column;gap:14px;align-items:flex-start;
+    opacity:0;animation:v3-fade 25s infinite cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .v3 .credit .av{
+    width:54px;height:54px;border-radius:50%;
+    background:var(--jet);color:var(--bone);
+    display:flex;align-items:center;justify-content:center;
+    font-family:'Oswald',sans-serif;font-weight:700;font-size:18px;
+  }
+  .v3 .credit .av.b{background:var(--red);color:#fff}
+  .v3 .credit .av.c{background:#7a4d3a;color:#fff}
+  .v3 .credit .av.d{background:#2a4a3a;color:#fff}
+  .v3 .credit .av.e{background:#7a3a3a;color:#fff}
+  .v3 .credit .who{
+    font-family:'Poppins',sans-serif;font-weight:600;font-size:14px;color:var(--jet);
+  }
+  .v3 .credit .where{
+    font-family:'Oswald',sans-serif;font-weight:500;font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--text-secondary);
+    margin-top:3px;line-height:1.4;
+  }
+  .v3 .credit:nth-child(1){animation-delay:0s}
+  .v3 .credit:nth-child(2){animation-delay:5s}
+  .v3 .credit:nth-child(3){animation-delay:10s}
+  .v3 .credit:nth-child(4){animation-delay:15s}
+  .v3 .credit:nth-child(5){animation-delay:20s}
+
+  /* Brands — structured grid with hairlines */
+  .v3 .brands{
+    background:var(--bone);
+    padding:8px var(--gutter) 56px;
+  }
+  .v3 .brands-head{
+    display:flex;align-items:baseline;justify-content:space-between;margin-bottom:18px;
+  }
+  .v3 .brands-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill, minmax(180px, 1fr));
+    border-top:0.5px solid var(--hairline);
+    border-left:0.5px solid var(--hairline);
+  }
+  .v3 .brand-cell{
+    padding:18px 20px;
+    border-right:0.5px solid var(--hairline);
+    border-bottom:0.5px solid var(--hairline);
+    display:flex;flex-direction:column;gap:4px;
+    min-height:78px;justify-content:center;
+    transition:background 160ms ease;
+  }
+  .v3 .brand-cell:hover{background:var(--cream)}
+  .v3 .brand-cell .name{
+    font-family:'Oswald',sans-serif;font-weight:600;font-size:16px;letter-spacing:-.005em;text-transform:uppercase;color:var(--jet);
+  }
+  .v3 .brand-cell .role{
+    font-family:'Oswald',sans-serif;font-weight:500;font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--text-secondary);
+  }
+  .v3 .brand-cell .arrow{
+    align-self:flex-start;margin-top:6px;
+    font-family:'Oswald',sans-serif;font-size:11px;color:var(--red);opacity:0;
+    transition:opacity 160ms ease;
+  }
+  .v3 .brand-cell:hover .arrow{opacity:1}
+
+  /* ════════════════════════════════════════════════════════════
+     V4 — POSTER STRIP (huge italic) + RED MARQUEE ribbon
+     ════════════════════════════════════════════════════════════ */
+  .v4 .say{
+    background:var(--bone);
+    padding:80px var(--gutter) 60px;
+    position:relative;overflow:hidden;
+    border-top:1px solid var(--hairline);
+  }
+  .v4 .say-mark{
+    position:absolute;
+    font-family:'Fraunces',Georgia,serif;font-style:italic;font-weight:700;
+    color:var(--red);opacity:.10;line-height:.85;
+    pointer-events:none;user-select:none;
+  }
+  .v4 .say-mark.tl{top:-30px;left:var(--gutter);font-size:300px}
+  .v4 .say-mark.br{
+    bottom:-80px;right:var(--gutter);font-size:300px;transform:rotate(180deg);
+  }
+  .v4 .say-head{
+    display:flex;align-items:center;gap:10px;margin-bottom:48px;position:relative;
+  }
+  .v4 .say-head::after{
+    content:'';flex:1;height:0.5px;background:var(--hairline-strong);margin-left:14px;max-width:300px;
+  }
+  .v4 .say-head .lbl{
+    font-family:'Oswald',sans-serif;font-weight:600;font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:var(--jet);
+  }
+  .v4 .say-head .pulse{
+    width:8px;height:8px;border-radius:50%;background:var(--red);
+    animation:v4-pulse 2s infinite;
+  }
+  @keyframes v4-pulse{
+    0%,100%{opacity:1;transform:scale(1)}
+    50%{opacity:.4;transform:scale(1.5)}
+  }
+
+  .v4 .stage{position:relative;min-height:200px;max-width:900px;margin:0 auto;text-align:center}
+  .v4 .q{
+    position:absolute;inset:0;
+    margin:0;
+    display:flex;flex-direction:column;justify-content:center;gap:24px;align-items:center;
+    opacity:0;
+    animation:v4-poster 25s infinite cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .v4 .q blockquote{
+    margin:0;font-family:'Fraunces',serif;font-optical-sizing:auto;
+    font-variation-settings:"opsz" 144;
+    font-style:italic;font-weight:400;
+    font-size:clamp(28px, 4vw, 52px);
+    line-height:1.1;letter-spacing:-.02em;color:var(--jet);
+  }
+  .v4 .q blockquote .red{color:var(--red)}
+  .v4 .q figcaption{
+    display:inline-flex;align-items:center;gap:14px;
+    padding:10px 22px 9px;border-radius:999px;
+    background:var(--jet);color:var(--bone);
+    font-family:'Oswald',sans-serif;font-weight:500;font-size:11px;letter-spacing:.18em;text-transform:uppercase;
+  }
+  .v4 .q figcaption .av{
+    width:24px;height:24px;border-radius:50%;
+    background:var(--red);color:#fff;
+    display:flex;align-items:center;justify-content:center;
+    font-size:11px;font-weight:700;margin-left:-8px;letter-spacing:0;
+  }
+  .v4 .q figcaption .dot{color:rgba(245,240,235,.4);margin:0 2px}
+
+  .v4 .q:nth-child(1){animation-delay:0s}
+  .v4 .q:nth-child(2){animation-delay:5s}
+  .v4 .q:nth-child(3){animation-delay:10s}
+  .v4 .q:nth-child(4){animation-delay:15s}
+  .v4 .q:nth-child(5){animation-delay:20s}
+  @keyframes v4-poster{
+    0%,1%   {opacity:0;transform:translateY(30px) scale(.95)}
+    5%,18%  {opacity:1;transform:translateY(0) scale(1)}
+    22%,100%{opacity:0;transform:translateY(-30px) scale(.95)}
+  }
+
+  /* Brands — full-bleed jet marquee ribbon */
+  .v4 .brands{
+    background:var(--jet);color:var(--bone);
+    border-top:1px solid var(--jet);border-bottom:1px solid var(--jet);
+    padding:28px 0;
+    overflow:hidden;position:relative;
+  }
+  .v4 .brands::before,.v4 .brands::after{
+    content:'';position:absolute;top:0;bottom:0;width:80px;z-index:2;pointer-events:none;
+  }
+  .v4 .brands::before{left:0;background:linear-gradient(90deg,var(--jet),transparent)}
+  .v4 .brands::after{right:0;background:linear-gradient(-90deg,var(--jet),transparent)}
+  .v4 .brands-label{
+    position:absolute;left:var(--gutter);top:50%;transform:translateY(-50%);z-index:3;
+    background:var(--jet);padding-right:18px;
+    font-family:'Oswald',sans-serif;font-weight:600;font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--red);
+  }
+  .v4 .brands-label::after{
+    content:'';position:absolute;left:100%;top:0;width:60px;height:100%;
+    background:linear-gradient(90deg,var(--jet),transparent);pointer-events:none;
+  }
+  .v4 .brands-track{
+    display:flex;gap:48px;white-space:nowrap;
+    animation:v4-scroll 50s linear infinite;
+    will-change:transform;
+    padding-left:160px;
+  }
+  .v4 .brands-track .brand{
+    font-family:'Oswald',sans-serif;font-weight:700;font-size:32px;letter-spacing:-.005em;text-transform:uppercase;
+    color:var(--bone);flex-shrink:0;
+    transition:color .18s ease;
+  }
+  .v4 .brands-track .brand:hover{color:var(--red)}
+  .v4 .brands-track .sep{
+    align-self:center;flex-shrink:0;
+    font-family:'Fraunces',serif;font-style:italic;font-weight:400;font-size:32px;color:var(--red);
+  }
+  @keyframes v4-scroll{
+    from{transform:translateX(0)}
+    to{transform:translateX(-50%)}
+  }
+
+  /* Reduced motion — show first quote only, no scroll */
+  @media (prefers-reduced-motion: reduce){
+    .v1 .quote,.v2 .comment,.v3 .q,.v3 .credit,.v4 .q{
+      animation:none;opacity:0;
+    }
+    .v1 .quote:first-child,.v2 .comment:first-child,
+    .v3 .q:first-child,.v3 .credit:first-child,.v4 .q:first-child{
+      opacity:1;
+    }
+    .v1 .brands-track,.v4 .brands-track{animation:none}
+    .v1 .pulse,.v4 .pulse,.v1 .say-dots .dot{animation:none}
+  }
+
+  /* Mobile */
+  @media (max-width:640px){
+    .v1 .say,.v3 .say,.v4 .say{padding-left:20px;padding-right:20px}
+    .v2 .say,.v2 .brands{padding-left:20px;padding-right:20px}
+    .v3 .brands{padding-left:20px;padding-right:20px}
+    .v1 .brands-label,.v4 .brands-label{left:20px}
+    .v3 .say-quote-col{padding:32px 24px 24px}
+    .v3 .credit-col{padding:24px 24px 32px}
+    .v3 .say-card{min-height:0}
+    .v4 .say-mark.tl,.v4 .say-mark.br{font-size:200px}
+  }
+</style>
+</head>
+<body>
+
+<!-- ════════════════════════════════════════════════════════════
+     V1 — MAGAZINE PULL-QUOTE  +  BRAND TICKER
+     ════════════════════════════════════════════════════════════ -->
+<div class="variant-banner">
+  <b>V1 · Magazine pull-quote</b>
+  <span>Dark editorial panel · Huge italic · Brand marquee ribbon</span>
+</div>
+
+<div class="v1">
+  <section class="say">
+    <div class="say-inner">
+      <div class="say-head">
+        <span class="pulse"></span>
+        <span class="lbl">What people are saying</span>
+      </div>
+      <div class="say-stage">
+        <figure class="quote">
+          <blockquote>Getting the best networking vibes already 🫂🤌🏻</blockquote>
+          <figcaption>
+            <div class="av">P</div>
+            <div class="meta"><b>@prathameshhshetye</b> Pickleball Socials · 19 May</div>
+          </figcaption>
+        </figure>
+        <figure class="quote">
+          <blockquote>Any membership we need to take to join this community?</blockquote>
+          <figcaption>
+            <div class="av b">S</div>
+            <div class="meta"><b>@suyog_patne</b> Run &amp; Smash Sunday · 28 Feb</div>
+          </figcaption>
+        </figure>
+        <figure class="quote">
+          <blockquote>Love thissssssssssss :)</blockquote>
+          <figcaption>
+            <div class="av c">B</div>
+            <div class="meta"><b>@iambhavyamehta</b> Pickleball Socials · 19 May</div>
+          </figcaption>
+        </figure>
+        <figure class="quote">
+          <blockquote>WHY on a Saturday — was waiting for one of your Sunday runs!</blockquote>
+          <figcaption>
+            <div class="av d">P</div>
+            <div class="meta"><b>@puja_nvogue</b> Exclusive Run · 26 Mar</div>
+          </figcaption>
+        </figure>
+        <figure class="quote">
+          <blockquote>Let's gooo!! 🔥🔥🔥</blockquote>
+          <figcaption>
+            <div class="av e">V</div>
+            <div class="meta"><b>@vinitsikariya</b> Run Lift Vibe · 19 Feb</div>
+          </figcaption>
+        </figure>
+      </div>
+      <div class="say-dots" aria-hidden="true">
+        <span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span>
+      </div>
+    </div>
+  </section>
+
+  <section class="brands">
+    <span class="brands-label">Seen with</span>
+    <div class="brands-track">
+      <span class="brand">Reebok</span><span class="sep"></span>
+      <span class="brand">KIMS Hospitals</span><span class="sep"></span>
+      <span class="brand">Pickledeck</span><span class="sep"></span>
+      <span class="brand">Nitrro Sport</span><span class="sep"></span>
+      <span class="brand">Wholy</span><span class="sep"></span>
+      <span class="brand">Playo</span><span class="sep"></span>
+      <span class="brand">The Fit Playce</span><span class="sep"></span>
+      <span class="brand">Yourplug</span><span class="sep"></span>
+      <span class="brand">Common Grounds</span><span class="sep"></span>
+      <span class="brand">Lake Shore Thane</span><span class="sep"></span>
+      <!-- duplicate for seamless loop -->
+      <span class="brand">Reebok</span><span class="sep"></span>
+      <span class="brand">KIMS Hospitals</span><span class="sep"></span>
+      <span class="brand">Pickledeck</span><span class="sep"></span>
+      <span class="brand">Nitrro Sport</span><span class="sep"></span>
+      <span class="brand">Wholy</span><span class="sep"></span>
+      <span class="brand">Playo</span><span class="sep"></span>
+      <span class="brand">The Fit Playce</span><span class="sep"></span>
+      <span class="brand">Yourplug</span><span class="sep"></span>
+      <span class="brand">Common Grounds</span><span class="sep"></span>
+      <span class="brand">Lake Shore Thane</span><span class="sep"></span>
+    </div>
+  </section>
+</div>
+
+
+<!-- ════════════════════════════════════════════════════════════
+     V2 — INSTAGRAM-STYLE COMMENT FEED + AVATAR BRAND CHIPS
+     ════════════════════════════════════════════════════════════ -->
+<div class="variant-banner">
+  <b>V2 · Live comments feed</b>
+  <span>Cream feed card · Comments slide up · Avatar @-chips below</span>
+</div>
+
+<div class="v2">
+  <section class="say">
+    <div class="say-head">
+      <h2>What people are saying</h2>
+      <span class="kicker">Live from Instagram</span>
+    </div>
+
+    <div class="feed">
+      <div class="feed-stage">
+        <div class="comment">
+          <div class="av">P</div>
+          <div class="body">
+            <div class="who">@prathameshhshetye <span class="time">19 May</span></div>
+            <div class="text">Getting the best networking vibes already 🫂🤌🏻</div>
+            <div class="meta"><span class="heart">♥</span>1 like · Pickleball Socials</div>
+          </div>
+        </div>
+        <div class="comment">
+          <div class="av b">S</div>
+          <div class="body">
+            <div class="who">@suyog_patne <span class="time">28 Feb</span></div>
+            <div class="text">Any membership we need to take to join this community?</div>
+            <div class="meta"><span class="heart">♥</span>1 like · Run &amp; Smash Sunday</div>
+          </div>
+        </div>
+        <div class="comment">
+          <div class="av c">B</div>
+          <div class="body">
+            <div class="who">@iambhavyamehta <span class="time">19 May</span></div>
+            <div class="text">Love thissssssssssss :)</div>
+            <div class="meta"><span class="heart">♥</span>1 like · Pickleball Socials</div>
+          </div>
+        </div>
+        <div class="comment">
+          <div class="av d">P</div>
+          <div class="body">
+            <div class="who">@puja_nvogue <span class="time">26 Mar</span></div>
+            <div class="text">WHY on a Saturday — was waiting for one of your Sunday runs!</div>
+            <div class="meta"><span class="heart">♥</span>1 like · Exclusive Run</div>
+          </div>
+        </div>
+        <div class="comment">
+          <div class="av e">V</div>
+          <div class="body">
+            <div class="who">@vinitsikariya <span class="time">19 Feb</span></div>
+            <div class="text">Let's gooo!! 🔥🔥🔥</div>
+            <div class="meta"><span class="heart">♥</span>1 like · Run Lift Vibe</div>
+          </div>
+        </div>
+      </div>
+      <div class="typing">
+        <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+      </div>
+    </div>
+  </section>
+
+  <section class="brands">
+    <div class="brands-head">
+      <h2 style="margin:0;font-family:'Oswald',sans-serif;font-weight:600;font-size:24px;text-transform:uppercase;letter-spacing:-.005em">Seen with</h2>
+      <span class="kicker">15 brands</span>
+    </div>
+    <div class="brands-row">
+      <a href="#" class="brand-chip"><span class="av">R</span> Reebok</a>
+      <a href="#" class="brand-chip"><span class="av b">K</span> KIMS Hospitals</a>
+      <a href="#" class="brand-chip"><span class="av c">P</span> Pickledeck</a>
+      <a href="#" class="brand-chip"><span class="av d">N</span> Nitrro Sport</a>
+      <a href="#" class="brand-chip"><span class="av e">W</span> Wholy</a>
+      <a href="#" class="brand-chip"><span class="av f">P</span> Playo</a>
+      <a href="#" class="brand-chip"><span class="av g">F</span> The Fit Playce</a>
+      <a href="#" class="brand-chip"><span class="av">Y</span> Yourplug</a>
+      <a href="#" class="brand-chip"><span class="av b">C</span> Common Grounds</a>
+      <a href="#" class="brand-chip"><span class="av c">L</span> Lake Shore Thane</a>
+      <a href="#" class="brand-chip"><span class="av d">3</span> 3 Sisters</a>
+      <a href="#" class="brand-chip"><span class="av e">M</span> Moha</a>
+      <a href="#" class="brand-chip"><span class="av f">P</span> Pickle Adda</a>
+      <a href="#" class="brand-chip"><span class="av g">P</span> Pickle Haus</a>
+      <a href="#" class="brand-chip"><span class="av">D</span> Devgn Cinex</a>
+    </div>
+  </section>
+</div>
+
+
+<!-- ════════════════════════════════════════════════════════════
+     V3 — EDITORIAL DUET (quote left, credit right) + STRUCTURED brand grid
+     ════════════════════════════════════════════════════════════ -->
+<div class="variant-banner">
+  <b>V3 · Editorial duet</b>
+  <span>Split panel quote+attribution · Structured brand grid w/ hairlines</span>
+</div>
+
+<div class="v3">
+  <section class="say">
+    <div class="say-card">
+      <div class="say-quote-col">
+        <span class="kicker">What people are saying</span>
+        <div class="stage">
+          <blockquote class="q">Getting the best networking vibes already 🫂🤌🏻</blockquote>
+          <blockquote class="q">Any membership we need to take to join this community?</blockquote>
+          <blockquote class="q">Love thissssssssssss :)</blockquote>
+          <blockquote class="q">WHY on a Saturday — was waiting for one of your Sunday runs!</blockquote>
+          <blockquote class="q">Let's gooo!! 🔥🔥🔥</blockquote>
+        </div>
+      </div>
+      <div class="credit-col">
+        <div class="credit-stage">
+          <div class="credit">
+            <div class="av">P</div>
+            <div>
+              <div class="who">@prathameshhshetye</div>
+              <div class="where">Pickleball Socials<br>19 May 2026</div>
+            </div>
+          </div>
+          <div class="credit">
+            <div class="av b">S</div>
+            <div>
+              <div class="who">@suyog_patne</div>
+              <div class="where">Run &amp; Smash<br>28 Feb 2026</div>
+            </div>
+          </div>
+          <div class="credit">
+            <div class="av c">B</div>
+            <div>
+              <div class="who">@iambhavyamehta</div>
+              <div class="where">Pickleball Socials<br>19 May 2026</div>
+            </div>
+          </div>
+          <div class="credit">
+            <div class="av d">P</div>
+            <div>
+              <div class="who">@puja_nvogue</div>
+              <div class="where">Exclusive Run<br>26 Mar 2026</div>
+            </div>
+          </div>
+          <div class="credit">
+            <div class="av e">V</div>
+            <div>
+              <div class="who">@vinitsikariya</div>
+              <div class="where">Run Lift Vibe<br>19 Feb 2026</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="brands">
+    <div class="brands-head">
+      <h2 style="margin:0;font-family:'Oswald',sans-serif;font-weight:600;font-size:24px;text-transform:uppercase;letter-spacing:-.005em">Seen with</h2>
+      <span class="kicker">15 partners · scraped from Instagram</span>
+    </div>
+    <div class="brands-grid">
+      <a href="#" class="brand-cell"><div class="name">Reebok</div><div class="role">Apparel partner</div><span class="arrow">View post →</span></a>
+      <a href="#" class="brand-cell"><div class="name">KIMS</div><div class="role">Health partner</div><span class="arrow">View post →</span></a>
+      <a href="#" class="brand-cell"><div class="name">Pickledeck</div><div class="role">Venue partner</div><span class="arrow">View post →</span></a>
+      <a href="#" class="brand-cell"><div class="name">Nitrro Sport</div><div class="role">Venue partner</div><span class="arrow">View post →</span></a>
+      <a href="#" class="brand-cell"><div class="name">Wholy</div><div class="role">Snack partner</div><span class="arrow">View post →</span></a>
+      <a href="#" class="brand-cell"><div class="name">Playo</div><div class="role">Sports community</div><span class="arrow">View post →</span></a>
+      <a href="#" class="brand-cell"><div class="name">The Fit Playce</div><div class="role">Partner</div><span class="arrow">View post →</span></a>
+      <a href="#" class="brand-cell"><div class="name">Yourplug</div><div class="role">Energy partner</div><span class="arrow">View post →</span></a>
+      <a href="#" class="brand-cell"><div class="name">Common Grounds</div><div class="role">Partner</div><span class="arrow">View post →</span></a>
+      <a href="#" class="brand-cell"><div class="name">Lake Shore</div><div class="role">Partner</div><span class="arrow">View post →</span></a>
+      <a href="#" class="brand-cell"><div class="name">3 Sisters</div><div class="role">Refreshment</div><span class="arrow">View post →</span></a>
+      <a href="#" class="brand-cell"><div class="name">Moha</div><div class="role">Skincare partner</div><span class="arrow">View post →</span></a>
+    </div>
+  </section>
+</div>
+
+
+<!-- ════════════════════════════════════════════════════════════
+     V4 — POSTER STRIP (huge centered italic) + JET MARQUEE
+     ════════════════════════════════════════════════════════════ -->
+<div class="variant-banner">
+  <b>V4 · Poster strip</b>
+  <span>Giant centered italic on bone · Brand marquee on jet · Most assertive</span>
+</div>
+
+<div class="v4">
+  <section class="say">
+    <span class="say-mark tl">"</span>
+    <span class="say-mark br">"</span>
+    <div class="say-head">
+      <span class="pulse"></span>
+      <span class="lbl">What people are saying</span>
+    </div>
+    <div class="stage">
+      <figure class="q">
+        <blockquote>Getting the best networking vibes <span class="red">already.</span></blockquote>
+        <figcaption><span class="av">P</span> <span>@prathameshhshetye</span> <span class="dot">·</span> <span>Pickleball Socials</span></figcaption>
+      </figure>
+      <figure class="q">
+        <blockquote>Any <span class="red">membership</span> we need to take to join this community?</blockquote>
+        <figcaption><span class="av">S</span> <span>@suyog_patne</span> <span class="dot">·</span> <span>Run &amp; Smash</span></figcaption>
+      </figure>
+      <figure class="q">
+        <blockquote>Love <span class="red">thissssssssssss</span> :)</blockquote>
+        <figcaption><span class="av">B</span> <span>@iambhavyamehta</span> <span class="dot">·</span> <span>Pickleball Socials</span></figcaption>
+      </figure>
+      <figure class="q">
+        <blockquote><span class="red">WHY</span> on a Saturday — was waiting for Sunday!</blockquote>
+        <figcaption><span class="av">P</span> <span>@puja_nvogue</span> <span class="dot">·</span> <span>Exclusive Run</span></figcaption>
+      </figure>
+      <figure class="q">
+        <blockquote>Let's <span class="red">gooo!!</span> 🔥🔥🔥</blockquote>
+        <figcaption><span class="av">V</span> <span>@vinitsikariya</span> <span class="dot">·</span> <span>Run Lift Vibe</span></figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section class="brands">
+    <span class="brands-label">Seen with</span>
+    <div class="brands-track">
+      <span class="brand">Reebok</span><span class="sep">·</span>
+      <span class="brand">KIMS Hospitals</span><span class="sep">·</span>
+      <span class="brand">Pickledeck</span><span class="sep">·</span>
+      <span class="brand">Nitrro Sport</span><span class="sep">·</span>
+      <span class="brand">Wholy</span><span class="sep">·</span>
+      <span class="brand">Playo</span><span class="sep">·</span>
+      <span class="brand">The Fit Playce</span><span class="sep">·</span>
+      <span class="brand">Yourplug</span><span class="sep">·</span>
+      <span class="brand">Common Grounds</span><span class="sep">·</span>
+      <span class="brand">Lake Shore Thane</span><span class="sep">·</span>
+      <!-- duplicate for seamless scroll -->
+      <span class="brand">Reebok</span><span class="sep">·</span>
+      <span class="brand">KIMS Hospitals</span><span class="sep">·</span>
+      <span class="brand">Pickledeck</span><span class="sep">·</span>
+      <span class="brand">Nitrro Sport</span><span class="sep">·</span>
+      <span class="brand">Wholy</span><span class="sep">·</span>
+      <span class="brand">Playo</span><span class="sep">·</span>
+      <span class="brand">The Fit Playce</span><span class="sep">·</span>
+      <span class="brand">Yourplug</span><span class="sep">·</span>
+      <span class="brand">Common Grounds</span><span class="sep">·</span>
+      <span class="brand">Lake Shore Thane</span><span class="sep">·</span>
+    </div>
+  </section>
+</div>
+
+<div style="height:80px"></div>
+
+</body>
+</html>

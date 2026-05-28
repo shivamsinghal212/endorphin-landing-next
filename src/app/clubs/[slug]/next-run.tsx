@@ -154,9 +154,11 @@ export function NextRun({
                 variant="primary"
               />
             )}
-            <span className="nr-going">
-              <strong>{event.goingCount}</strong> going
-            </span>
+            {event.goingCount > 0 && (
+              <span className="nr-going">
+                <strong>{event.goingCount}</strong> going
+              </span>
+            )}
           </div>
         </div>
       </div>

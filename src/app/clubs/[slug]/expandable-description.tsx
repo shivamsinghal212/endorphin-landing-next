@@ -10,14 +10,26 @@ export function ExpandableDescription({ text }: { text: string }) {
   const needsTruncation = trimmed.length > COLLAPSED_CHARS;
 
   if (!needsTruncation) {
-    return <p className="hero-description">{trimmed}</p>;
+    return (
+      <p className="hero-description">
+        <span className="hero-description-text">{trimmed}</span>
+      </p>
+    );
   }
 
-  const visible = expanded ? trimmed : `${trimmed.slice(0, COLLAPSED_CHARS).trimEnd()}…`;
+  // On desktop the slice keeps the visible text under COLLAPSED_CHARS.
+  // On mobile the text span is also CSS-line-clamped to 2 lines so the
+  // section stays compact regardless of where the slice happens to land.
+  const visible = expanded
+    ? trimmed
+    : `${trimmed.slice(0, COLLAPSED_CHARS).trimEnd()}…`;
 
   return (
-    <p className="hero-description hero-description--expandable">
-      {visible}{' '}
+    <p
+      className="hero-description hero-description--expandable"
+      data-expanded={expanded}
+    >
+      <span className="hero-description-text">{visible}</span>
       <button
         type="button"
         className="hero-description-toggle"

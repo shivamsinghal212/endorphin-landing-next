@@ -1,0 +1,1122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Club Detail · V5 Full data · Endorfin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@1,9..144,400;1,9..144,500&family=Oswald:wght@400;500;600&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --jet:#0A0A0A;
+    --ink:#1A1A1A;
+    --bone:#F5F0EB;
+    --bone-warm:#EDE6DC;
+    --paper:#FAF7F2;
+    --signal:#E6232A;
+    --signal-dim:#c81920;
+    --dim:#7A7670;
+    --dim-2:#9C9893;
+    --hair:rgba(10,10,10,0.08);
+    --hair-strong:rgba(10,10,10,0.14);
+    --hair-light:rgba(245,240,235,0.12);
+    --hair-light-strong:rgba(245,240,235,0.22);
+    --gutter:clamp(20px,4vw,48px);
+    --container:1100px;
+  }
+  *,*::before,*::after{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    font-family:'Poppins',sans-serif;
+    background:var(--bone);color:var(--jet);
+    -webkit-font-smoothing:antialiased;
+    font-size:15px;line-height:1.55;
+  }
+  a{color:inherit;text-decoration:none}
+  img{display:block;max-width:100%}
+  .wrap{max-width:var(--container);margin:0 auto;padding:0 var(--gutter)}
+
+  /* Variant banner */
+  .variant-banner{
+    background:var(--jet);color:var(--bone);
+    padding:12px var(--gutter);display:flex;justify-content:space-between;align-items:center;
+    font-family:'Oswald',sans-serif;font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+  }
+  .variant-banner b{font-weight:500;letter-spacing:.06em;font-size:13px}
+  .variant-banner span{color:rgba(245,240,235,.5)}
+
+  /* Type tokens */
+  .kicker{font-family:'Oswald',sans-serif;font-weight:500;text-transform:uppercase;letter-spacing:.16em;font-size:11px;color:var(--dim)}
+  .italic{font-family:'Fraunces',serif;font-style:italic;font-weight:400}
+
+  /* Sticky top bar */
+  .topbar{
+    border-bottom:1px solid var(--hair);
+    padding:14px 0;
+    position:sticky;top:0;z-index:30;
+    background:rgba(245,240,235,.92);
+    backdrop-filter:saturate(180%) blur(10px);
+  }
+  .topbar-inner{display:flex;align-items:center;justify-content:space-between;gap:16px}
+  .crumb{display:flex;align-items:center;gap:8px;font-family:'Oswald',sans-serif;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);min-width:0}
+  .crumb a:hover{color:var(--jet)}
+  .crumb-arrow{opacity:.4}
+  .crumb-current{color:var(--jet);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .top-cta{display:flex;gap:8px;align-items:center;flex:none}
+
+  /* Icons */
+  .icon-dot{
+    width:34px;height:34px;border-radius:50%;
+    border:1px solid var(--hair-strong);
+    display:inline-flex;align-items:center;justify-content:center;
+    color:var(--jet);transition:all .16s ease;
+  }
+  .icon-dot:hover{background:var(--jet);color:var(--bone);border-color:var(--jet)}
+  .icon-dot svg{width:14px;height:14px;fill:currentColor}
+  .icon-xs{width:18px;height:18px;border:0;border-radius:0;color:var(--dim)}
+  .icon-xs svg{width:14px;height:14px}
+  .icon-xs:hover{color:var(--signal);background:transparent}
+
+  /* Buttons */
+  .btn{
+    font-family:'Oswald',sans-serif;font-weight:500;font-size:12px;letter-spacing:.14em;text-transform:uppercase;
+    padding:11px 18px;border-radius:999px;
+    transition:all .16s ease;cursor:pointer;border:0;
+    display:inline-flex;align-items:center;gap:8px;
+  }
+  .btn-primary{background:var(--signal);color:#fff}
+  .btn-primary:hover{background:var(--signal-dim)}
+  .btn-dark{background:var(--jet);color:var(--bone)}
+  .btn-dark:hover{background:var(--signal)}
+  .btn-ghost{background:transparent;color:var(--jet);border:1px solid var(--hair-strong)}
+  .btn-ghost:hover{background:var(--jet);color:var(--bone);border-color:var(--jet)}
+  .btn-light{background:var(--bone);color:var(--jet)}
+  .btn-light:hover{background:#fff}
+  .btn-ghost-light{background:transparent;color:var(--bone);border:1px solid var(--hair-light-strong)}
+  .btn-ghost-light:hover{background:var(--bone);color:var(--jet);border-color:var(--bone)}
+  .btn-sm{padding:8px 14px;font-size:11px}
+  .btn-link{
+    background:none;padding:0;color:var(--jet);
+    border-bottom:1px solid var(--hair-strong);border-radius:0;
+    font-family:'Oswald',sans-serif;font-weight:500;font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+    padding-bottom:2px;display:inline-flex;align-items:center;gap:5px;
+  }
+  .btn-link:hover{color:var(--signal);border-color:var(--signal)}
+
+  /* ─────────── LAYOUT ─────────── */
+  .grid{
+    display:grid;
+    grid-template-columns:300px 1fr;
+    gap:56px;
+    padding:48px 0 24px;
+    align-items:start;
+  }
+
+  /* ─────────── SIDEBAR ─────────── */
+  .side{position:sticky;top:74px;align-self:start}
+  .side-logo{
+    width:64px;height:64px;border-radius:50%;
+    overflow:hidden;background:var(--bone-warm);
+    border:1px solid var(--hair);
+  }
+  .side-logo img{width:100%;height:100%;object-fit:cover}
+  .side-kicker{
+    margin-top:18px;
+    font-family:'Oswald',sans-serif;font-weight:500;font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--signal);
+  }
+  .side-loc{
+    margin:6px 0 0;
+    display:flex;align-items:center;gap:6px;
+    font-family:'Oswald',sans-serif;font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--dim);
+  }
+  .side-loc .dot{width:5px;height:5px;border-radius:50%;background:var(--signal);display:inline-block}
+  .side-name{
+    margin:10px 0 14px;
+    font-family:'Oswald',sans-serif;font-weight:500;
+    font-size:26px;line-height:1.1;letter-spacing:-.005em;
+  }
+  .side-name .red{color:var(--signal)}
+  .side-desc{font-size:14px;color:var(--ink);line-height:1.55;margin:0 0 20px}
+  .side-desc .italic{color:var(--jet)}
+  .side-actions{display:flex;flex-direction:column;gap:8px;margin-bottom:14px}
+  .side-actions .btn{justify-content:center;width:100%}
+  .side-socials{display:flex;gap:6px;margin-bottom:22px}
+
+  .side-stats{
+    border-top:1px solid var(--hair);
+    padding-top:14px;
+    display:flex;flex-direction:column;gap:0;
+  }
+  .stat-row{
+    display:flex;align-items:baseline;justify-content:space-between;
+    border-bottom:1px solid var(--hair);padding:10px 0;
+  }
+  .stat-row:last-child{border-bottom:0}
+  .stat-row .label{font-family:'Oswald',sans-serif;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim)}
+  .stat-row .val{
+    font-family:'Oswald',sans-serif;font-weight:500;font-size:18px;color:var(--jet);
+    font-variant-numeric:tabular-nums;letter-spacing:-.005em;
+  }
+  .stat-row .val .unit{font-size:11px;color:var(--dim);margin-left:2px;letter-spacing:.04em}
+
+  .side-tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:18px}
+  .tag{
+    font-family:'Oswald',sans-serif;font-size:10px;letter-spacing:.12em;text-transform:uppercase;
+    padding:4px 9px;border-radius:999px;
+    border:1px solid var(--hair-strong);color:var(--ink);
+  }
+  .side-source{
+    margin-top:22px;padding-top:16px;border-top:1px solid var(--hair);
+    font-size:11.5px;color:var(--dim);line-height:1.55;
+  }
+  .side-source a{color:var(--jet);border-bottom:1px solid var(--hair-strong)}
+  .side-source a:hover{color:var(--signal);border-color:var(--signal)}
+
+  /* ─────────── CONTENT ─────────── */
+  .content{min-width:0}
+  .section{
+    padding:0 0 36px;
+    margin-bottom:36px;
+    border-bottom:1px solid var(--hair);
+  }
+  .section:last-child{border-bottom:0;margin-bottom:0;padding-bottom:0}
+
+  .section-head{
+    display:flex;align-items:baseline;justify-content:space-between;gap:16px;
+    margin-bottom:20px;
+  }
+  .section-head h2{
+    margin:0;
+    font-family:'Oswald',sans-serif;font-weight:500;font-size:13px;letter-spacing:.16em;text-transform:uppercase;
+  }
+  .section-head .count{
+    font-family:'Oswald',sans-serif;font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--dim);
+  }
+  .section-head .count a{color:var(--jet);border-bottom:1px solid var(--hair-strong);padding-bottom:1px}
+
+  /* ─────────── AGENDA ─────────── */
+  .agenda{display:flex;flex-direction:column;gap:0}
+  .agenda-row{
+    display:grid;
+    grid-template-columns:64px 1fr auto;
+    gap:18px;align-items:flex-start;
+    padding:18px 0;
+    border-bottom:1px solid var(--hair);
+  }
+  .agenda-row:last-child{border-bottom:0}
+  .agenda-row.featured{
+    background:var(--paper);
+    padding:18px;
+    border-radius:12px;
+    border:1px solid var(--hair-strong);
+    margin-bottom:8px;
+  }
+  .agenda-date{display:flex;flex-direction:column;align-items:center;text-align:center;padding-top:2px}
+  .agenda-date .day{font-family:'Oswald',sans-serif;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim)}
+  .agenda-date .num{font-family:'Oswald',sans-serif;font-weight:500;font-size:32px;line-height:1;color:var(--jet);margin:3px 0 2px;font-variant-numeric:tabular-nums}
+  .agenda-date .mon{font-family:'Oswald',sans-serif;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim)}
+  .agenda-tag{
+    display:inline-flex;align-items:center;gap:6px;
+    font-family:'Oswald',sans-serif;font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--signal);
+    margin-bottom:6px;
+  }
+  .agenda-tag.club{color:var(--dim)}
+  .agenda-tag .pin{
+    display:inline-block;background:var(--signal);color:#fff;
+    padding:2px 7px;border-radius:999px;font-size:9px;letter-spacing:.18em;
+  }
+  .agenda-title{
+    font-family:'Poppins',sans-serif;font-weight:500;font-size:16px;color:var(--jet);
+    line-height:1.35;margin:0 0 4px;
+  }
+  .agenda-meta{font-size:13px;color:var(--dim);line-height:1.5}
+  .agenda-meta .sep{margin:0 6px;opacity:.5}
+  .agenda-meta .dist{color:var(--ink);font-weight:500;font-variant-numeric:tabular-nums}
+  .agenda-desc{margin-top:8px;font-size:13.5px;color:var(--ink);line-height:1.55;max-width:60ch}
+  .agenda-extra{
+    display:flex;flex-wrap:wrap;gap:5px;margin-top:10px;
+  }
+  .mini-tag{
+    font-family:'Oswald',sans-serif;font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--dim);padding:3px 7px;border:1px solid var(--hair-strong);border-radius:999px;
+  }
+  .agenda-cta{display:flex;align-items:center;gap:8px;padding-top:2px}
+
+  /* ─────────── ACTIVITIES PILLS ─────────── */
+  .activities-flex{
+    display:grid;grid-template-columns:1fr auto;gap:24px;align-items:center;
+  }
+  .activities{display:flex;flex-wrap:wrap;gap:6px}
+  .pill{
+    font-family:'Poppins',sans-serif;font-weight:400;font-size:13px;
+    padding:7px 12px;border-radius:999px;
+    background:var(--bone-warm);color:var(--ink);
+  }
+  .pill.solid{background:var(--jet);color:var(--bone)}
+  .activities-aside{
+    font-family:'Fraunces',serif;font-style:italic;font-weight:400;
+    font-size:15px;color:var(--dim);max-width:24ch;text-align:right;
+  }
+
+  /* ─────────── LATEST RUN FEATURED CARD ─────────── */
+  .latest{
+    background:var(--paper);
+    border:1px solid var(--hair-strong);
+    border-radius:14px;
+    overflow:hidden;
+  }
+  .latest-cover{
+    position:relative;aspect-ratio:16/9;background:var(--bone-warm);
+  }
+  .latest-cover img{width:100%;height:100%;object-fit:cover}
+  .latest-cover::after{
+    content:'';position:absolute;inset:auto 0 0 0;height:55%;
+    background:linear-gradient(180deg,transparent,rgba(10,10,10,.6));
+    pointer-events:none;
+  }
+  .latest-cover .tag-row{
+    position:absolute;top:14px;left:14px;display:flex;gap:6px;z-index:2;
+  }
+  .latest-cover .badge{
+    background:rgba(10,10,10,.78);color:var(--bone);
+    padding:5px 10px;border-radius:999px;
+    font-family:'Oswald',sans-serif;font-weight:500;font-size:10px;letter-spacing:.16em;text-transform:uppercase;
+  }
+  .latest-cover .badge.race{background:var(--signal)}
+  .latest-cover .corner{
+    position:absolute;left:18px;right:18px;bottom:14px;color:var(--bone);z-index:2;
+    display:flex;align-items:flex-end;justify-content:space-between;gap:14px;
+  }
+  .latest-cover .corner .date{
+    font-family:'Oswald',sans-serif;font-weight:500;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:rgba(245,240,235,.8);
+  }
+  .latest-cover .corner h3{
+    margin:4px 0 0;font-family:'Oswald',sans-serif;font-weight:600;
+    font-size:24px;line-height:1.1;letter-spacing:-.005em;
+  }
+  .latest-cover .corner .loc{font-size:13px;color:rgba(245,240,235,.7);margin-top:4px}
+  .latest-cover .corner .dist{
+    font-family:'Oswald',sans-serif;font-weight:600;font-size:32px;line-height:1;
+    font-variant-numeric:tabular-nums;color:#fff;letter-spacing:-.01em;
+    flex:none;text-align:right;
+  }
+  .latest-cover .corner .dist .unit{font-size:14px;color:rgba(245,240,235,.7);margin-left:2px}
+  .latest-body{padding:18px 20px}
+  .latest-summary{font-size:14.5px;color:var(--ink);line-height:1.55;margin:0 0 14px;max-width:62ch}
+
+  .latest-meta{
+    display:grid;
+    grid-template-columns:1fr 1fr;gap:12px;
+    background:#fff;
+    border:1px solid var(--hair);border-radius:10px;
+    padding:12px 14px;margin-bottom:16px;
+  }
+  .lm-row{display:flex;flex-direction:column;gap:3px}
+  .lm-row .lbl{font-family:'Oswald',sans-serif;font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--dim)}
+  .lm-row .val{font-size:13.5px;color:var(--jet);font-weight:500;line-height:1.4}
+  .lm-row .val .sub{color:var(--dim);font-weight:400}
+
+  .latest-sponsors{
+    display:flex;flex-wrap:wrap;gap:6px;align-items:center;
+    margin-bottom:16px;
+  }
+  .latest-sponsors .lbl{
+    font-family:'Oswald',sans-serif;font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--dim);
+    margin-right:4px;
+  }
+  .sponsor-chip{
+    font-family:'Poppins',sans-serif;font-size:12px;color:var(--ink);
+    background:var(--bone-warm);padding:5px 10px;border-radius:999px;
+  }
+
+  /* Comments inside latest */
+  .comments{
+    margin-top:14px;padding-top:14px;
+    border-top:1px solid var(--hair);
+  }
+  .comments-head{
+    font-family:'Oswald',sans-serif;font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--dim);
+    margin-bottom:10px;
+  }
+  .comment{
+    display:grid;grid-template-columns:28px 1fr auto;gap:10px;
+    padding:8px 0;align-items:flex-start;
+  }
+  .c-avatar{
+    width:28px;height:28px;border-radius:50%;
+    background:var(--bone-warm);color:var(--ink);
+    font-family:'Oswald',sans-serif;font-weight:500;font-size:11px;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .c-avatar.red{background:var(--signal);color:#fff}
+  .c-body .user{
+    font-size:12.5px;font-weight:500;color:var(--jet);
+  }
+  .c-body .text{
+    font-size:13.5px;color:var(--ink);line-height:1.45;margin-top:1px;
+  }
+  .c-body .text.italic{font-family:'Fraunces',serif;font-style:italic;color:var(--jet)}
+  .c-meta{
+    font-family:'Oswald',sans-serif;font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);
+    white-space:nowrap;padding-top:3px;
+    display:flex;align-items:center;gap:4px;
+  }
+  .c-meta .heart{color:var(--signal)}
+
+  .latest-foot{
+    display:flex;align-items:center;justify-content:space-between;gap:12px;
+    margin-top:14px;padding-top:14px;border-top:1px solid var(--hair);
+  }
+  .latest-foot .left{
+    font-family:'Oswald',sans-serif;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);
+    display:flex;align-items:center;gap:6px;
+  }
+
+  /* ─────────── PAST RUNS TIMELINE ─────────── */
+  .timeline{display:flex;flex-direction:column;gap:0}
+  .tl-row{
+    display:grid;
+    grid-template-columns:88px 96px 1fr auto;
+    gap:18px;align-items:flex-start;
+    padding:14px 0;
+    border-bottom:1px solid var(--hair);
+  }
+  .tl-row:last-child{border-bottom:0}
+  .tl-date{
+    font-family:'Oswald',sans-serif;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);
+    font-variant-numeric:tabular-nums;padding-top:6px;
+  }
+  .tl-thumb{
+    width:96px;aspect-ratio:16/10;border-radius:6px;overflow:hidden;background:var(--bone-warm);flex:none;
+  }
+  .tl-thumb img{width:100%;height:100%;object-fit:cover}
+  .tl-info{min-width:0;padding-top:2px}
+  .tl-info .title{font-size:14px;color:var(--jet);font-weight:500;line-height:1.35}
+  .tl-info .loc{font-size:12px;color:var(--dim);margin-top:2px}
+  .tl-info .after{
+    margin-top:4px;font-size:12px;color:var(--dim);
+  }
+  .tl-info .after b{color:var(--ink);font-weight:500;letter-spacing:.04em;font-family:'Oswald',sans-serif;text-transform:uppercase;font-size:10px;letter-spacing:.14em;margin-right:4px}
+  .tl-quote{
+    margin-top:8px;
+    font-family:'Fraunces',serif;font-style:italic;font-weight:400;font-size:13.5px;color:var(--ink);line-height:1.4;
+    padding-left:10px;border-left:2px solid var(--signal);
+  }
+  .tl-quote .by{font-family:'Oswald',sans-serif;font-style:normal;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);margin-left:6px}
+  .tl-right{
+    display:flex;flex-direction:column;align-items:flex-end;gap:6px;padding-top:6px;
+  }
+  .tl-tag{
+    font-family:'Oswald',sans-serif;font-size:10px;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--dim);border:1px solid var(--hair-strong);
+    padding:4px 9px;border-radius:999px;font-variant-numeric:tabular-nums;
+  }
+  .tl-tag.workshop{color:#fff;background:var(--signal);border-color:var(--signal)}
+  .tl-tag.social{color:var(--ink);background:var(--bone-warm);border-color:transparent}
+
+  .past-more{margin-top:18px;display:flex;justify-content:center}
+
+  /* ─────────── COMMUNITY VOICES ─────────── */
+  .voices{
+    display:grid;grid-template-columns:repeat(3,1fr);gap:12px;
+  }
+  .voice{
+    background:var(--paper);border:1px solid var(--hair);
+    border-radius:10px;padding:14px 16px;
+    display:flex;flex-direction:column;gap:10px;
+  }
+  .voice .q{
+    font-family:'Fraunces',serif;font-style:italic;font-weight:400;font-size:15.5px;line-height:1.4;color:var(--jet);
+    position:relative;padding-left:14px;
+  }
+  .voice .q::before{
+    content:'"';color:var(--signal);font-size:30px;line-height:0;position:absolute;left:-2px;top:8px;
+  }
+  .voice .from{
+    display:flex;align-items:center;gap:8px;font-size:12px;color:var(--dim);
+    border-top:1px solid var(--hair);padding-top:10px;
+  }
+  .voice .from .who{color:var(--jet);font-weight:500}
+  .voice .from .where{font-family:'Oswald',sans-serif;font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim)}
+
+  /* ─────────── PARTNERS ─────────── */
+  .partners-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
+    gap:0;
+    border-top:1px solid var(--hair);
+    border-left:1px solid var(--hair);
+    border-radius:6px;overflow:hidden;
+  }
+  .partner-cell{
+    padding:14px 16px;
+    border-right:1px solid var(--hair);
+    border-bottom:1px solid var(--hair);
+    display:flex;align-items:center;justify-content:space-between;gap:10px;
+    min-height:72px;
+  }
+  .partner-info{display:flex;flex-direction:column;gap:3px;min-width:0}
+  .partner-name{font-size:13.5px;color:var(--jet);font-weight:500;line-height:1.3}
+  .partner-handle{font-size:11.5px;color:var(--dim);line-height:1.3}
+  .partner-role{font-family:'Oswald',sans-serif;font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim)}
+  .partner-link{
+    width:30px;height:30px;border-radius:50%;
+    background:var(--bone-warm);color:var(--ink);
+    display:inline-flex;align-items:center;justify-content:center;
+    flex:none;transition:all .16s ease;
+  }
+  .partner-link:hover{background:var(--signal);color:#fff}
+  .partner-link svg{width:13px;height:13px;fill:currentColor}
+
+  /* ─────────── APP CTA ─────────── */
+  .app-cta{
+    margin-top:48px;
+    background:var(--jet);color:var(--bone);
+    border-radius:14px;
+    padding:28px 26px;
+    display:grid;grid-template-columns:1fr auto;gap:18px;align-items:center;
+  }
+  .app-cta h3{margin:0;font-family:'Oswald',sans-serif;font-weight:500;font-size:20px;line-height:1.25}
+  .app-cta h3 .italic{font-family:'Fraunces',serif;font-style:italic;font-weight:400;color:var(--bone)}
+  .app-cta p{margin:6px 0 0;font-size:13px;color:rgba(245,240,235,.65);max-width:46ch}
+  .app-buttons{display:flex;gap:8px}
+
+  .foot{padding:24px 0 36px;color:var(--dim);text-align:center;font-size:12px}
+
+  /* ─────────── MOBILE ─────────── */
+  @media (max-width:780px){
+    .grid{grid-template-columns:1fr;gap:24px;padding:28px 0 16px}
+    .side{position:static}
+    .side-name{font-size:22px}
+    .side-actions{flex-direction:row}
+    .side-actions .btn{flex:1}
+    .side-stats{
+      display:grid;grid-template-columns:repeat(2,1fr);gap:0;
+      border-top:1px solid var(--hair);
+      border-left:1px solid var(--hair);
+      border-radius:6px;overflow:hidden;padding-top:0;
+    }
+    .stat-row{
+      flex-direction:column-reverse;align-items:flex-start;gap:4px;
+      padding:12px 14px;
+      border-right:1px solid var(--hair);border-bottom:1px solid var(--hair);
+    }
+
+    .agenda-row{grid-template-columns:54px 1fr;gap:14px;padding:14px 0}
+    .agenda-row.featured{padding:16px 14px}
+    .agenda-cta{grid-column:1/-1;border-top:1px solid var(--hair);padding-top:10px;width:100%;justify-content:space-between}
+
+    .activities-flex{grid-template-columns:1fr;gap:12px}
+    .activities-aside{text-align:left;font-size:14px}
+
+    .latest-cover .corner{flex-direction:column;align-items:flex-start;gap:6px}
+    .latest-cover .corner .dist{text-align:left;font-size:24px}
+    .latest-meta{grid-template-columns:1fr}
+
+    .tl-row{grid-template-columns:72px 1fr;gap:12px;align-items:flex-start}
+    .tl-date{grid-column:1/-1;font-size:10px;order:1;padding-top:0}
+    .tl-thumb{order:2;width:72px}
+    .tl-info{order:3;min-width:0}
+    .tl-right{display:none}
+
+    .voices{grid-template-columns:1fr}
+
+    .app-cta{grid-template-columns:1fr;padding:24px 18px}
+    .app-buttons{width:100%}
+    .app-buttons .btn{flex:1;justify-content:center}
+  }
+</style>
+</head>
+<body>
+
+<div class="variant-banner">
+  <b>V5 · Full data</b>
+  <span>V2 layout · Latest run recap · Top comments · Sponsors per event · Partner handles</span>
+</div>
+
+<!-- Sticky top bar -->
+<div class="topbar">
+  <div class="wrap topbar-inner">
+    <nav class="crumb" aria-label="Breadcrumb">
+      <a href="/clubs">Clubs</a>
+      <span class="crumb-arrow">›</span>
+      <a href="/clubs?city=Thane">Thane</a>
+      <span class="crumb-arrow">›</span>
+      <span class="crumb-current">Rukna Mana Hai</span>
+    </nav>
+    <div class="top-cta">
+      <button class="btn btn-primary btn-sm">Join club</button>
+    </div>
+  </div>
+</div>
+
+<main class="wrap">
+  <div class="grid">
+
+    <!-- ─── SIDEBAR ─── -->
+    <aside class="side">
+      <div class="side-logo">
+        <img src="https://elnsymmgbfgawysakohc.supabase.co/storage/v1/object/public/avatars/clubs/rukna-manahai/logo.jpg" alt="Rukna Mana Hai logo" />
+      </div>
+      <div class="side-kicker">Run. Connect. Repeat.</div>
+      <div class="side-loc"><span class="dot"></span>Thane's own run club</div>
+      <h1 class="side-name">Rukna Mana Hai<span class="red">.</span></h1>
+      <p class="side-desc">
+        High-energy running community out of Thane. Beginner-friendly weekend runs paired with
+        <span class="italic">pickleball, badminton, dance cardio</span> — and the occasional pool party.
+      </p>
+
+      <div class="side-actions">
+        <button class="btn btn-primary">Join club</button>
+        <button class="btn btn-ghost">RSVP next run</button>
+      </div>
+
+      <div class="side-socials">
+        <a href="https://chat.whatsapp.com/DE6eABQheHPFVP5iTORveJ" target="_blank" rel="noopener noreferrer" class="icon-dot" aria-label="WhatsApp group">
+          <svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 0 0-8.45 15.32L2 22l4.83-1.49A10 10 0 1 0 12 2zm5.07 14.07c-.21.6-1.21 1.17-1.7 1.21-.44.04-.99.06-1.6-.1-.37-.1-.85-.26-1.46-.52-2.57-1.11-4.25-3.7-4.38-3.87-.13-.17-1.04-1.38-1.04-2.64s.66-1.87.9-2.13c.23-.25.51-.31.68-.31.17 0 .34.01.49.01.16 0 .37-.06.58.45.21.51.72 1.77.78 1.9.06.13.1.28.02.45-.08.17-.13.28-.25.43-.13.16-.27.36-.39.48-.13.13-.26.27-.11.53.16.26.71 1.18 1.52 1.91 1.04.95 1.92 1.24 2.19 1.38.27.13.42.11.58-.07.16-.17.67-.78.85-1.05.17-.27.34-.22.58-.13.23.08 1.48.7 1.74.82.25.13.42.19.49.3.06.11.06.65-.15 1.25z"/></svg>
+        </a>
+        <a href="https://instagram.com/rukna.manahai" target="_blank" rel="noopener noreferrer" class="icon-dot" aria-label="Instagram">
+          <svg viewBox="0 0 24 24"><path d="M12 2.2c3.2 0 3.6 0 4.8.06 1.2.06 1.85.25 2.28.42.57.22.98.49 1.41.92.43.43.7.84.92 1.41.17.43.36 1.08.42 2.28.06 1.2.06 1.6.06 4.8s0 3.6-.06 4.8c-.06 1.2-.25 1.85-.42 2.28-.22.57-.49.98-.92 1.41-.43.43-.84.7-1.41.92-.43.17-1.08.36-2.28.42-1.2.06-1.6.06-4.8.06s-3.6 0-4.8-.06c-1.2-.06-1.85-.25-2.28-.42-.57-.22-.98-.49-1.41-.92-.43-.43-.7-.84-.92-1.41-.17-.43-.36-1.08-.42-2.28C2.2 15.6 2.2 15.2 2.2 12s0-3.6.06-4.8c.06-1.2.25-1.85.42-2.28.22-.57.49-.98.92-1.41.43-.43.84-.7 1.41-.92.43-.17 1.08-.36 2.28-.42C8.4 2.2 8.8 2.2 12 2.2zm0 1.8c-3.14 0-3.51 0-4.74.06-1.14.05-1.76.24-2.17.4-.55.21-.94.47-1.35.88-.41.41-.67.8-.88 1.35-.16.41-.35 1.03-.4 2.17C2.4 8.49 2.4 8.86 2.4 12s0 3.51.06 4.74c.05 1.14.24 1.76.4 2.17.21.55.47.94.88 1.35.41.41.8.67 1.35.88.41.16 1.03.35 2.17.4 1.23.06 1.6.06 4.74.06s3.51 0 4.74-.06c1.14-.05 1.76-.24 2.17-.4.55-.21.94-.47 1.35-.88.41-.41.67-.8.88-1.35.16-.41.35-1.03.4-2.17.06-1.23.06-1.6.06-4.74s0-3.51-.06-4.74c-.05-1.14-.24-1.76-.4-2.17-.21-.55-.47-.94-.88-1.35-.41-.41-.8-.67-1.35-.88-.41-.16-1.03-.35-2.17-.4C15.51 4 15.14 4 12 4zm0 3.04A4.96 4.96 0 1 1 7.04 12 4.96 4.96 0 0 1 12 7.04zm0 8.18A3.22 3.22 0 1 0 8.78 12 3.22 3.22 0 0 0 12 15.22zm5.16-8.4a1.16 1.16 0 1 1-1.16-1.16 1.16 1.16 0 0 1 1.16 1.16z"/></svg>
+        </a>
+        <a href="#" class="icon-dot" aria-label="Share">
+          <svg viewBox="0 0 24 24"><path d="M18 8a3 3 0 1 0-2.83-4H15a3 3 0 0 0 .17 4.83L8.83 12.17A3 3 0 1 0 8.83 15.83l6.34 3.34A3 3 0 1 0 16 18a3 3 0 0 0-.83.17L8.83 14.83A3 3 0 0 0 9 12a3 3 0 0 0-.17-.83L15.17 7.83A3 3 0 0 0 18 8z"/></svg>
+        </a>
+      </div>
+
+      <div class="side-stats">
+        <div class="stat-row"><span class="label">Members</span><span class="val">11,205</span></div>
+        <div class="stat-row"><span class="label">Runs this month</span><span class="val">3</span></div>
+        <div class="stat-row"><span class="label">Distance · May</span><span class="val">15<span class="unit">km</span></span></div>
+        <div class="stat-row"><span class="label">Total runs hosted</span><span class="val">17</span></div>
+      </div>
+
+      <div class="side-tags">
+        <span class="tag">running</span>
+        <span class="tag">community</span>
+        <span class="tag">pickleball</span>
+        <span class="tag">fitness</span>
+        <span class="tag">socials</span>
+      </div>
+
+      <div class="side-source">
+        Activity synced from <a href="https://instagram.com/rukna.manahai" target="_blank" rel="noopener noreferrer">@rukna.manahai</a>.
+        Not claimed yet — <a href="#">claim this page</a>.
+      </div>
+    </aside>
+
+    <!-- ─── CONTENT ─── -->
+    <div class="content">
+
+      <!-- 1. AGENDA -->
+      <section class="section">
+        <div class="section-head">
+          <h2>Agenda</h2>
+          <span class="count">2 runs scheduled</span>
+        </div>
+
+        <div class="agenda">
+
+          <div class="agenda-row featured">
+            <div class="agenda-date">
+              <div class="day">Sat</div>
+              <div class="num">30</div>
+              <div class="mon">May</div>
+            </div>
+            <div>
+              <div class="agenda-tag"><span class="pin">Next</span> Club run · 5 km · 10:30 pm</div>
+              <h3 class="agenda-title">Night Run &amp; Pickleball</h3>
+              <div class="agenda-meta">
+                Subway, Pawar Nagar
+              </div>
+              <p class="agenda-desc">
+                A late-night weekend community run combined with a post-run pickleball social.
+              </p>
+              <div class="agenda-extra">
+                <span class="mini-tag">Pickleball after</span>
+              </div>
+            </div>
+            <div class="agenda-cta">
+              <button class="btn btn-primary btn-sm">I'm going</button>
+            </div>
+          </div>
+
+          <div class="agenda-row">
+            <div class="agenda-date">
+              <div class="day">Sun</div>
+              <div class="num">31</div>
+              <div class="mon">May</div>
+            </div>
+            <div>
+              <div class="agenda-tag club">Club social · Invite-only · 5:00 pm</div>
+              <h3 class="agenda-title">Pickleball Socials</h3>
+              <div class="agenda-meta">
+                Lake Shore Mall, Thane
+              </div>
+              <p class="agenda-desc">
+                An exclusive, invite-only pickleball social for founders and creators at Lake Shore Mall.
+              </p>
+              <div class="agenda-extra">
+                <span class="mini-tag">Pickleball</span>
+                <span class="mini-tag">w/ Lake Shore Thane</span>
+                <span class="mini-tag">w/ Pickle Haus</span>
+              </div>
+            </div>
+            <div class="agenda-cta">
+              <button class="btn btn-ghost btn-sm">Details</button>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- 2. AFTER THE RUN -->
+      <section class="section">
+        <div class="section-head">
+          <h2>After the run</h2>
+          <span class="count">7 ways to hang</span>
+        </div>
+        <div class="activities-flex">
+          <div class="activities">
+            <span class="pill solid">Pickleball</span>
+            <span class="pill">Badminton</span>
+            <span class="pill">Dance cardio</span>
+            <span class="pill">Pool party</span>
+            <span class="pill">Coffee</span>
+            <span class="pill">Brunch</span>
+            <span class="pill">Calisthenics</span>
+          </div>
+          <p class="activities-aside">
+            It's never <span style="color:var(--signal)">just</span> a run — it's the hangout after.
+          </p>
+        </div>
+      </section>
+
+      <!-- 3. LATEST RUN (full recap with comments + sponsors) -->
+      <section class="section">
+        <div class="section-head">
+          <h2>Latest run</h2>
+          <span class="count">Sun · 19 Apr · Run &amp; Pickleball</span>
+        </div>
+
+        <article class="latest">
+          <div class="latest-cover">
+            <img src="https://elnsymmgbfgawysakohc.supabase.co/storage/v1/object/public/media/clubs/rukna-manahai/events/DXJqQHpjG8w/cover.jpg" alt="" />
+            <div class="tag-row">
+              <span class="badge">Club run</span>
+              <span class="badge">Sponsored</span>
+            </div>
+            <div class="corner">
+              <div>
+                <div class="date">Sun · 19 Apr · 6:30 am</div>
+                <h3>Run &amp; Pickleball</h3>
+                <div class="loc">Highland Circle · Dhokali, Thane</div>
+              </div>
+              <div class="dist">6<span class="unit">km</span></div>
+            </div>
+          </div>
+
+          <div class="latest-body">
+            <p class="latest-summary">
+              Community run with snacks, hydration, and a pickleball session right after. Steady pace, casual crowd, big post-run energy.
+            </p>
+
+            <div class="latest-meta">
+              <div class="lm-row">
+                <span class="lbl">Distance</span>
+                <span class="val">6 km <span class="sub">· flat loop</span></span>
+              </div>
+              <div class="lm-row">
+                <span class="lbl">After</span>
+                <span class="val">Pickleball session</span>
+              </div>
+              <div class="lm-row">
+                <span class="lbl">Secondary activity</span>
+                <span class="val">Pickleball</span>
+              </div>
+              <div class="lm-row">
+                <span class="lbl">Hosted at</span>
+                <span class="val">Highland Circle <span class="sub">· Dhokali</span></span>
+              </div>
+            </div>
+
+            <div class="latest-sponsors">
+              <span class="lbl">Brands present</span>
+              <span class="sponsor-chip">Pickledeck</span>
+              <span class="sponsor-chip">Wholy</span>
+              <span class="sponsor-chip">Yourplug</span>
+            </div>
+
+            <div class="comments">
+              <div class="comments-head">Top comments from the post</div>
+
+              <div class="comment">
+                <div class="c-avatar">K</div>
+                <div class="c-body">
+                  <div class="user">@kala_mulga</div>
+                  <div class="text italic">"@rukna.manahai Run 42"</div>
+                </div>
+                <div class="c-meta"><span class="heart">♥</span>1</div>
+              </div>
+
+              <div class="comment">
+                <div class="c-avatar red">S</div>
+                <div class="c-body">
+                  <div class="user">@smitthakkarrr</div>
+                  <div class="text italic">"Looks like fire 🔥🔥"</div>
+                </div>
+                <div class="c-meta"><span class="heart">♥</span>1</div>
+              </div>
+
+              <div class="comment">
+                <div class="c-avatar">H</div>
+                <div class="c-body">
+                  <div class="user">@harsh_ghawale2000</div>
+                  <div class="text italic">"Run 42"</div>
+                </div>
+                <div class="c-meta"><span class="heart">♥</span>1</div>
+              </div>
+            </div>
+
+            <div class="latest-foot">
+              <div class="left">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.2c3.2 0 3.6 0 4.8.06 1.2.06 1.85.25 2.28.42.57.22.98.49 1.41.92.43.43.7.84.92 1.41.17.43.36 1.08.42 2.28.06 1.2.06 1.6.06 4.8s0 3.6-.06 4.8c-.06 1.2-.25 1.85-.42 2.28-.22.57-.49.98-.92 1.41-.43.43-.84.7-1.41.92-.43.17-1.08.36-2.28.42-1.2.06-1.6.06-4.8.06s-3.6 0-4.8-.06c-1.2-.06-1.85-.25-2.28-.42-.57-.22-.98-.49-1.41-.92-.43-.43-.7-.84-.92-1.41-.17-.43-.36-1.08-.42-2.28C2.2 15.6 2.2 15.2 2.2 12s0-3.6.06-4.8c.06-1.2.25-1.85.42-2.28.22-.57.49-.98.92-1.41.43-.43.84-.7 1.41-.92.43-.17 1.08-.36 2.28-.42C8.4 2.2 8.8 2.2 12 2.2zm0 3.04A4.96 4.96 0 1 1 7.04 12 4.96 4.96 0 0 1 12 7.04zm0 8.18A3.22 3.22 0 1 0 8.78 12 3.22 3.22 0 0 0 12 15.22z"/></svg>
+                Sourced from Instagram
+              </div>
+              <a href="https://www.instagram.com/p/DXJqQHpjG8w/" target="_blank" rel="noopener noreferrer" class="btn-link">View original ›</a>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <!-- 4. PAST RUNS (with inline comments + recap "after") -->
+      <section class="section">
+        <div class="section-head">
+          <h2>Past runs</h2>
+          <span class="count"><a href="#">See all 16 ›</a></span>
+        </div>
+
+        <div class="timeline">
+
+          <div class="tl-row">
+            <div class="tl-date">10 May</div>
+            <div class="tl-thumb"><img src="https://elnsymmgbfgawysakohc.supabase.co/storage/v1/object/public/media/clubs/rukna-manahai/events/DXzWivKjE4N/cover.jpg" loading="lazy" alt="" /></div>
+            <div class="tl-info">
+              <div class="title">RMH Pool Party</div>
+              <div class="loc">Nitrro Sport &amp; Fitness · Thane East</div>
+              <div class="after"><b>Brands</b> Nitrro · Moha · 3 Sisters</div>
+              <div class="tl-quote">
+                Which date? Looks like 🔥
+                <span class="by">@khansabbar234</span>
+              </div>
+            </div>
+            <div class="tl-right">
+              <span class="tl-tag social">Pool party</span>
+              <a href="https://www.instagram.com/p/DXzWivKjE4N/" target="_blank" rel="noopener noreferrer" class="icon-dot icon-xs" aria-label="View on Instagram">
+                <svg viewBox="0 0 24 24"><path d="M12 2.2c3.2 0 3.6 0 4.8.06 1.2.06 1.85.25 2.28.42.57.22.98.49 1.41.92.43.43.7.84.92 1.41.17.43.36 1.08.42 2.28.06 1.2.06 1.6.06 4.8s0 3.6-.06 4.8c-.06 1.2-.25 1.85-.42 2.28-.22.57-.49.98-.92 1.41-.43.43-.84.7-1.41.92-.43.17-1.08.36-2.28.42-1.2.06-1.6.06-4.8.06s-3.6 0-4.8-.06c-1.2-.06-1.85-.25-2.28-.42-.57-.22-.98-.49-1.41-.92-.43-.43-.7-.84-.92-1.41-.17-.43-.36-1.08-.42-2.28C2.2 15.6 2.2 15.2 2.2 12s0-3.6.06-4.8c.06-1.2.25-1.85.42-2.28.22-.57.49-.98.92-1.41.43-.43.84-.7 1.41-.92.43-.17 1.08-.36 2.28-.42C8.4 2.2 8.8 2.2 12 2.2zm0 3.04A4.96 4.96 0 1 1 7.04 12 4.96 4.96 0 0 1 12 7.04zm0 8.18A3.22 3.22 0 1 0 8.78 12 3.22 3.22 0 0 0 12 15.22z"/></svg>
+              </a>
+            </div>
+          </div>
+
+          <div class="tl-row">
+            <div class="tl-date">03 May</div>
+            <div class="tl-thumb"><img src="https://elnsymmgbfgawysakohc.supabase.co/storage/v1/object/public/media/clubs/rukna-manahai/events/DXtZ0FXDI10/cover.jpg" loading="lazy" alt="" /></div>
+            <div class="tl-info">
+              <div class="title">Run &amp; Smash</div>
+              <div class="loc">Ora Kitchen &amp; Bar · Hiranandani</div>
+              <div class="after"><b>After</b> Post-run badminton · <b>Brands</b> Playo</div>
+              <div class="tl-quote">
+                🔥🔥
+                <span class="by">@amritpal.singh._</span>
+              </div>
+            </div>
+            <div class="tl-right">
+              <span class="tl-tag">5 km</span>
+              <a href="https://www.instagram.com/p/DXtZ0FXDI10/" target="_blank" rel="noopener noreferrer" class="icon-dot icon-xs" aria-label="View on Instagram">
+                <svg viewBox="0 0 24 24"><path d="M12 2.2c3.2 0 3.6 0 4.8.06 1.2.06 1.85.25 2.28.42.57.22.98.49 1.41.92.43.43.7.84.92 1.41.17.43.36 1.08.42 2.28.06 1.2.06 1.6.06 4.8s0 3.6-.06 4.8c-.06 1.2-.25 1.85-.42 2.28-.22.57-.49.98-.92 1.41-.43.43-.84.7-1.41.92-.43.17-1.08.36-2.28.42-1.2.06-1.6.06-4.8.06s-3.6 0-4.8-.06c-1.2-.06-1.85-.25-2.28-.42-.57-.22-.98-.49-1.41-.92-.43-.43-.7-.84-.92-1.41-.17-.43-.36-1.08-.42-2.28C2.2 15.6 2.2 15.2 2.2 12s0-3.6.06-4.8c.06-1.2.25-1.85.42-2.28.22-.57.49-.98.92-1.41.43-.43.84-.7 1.41-.92.43-.17 1.08-.36 2.28-.42C8.4 2.2 8.8 2.2 12 2.2zm0 3.04A4.96 4.96 0 1 1 7.04 12 4.96 4.96 0 0 1 12 7.04zm0 8.18A3.22 3.22 0 1 0 8.78 12 3.22 3.22 0 0 0 12 15.22z"/></svg>
+              </a>
+            </div>
+          </div>
+
+          <div class="tl-row">
+            <div class="tl-date">26 Apr</div>
+            <div class="tl-thumb"><img src="https://elnsymmgbfgawysakohc.supabase.co/storage/v1/object/public/media/clubs/rukna-manahai/events/DXejHl6DPl-/cover.jpg" loading="lazy" alt="" /></div>
+            <div class="tl-info">
+              <div class="title">Week 43 Run</div>
+              <div class="loc">TMC Ground · Hiranandani</div>
+              <div class="after"><b>After</b> Post-run dance cardio · <b>Brands</b> Wholy</div>
+              <div class="tl-quote">
+                How to join?
+                <span class="by">@cni212121</span>
+              </div>
+            </div>
+            <div class="tl-right">
+              <span class="tl-tag">5 km</span>
+              <a href="https://www.instagram.com/p/DXejHl6DPl-/" target="_blank" rel="noopener noreferrer" class="icon-dot icon-xs" aria-label="View on Instagram">
+                <svg viewBox="0 0 24 24"><path d="M12 2.2c3.2 0 3.6 0 4.8.06 1.2.06 1.85.25 2.28.42.57.22.98.49 1.41.92.43.43.7.84.92 1.41.17.43.36 1.08.42 2.28.06 1.2.06 1.6.06 4.8s0 3.6-.06 4.8c-.06 1.2-.25 1.85-.42 2.28-.22.57-.49.98-.92 1.41-.43.43-.84.7-1.41.92-.43.17-1.08.36-2.28.42-1.2.06-1.6.06-4.8.06s-3.6 0-4.8-.06c-1.2-.06-1.85-.25-2.28-.42-.57-.22-.98-.49-1.41-.92-.43-.43-.7-.84-.92-1.41-.17-.43-.36-1.08-.42-2.28C2.2 15.6 2.2 15.2 2.2 12s0-3.6.06-4.8c.06-1.2.25-1.85.42-2.28.22-.57.49-.98.92-1.41.43-.43.84-.7 1.41-.92.43-.17 1.08-.36 2.28-.42C8.4 2.2 8.8 2.2 12 2.2zm0 3.04A4.96 4.96 0 1 1 7.04 12 4.96 4.96 0 0 1 12 7.04zm0 8.18A3.22 3.22 0 1 0 8.78 12 3.22 3.22 0 0 0 12 15.22z"/></svg>
+              </a>
+            </div>
+          </div>
+
+          <div class="tl-row">
+            <div class="tl-date">18 Apr</div>
+            <div class="tl-thumb"><img src="https://elnsymmgbfgawysakohc.supabase.co/storage/v1/object/public/media/clubs/rukna-manahai/events/DXKOqOWDHsI/cover.jpg" loading="lazy" alt="" /></div>
+            <div class="tl-info">
+              <div class="title">CPR Training &amp; Injury Prevention</div>
+              <div class="loc">KIMS Hospitals · Hiranandani</div>
+              <div class="after"><b>Brands</b> KIMS Hospitals</div>
+              <div class="tl-quote">
+                👏👏
+                <span class="by">@amritpal.singh._</span>
+              </div>
+            </div>
+            <div class="tl-right">
+              <span class="tl-tag workshop">Workshop</span>
+              <a href="https://www.instagram.com/p/DXKOqOWDHsI/" target="_blank" rel="noopener noreferrer" class="icon-dot icon-xs" aria-label="View on Instagram">
+                <svg viewBox="0 0 24 24"><path d="M12 2.2c3.2 0 3.6 0 4.8.06 1.2.06 1.85.25 2.28.42.57.22.98.49 1.41.92.43.43.7.84.92 1.41.17.43.36 1.08.42 2.28.06 1.2.06 1.6.06 4.8s0 3.6-.06 4.8c-.06 1.2-.25 1.85-.42 2.28-.22.57-.49.98-.92 1.41-.43.43-.84.7-1.41.92-.43.17-1.08.36-2.28.42-1.2.06-1.6.06-4.8.06s-3.6 0-4.8-.06c-1.2-.06-1.85-.25-2.28-.42-.57-.22-.98-.49-1.41-.92-.43-.43-.7-.84-.92-1.41-.17-.43-.36-1.08-.42-2.28C2.2 15.6 2.2 15.2 2.2 12s0-3.6.06-4.8c.06-1.2.25-1.85.42-2.28.22-.57.49-.98.92-1.41.43-.43.84-.7 1.41-.92.43-.17 1.08-.36 2.28-.42C8.4 2.2 8.8 2.2 12 2.2zm0 3.04A4.96 4.96 0 1 1 7.04 12 4.96 4.96 0 0 1 12 7.04zm0 8.18A3.22 3.22 0 1 0 8.78 12 3.22 3.22 0 0 0 12 15.22z"/></svg>
+              </a>
+            </div>
+          </div>
+
+          <div class="tl-row">
+            <div class="tl-date">12 Apr</div>
+            <div class="tl-thumb"><img src="https://elnsymmgbfgawysakohc.supabase.co/storage/v1/object/public/media/clubs/rukna-manahai/events/DW8HXz3k8ql/cover.jpg" loading="lazy" alt="" /></div>
+            <div class="tl-info">
+              <div class="title">Week 41 Sunday Run</div>
+              <div class="loc">Brunch Bar Cafe · Manpada</div>
+              <div class="after"><b>After</b> Coffee &amp; hangout at Brunch Bar Cafe</div>
+              <div class="tl-quote">
+                🔥😍😍
+                <span class="by">@vinitsikariya</span>
+              </div>
+            </div>
+            <div class="tl-right">
+              <span class="tl-tag">7 km</span>
+              <a href="https://www.instagram.com/p/DW8HXz3k8ql/" target="_blank" rel="noopener noreferrer" class="icon-dot icon-xs" aria-label="View on Instagram">
+                <svg viewBox="0 0 24 24"><path d="M12 2.2c3.2 0 3.6 0 4.8.06 1.2.06 1.85.25 2.28.42.57.22.98.49 1.41.92.43.43.7.84.92 1.41.17.43.36 1.08.42 2.28.06 1.2.06 1.6.06 4.8s0 3.6-.06 4.8c-.06 1.2-.25 1.85-.42 2.28-.22.57-.49.98-.92 1.41-.43.43-.84.7-1.41.92-.43.17-1.08.36-2.28.42-1.2.06-1.6.06-4.8.06s-3.6 0-4.8-.06c-1.2-.06-1.85-.25-2.28-.42-.57-.22-.98-.49-1.41-.92-.43-.43-.7-.84-.92-1.41-.17-.43-.36-1.08-.42-2.28C2.2 15.6 2.2 15.2 2.2 12s0-3.6.06-4.8c.06-1.2.25-1.85.42-2.28.22-.57.49-.98.92-1.41.43-.43.84-.7 1.41-.92.43-.17 1.08-.36 2.28-.42C8.4 2.2 8.8 2.2 12 2.2zm0 3.04A4.96 4.96 0 1 1 7.04 12 4.96 4.96 0 0 1 12 7.04zm0 8.18A3.22 3.22 0 1 0 8.78 12 3.22 3.22 0 0 0 12 15.22z"/></svg>
+              </a>
+            </div>
+          </div>
+
+          <div class="tl-row">
+            <div class="tl-date">04 Apr</div>
+            <div class="tl-thumb"><img src="https://elnsymmgbfgawysakohc.supabase.co/storage/v1/object/public/media/clubs/rukna-manahai/events/DWpE3-hjF4V/cover.jpg" loading="lazy" alt="" /></div>
+            <div class="tl-info">
+              <div class="title">Night Run &amp; Pickleball</div>
+              <div class="loc">Subway · Pawar Nagar</div>
+              <div class="after"><b>After</b> Midnight pickleball · <b>Brands</b> Common Grounds</div>
+            </div>
+            <div class="tl-right">
+              <span class="tl-tag">3 km</span>
+              <a href="https://www.instagram.com/p/DWpE3-hjF4V/" target="_blank" rel="noopener noreferrer" class="icon-dot icon-xs" aria-label="View on Instagram">
+                <svg viewBox="0 0 24 24"><path d="M12 2.2c3.2 0 3.6 0 4.8.06 1.2.06 1.85.25 2.28.42.57.22.98.49 1.41.92.43.43.7.84.92 1.41.17.43.36 1.08.42 2.28.06 1.2.06 1.6.06 4.8s0 3.6-.06 4.8c-.06 1.2-.25 1.85-.42 2.28-.22.57-.49.98-.92 1.41-.43.43-.84.7-1.41.92-.43.17-1.08.36-2.28.42-1.2.06-1.6.06-4.8.06s-3.6 0-4.8-.06c-1.2-.06-1.85-.25-2.28-.42-.57-.22-.98-.49-1.41-.92-.43-.43-.7-.84-.92-1.41-.17-.43-.36-1.08-.42-2.28C2.2 15.6 2.2 15.2 2.2 12s0-3.6.06-4.8c.06-1.2.25-1.85.42-2.28.22-.57.49-.98.92-1.41.43-.43.84-.7 1.41-.92.43-.17 1.08-.36 2.28-.42C8.4 2.2 8.8 2.2 12 2.2zm0 3.04A4.96 4.96 0 1 1 7.04 12 4.96 4.96 0 0 1 12 7.04zm0 8.18A3.22 3.22 0 1 0 8.78 12 3.22 3.22 0 0 0 12 15.22z"/></svg>
+              </a>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="past-more">
+          <button class="btn btn-ghost btn-sm">Show 10 more runs</button>
+        </div>
+      </section>
+
+      <!-- 5. COMMUNITY VOICES -->
+      <section class="section">
+        <div class="section-head">
+          <h2>From the community</h2>
+          <span class="count">Comments on RMH runs</span>
+        </div>
+        <div class="voices">
+          <div class="voice">
+            <div class="q">Any membership we need to take to join this community?</div>
+            <div class="from">
+              <span class="who">@suyog_patne</span>
+              <span class="where">· Run &amp; Smash Sunday</span>
+            </div>
+          </div>
+          <div class="voice">
+            <div class="q">Getting the best networking vibes already 🫂🤌🏻</div>
+            <div class="from">
+              <span class="who">@prathameshhshetye</span>
+              <span class="where">· Pickleball Socials</span>
+            </div>
+          </div>
+          <div class="voice">
+            <div class="q">WHY on a Saturday 😅 was waiting for one of your Sunday runs.</div>
+            <div class="from">
+              <span class="who">@puja_nvogue</span>
+              <span class="where">· Exclusive Run</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 6. PARTNERS & SPONSORS -->
+      <section class="section">
+        <div class="section-head">
+          <h2>Partners &amp; sponsors</h2>
+          <span class="count">15 brands · spotted on Instagram</span>
+        </div>
+        <div class="partners-grid">
+
+          <div class="partner-cell">
+            <div class="partner-info">
+              <div class="partner-name">Playo</div>
+              <div class="partner-handle">Sports community partner</div>
+              <div class="partner-role">Spotted at Run &amp; Smash</div>
+            </div>
+            <a href="https://www.instagram.com/p/DXtZ0FXDI10/" target="_blank" rel="noopener noreferrer" class="partner-link" aria-label="Spotted at">
+              <svg viewBox="0 0 24 24"><path d="M12 2.2c3.2 0 3.6 0 4.8.06 1.2.06 1.85.25 2.28.42.57.22.98.49 1.41.92.43.43.7.84.92 1.41.17.43.36 1.08.42 2.28.06 1.2.06 1.6.06 4.8s0 3.6-.06 4.8c-.06 1.2-.25 1.85-.42 2.28-.22.57-.49.98-.92 1.41-.43.43-.84.7-1.41.92-.43.17-1.08.36-2.28.42-1.2.06-1.6.06-4.8.06s-3.6 0-4.8-.06c-1.2-.06-1.85-.25-2.28-.42-.57-.22-.98-.49-1.41-.92-.43-.43-.7-.84-.92-1.41-.17-.43-.36-1.08-.42-2.28C2.2 15.6 2.2 15.2 2.2 12s0-3.6.06-4.8c.06-1.2.25-1.85.42-2.28.22-.57.49-.98.92-1.41.43-.43.84-.7 1.41-.92.43-.17 1.08-.36 2.28-.42C8.4 2.2 8.8 2.2 12 2.2zm0 3.04A4.96 4.96 0 1 1 7.04 12 4.96 4.96 0 0 1 12 7.04zm0 8.18A3.22 3.22 0 1 0 8.78 12 3.22 3.22 0 0 0 12 15.22z"/></svg>
+            </a>
+          </div>
+
+          <div class="partner-cell">
+            <div class="partner-info">
+              <div class="partner-name">The Fit Playce</div>
+              <div class="partner-handle">@fit.playce</div>
+              <div class="partner-role">Partner</div>
+            </div>
+            <a href="https://www.instagram.com/p/DU5TL0oDNA5/" target="_blank" rel="noopener noreferrer" class="partner-link" aria-label="Spotted at"><svg viewBox="0 0 24 24"><path d="M12 2.2c3.2 0 3.6 0 4.8.06 1.2.06 1.85.25 2.28.42.57.22.98.49 1.41.92.43.43.7.84.92 1.41.17.43.36 1.08.42 2.28.06 1.2.06 1.6.06 4.8s0 3.6-.06 4.8c-.06 1.2-.25 1.85-.42 2.28-.22.57-.49.98-.92 1.41-.43.43-.84.7-1.41.92-.43.17-1.08.36-2.28.42-1.2.06-1.6.06-4.8.06s-3.6 0-4.8-.06c-1.2-.06-1.85-.25-2.28-.42-.57-.22-.98-.49-1.41-.92-.43-.43-.7-.84-.92-1.41-.17-.43-.36-1.08-.42-2.28C2.2 15.6 2.2 15.2 2.2 12s0-3.6.06-4.8c.06-1.2.25-1.85.42-2.28.22-.57.49-.98.92-1.41.43-.43.84-.7 1.41-.92.43-.17 1.08-.36 2.28-.42C8.4 2.2 8.8 2.2 12 2.2zm0 3.04A4.96 4.96 0 1 1 7.04 12 4.96 4.96 0 0 1 12 7.04zm0 8.18A3.22 3.22 0 1 0 8.78 12 3.22 3.22 0 0 0 12 15.22z"/></svg></a>
+          </div>
+
+          <div class="partner-cell">
+            <div class="partner-info">
+              <div class="partner-name">Reebok</div>
+              <div class="partner-handle">@reebokindia</div>
+              <div class="partner-role">Partner · Week 46</div>
+            </div>
+            <a href="https://www.instagram.com/p/DYUvKwhMMmU/" target="_blank" rel="noopener noreferrer" class="partner-link"><svg viewBox="0 0 24 24"><path d="M12 2.2c3.2 0 3.6 0 4.8.06 1.2.06 1.85.25 2.28.42.57.22.98.49 1.41.92.43.43.7.84.92 1.41.17.43.36 1.08.42 2.28.06 1.2.06 1.6.06 4.8s0 3.6-.06 4.8c-.06 1.2-.25 1.85-.42 2.28-.22.57-.49.98-.92 1.41-.43.43-.84.7-1.41.92-.43.17-1.08.36-2.28.42-1.2.06-1.6.06-4.8.06s-3.6 0-4.8-.06c-1.2-.06-1.85-.25-2.28-.42-.57-.22-.98-.49-1.41-.92-.43-.43-.7-.84-.92-1.41-.17-.43-.36-1.08-.42-2.28C2.2 15.6 2.2 15.2 2.2 12s0-3.6.06-4.8c.06-1.2.25-1.85.42-2.28.22-.57.49-.98.92-1.41.43-.43.84-.7 1.41-.92.43-.17 1.08-.36 2.28-.42C8.4 2.2 8.8 2.2 12 2.2zm0 3.04A4.96 4.96 0 1 1 7.04 12 4.96 4.96 0 0 1 12 7.04zm0 8.18A3.22 3.22 0 1 0 8.78 12 3.22 3.22 0 0 0 12 15.22z"/></svg></a>
+          </div>
+
+          <div class="partner-cell">
+            <div class="partner-info">
+              <div class="partner-name">KIMS Hospitals</div>
+              <div class="partner-handle">@kimshospitals</div>
+              <div class="partner-role">Health partner · Workshop</div>
+            </div>
+            <a href="https://www.instagram.com/p/DXKOqOWDHsI/" target="_blank" rel="noopener noreferrer" class="partner-link"><svg viewBox="0 0 24 24"><path d="M12 2.2c3.2 0 3.6 0 4.8.06 1.2.06 1.85.25 2.28.42.57.22.98.49 1.41.92.43.43.7.84.92 1.41.17.43.36 1.08.42 2.28.06 1.2.06 1.6.06 4.8s0 3.6-.06 4.8c-.06 1.2-.25 1.85-.42 2.28-.22.57-.49.98-.92 1.41-.43.43-.84.7-1.41.92-.43.17-1.08.36-2.28.42-1.2.06-1.6.06-4.8.06s-3.6 0-4.8-.06c-1.2-.06-1.85-.25-2.28-.42-.57-.22-.98-.49-1.41-.92-.43-.43-.7-.84-.92-1.41-.17-.43-.36-1.08-.42-2.28C2.2 15.6 2.2 15.2 2.2 12s0-3.6.06-4.8c.06-1.2.25-1.85.42-2.28.22-.57.49-.98.92-1.41.43-.43.84-.7 1.41-.92.43-.17 1.08-.36 2.28-.42C8.4 2.2 8.8 2.2 12 2.2zm0 3.04A4.96 4.96 0 1 1 7.04 12 4.96 4.96 0 0 1 12 7.04zm0 8.18A3.22 3.22 0 1 0 8.78 12 3.22 3.22 0 0 0 12 15.22z"/></svg></a>
+          </div>
+
+          <div class="partner-cell">
+            <div class="partner-info">
+              <div class="partner-name">Pickledeck</div>
+              <div class="partner-handle">@pickledeck</div>
+              <div class="partner-role">Venue partner</div>
+            </div>
+            <a href="https://www.instagram.com/p/DXJqQHpjG8w/" target="_blank" rel="noopener noreferrer" class="partner-link"><svg viewBox="0 0 24 24"><path d="M12 2.2c3.2 0 3.6 0 4.8.06 1.2.06 1.85.25 2.28.42.57.22.98.49 1.41.92.43.43.7.84.92 1.41.17.43.36 1.08.42 2.28.06 1.2.06 1.6.06 4.8s0 3.6-.06 4.8c-.06 1.2-.25 1.85-.42 2.28-.22.57-.49.98-.92 1.41-.43.43-.84.7-1.41.92-.43.17-1.08.36-2.28.42-1.2.06-1.6.06-4.8.06s-3.6 0-4.8-.06c-1.2-.06-1.85-.25-2.28-.42-.57-.22-.98-.49-1.41-.92-.43-.43-.7-.84-.92-1.41-.17-.43-.36-1.08-.42-2.28C2.2 15.6 2.2 15.2 2.2 12s0-3.6.06-4.8c.06-1.2.25-1.85.42-2.28.22-.57.49-.98.92-1.41.43-.43.84-.7 1.41-.92.43-.17 1.08-.36 2.28-.42C8.4 2.2 8.8 2.2 12 2.2zm0 3.04A4.96 4.96 0 1 1 7.04 12 4.96 4.96 0 0 1 12 7.04zm0 8.18A3.22 3.22 0 1 0 8.78 12 3.22 3.22 0 0 0 12 15.22z"/></svg></a>
+          </div>
+
+          <div class="partner-cell">
+            <div class="partner-info">
+              <div class="partner-name">Pickle Adda</div>
+              <div class="partner-handle">@_pickleadda</div>
+              <div class="partner-role">Partner</div>
+            </div>
+            <a href="https://www.instagram.com/p/DWT8wRVjL23/" target="_blank" rel="noopener noreferrer" class="partner-link"><svg viewBox="0 0 24 24"><path d="M12 2.2c3.2 0 3.6 0 4.8.06 1.2.06 1.85.25 2.28.42.57.22.98.49 1.41.92.43.43.7.84.92 1.41.17.43.36 1.08.42 2.28.06 1.2.06 1.6.06 4.8s0 3.6-.06 4.8c-.06 1.2-.25 1.85-.42 2.28-.22.57-.49.98-.92 1.41-.43.43-.84.7-1.41.92-.43.17-1.08.36-2.28.42-1.2.06-1.6.06-4.8.06s-3.6 0-4.8-.06c-1.2-.06-1.85-.25-2.28-.42-.57-.22-.98-.49-1.41-.92-.43-.43-.7-.84-.92-1.41-.17-.43-.36-1.08-.42-2.28C2.2 15.6 2.2 15.2 2.2 12s0-3.6.06-4.8c.06-1.2.25-1.85.42-2.28.22-.57.49-.98.92-1.41.43-.43.84-.7 1.41-.92.43-.17 1.08-.36 2.28-.42C8.4 2.2 8.8 2.2 12 2.2zm0 3.04A4.96 4.96 0 1 1 7.04 12 4.96 4.96 0 0 1 12 7.04zm0 8.18A3.22 3.22 0 1 0 8.78 12 3.22 3.22 0 0 0 12 15.22z"/></svg></a>
+          </div>
+
+          <div class="partner-cell">
+            <div class="partner-info">
+              <div class="partner-name">Pickle Haus</div>
+              <div class="partner-handle">@_picklehaus_</div>
+              <div class="partner-role">Partner · Socials</div>
+            </div>
+            <a href="https://www.instagram.com/p/DYg8FP1MA1r/" target="_blank" rel="noopener noreferrer" class="partner-link"><svg viewBox="0 0 24 24"><path d="M12 2.2c3.2 0 3.6 0 4.8.06 1.2.06 1.85.25 2.28.42.57.22.98.49 1.41.92.43.43.7.84.92 1.41.17.43.36 1.08.42 2.28.06 1.2.06 1.6.06 4.8s0 3.6-.06 4.8c-.06 1.2-.25 1.85-.42 2.28-.22.57-.49.98-.92 1.41-.43.43-.84.7-1.41.92-.43.17-1.08.36-2.28.42-1.2.06-1.6.06-4.8.06s-3.6 0-4.8-.06c-1.2-.06-1.85-.25-2.28-.42-.57-.22-.98-.49-1.41-.92-.43-.43-.7-.84-.92-1.41-.17-.43-.36-1.08-.42-2.28C2.2 15.6 2.2 15.2 2.2 12s0-3.6.06-4.8c.06-1.2.25-1.85.42-2.28.22-.57.49-.98.92-1.41.43-.43.84-.7 1.41-.92.43-.17 1.08-.36 2.28-.42C8.4 2.2 8.8 2.2 12 2.2zm0 3.04A4.96 4.96 0 1 1 7.04 12 4.96 4.96 0 0 1 12 7.04zm0 8.18A3.22 3.22 0 1 0 8.78 12 3.22 3.22 0 0 0 12 15.22z"/></svg></a>
+          </div>
+
+          <div class="partner-cell">
+            <div class="partner-info">
+              <div class="partner-name">Nitrro Sport &amp; Fitness</div>
+              <div class="partner-handle">@nitrro_thaneeast</div>
+              <div class="partner-role">Venue partner · Pool party</div>
+            </div>
+            <a href="https://www.instagram.com/p/DXzWivKjE4N/" target="_blank" rel="noopener noreferrer" class="partner-link"><svg viewBox="0 0 24 24"><path d="M12 2.2c3.2 0 3.6 0 4.8.06 1.2.06 1.85.25 2.28.42.57.22.98.49 1.41.92.43.43.7.84.92 1.41.17.43.36 1.08.42 2.28.06 1.2.06 1.6.06 4.8s0 3.6-.06 4.8c-.06 1.2-.25 1.85-.42 2.28-.22.57-.49.98-.92 1.41-.43.43-.84.7-1.41.92-.43.17-1.08.36-2.28.42-1.2.06-1.6.06-4.8.06s-3.6 0-4.8-.06c-1.2-.06-1.85-.25-2.28-.42-.57-.22-.98-.49-1.41-.92-.43-.43-.7-.84-.92-1.41-.17-.43-.36-1.08-.42-2.28C2.2 15.6 2.2 15.2 2.2 12s0-3.6.06-4.8c.06-1.2.25-1.85.42-2.28.22-.57.49-.98.92-1.41.43-.43.84-.7 1.41-.92.43-.17 1.08-.36 2.28-.42C8.4 2.2 8.8 2.2 12 2.2zm0 3.04A4.96 4.96 0 1 1 7.04 12 4.96 4.96 0 0 1 12 7.04zm0 8.18A3.22 3.22 0 1 0 8.78 12 3.22 3.22 0 0 0 12 15.22z"/></svg></a>
+          </div>
+
+          <div class="partner-cell">
+            <div class="partner-info">
+              <div class="partner-name">Wholy</div>
+              <div class="partner-handle">@wholy.in</div>
+              <div class="partner-role">Snack partner</div>
+            </div>
+            <a href="https://www.instagram.com/p/DXJqQHpjG8w/" target="_blank" rel="noopener noreferrer" class="partner-link"><svg viewBox="0 0 24 24"><path d="M12 2.2c3.2 0 3.6 0 4.8.06 1.2.06 1.85.25 2.28.42.57.22.98.49 1.41.92.43.43.7.84.92 1.41.17.43.36 1.08.42 2.28.06 1.2.06 1.6.06 4.8s0 3.6-.06 4.8c-.06 1.2-.25 1.85-.42 2.28-.22.57-.49.98-.92 1.41-.43.43-.84.7-1.41.92-.43.17-1.08.36-2.28.42-1.2.06-1.6.06-4.8.06s-3.6 0-4.8-.06c-1.2-.06-1.85-.25-2.28-.42-.57-.22-.98-.49-1.41-.92-.43-.43-.7-.84-.92-1.41-.17-.43-.36-1.08-.42-2.28C2.2 15.6 2.2 15.2 2.2 12s0-3.6.06-4.8c.06-1.2.25-1.85.42-2.28.22-.57.49-.98.92-1.41.43-.43.84-.7 1.41-.92.43-.17 1.08-.36 2.28-.42C8.4 2.2 8.8 2.2 12 2.2zm0 3.04A4.96 4.96 0 1 1 7.04 12 4.96 4.96 0 0 1 12 7.04zm0 8.18A3.22 3.22 0 1 0 8.78 12 3.22 3.22 0 0 0 12 15.22z"/></svg></a>
+          </div>
+
+          <div class="partner-cell">
+            <div class="partner-info">
+              <div class="partner-name">Yourplug</div>
+              <div class="partner-handle">@yourplug.life</div>
+              <div class="partner-role">Energy partner</div>
+            </div>
+            <a href="https://www.instagram.com/p/DXJqQHpjG8w/" target="_blank" rel="noopener noreferrer" class="partner-link"><svg viewBox="0 0 24 24"><path d="M12 2.2c3.2 0 3.6 0 4.8.06 1.2.06 1.85.25 2.28.42.57.22.98.49 1.41.92.43.43.7.84.92 1.41.17.43.36 1.08.42 2.28.06 1.2.06 1.6.06 4.8s0 3.6-.06 4.8c-.06 1.2-.25 1.85-.42 2.28-.22.57-.49.98-.92 1.41-.43.43-.84.7-1.41.92-.43.17-1.08.36-2.28.42-1.2.06-1.6.06-4.8.06s-3.6 0-4.8-.06c-1.2-.06-1.85-.25-2.28-.42-.57-.22-.98-.49-1.41-.92-.43-.43-.7-.84-.92-1.41-.17-.43-.36-1.08-.42-2.28C2.2 15.6 2.2 15.2 2.2 12s0-3.6.06-4.8c.06-1.2.25-1.85.42-2.28.22-.57.49-.98.92-1.41.43-.43.84-.7 1.41-.92.43-.17 1.08-.36 2.28-.42C8.4 2.2 8.8 2.2 12 2.2zm0 3.04A4.96 4.96 0 1 1 7.04 12 4.96 4.96 0 0 1 12 7.04zm0 8.18A3.22 3.22 0 1 0 8.78 12 3.22 3.22 0 0 0 12 15.22z"/></svg></a>
+          </div>
+
+          <div class="partner-cell">
+            <div class="partner-info">
+              <div class="partner-name">3 Sisters</div>
+              <div class="partner-handle">@3sistersdrinks</div>
+              <div class="partner-role">Refreshment partner</div>
+            </div>
+            <a href="https://www.instagram.com/p/DXzWivKjE4N/" target="_blank" rel="noopener noreferrer" class="partner-link"><svg viewBox="0 0 24 24"><path d="M12 2.2c3.2 0 3.6 0 4.8.06 1.2.06 1.85.25 2.28.42.57.22.98.49 1.41.92.43.43.7.84.92 1.41.17.43.36 1.08.42 2.28.06 1.2.06 1.6.06 4.8s0 3.6-.06 4.8c-.06 1.2-.25 1.85-.42 2.28-.22.57-.49.98-.92 1.41-.43.43-.84.7-1.41.92-.43.17-1.08.36-2.28.42-1.2.06-1.6.06-4.8.06s-3.6 0-4.8-.06c-1.2-.06-1.85-.25-2.28-.42-.57-.22-.98-.49-1.41-.92-.43-.43-.7-.84-.92-1.41-.17-.43-.36-1.08-.42-2.28C2.2 15.6 2.2 15.2 2.2 12s0-3.6.06-4.8c.06-1.2.25-1.85.42-2.28.22-.57.49-.98.92-1.41.43-.43.84-.7 1.41-.92.43-.17 1.08-.36 2.28-.42C8.4 2.2 8.8 2.2 12 2.2zm0 3.04A4.96 4.96 0 1 1 7.04 12 4.96 4.96 0 0 1 12 7.04zm0 8.18A3.22 3.22 0 1 0 8.78 12 3.22 3.22 0 0 0 12 15.22z"/></svg></a>
+          </div>
+
+          <div class="partner-cell">
+            <div class="partner-info">
+              <div class="partner-name">Moha</div>
+              <div class="partner-handle">—</div>
+              <div class="partner-role">Skincare partner</div>
+            </div>
+            <a href="https://www.instagram.com/p/DXzWivKjE4N/" target="_blank" rel="noopener noreferrer" class="partner-link"><svg viewBox="0 0 24 24"><path d="M12 2.2c3.2 0 3.6 0 4.8.06 1.2.06 1.85.25 2.28.42.57.22.98.49 1.41.92.43.43.7.84.92 1.41.17.43.36 1.08.42 2.28.06 1.2.06 1.6.06 4.8s0 3.6-.06 4.8c-.06 1.2-.25 1.85-.42 2.28-.22.57-.49.98-.92 1.41-.43.43-.84.7-1.41.92-.43.17-1.08.36-2.28.42-1.2.06-1.6.06-4.8.06s-3.6 0-4.8-.06c-1.2-.06-1.85-.25-2.28-.42-.57-.22-.98-.49-1.41-.92-.43-.43-.7-.84-.92-1.41-.17-.43-.36-1.08-.42-2.28C2.2 15.6 2.2 15.2 2.2 12s0-3.6.06-4.8c.06-1.2.25-1.85.42-2.28.22-.57.49-.98.92-1.41.43-.43.84-.7 1.41-.92.43-.17 1.08-.36 2.28-.42C8.4 2.2 8.8 2.2 12 2.2zm0 3.04A4.96 4.96 0 1 1 7.04 12 4.96 4.96 0 0 1 12 7.04zm0 8.18A3.22 3.22 0 1 0 8.78 12 3.22 3.22 0 0 0 12 15.22z"/></svg></a>
+          </div>
+
+          <div class="partner-cell">
+            <div class="partner-info">
+              <div class="partner-name">Common Grounds</div>
+              <div class="partner-handle">@commongrounds.in</div>
+              <div class="partner-role">Partner · Night run</div>
+            </div>
+            <a href="https://www.instagram.com/p/DWpE3-hjF4V/" target="_blank" rel="noopener noreferrer" class="partner-link"><svg viewBox="0 0 24 24"><path d="M12 2.2c3.2 0 3.6 0 4.8.06 1.2.06 1.85.25 2.28.42.57.22.98.49 1.41.92.43.43.7.84.92 1.41.17.43.36 1.08.42 2.28.06 1.2.06 1.6.06 4.8s0 3.6-.06 4.8c-.06 1.2-.25 1.85-.42 2.28-.22.57-.49.98-.92 1.41-.43.43-.84.7-1.41.92-.43.17-1.08.36-2.28.42-1.2.06-1.6.06-4.8.06s-3.6 0-4.8-.06c-1.2-.06-1.85-.25-2.28-.42-.57-.22-.98-.49-1.41-.92-.43-.43-.7-.84-.92-1.41-.17-.43-.36-1.08-.42-2.28C2.2 15.6 2.2 15.2 2.2 12s0-3.6.06-4.8c.06-1.2.25-1.85.42-2.28.22-.57.49-.98.92-1.41.43-.43.84-.7 1.41-.92.43-.17 1.08-.36 2.28-.42C8.4 2.2 8.8 2.2 12 2.2zm0 3.04A4.96 4.96 0 1 1 7.04 12 4.96 4.96 0 0 1 12 7.04zm0 8.18A3.22 3.22 0 1 0 8.78 12 3.22 3.22 0 0 0 12 15.22z"/></svg></a>
+          </div>
+
+          <div class="partner-cell">
+            <div class="partner-info">
+              <div class="partner-name">Lake Shore Thane</div>
+              <div class="partner-handle">@lakeshorethane</div>
+              <div class="partner-role">Partner · Socials venue</div>
+            </div>
+            <a href="https://www.instagram.com/p/DYg8FP1MA1r/" target="_blank" rel="noopener noreferrer" class="partner-link"><svg viewBox="0 0 24 24"><path d="M12 2.2c3.2 0 3.6 0 4.8.06 1.2.06 1.85.25 2.28.42.57.22.98.49 1.41.92.43.43.7.84.92 1.41.17.43.36 1.08.42 2.28.06 1.2.06 1.6.06 4.8s0 3.6-.06 4.8c-.06 1.2-.25 1.85-.42 2.28-.22.57-.49.98-.92 1.41-.43.43-.84.7-1.41.92-.43.17-1.08.36-2.28.42-1.2.06-1.6.06-4.8.06s-3.6 0-4.8-.06c-1.2-.06-1.85-.25-2.28-.42-.57-.22-.98-.49-1.41-.92-.43-.43-.7-.84-.92-1.41-.17-.43-.36-1.08-.42-2.28C2.2 15.6 2.2 15.2 2.2 12s0-3.6.06-4.8c.06-1.2.25-1.85.42-2.28.22-.57.49-.98.92-1.41.43-.43.84-.7 1.41-.92.43-.17 1.08-.36 2.28-.42C8.4 2.2 8.8 2.2 12 2.2zm0 3.04A4.96 4.96 0 1 1 7.04 12 4.96 4.96 0 0 1 12 7.04zm0 8.18A3.22 3.22 0 1 0 8.78 12 3.22 3.22 0 0 0 12 15.22z"/></svg></a>
+          </div>
+
+          <div class="partner-cell">
+            <div class="partner-info">
+              <div class="partner-name">Devgn Cinex</div>
+              <div class="partner-handle">@devgncinex</div>
+              <div class="partner-role">Partner · Exclusive run</div>
+            </div>
+            <a href="https://www.instagram.com/p/DWWyOyGjIqT/" target="_blank" rel="noopener noreferrer" class="partner-link"><svg viewBox="0 0 24 24"><path d="M12 2.2c3.2 0 3.6 0 4.8.06 1.2.06 1.85.25 2.28.42.57.22.98.49 1.41.92.43.43.7.84.92 1.41.17.43.36 1.08.42 2.28.06 1.2.06 1.6.06 4.8s0 3.6-.06 4.8c-.06 1.2-.25 1.85-.42 2.28-.22.57-.49.98-.92 1.41-.43.43-.84.7-1.41.92-.43.17-1.08.36-2.28.42-1.2.06-1.6.06-4.8.06s-3.6 0-4.8-.06c-1.2-.06-1.85-.25-2.28-.42-.57-.22-.98-.49-1.41-.92-.43-.43-.7-.84-.92-1.41-.17-.43-.36-1.08-.42-2.28C2.2 15.6 2.2 15.2 2.2 12s0-3.6.06-4.8c.06-1.2.25-1.85.42-2.28.22-.57.49-.98.92-1.41.43-.43.84-.7 1.41-.92.43-.17 1.08-.36 2.28-.42C8.4 2.2 8.8 2.2 12 2.2zm0 3.04A4.96 4.96 0 1 1 7.04 12 4.96 4.96 0 0 1 12 7.04zm0 8.18A3.22 3.22 0 1 0 8.78 12 3.22 3.22 0 0 0 12 15.22z"/></svg></a>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- APP CTA -->
+      <section class="app-cta">
+        <div>
+          <h3>Get reminders for <span class="italic">RMH</span> runs.</h3>
+          <p>Install Endorfin to RSVP, get notified, and track your training.</p>
+        </div>
+        <div class="app-buttons">
+          <a href="#" class="btn btn-light">App Store</a>
+          <a href="#" class="btn btn-primary">Google Play</a>
+        </div>
+      </section>
+
+    </div>
+  </div>
+
+  <div class="foot">© Endorfin · /clubs/rukna-manahai</div>
+</main>
+
+</body>
+</html>
