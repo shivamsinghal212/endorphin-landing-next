@@ -79,15 +79,13 @@ function primaryDistance(r: ApiEvent) {
   return DISTANCE_LABELS[first.toUpperCase().replace(/\s+/g, '')] || first;
 }
 
-// ─── Register CTA button — auth-gated, mirrors /running-events CtaButton ─────
+// ─── Register CTA button — mirrors /running-events CtaButton ─────
 
 function RegisterButton({
   race,
-  isAuthed,
   onLoginNeeded,
 }: {
   race: ApiEvent;
-  isAuthed: boolean;
   onLoginNeeded: (race: ApiEvent, pendingUrl?: string) => void;
 }) {
   const cta = couponCta(race);
@@ -103,7 +101,9 @@ function RegisterButton({
   if (cta.intent === 'tbd') {
     return <span className={cls} style={{ opacity: 0.55 }}>{cta.label}</span>;
   }
-  const needsLogin = cta.intent === 'login' || (cta.intent === 'register' && !isAuthed);
+  // Plain Register on external events opens directly; only coupon-unlock
+  // still routes through login (the discount is the value exchange).
+  const needsLogin = cta.intent === 'login';
   if (needsLogin) {
     return (
       <button
@@ -137,11 +137,9 @@ function RegisterButton({
 
 function RaceCard({
   r,
-  isAuthed,
   onLoginNeeded,
 }: {
   r: ApiEvent;
-  isAuthed: boolean;
   onLoginNeeded: (race: ApiEvent, pendingUrl?: string) => void;
 }) {
   const title = normalizeTitle(r.title);
@@ -207,7 +205,7 @@ function RaceCard({
           <Link href={detailHref} className="v1r-race-action v1r-race-action-ghost">
             Show details
           </Link>
-          <RegisterButton race={r} isAuthed={isAuthed} onLoginNeeded={onLoginNeeded} />
+          <RegisterButton race={r} onLoginNeeded={onLoginNeeded} />
         </div>
       )}
     </div>
@@ -218,10 +216,8 @@ function RaceCard({
 
 export default function RaceCardsList({
   races,
-  isAuthed,
 }: {
   races: ApiEvent[];
-  isAuthed: boolean;
 }) {
   const router = useRouter();
   const [loginRace, setLoginRace] = useState<ApiEvent | null>(null);
@@ -261,7 +257,6 @@ export default function RaceCardsList({
           <RaceCard
             key={r.id}
             r={r}
-            isAuthed={isAuthed}
             onLoginNeeded={handleLoginNeeded}
           />
         ))}

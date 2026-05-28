@@ -190,7 +190,7 @@ export default async function RacesPage() {
       />
       <Header />
       <div className="v1-races-page">
-        <RacesView races={races} isAuthed={!!token} />
+        <RacesView races={races} />
       </div>
       <Footer />
     </main>

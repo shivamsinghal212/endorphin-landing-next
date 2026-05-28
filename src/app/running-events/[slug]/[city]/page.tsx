@@ -4,7 +4,6 @@ import { notFound } from 'next/navigation';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { API_BASE } from '@/lib/api';
-import { getSessionToken } from '@/lib/session';
 import type { ApiEvent } from '@/app/running-events/page';
 import RaceCardsList from './RaceCardsList';
 import {
@@ -206,8 +205,7 @@ export default async function RaceCityScopePage({ params }: RouteParams) {
   const scopeRes = getRaceScopeMeta(slug);
   if (!cityPage || !scopeRes) notFound();
 
-  const [allRaces, token] = await Promise.all([getRaces(), getSessionToken()]);
-  const isAuthed = !!token;
+  const allRaces = await getRaces();
   const races = filterRacesForCityScope(allRaces, cityPage, scopeRes.scope);
   if (!passesQualityGate(races.length, scopeRes.scope)) notFound();
 
@@ -331,7 +329,7 @@ export default async function RaceCityScopePage({ params }: RouteParams) {
               </span>
             </div>
 
-            <RaceCardsList races={races} isAuthed={isAuthed} />
+            <RaceCardsList races={races} />
           </div>
         </section>
       </div>

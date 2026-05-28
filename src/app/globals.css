@@ -185,6 +185,7 @@ body.nav-open { overflow: hidden; }
   transition: color 160ms ease-out;
 }
 .v1-nav-links a:hover { color: var(--bone); }
+.v1-nav-links a.is-primary { color: var(--bone); font-weight: 600; }
 .v1-nav-links a.is-current { color: var(--bone); position: relative; }
 .v1-nav-links a.is-current::before {
   content: '';

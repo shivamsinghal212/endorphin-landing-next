@@ -129,13 +129,11 @@ function storySnippet(r: ApiEvent) {
  *  reopen it in a new tab once auth finalizes. */
 function CtaButton({
   cta,
-  isAuthed,
   onLoginNeeded,
   onRegisterClick,
   shape = 'race-action',
 }: {
   cta: CouponCta;
-  isAuthed: boolean;
   onLoginNeeded: (pendingUrl?: string) => void;
   onRegisterClick?: () => void;
   shape?: 'race-action' | 'btn';
@@ -152,7 +150,10 @@ function CtaButton({
   if (cta.intent === 'tbd') {
     return <span className={cls}>{cta.label}</span>;
   }
-  const needsLogin = cta.intent === 'login' || (cta.intent === 'register' && !isAuthed);
+  // Coupon-unlock still goes through login (the discount is the value
+  // exchange for signing in). Plain Register on external events opens
+  // directly — discoverability beats email capture here.
+  const needsLogin = cta.intent === 'login';
   if (needsLogin) {
     return (
       <button
@@ -185,11 +186,9 @@ function CtaButton({
 
 function RaceCard({
   r,
-  isAuthed,
   onLoginNeeded,
 }: {
   r: ApiEvent;
-  isAuthed: boolean;
   onLoginNeeded: (r: ApiEvent, pendingUrl?: string) => void;
 }) {
   const title = normalizeTitle(r.title);
@@ -200,8 +199,6 @@ function RaceCard({
   const detailHref = `/running-events/${r.slug || r.id}`;
   const showCoupon = !!r.hasCoupon && r.couponDiscountPercent != null;
   const cta = couponCta(r);
-  // Auth-gate plain Register too — when anon, even no-coupon registers route
-  // through the login modal before opening the external URL.
   const showActions = cta.intent !== 'tbd' || showCoupon;
 
   return (
@@ -275,7 +272,6 @@ function RaceCard({
           </Link>
           <CtaButton
             cta={cta}
-            isAuthed={isAuthed}
             onLoginNeeded={(pendingUrl) => onLoginNeeded(r, pendingUrl)}
             onRegisterClick={() => posthog.capture('race_register_clicked', {
               race_id: r.id,
@@ -294,11 +290,9 @@ function RaceCard({
 
 function FeaturedCard({
   r,
-  isAuthed,
   onLoginNeeded,
 }: {
   r: ApiEvent;
-  isAuthed: boolean;
   onLoginNeeded: (r: ApiEvent, pendingUrl?: string) => void;
 }) {
   const dateStr = new Date(r.startTime).toLocaleString('en-GB', { day: 'numeric', month: 'long', timeZone: IST });
@@ -368,7 +362,6 @@ function FeaturedCard({
           <div className="v1r-featured-ctas">
             <CtaButton
               cta={cta}
-              isAuthed={isAuthed}
               onLoginNeeded={(pendingUrl) => onLoginNeeded(r, pendingUrl)}
               onRegisterClick={() => posthog.capture('race_register_clicked', {
                 race_id: r.id,
@@ -394,10 +387,8 @@ function FeaturedCard({
 
 export default function RacesView({
   races: initialRaces,
-  isAuthed,
 }: {
   races: ApiEvent[];
-  isAuthed: boolean;
 }) {
   const router = useRouter();
   const [allRaces, setAllRaces] = useState<ApiEvent[]>(initialRaces);
@@ -792,7 +783,6 @@ export default function RacesView({
                   <FeaturedCard
                     key={r.id}
                     r={r}
-                    isAuthed={isAuthed}
                     onLoginNeeded={handleLoginNeeded}
                   />
                 ))}
@@ -872,7 +862,6 @@ export default function RacesView({
                   <RaceCard
                     key={r.id}
                     r={r}
-                    isAuthed={isAuthed}
                     onLoginNeeded={handleLoginNeeded}
                   />
                 ))

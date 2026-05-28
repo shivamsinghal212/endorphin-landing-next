@@ -18,7 +18,7 @@ export default function PrivacyPolicy() {
         <h1 className="text-4xl md:text-5xl font-display font-bold uppercase text-foreground mb-8">
           Privacy Policy
         </h1>
-        <p className="text-sm text-muted-foreground font-body mb-10">Last updated: April 30, 2026</p>
+        <p className="text-sm text-muted-foreground font-body mb-10">Last updated: May 28, 2026</p>
 
         <div className="space-y-8 font-body text-muted-foreground leading-relaxed">
           <section>
@@ -67,7 +67,8 @@ export default function PrivacyPolicy() {
               <li><span className="text-foreground/80">Sentry:</span> Crash and error reporting. Subject to <a href="https://sentry.io/privacy/" target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">Sentry&apos;s Privacy Policy</a>.</li>
               <li><span className="text-foreground/80">Detour:</span> Deep linking and deferred deep links. Subject to <a href="https://godetour.com/privacy" target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">Detour&apos;s Privacy Policy</a>.</li>
               <li><span className="text-foreground/80">Anthropic (Claude):</span> Powers the Kip AI Coach. When you interact with Kip, the relevant conversation context and your run/profile metrics are sent to Anthropic to generate a response. Subject to <a href="https://www.anthropic.com/legal/privacy" target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">Anthropic&apos;s Privacy Policy</a>. Anthropic does not use your data to train its models.</li>
-              <li><span className="text-foreground/80">Event platforms:</span> When you RSVP to events sourced from external platforms, limited profile information (name, profile photo) may be visible to event organizers and other attendees.</li>
+              <li><span className="text-foreground/80">Third-party event registration platforms:</span> Many events listed on Endorfin are hosted on third-party registration platforms — including <span className="text-foreground/80">MySamay</span>, <span className="text-foreground/80">Townscript</span>, <span className="text-foreground/80">IndiaRunning</span>, and <span className="text-foreground/80">City Woofer</span>. Only events explicitly listed with source &ldquo;Organiser&rdquo; are registered through Endorfin directly. When you click &ldquo;Register&rdquo; on a third-party event, we redirect you to the relevant external platform. Any information you submit there (name, contact details, payment information, etc.) is collected and processed by that platform under its own privacy policy, not Endorfin&apos;s. We do not receive your registration or payment data from those platforms unless they share it with us in aggregate or you authorise it explicitly.</li>
+              <li><span className="text-foreground/80">Event organizers:</span> When you RSVP to or register for an event through Endorfin (whether hosted by us or by a third-party platform), limited profile information (name, profile photo) may be visible to event organizers and other attendees.</li>
             </ul>
           </section>
 

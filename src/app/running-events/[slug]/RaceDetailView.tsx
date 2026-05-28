@@ -221,10 +221,9 @@ export default function RaceDetailView({
         : 'Register ↗'
     : 'Register ↗';
 
-  // Auth-gate Register clicks. Same rule as the /running-events listing:
-  //   intent === 'login'                              → always modal (anon + coupon)
-  //   intent === 'register' && !isAuthed              → modal, stash URL for post-login open
-  //   anything else                                   → let the <a target="_blank"> run
+  // Gate only coupon-unlock through the login modal (the discount is the
+  // value exchange for signing in). Plain Register on external events opens
+  // directly — discoverability beats email capture here.
   const handleRegisterClick = useCallback(
     (e: React.MouseEvent) => {
       posthog.capture('race_register_clicked', {
@@ -239,15 +238,9 @@ export default function RaceDetailView({
         e.preventDefault();
         pendingUrlRef.current = null;
         setLoginOpen(true);
-        return;
-      }
-      if (cta.intent === 'register' && !isAuthed) {
-        e.preventDefault();
-        pendingUrlRef.current = event.registrationUrl ?? null;
-        setLoginOpen(true);
       }
     },
-    [cta.intent, isAuthed, event.registrationUrl, event.id, event.slug, event.title, event.locationName, event.hasCoupon],
+    [cta.intent, event.id, event.slug, event.title, event.locationName, event.hasCoupon],
   );
 
   const handleLoginSuccess = useCallback(() => {

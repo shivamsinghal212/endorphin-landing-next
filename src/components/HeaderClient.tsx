@@ -8,11 +8,11 @@ import { logoutAction } from '@/app/actions/auth';
 import { useStoreLink } from '@/lib/use-store-link';
 
 const NAV_LINKS = [
-  { label: 'Running Events', href: '/running-events', soon: false },
-  { label: 'Runners', href: '/runners', soon: false },
-  { label: 'Clubs', href: '/clubs', soon: false },
-  { label: 'Workout Plan', href: '/workout-plan', soon: true },
-  { label: 'Coaches', href: '/coaches', soon: true },
+  { label: 'Running Events', href: '/running-events', soon: false, primary: true },
+  { label: 'Clubs', href: '/clubs', soon: false, primary: true },
+  { label: 'Runners', href: '/runners', soon: false, primary: false },
+  { label: 'Workout Plan', href: '/workout-plan', soon: true, primary: false },
+  { label: 'Coaches', href: '/coaches', soon: true, primary: false },
 ];
 
 function isLinkActive(pathname: string | null, href: string) {
@@ -148,7 +148,11 @@ const HeaderClient = ({
         <ul className="v1-nav-links">
           {NAV_LINKS.map((l) => {
             const active = isLinkActive(pathname, l.href);
-            const cls = [l.soon ? 'has-soon' : '', active ? 'is-current' : ''].filter(Boolean).join(' ') || undefined;
+            const cls = [
+              l.soon ? 'has-soon' : '',
+              active ? 'is-current' : '',
+              l.primary ? 'is-primary' : '',
+            ].filter(Boolean).join(' ') || undefined;
             return (
               <li key={l.href}>
                 <Link
