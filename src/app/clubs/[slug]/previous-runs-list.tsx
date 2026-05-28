@@ -4,25 +4,40 @@ import { useState } from 'react';
 import type { ClubEvent } from '../page';
 import { RunGallery } from './run-gallery';
 
+// All formatters pin to Asia/Kolkata so the server (Vercel runs in
+// UTC) and the client (typically IST = UTC+5:30) produce identical
+// strings. Without this, events near midnight UTC render with a
+// different day-of-month on each side and trigger React hydration
+// error #418.
+const TZ = 'Asia/Kolkata';
+
 function parseDate(iso: string | null | undefined): Date | null {
   if (!iso) return null;
   const d = new Date(iso.includes('T') ? iso : `${iso}T00:00:00`);
   return Number.isNaN(d.getTime()) ? null : d;
 }
 
-function fmtDay(iso: string | null | undefined) {
+function fmtIn(
+  iso: string | null | undefined,
+  opts: Intl.DateTimeFormatOptions,
+): string {
   const d = parseDate(iso);
-  return d ? d.toLocaleString('en', { weekday: 'short' }) : '';
+  if (!d) return '';
+  return new Intl.DateTimeFormat('en-IN', { timeZone: TZ, ...opts }).format(d);
+}
+
+function fmtDay(iso: string | null | undefined) {
+  return fmtIn(iso, { weekday: 'short' });
 }
 
 function fmtDayNum(iso: string | null | undefined) {
-  const d = parseDate(iso);
-  return d ? String(d.getDate()).padStart(2, '0') : '';
+  // Intl always emits at least 1 digit; pad to 2 for consistent UI
+  // (some events render "9" vs others "10").
+  return fmtIn(iso, { day: '2-digit' }).padStart(2, '0');
 }
 
 function fmtMonth(iso: string | null | undefined) {
-  const d = parseDate(iso);
-  return d ? d.toLocaleString('en', { month: 'short' }) : '';
+  return fmtIn(iso, { month: 'short' });
 }
 
 function RunRow({ event }: { event: ClubEvent }) {

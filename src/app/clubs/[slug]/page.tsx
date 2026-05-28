@@ -242,7 +242,11 @@ export default async function ClubPage({ params }: PageProps) {
   return (
     <main id="main-content" className="overflow-x-hidden">
       <ClubIcons />
-      <ClubJsonLd club={club} totalRunsHosted={totalRunsHosted} />
+      <ClubJsonLd
+        club={club}
+        totalRunsHosted={totalRunsHosted}
+        neighborhoods={neighborhoods}
+      />
       <ClubBreadcrumbJsonLd club={club} />
       <ClubEventsJsonLd club={club} events={futureEvents} />
       <ClubFaqJsonLd club={club} neighborhoods={neighborhoods} />
@@ -256,7 +260,6 @@ export default async function ClubPage({ params }: PageProps) {
         />
         <Ribbon />
         <Stats club={club} />
-        <WhereWeRun city={club.city} neighborhoods={neighborhoods} />
         <NextRun
           event={nextEvent}
           club={club}
@@ -290,9 +293,11 @@ export default async function ClubPage({ params }: PageProps) {
 function ClubJsonLd({
   club,
   totalRunsHosted,
+  neighborhoods,
 }: {
   club: Club;
   totalRunsHosted: number;
+  neighborhoods: string[];
 }) {
   const url = `https://www.endorfin.run/clubs/${club.slug}`;
   // WhatsApp invite links are ephemeral (they rotate / expire) and carry
@@ -369,6 +374,23 @@ function ClubJsonLd({
         return member;
       });
     if (members.length > 0) data.member = members;
+  }
+  // Locality coverage — surface the distinct neighborhoods this club
+  // operates in via `areaServed` so map-aware AI assistants and
+  // Google's Knowledge Graph see the club as locally relevant without
+  // needing a visual section on the page. Cap at 8 to keep the
+  // structured-data payload tight.
+  if (neighborhoods.length > 0) {
+    data.areaServed = neighborhoods.slice(0, 8).map((n) => ({
+      '@type': 'Place',
+      name: n,
+      address: {
+        '@type': 'PostalAddress',
+        addressLocality: club.city,
+        ...(addressRegion ? { addressRegion } : {}),
+        addressCountry: 'IN',
+      },
+    }));
   }
   // Recency signals — AI assistants (Perplexity, Google AIO, Bing
   // Copilot) all rank by freshness; we already have the timestamps on
@@ -691,34 +713,6 @@ function Hero({
           </div>
         </aside>
       </div>
-    </section>
-  );
-}
-
-// Static HTML chip list of distinct neighborhoods this club runs in,
-// derived from event locationAddress / locationName. Crawler-readable
-// locality coverage — Googlebot and AI assistants can answer
-// "running clubs in <neighborhood>" queries without needing to
-// hydrate the upcoming/previous-runs lists.
-function WhereWeRun({
-  city,
-  neighborhoods,
-}: {
-  city: string;
-  neighborhoods: string[];
-}) {
-  if (neighborhoods.length < 2) return null;
-  const visible = neighborhoods.slice(0, 10);
-  return (
-    <section className="where-we-run" aria-label="Where this club runs">
-      <span className="kicker where-we-run-kicker">Where we run in {city}</span>
-      <ul className="where-we-run-list">
-        {visible.map((n) => (
-          <li key={n} className="where-we-run-chip">
-            {n}
-          </li>
-        ))}
-      </ul>
     </section>
   );
 }
