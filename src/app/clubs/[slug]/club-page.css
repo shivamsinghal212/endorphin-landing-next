@@ -785,8 +785,12 @@
   animation: upcomingRowReveal 160ms ease-out;
 }
 .club-page .upcoming-row-flyer {
-  width: 220px;
-  max-width: 40%;
+  /* Match .last-run-card: same 340px / 4:5 footprint so the upcoming
+     flyer feels visually equivalent to the past-runs carousel image. */
+  flex: 0 0 auto;
+  width: 340px;
+  max-width: 50%;
+  aspect-ratio: 4 / 5;
   height: auto;
   border-radius: 6px;
   object-fit: cover;
@@ -864,7 +868,7 @@
   .club-page .upcoming-row { grid-template-columns: minmax(0, 1fr) auto; gap: 14px; padding: 16px 0; }
   .club-page .upcoming-row-trigger { grid-template-columns: 56px minmax(0, 1fr); gap: 14px; }
   .club-page .upcoming-row-details { padding-left: 70px; flex-wrap: wrap; }
-  .club-page .upcoming-row-flyer { width: 100%; max-width: 100%; }
+  .club-page .upcoming-row-flyer { width: 100%; max-width: 100%; aspect-ratio: 4 / 5; }
   /* Going-pill is inlined into the meta line on mobile to save the
      vertical space; the .row-actions cell stays right-aligned with
      just the RSVP button visible. */
