@@ -455,6 +455,12 @@ export const setClubFeatured = (token: string, slug: string, isFeatured: boolean
     body: JSON.stringify({ isFeatured }),
   });
 
+export const setClubPublished = (token: string, slug: string, isPublished: boolean) =>
+  adminFetch<Club>(`/clubs/${encodeURIComponent(slug)}/published`, token, {
+    method: 'PATCH',
+    body: JSON.stringify({ isPublished }),
+  });
+
 // ── Club Instagram scrape ──────────────────────────────────────────────────
 
 export interface ClubScrapeTriggerResponse {

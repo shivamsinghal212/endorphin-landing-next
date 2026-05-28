@@ -2,17 +2,44 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
-import { Search, Star, BadgeCheck, RefreshCw, Download, Loader2, CheckCircle2, XCircle, AtSign } from 'lucide-react';
+import { Search, Star, BadgeCheck, RefreshCw, Download, Loader2, CheckCircle2, XCircle, AtSign, Eye, EyeOff, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
 import { useAdminToken } from '@/lib/use-admin-token';
 import {
   listAdminClubs,
   setClubFeatured,
+  setClubPublished,
   triggerClubScrape,
   getClubScrapeHistory,
   AdminApiError,
   type Club,
   type ClubScrapeRun,
 } from '@/lib/admin-api';
+
+function SortHeader({
+  label,
+  active,
+  dir,
+  onClick,
+  className,
+}: {
+  label: string;
+  active: boolean;
+  dir: 'asc' | 'desc';
+  onClick: () => void;
+  className?: string;
+}) {
+  const Icon = !active ? ArrowUpDown : dir === 'asc' ? ArrowUp : ArrowDown;
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`items-center gap-1 hover:text-jet transition-colors cursor-pointer ${active ? 'text-jet' : ''} ${className ?? 'inline-flex'}`}
+    >
+      <span>{label}</span>
+      <Icon className="w-3 h-3" />
+    </button>
+  );
+}
 
 export function ClubsListContent() {
   const token = useAdminToken();
@@ -22,6 +49,10 @@ export function ClubsListContent() {
   const [query, setQuery] = useState('');
   const [filter, setFilter] = useState<'all' | 'published' | 'drafts' | 'featured'>('all');
   const [togglingSlug, setTogglingSlug] = useState<string | null>(null);
+  const [publishingSlug, setPublishingSlug] = useState<string | null>(null);
+  type SortKey = 'updated' | 'lastScraped' | 'members';
+  const [sortKey, setSortKey] = useState<SortKey>('updated');
+  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc');
 
   // AtSign scrape state
   const [newClubIg, setNewClubIg] = useState('');
@@ -82,7 +113,7 @@ export function ClubsListContent() {
 
   const visible = useMemo(() => {
     const q = query.trim().toLowerCase();
-    return clubs.filter((c) => {
+    const filtered = clubs.filter((c) => {
       if (filter === 'published' && !c.publishedAt) return false;
       if (filter === 'drafts' && c.publishedAt) return false;
       if (filter === 'featured' && !c.isFeatured) return false;
@@ -93,7 +124,22 @@ export function ClubsListContent() {
         c.city.toLowerCase().includes(q)
       );
     });
-  }, [clubs, query, filter]);
+    const valueOf = (c: Club): number => {
+      if (sortKey === 'members') return c.stats?.members ?? 0;
+      const iso = sortKey === 'lastScraped' ? c.lastScrapedAt : c.updatedAt;
+      // Nulls sort to the bottom regardless of direction.
+      return iso ? new Date(iso).getTime() : Number.NEGATIVE_INFINITY;
+    };
+    const sign = sortDir === 'asc' ? 1 : -1;
+    return [...filtered].sort((a, b) => {
+      const av = valueOf(a);
+      const bv = valueOf(b);
+      // Keep nulls at the bottom no matter what direction is selected.
+      if (av === Number.NEGATIVE_INFINITY && bv !== Number.NEGATIVE_INFINITY) return 1;
+      if (bv === Number.NEGATIVE_INFINITY && av !== Number.NEGATIVE_INFINITY) return -1;
+      return sign * (av - bv);
+    });
+  }, [clubs, query, filter, sortKey, sortDir]);
 
   const scrapeClub = async (instagramUrl: string | null, username?: string) => {
     if (!token || !instagramUrl) return;
@@ -155,6 +201,39 @@ export function ClubsListContent() {
     const cleaned = url.split('?')[0].split('#')[0].replace(/\/+$/, '');
     const last = cleaned.split('/').pop() || '';
     return last.replace(/^@/, '') || null;
+  };
+
+  const togglePublished = async (slug: string, next: boolean) => {
+    if (!token) return;
+    setPublishingSlug(slug);
+    const nowIso = new Date().toISOString();
+    // Optimistic: flip the badge immediately. Roll back on error.
+    setClubs((prev) =>
+      prev.map((c) =>
+        c.slug === slug ? { ...c, publishedAt: next ? c.publishedAt ?? nowIso : null } : c,
+      ),
+    );
+    try {
+      const updated = await setClubPublished(token, slug, next);
+      setClubs((prev) => prev.map((c) => (c.slug === slug ? updated : c)));
+    } catch (e) {
+      // Reload from server so optimistic state can't drift.
+      await reload();
+      setError(e instanceof AdminApiError ? `${e.status} — ${e.message}` : (e as Error).message);
+    } finally {
+      setPublishingSlug(null);
+    }
+  };
+
+  const cycleSort = (key: SortKey) => {
+    setSortKey((prevKey) => {
+      if (prevKey !== key) {
+        setSortDir('desc');
+        return key;
+      }
+      setSortDir((d) => (d === 'desc' ? 'asc' : 'desc'));
+      return key;
+    });
   };
 
   const toggleFeatured = async (slug: string, next: boolean) => {
@@ -319,12 +398,32 @@ export function ClubsListContent() {
 
       {/* Table */}
       <div className="bg-white rounded-xl border border-jet/10 overflow-hidden">
-        <div className="grid grid-cols-[80px_1fr_auto_auto_auto_auto_auto] gap-3 px-4 py-3 border-b border-jet/10 font-body text-xs font-medium text-jet/40 uppercase tracking-wider">
+        <div className="grid grid-cols-[80px_1fr_auto_auto_auto_auto_auto_auto_auto] gap-3 px-4 py-3 border-b border-jet/10 font-body text-xs font-medium text-jet/40 uppercase tracking-wider">
           <span>Cover</span>
           <span>Club</span>
-          <span className="hidden sm:inline">Members</span>
-          <span className="hidden md:inline">Updated</span>
+          <SortHeader
+            label="Members"
+            active={sortKey === 'members'}
+            dir={sortDir}
+            onClick={() => cycleSort('members')}
+            className="hidden sm:inline-flex"
+          />
+          <SortHeader
+            label="Updated"
+            active={sortKey === 'updated'}
+            dir={sortDir}
+            onClick={() => cycleSort('updated')}
+            className="hidden md:inline-flex"
+          />
+          <SortHeader
+            label="Last scraped"
+            active={sortKey === 'lastScraped'}
+            dir={sortDir}
+            onClick={() => cycleSort('lastScraped')}
+            className="hidden md:inline-flex"
+          />
           <span>Status</span>
+          <span>Publish</span>
           <span>Featured</span>
           <span>Scrape</span>
         </div>
@@ -340,10 +439,17 @@ export function ClubsListContent() {
           visible.map((c) => {
             const cover = c.headerImageUrl || c.logoUrl;
             const updated = c.updatedAt ? new Date(c.updatedAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }) : '—';
+            const lastScraped = c.lastScrapedAt
+              ? new Date(c.lastScrapedAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })
+              : '—';
+            const lastScrapedTitle = c.lastScrapedAt
+              ? new Date(c.lastScrapedAt).toLocaleString('en-IN')
+              : 'Never scraped';
+            const isPublished = !!c.publishedAt;
             return (
               <div
                 key={c.slug}
-                className="grid grid-cols-[80px_1fr_auto_auto_auto_auto_auto] gap-3 items-center px-4 py-3 border-b border-jet/5 last:border-b-0 hover:bg-jet/[0.015] transition-colors"
+                className="grid grid-cols-[80px_1fr_auto_auto_auto_auto_auto_auto_auto] gap-3 items-center px-4 py-3 border-b border-jet/5 last:border-b-0 hover:bg-jet/[0.015] transition-colors"
               >
                 <Link
                   href={`/admin/clubs/${encodeURIComponent(c.slug)}`}
@@ -372,14 +478,39 @@ export function ClubsListContent() {
                 </span>
                 <span className="hidden md:block font-body text-xs text-jet/50">{updated}</span>
                 <span
+                  className="hidden md:block font-body text-xs text-jet/50"
+                  title={lastScrapedTitle}
+                >
+                  {lastScraped}
+                </span>
+                <span
                   className={`px-2 py-0.5 rounded-full text-[10px] font-body font-medium uppercase tracking-wide ${
-                    c.publishedAt
+                    isPublished
                       ? 'bg-green-100 text-green-800'
                       : 'bg-jet/5 text-jet/60'
                   }`}
                 >
-                  {c.publishedAt ? 'Published' : 'Draft'}
+                  {isPublished ? 'Published' : 'Draft'}
                 </span>
+                <button
+                  onClick={() => togglePublished(c.slug, !isPublished)}
+                  disabled={publishingSlug === c.slug}
+                  className={`p-1.5 rounded-md transition-colors disabled:opacity-50 cursor-pointer ${
+                    isPublished
+                      ? 'text-green-600 hover:bg-green-50'
+                      : 'text-jet/30 hover:text-jet hover:bg-jet/5'
+                  }`}
+                  aria-label={isPublished ? 'Unpublish' : 'Publish'}
+                  title={isPublished ? 'Published — click to unpublish' : 'Click to publish'}
+                >
+                  {publishingSlug === c.slug ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : isPublished ? (
+                    <Eye className="w-4 h-4" />
+                  ) : (
+                    <EyeOff className="w-4 h-4" />
+                  )}
+                </button>
                 <button
                   onClick={() => toggleFeatured(c.slug, !c.isFeatured)}
                   disabled={togglingSlug === c.slug}
