@@ -54,7 +54,7 @@ export function ClubsListContent() {
   const [sortKey, setSortKey] = useState<SortKey>('updated');
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc');
 
-  // AtSign scrape state
+  // Instagram scrape state
   const [newClubIg, setNewClubIg] = useState('');
   const [newClubBusy, setNewClubBusy] = useState(false);
   const [newClubMsg, setNewClubMsg] = useState<string | null>(null);
@@ -398,7 +398,7 @@ export function ClubsListContent() {
 
       {/* Table */}
       <div className="bg-white rounded-xl border border-jet/10 overflow-hidden">
-        <div className="grid grid-cols-[80px_1fr_auto_auto_auto_auto_auto_auto_auto] gap-3 px-4 py-3 border-b border-jet/10 font-body text-xs font-medium text-jet/40 uppercase tracking-wider">
+        <div className="grid grid-cols-[64px_minmax(180px,1fr)_auto_auto_auto_auto_auto_auto] gap-3 px-4 py-3 border-b border-jet/10 font-body text-xs font-medium text-jet/40 uppercase tracking-wider">
           <span>Cover</span>
           <span>Club</span>
           <SortHeader
@@ -406,26 +406,25 @@ export function ClubsListContent() {
             active={sortKey === 'members'}
             dir={sortDir}
             onClick={() => cycleSort('members')}
-            className="hidden sm:inline-flex"
+            className="hidden sm:inline-flex justify-self-end"
           />
           <SortHeader
             label="Updated"
             active={sortKey === 'updated'}
             dir={sortDir}
             onClick={() => cycleSort('updated')}
-            className="hidden md:inline-flex"
+            className="hidden md:inline-flex justify-self-end"
           />
           <SortHeader
-            label="Last scraped"
+            label="Scraped"
             active={sortKey === 'lastScraped'}
             dir={sortDir}
             onClick={() => cycleSort('lastScraped')}
-            className="hidden md:inline-flex"
+            className="hidden md:inline-flex justify-self-end"
           />
-          <span>Status</span>
-          <span>Publish</span>
-          <span>Featured</span>
-          <span>Scrape</span>
+          <span className="justify-self-center">Status</span>
+          <span className="justify-self-center">Featured</span>
+          <span className="justify-self-center">Scrape</span>
         </div>
         {loading && clubs.length === 0 ? (
           <div className="px-4 py-12 text-center font-body text-sm text-jet/50">
@@ -449,7 +448,7 @@ export function ClubsListContent() {
             return (
               <div
                 key={c.slug}
-                className="grid grid-cols-[80px_1fr_auto_auto_auto_auto_auto_auto_auto] gap-3 items-center px-4 py-3 border-b border-jet/5 last:border-b-0 hover:bg-jet/[0.015] transition-colors"
+                className="grid grid-cols-[64px_minmax(180px,1fr)_auto_auto_auto_auto_auto_auto] gap-3 items-center px-4 py-3 border-b border-jet/5 last:border-b-0 hover:bg-jet/[0.015] transition-colors"
               >
                 <Link
                   href={`/admin/clubs/${encodeURIComponent(c.slug)}`}
@@ -473,48 +472,40 @@ export function ClubsListContent() {
                     {c.slug} · {c.city}
                   </div>
                 </Link>
-                <span className="hidden sm:block font-body text-sm text-jet/70 tabular-nums">
+                <span className="hidden sm:block font-body text-sm text-jet/70 tabular-nums justify-self-end">
                   {c.stats?.members?.toLocaleString('en-IN') ?? 0}
                 </span>
-                <span className="hidden md:block font-body text-xs text-jet/50">{updated}</span>
+                <span className="hidden md:block font-body text-xs text-jet/50 justify-self-end">{updated}</span>
                 <span
-                  className="hidden md:block font-body text-xs text-jet/50"
+                  className="hidden md:block font-body text-xs text-jet/50 justify-self-end"
                   title={lastScrapedTitle}
                 >
                   {lastScraped}
                 </span>
-                <span
-                  className={`px-2 py-0.5 rounded-full text-[10px] font-body font-medium uppercase tracking-wide ${
-                    isPublished
-                      ? 'bg-green-100 text-green-800'
-                      : 'bg-jet/5 text-jet/60'
-                  }`}
-                >
-                  {isPublished ? 'Published' : 'Draft'}
-                </span>
                 <button
                   onClick={() => togglePublished(c.slug, !isPublished)}
                   disabled={publishingSlug === c.slug}
-                  className={`p-1.5 rounded-md transition-colors disabled:opacity-50 cursor-pointer ${
+                  className={`justify-self-center inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-body font-medium uppercase tracking-wide transition-colors disabled:opacity-50 cursor-pointer ${
                     isPublished
-                      ? 'text-green-600 hover:bg-green-50'
-                      : 'text-jet/30 hover:text-jet hover:bg-jet/5'
+                      ? 'bg-green-100 text-green-800 hover:bg-green-200'
+                      : 'bg-jet/5 text-jet/60 hover:bg-jet/10'
                   }`}
                   aria-label={isPublished ? 'Unpublish' : 'Publish'}
-                  title={isPublished ? 'Published — click to unpublish' : 'Click to publish'}
+                  title={isPublished ? 'Published — click to unpublish' : 'Draft — click to publish'}
                 >
                   {publishingSlug === c.slug ? (
-                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <Loader2 className="w-3 h-3 animate-spin" />
                   ) : isPublished ? (
-                    <Eye className="w-4 h-4" />
+                    <Eye className="w-3 h-3" />
                   ) : (
-                    <EyeOff className="w-4 h-4" />
+                    <EyeOff className="w-3 h-3" />
                   )}
+                  {isPublished ? 'Published' : 'Draft'}
                 </button>
                 <button
                   onClick={() => toggleFeatured(c.slug, !c.isFeatured)}
                   disabled={togglingSlug === c.slug}
-                  className={`p-1.5 rounded-md transition-colors disabled:opacity-50 cursor-pointer ${
+                  className={`justify-self-center p-1.5 rounded-md transition-colors disabled:opacity-50 cursor-pointer ${
                     c.isFeatured
                       ? 'text-yellow-500 hover:bg-yellow-50'
                       : 'text-jet/30 hover:text-jet hover:bg-jet/5'
@@ -531,7 +522,7 @@ export function ClubsListContent() {
                   const isPending = isStarting || run?.status === 'pending';
                   const lastFinished = run?.finishedAt ? new Date(run.finishedAt) : null;
                   const title = !c.instagramUrl
-                    ? 'No AtSign URL set on this club'
+                    ? 'No Instagram URL set on this club'
                     : isPending
                     ? `Scraping @${handle}…`
                     : run?.status === 'failed'
@@ -543,14 +534,14 @@ export function ClubsListContent() {
                     <button
                       onClick={() => scrapeClub(c.instagramUrl, handle ?? undefined)}
                       disabled={!c.instagramUrl || isPending}
-                      className={`p-1.5 rounded-md transition-colors disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer ${
+                      className={`justify-self-center p-1.5 rounded-md transition-colors disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer ${
                         run?.status === 'failed'
                           ? 'text-red-500 hover:bg-red-50'
                           : isPending
                           ? 'text-blue-500'
                           : 'text-jet/40 hover:text-jet hover:bg-jet/5'
                       }`}
-                      aria-label="Scrape AtSign"
+                      aria-label="Scrape Instagram"
                       title={title}
                     >
                       {isPending ? (
