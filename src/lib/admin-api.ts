@@ -455,6 +455,36 @@ export const setClubFeatured = (token: string, slug: string, isFeatured: boolean
     body: JSON.stringify({ isFeatured }),
   });
 
+// ── Club Instagram scrape ──────────────────────────────────────────────────
+
+export interface ClubScrapeTriggerResponse {
+  ok: boolean;
+  instagramUsername: string;
+  existingClub: { id: string; slug: string; name: string } | null;
+}
+
+export interface ClubScrapeRun {
+  id: string;
+  instagramUsername: string;
+  status: 'pending' | 'success' | 'partial' | 'failed' | string;
+  errorMessage: string | null;
+  startedAt: string | null;
+  finishedAt: string | null;
+  counts: Record<string, number>;
+  clubId: string | null;
+  clubSlug: string | null;
+  clubName: string | null;
+}
+
+export const triggerClubScrape = (token: string, instagramUrl: string) =>
+  adminFetch<ClubScrapeTriggerResponse>('/clubs/scrape', token, {
+    method: 'POST',
+    body: JSON.stringify({ instagramUrl }),
+  });
+
+export const getClubScrapeHistory = (token: string, limit = 30) =>
+  adminFetch<{ runs: ClubScrapeRun[] }>(`/clubs/scrape/history?limit=${limit}`, token);
+
 // ── Club events ────────────────────────────────────────────────────────────
 // These hit /api/v1/clubs/{slug}/events directly. Platform admins (whitelisted
 // emails) are accepted by require_club_admin even without club membership.

@@ -1,10 +1,18 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
-import { Plus, Search, Star, BadgeCheck, RefreshCw } from 'lucide-react';
+import { Search, Star, BadgeCheck, RefreshCw, Download, Loader2, CheckCircle2, XCircle, AtSign } from 'lucide-react';
 import { useAdminToken } from '@/lib/use-admin-token';
-import { listAdminClubs, setClubFeatured, AdminApiError, type Club } from '@/lib/admin-api';
+import {
+  listAdminClubs,
+  setClubFeatured,
+  triggerClubScrape,
+  getClubScrapeHistory,
+  AdminApiError,
+  type Club,
+  type ClubScrapeRun,
+} from '@/lib/admin-api';
 
 export function ClubsListContent() {
   const token = useAdminToken();
@@ -14,6 +22,14 @@ export function ClubsListContent() {
   const [query, setQuery] = useState('');
   const [filter, setFilter] = useState<'all' | 'published' | 'drafts' | 'featured'>('all');
   const [togglingSlug, setTogglingSlug] = useState<string | null>(null);
+
+  // AtSign scrape state
+  const [newClubIg, setNewClubIg] = useState('');
+  const [newClubBusy, setNewClubBusy] = useState(false);
+  const [newClubMsg, setNewClubMsg] = useState<string | null>(null);
+  const [scrapingUsernames, setScrapingUsernames] = useState<Set<string>>(new Set());
+  const [scrapeRuns, setScrapeRuns] = useState<ClubScrapeRun[]>([]);
+  const hasPending = useMemo(() => scrapeRuns.some((r) => r.status === 'pending'), [scrapeRuns]);
 
   const reload = async () => {
     if (!token) return;
@@ -29,10 +45,40 @@ export function ClubsListContent() {
     }
   };
 
+  const loadHistory = useCallback(async () => {
+    if (!token) return;
+    try {
+      const { runs } = await getClubScrapeHistory(token, 30);
+      setScrapeRuns(runs);
+    } catch {
+      // Non-fatal — the history panel just stays stale.
+    }
+  }, [token]);
+
   useEffect(() => {
     reload();
+    loadHistory();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token]);
+
+  // Poll history every 4s while any scrape is pending (or just after we
+  // kicked one off). When the last pending row settles, do a final reload
+  // of the club list so newly-scraped clubs / updated counts show up.
+  const prevPendingRef = useRef(false);
+  useEffect(() => {
+    if (!token) return;
+    if (!hasPending && scrapingUsernames.size === 0) {
+      if (prevPendingRef.current) {
+        prevPendingRef.current = false;
+        reload();
+      }
+      return;
+    }
+    prevPendingRef.current = true;
+    const id = setInterval(loadHistory, 4000);
+    return () => clearInterval(id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [token, hasPending, scrapingUsernames.size, loadHistory]);
 
   const visible = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -48,6 +94,68 @@ export function ClubsListContent() {
       );
     });
   }, [clubs, query, filter]);
+
+  const scrapeClub = async (instagramUrl: string | null, username?: string) => {
+    if (!token || !instagramUrl) return;
+    const key = username ?? instagramUrl;
+    setScrapingUsernames((prev) => new Set(prev).add(key));
+    try {
+      await triggerClubScrape(token, instagramUrl);
+      await loadHistory();
+    } catch (e) {
+      setError(e instanceof AdminApiError ? `${e.status} — ${e.message}` : (e as Error).message);
+    } finally {
+      // The polling loop takes over from here; clear the local "starting"
+      // flag so the row reflects whatever the history row says.
+      setScrapingUsernames((prev) => {
+        const next = new Set(prev);
+        next.delete(key);
+        return next;
+      });
+    }
+  };
+
+  const submitNewClubScrape = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!token || !newClubIg.trim() || newClubBusy) return;
+    setNewClubBusy(true);
+    setNewClubMsg(null);
+    try {
+      const res = await triggerClubScrape(token, newClubIg.trim());
+      if (res.existingClub) {
+        setNewClubMsg(
+          `Club "${res.existingClub.name}" already exists — rescraping in the background.`,
+        );
+      } else {
+        setNewClubMsg(
+          `Scraping @${res.instagramUsername}… it'll appear in the list when done.`,
+        );
+      }
+      setNewClubIg('');
+      await loadHistory();
+    } catch (e) {
+      setNewClubMsg(
+        e instanceof AdminApiError ? `${e.status} — ${e.message}` : (e as Error).message,
+      );
+    } finally {
+      setNewClubBusy(false);
+    }
+  };
+
+  const latestRunByUsername = useMemo(() => {
+    const m = new Map<string, ClubScrapeRun>();
+    for (const r of scrapeRuns) {
+      if (!m.has(r.instagramUsername)) m.set(r.instagramUsername, r);
+    }
+    return m;
+  }, [scrapeRuns]);
+
+  const usernameFromUrl = (url: string | null | undefined): string | null => {
+    if (!url) return null;
+    const cleaned = url.split('?')[0].split('#')[0].replace(/\/+$/, '');
+    const last = cleaned.split('/').pop() || '';
+    return last.replace(/^@/, '') || null;
+  };
 
   const toggleFeatured = async (slug: string, next: boolean) => {
     if (!token) return;
@@ -68,14 +176,100 @@ export function ClubsListContent() {
     <div>
       <div className="flex items-center justify-between mb-6 gap-3 flex-wrap">
         <h1 className="font-display text-xl font-bold uppercase text-jet">Clubs</h1>
-        <Link
-          href="/admin/clubs/new"
-          className="flex items-center gap-2 px-4 py-2 rounded-lg bg-jet text-bone text-sm font-body font-medium hover:bg-jet/90 transition-colors cursor-pointer"
-        >
-          <Plus className="w-4 h-4" />
-          New club
-        </Link>
+        <form onSubmit={submitNewClubScrape} className="flex items-center gap-2 flex-wrap">
+          <div className="relative">
+            <AtSign className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-jet/40 pointer-events-none" />
+            <input
+              value={newClubIg}
+              onChange={(e) => setNewClubIg(e.target.value)}
+              placeholder="instagram.com/handle or @handle"
+              className="pl-10 pr-3 py-2 rounded-lg border border-jet/10 font-body text-sm text-jet placeholder:text-jet/30 focus:outline-none focus:border-signal/30 transition-colors bg-white w-[300px]"
+              disabled={newClubBusy}
+            />
+          </div>
+          <button
+            type="submit"
+            disabled={newClubBusy || !newClubIg.trim()}
+            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-jet text-bone text-sm font-body font-medium hover:bg-jet/90 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {newClubBusy ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
+            Scrape & add
+          </button>
+          <Link
+            href="/admin/clubs/new"
+            className="px-3 py-2 rounded-lg border border-jet/10 text-sm font-body text-jet/70 hover:bg-jet/5 transition-colors"
+            title="Create a club manually without scraping"
+          >
+            Manual
+          </Link>
+        </form>
       </div>
+
+      {newClubMsg && (
+        <div className="mb-4 px-4 py-3 rounded-lg text-sm font-body bg-blue-50 text-blue-900 border border-blue-200">
+          {newClubMsg}
+        </div>
+      )}
+
+      {scrapeRuns.length > 0 && (
+        <div className="mb-5 bg-white rounded-xl border border-jet/10 overflow-hidden">
+          <div className="flex items-center justify-between px-4 py-2 border-b border-jet/10">
+            <span className="font-body text-xs font-medium text-jet/40 uppercase tracking-wider">
+              Recent scrapes
+            </span>
+            {hasPending && (
+              <span className="flex items-center gap-1.5 text-xs font-body text-blue-700">
+                <Loader2 className="w-3 h-3 animate-spin" />
+                Live
+              </span>
+            )}
+          </div>
+          <div className="max-h-56 overflow-y-auto">
+            {scrapeRuns.slice(0, 10).map((r) => {
+              const isPending = r.status === 'pending';
+              const isOk = r.status === 'success' || r.status === 'partial';
+              const isFail = r.status === 'failed';
+              const started = r.startedAt ? new Date(r.startedAt) : null;
+              const finished = r.finishedAt ? new Date(r.finishedAt) : null;
+              const durSec = started && finished ? Math.round((finished.getTime() - started.getTime()) / 1000) : null;
+              return (
+                <div
+                  key={r.id}
+                  className="flex items-center gap-3 px-4 py-2 border-b border-jet/5 last:border-b-0 text-sm"
+                >
+                  {isPending && <Loader2 className="w-4 h-4 text-blue-600 animate-spin flex-shrink-0" />}
+                  {isOk && <CheckCircle2 className="w-4 h-4 text-green-600 flex-shrink-0" />}
+                  {isFail && <XCircle className="w-4 h-4 text-red-600 flex-shrink-0" />}
+                  <div className="flex-1 min-w-0">
+                    <div className="font-body text-jet truncate">
+                      {r.clubSlug ? (
+                        <Link href={`/admin/clubs/${encodeURIComponent(r.clubSlug)}`} className="hover:underline">
+                          {r.clubName || r.clubSlug}
+                        </Link>
+                      ) : (
+                        <span>@{r.instagramUsername}</span>
+                      )}
+                      <span className="text-jet/40 font-body text-xs ml-2">@{r.instagramUsername}</span>
+                    </div>
+                    {isFail && r.errorMessage && (
+                      <div className="font-body text-xs text-red-700 truncate">{r.errorMessage}</div>
+                    )}
+                    {isOk && (
+                      <div className="font-body text-xs text-jet/50">
+                        {r.counts.events_persisted ?? 0} events · {r.counts.media_uploaded ?? 0} media
+                        {durSec != null ? ` · ${durSec}s` : ''}
+                      </div>
+                    )}
+                  </div>
+                  <span className="font-body text-xs text-jet/40 whitespace-nowrap">
+                    {started ? started.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }) : ''}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       {/* Filter row */}
       <div className="flex items-center gap-3 mb-5 flex-wrap">
@@ -119,13 +313,14 @@ export function ClubsListContent() {
 
       {/* Table */}
       <div className="bg-white rounded-xl border border-jet/10 overflow-hidden">
-        <div className="grid grid-cols-[80px_1fr_auto_auto_auto_auto] gap-3 px-4 py-3 border-b border-jet/10 font-body text-xs font-medium text-jet/40 uppercase tracking-wider">
+        <div className="grid grid-cols-[80px_1fr_auto_auto_auto_auto_auto] gap-3 px-4 py-3 border-b border-jet/10 font-body text-xs font-medium text-jet/40 uppercase tracking-wider">
           <span>Cover</span>
           <span>Club</span>
           <span className="hidden sm:inline">Members</span>
           <span className="hidden md:inline">Updated</span>
           <span>Status</span>
           <span>Featured</span>
+          <span>Scrape</span>
         </div>
         {loading && clubs.length === 0 ? (
           <div className="px-4 py-12 text-center font-body text-sm text-jet/50">
@@ -142,7 +337,7 @@ export function ClubsListContent() {
             return (
               <div
                 key={c.slug}
-                className="grid grid-cols-[80px_1fr_auto_auto_auto_auto] gap-3 items-center px-4 py-3 border-b border-jet/5 last:border-b-0 hover:bg-jet/[0.015] transition-colors"
+                className="grid grid-cols-[80px_1fr_auto_auto_auto_auto_auto] gap-3 items-center px-4 py-3 border-b border-jet/5 last:border-b-0 hover:bg-jet/[0.015] transition-colors"
               >
                 <Link
                   href={`/admin/clubs/${encodeURIComponent(c.slug)}`}
@@ -192,6 +387,43 @@ export function ClubsListContent() {
                 >
                   <Star className={`w-4 h-4 ${c.isFeatured ? 'fill-current' : ''}`} />
                 </button>
+                {(() => {
+                  const handle = usernameFromUrl(c.instagramUrl);
+                  const run = handle ? latestRunByUsername.get(handle) : null;
+                  const isStarting = handle ? scrapingUsernames.has(handle) : false;
+                  const isPending = isStarting || run?.status === 'pending';
+                  const lastFinished = run?.finishedAt ? new Date(run.finishedAt) : null;
+                  const title = !c.instagramUrl
+                    ? 'No AtSign URL set on this club'
+                    : isPending
+                    ? `Scraping @${handle}…`
+                    : run?.status === 'failed'
+                    ? `Last scrape failed: ${run.errorMessage ?? 'unknown error'}`
+                    : lastFinished
+                    ? `Last scraped ${lastFinished.toLocaleString('en-IN')}`
+                    : `Scrape @${handle}`;
+                  return (
+                    <button
+                      onClick={() => scrapeClub(c.instagramUrl, handle ?? undefined)}
+                      disabled={!c.instagramUrl || isPending}
+                      className={`p-1.5 rounded-md transition-colors disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer ${
+                        run?.status === 'failed'
+                          ? 'text-red-500 hover:bg-red-50'
+                          : isPending
+                          ? 'text-blue-500'
+                          : 'text-jet/40 hover:text-jet hover:bg-jet/5'
+                      }`}
+                      aria-label="Scrape AtSign"
+                      title={title}
+                    >
+                      {isPending ? (
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                      ) : (
+                        <Download className="w-4 h-4" />
+                      )}
+                    </button>
+                  );
+                })()}
               </div>
             );
           })
