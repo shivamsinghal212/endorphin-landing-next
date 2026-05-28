@@ -176,14 +176,14 @@ export function ClubsListContent() {
     <div>
       <div className="flex items-center justify-between mb-6 gap-3 flex-wrap">
         <h1 className="font-display text-xl font-bold uppercase text-jet">Clubs</h1>
-        <form onSubmit={submitNewClubScrape} className="flex items-center gap-2 flex-wrap">
-          <div className="relative">
+        <form onSubmit={submitNewClubScrape} className="flex items-center gap-2 flex-wrap min-w-0">
+          <div className="relative min-w-0">
             <AtSign className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-jet/40 pointer-events-none" />
             <input
               value={newClubIg}
               onChange={(e) => setNewClubIg(e.target.value)}
               placeholder="instagram.com/handle or @handle"
-              className="pl-10 pr-3 py-2 rounded-lg border border-jet/10 font-body text-sm text-jet placeholder:text-jet/30 focus:outline-none focus:border-signal/30 transition-colors bg-white w-[300px]"
+              className="pl-10 pr-3 py-2 rounded-lg border border-jet/10 font-body text-sm text-jet placeholder:text-jet/30 focus:outline-none focus:border-signal/30 transition-colors bg-white w-full sm:w-[280px] max-w-full"
               disabled={newClubBusy}
             />
           </div>
@@ -235,11 +235,11 @@ export function ClubsListContent() {
               return (
                 <div
                   key={r.id}
-                  className="flex items-center gap-3 px-4 py-2 border-b border-jet/5 last:border-b-0 text-sm"
+                  className="flex items-start gap-3 px-4 py-2 border-b border-jet/5 last:border-b-0 text-sm min-w-0"
                 >
-                  {isPending && <Loader2 className="w-4 h-4 text-blue-600 animate-spin flex-shrink-0" />}
-                  {isOk && <CheckCircle2 className="w-4 h-4 text-green-600 flex-shrink-0" />}
-                  {isFail && <XCircle className="w-4 h-4 text-red-600 flex-shrink-0" />}
+                  {isPending && <Loader2 className="w-4 h-4 mt-0.5 text-blue-600 animate-spin flex-shrink-0" />}
+                  {isOk && <CheckCircle2 className="w-4 h-4 mt-0.5 text-green-600 flex-shrink-0" />}
+                  {isFail && <XCircle className="w-4 h-4 mt-0.5 text-red-600 flex-shrink-0" />}
                   <div className="flex-1 min-w-0">
                     <div className="font-body text-jet truncate">
                       {r.clubSlug ? (
@@ -252,7 +252,13 @@ export function ClubsListContent() {
                       <span className="text-jet/40 font-body text-xs ml-2">@{r.instagramUsername}</span>
                     </div>
                     {isFail && r.errorMessage && (
-                      <div className="font-body text-xs text-red-700 truncate">{r.errorMessage}</div>
+                      <div
+                        className="font-body text-xs text-red-700 break-words overflow-hidden"
+                        style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}
+                        title={r.errorMessage}
+                      >
+                        {r.errorMessage}
+                      </div>
                     )}
                     {isOk && (
                       <div className="font-body text-xs text-jet/50">
@@ -261,7 +267,7 @@ export function ClubsListContent() {
                       </div>
                     )}
                   </div>
-                  <span className="font-body text-xs text-jet/40 whitespace-nowrap">
+                  <span className="font-body text-xs text-jet/40 whitespace-nowrap flex-shrink-0">
                     {started ? started.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }) : ''}
                   </span>
                 </div>
