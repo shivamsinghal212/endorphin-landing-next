@@ -87,7 +87,7 @@ export function ClubsListContent() {
   const loadHistory = useCallback(async () => {
     if (!token) return;
     try {
-      const { runs } = await getClubScrapeHistory(token, 30);
+      const { runs } = await getClubScrapeHistory(token, 100);
       setScrapeRuns(runs);
     } catch {
       // Non-fatal — the history panel just stays stale.
@@ -312,7 +312,7 @@ export function ClubsListContent() {
             )}
           </div>
           <div className="max-h-56 overflow-y-auto">
-            {scrapeRuns.slice(0, 10).map((r) => {
+            {scrapeRuns.slice(0, 100).map((r) => {
               const isPending = r.status === 'pending';
               const isOk = r.status === 'success' || r.status === 'partial';
               const isFail = r.status === 'failed';
