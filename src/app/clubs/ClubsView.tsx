@@ -183,12 +183,14 @@ function FlagshipCard({
   claim,
   onJoin,
   onClaim,
+  isLcp = false,
 }: {
   c: ApiClub;
   membership: Membership | null;
   claim: Claim | null;
   onJoin: (club: ApiClub) => void;
   onClaim: (club: ApiClub) => void;
+  isLcp?: boolean;
 }) {
   const stats = c.stats || {};
   const nr = pickNextEvent(c.events);
@@ -222,6 +224,9 @@ function FlagshipCard({
                 <img
                   src={c.logoUrl}
                   alt={`${c.name} logo`}
+                  loading={isLcp ? 'eager' : 'lazy'}
+                  decoding="async"
+                  fetchPriority={isLcp ? 'high' : 'low'}
                   onError={(e) => {
                     (e.currentTarget as HTMLImageElement).style.display = 'none';
                   }}
@@ -359,6 +364,9 @@ function ClubCard({
               <img
                 src={c.logoUrl}
                 alt={`${c.name} logo`}
+                loading="lazy"
+                decoding="async"
+                fetchPriority="low"
                 onError={(e) => {
                   (e.currentTarget as HTMLImageElement).style.display = 'none';
                 }}
@@ -941,7 +949,7 @@ export default function ClubsView({
         <div className="v1c-hero-bg" aria-hidden />
         <div className="v1c-container">
           <h1 className="v1c-hero-title">
-            Every run club<br />in India. <span className="v1c-red">Listed.</span>
+            Every run club <br />in India. <span className="v1c-red">Listed.</span>
           </h1>
 
           <div className="v1c-hero-foot">
@@ -1053,7 +1061,7 @@ export default function ClubsView({
                 role="region"
                 aria-label="Flagship clubs"
               >
-                {flagships.map((c) => (
+                {flagships.map((c, i) => (
                   <FlagshipCard
                     key={c.slug}
                     c={c}
@@ -1061,6 +1069,7 @@ export default function ClubsView({
                     claim={claimFor(c.slug)}
                     onJoin={openJoin}
                     onClaim={openClaim}
+                    isLcp={i === 0}
                   />
                 ))}
               </div>
