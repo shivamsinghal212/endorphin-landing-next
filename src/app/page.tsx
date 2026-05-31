@@ -1,7 +1,7 @@
 import Header from '@/components/Header';
-import HeroSection from '@/components/HeroSection';
+import HeroSearch from '@/components/HeroSearch';
 import PillarsAccordion from '@/components/PillarsAccordion';
-import MeetKip from '@/components/MeetKip';
+import ManageClubSection from '@/components/ManageClubSection';
 import CTASection from '@/components/CTASection';
 import Footer from '@/components/Footer';
 
@@ -28,6 +28,45 @@ async function getUpcomingEvents(): Promise<ApiEvent[]> {
     return data.events || data.data || data || [];
   } catch {
     return [];
+  }
+}
+
+export interface HeroStats {
+  clubs: number;
+  races: number;
+  clubEvents: number;
+  cities: number;
+}
+
+const FALLBACK_STATS: HeroStats = { clubs: 50, races: 500, clubEvents: 100, cities: 25 };
+
+// /discover?includeFacets=true exposes kind + city counts at the top level —
+// cheaper than three separate listing fetches. Cached for an hour because the
+// numbers move slowly.
+async function getHeroStats(): Promise<HeroStats> {
+  try {
+    const res = await fetch(
+      'https://api.endorfin.run/api/v1/discover?includeFacets=true&limit=1',
+      { next: { revalidate: 3600 } },
+    );
+    if (!res.ok) return FALLBACK_STATS;
+    const data = (await res.json()) as {
+      facets: {
+        kinds: { value: string; count: number }[];
+        cities: { value: string; count: number }[];
+      } | null;
+    };
+    if (!data.facets) return FALLBACK_STATS;
+    const kindCount = (v: string) =>
+      data.facets!.kinds.find((k) => k.value === v)?.count ?? 0;
+    return {
+      clubs: kindCount('club'),
+      races: kindCount('race'),
+      clubEvents: kindCount('club_event'),
+      cities: data.facets.cities.length,
+    };
+  } catch {
+    return FALLBACK_STATS;
   }
 }
 
@@ -88,7 +127,7 @@ function buildEventsJsonLd(events: ApiEvent[]) {
 }
 
 export default async function Home() {
-  const events = await getUpcomingEvents();
+  const [events, heroStats] = await Promise.all([getUpcomingEvents(), getHeroStats()]);
   const eventsJsonLd = buildEventsJsonLd(events);
 
   return (
@@ -100,9 +139,9 @@ export default async function Home() {
         />
       )}
       <Header />
-      <HeroSection />
+      <HeroSearch stats={heroStats} />
       <PillarsAccordion />
-      <MeetKip />
+      <ManageClubSection />
       <CTASection />
       <Footer />
     </main>
