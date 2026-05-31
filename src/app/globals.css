@@ -2325,73 +2325,31 @@ body { padding-top: var(--nav-h, 68px); }
   background: linear-gradient(180deg, rgba(10,10,10,0.55) 0%, rgba(10,10,10,0.3) 40%, rgba(10,10,10,0.82) 100%);
 }
 .v1-clubs-page .v1c-hero > .v1c-container { position: relative; z-index: 2; }
-.v1-clubs-page .v1c-hero-title {
-  font-family: var(--font-fraunces), serif;
-  font-style: italic; font-weight: 500;
-  font-size: 64px; line-height: 1.0;
-  letter-spacing: -0.025em;
-  color: var(--bone);
-  max-width: 14ch;
-  margin: 8px 0 0;
+/* /clubs reuses the homepage's `.v1-hero` classes directly so the two
+   pages feel like the same product. The page-scoped overrides below
+   tighten just what differs: 2-stat bar instead of 5, no app-store CTA
+   row pushing the page down, search panel always expanded. */
+.v1-clubs-page .v1-hero { padding-bottom: 56px; }
+.v1-clubs-page .v1-hero .v1-hero-stats-bar {
+  /* Homepage default is `justify-content: space-between` which works for
+     5 stats but spreads 2 stats to opposite edges of the hero. Center
+     them with a fixed gap so they sit together as a unit. */
+  justify-content: center;
+  gap: 72px;
+  margin-top: 44px;
+  flex-wrap: wrap;
 }
+@media (max-width: 640px) {
+  .v1-clubs-page .v1-hero .v1-hero-stats-bar { gap: 40px; justify-content: flex-start; }
+}
+.v1-clubs-page .v1-hero .v1-hero-cta-row { display: none; } /* no app-store row on /clubs */
 .v1-clubs-page .v1c-red { color: var(--red); }
-.v1-clubs-page .v1c-hero-kicker {
-  display: inline-block;
-  font-family: var(--font-oswald), sans-serif;
-  font-weight: 600; font-size: 12px;
-  letter-spacing: 0.24em; text-transform: uppercase;
-  color: rgba(245, 240, 235, 0.55);
-}
-/* Homepage-style stats bar — matches the .v1-hero-stats-bar pattern on
-   the landing page so the two pages feel like part of the same product. */
-.v1-clubs-page .v1c-hero-stats-bar {
-  margin-top: 32px; padding-top: 24px;
-  border-top: 0.5px solid rgba(245, 240, 235, 0.2);
-  display: flex; gap: 40px; flex-wrap: wrap;
-}
-.v1-clubs-page .v1c-hero-stat {
-  display: inline-flex; flex-direction: column; gap: 4px;
-  font-family: var(--font-oswald), sans-serif;
-}
-.v1-clubs-page .v1c-hero-stat-n {
-  font-weight: 700; font-size: 32px; line-height: 1;
-  letter-spacing: -0.01em; color: var(--bone);
-  font-variant-numeric: tabular-nums;
-}
-.v1-clubs-page .v1c-hero-stat-l {
-  font-size: 11px; letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: rgba(245, 240, 235, 0.6);
-}
-@media (max-width: 640px) {
-  .v1-clubs-page .v1c-hero-stats-bar { gap: 28px; }
-  .v1-clubs-page .v1c-hero-stat-n { font-size: 26px; }
-}
-@media (max-width: 960px) {
-  .v1-clubs-page .v1c-hero { padding: 48px 0 56px; }
-  .v1-clubs-page .v1c-hero-title { font-size: 44px; letter-spacing: -0.02em; max-width: none; }
-}
-@media (max-width: 640px) {
-  .v1-clubs-page .v1c-hero-title { font-size: 36px; }
-}
-
-/* ─── Embedded search panel section ─────── */
-.v1-clubs-page .v1c-search-section {
-  background: var(--jet);
-  padding: 0 0 40px;
-}
-.v1-clubs-page .v1c-search-section .v1c-container {
-  padding-bottom: 24px;
-}
-.v1-clubs-page .v1c-search-section .v1-hero-search {
-  margin: 0 auto;
-  max-width: 980px;
-}
 
 /* ─── Featured strip (top-5-by-members) ───
    Reuses the original .v1c-flagship-card design (2-col editorial card
-   with image bg, logo, tags, next-run footer). Replaces the bespoke
-   horizontal carousel with a real responsive grid. */
+   with image bg, logo, tags, next-run footer). Desktop = 2-col grid;
+   mobile = horizontal scroll carousel with snap so all 5 featured
+   clubs are reachable without stacking them into a long column. */
 .v1-clubs-page .v1c-featured {
   background: var(--cream);
   padding: 64px 0 56px;
@@ -2404,6 +2362,38 @@ body { padding-top: var(--nav-h, 68px); }
 }
 @media (min-width: 1100px) {
   .v1-clubs-page .v1c-flagship-grid { grid-template-columns: repeat(2, 1fr); }
+}
+/* Mobile/tablet: horizontal scroll carousel. Cards are 88vw so a peek
+   of the next one is visible, telling the user "there's more — swipe."
+   Scroll-snap keeps each card landing cleanly. */
+@media (max-width: 860px) {
+  .v1-clubs-page .v1c-featured {
+    padding: 48px 0 40px;
+  }
+  .v1-clubs-page .v1c-featured .v1c-section-header {
+    padding: 0 24px;
+  }
+  .v1-clubs-page .v1c-featured .v1c-container {
+    padding-left: 0; padding-right: 0;
+  }
+  .v1-clubs-page .v1c-flagship-grid {
+    display: flex;
+    grid-template-columns: none;
+    overflow-x: auto;
+    overflow-y: hidden;
+    gap: 14px;
+    padding: 0 24px;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .v1-clubs-page .v1c-flagship-grid::-webkit-scrollbar { display: none; }
+  .v1-clubs-page .v1c-flagship-grid > .v1c-flagship-card {
+    flex: 0 0 88%;
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+  }
 }
 
 /* ─── All-clubs grid + Load more ───

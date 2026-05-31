@@ -558,37 +558,40 @@ export default function ClubsView({
 
   return (
     <>
-      {/* Slim hero — kicker + new copy + homepage-style stats bar */}
-      <section className="v1c-hero">
-        <div className="v1c-hero-bg" aria-hidden />
-        <div className="v1c-container">
-          <span className="v1c-hero-kicker">Run clubs · India&apos;s verified directory</span>
-          <h1 className="v1c-hero-title">
-            Find India&apos;s most<br />
-            <span className="v1c-red">happening</span> run clubs.
-          </h1>
-          <div className="v1c-hero-stats-bar">
-            <span className="v1c-hero-stat">
-              <span className="v1c-hero-stat-n">{totalClubs}</span>
-              <span className="v1c-hero-stat-l">Clubs</span>
-            </span>
-            <span className="v1c-hero-stat">
-              <span className="v1c-hero-stat-n">{cityCount}</span>
-              <span className="v1c-hero-stat-l">Cities</span>
-            </span>
+      {/* Hero — reuses the homepage's .v1-hero classes so /clubs and /
+          feel like the same product (centered title, stats bar, gradient
+          bg, search bar inside the hero). HeroSearchPanel renders its
+          own .v1-hero-search wrapper inline; the page-scoped CSS in
+          .v1-clubs-page lets us tweak just the bits that differ. */}
+      <section className="v1-hero">
+        <div className="v1-hero-bg" aria-hidden="true" />
+        <div className="container">
+          <div className="v1-hero-topline">
+            <span className="v1-hero-kicker">Run clubs · India&apos;s verified directory</span>
+            <span className="v1-hero-meta">{totalClubs} listed</span>
           </div>
-        </div>
-      </section>
 
-      {/* Embedded search — kindLock=club, custom chip set scoped to clubs */}
-      <section className="v1c-search-section">
-        <div className="v1c-container">
+          <h1 className="v1-hero-title">
+            Find India&apos;s most happening run clubs<span className="accent">.</span>
+          </h1>
+
           <HeroSearchPanel
             kindLock="club"
             placeholder="Search clubs by name, city, or vibe…"
             onSearchActiveChange={setIsSearching}
             quickChips={clubChips}
           />
+
+          <div className="v1-hero-stats-bar">
+            <span className="v1-hero-stat">
+              <span className="v1-hero-stat-n">{totalClubs}</span>
+              <span className="v1-hero-stat-l">Clubs</span>
+            </span>
+            <span className="v1-hero-stat">
+              <span className="v1-hero-stat-n">{cityCount}</span>
+              <span className="v1-hero-stat-l">Cities</span>
+            </span>
+          </div>
         </div>
       </section>
 
