@@ -901,7 +901,7 @@ function ResultsSection({
               Tabs and city options are data-driven from facets — anything
               with zero results gets hidden so the UI never offers a dead
               filter. */}
-          <div className="v1-discover-toolbar">
+          <div className={`v1-discover-toolbar ${hideKindTabs ? 'is-no-tabs' : ''}`}>
             {!hideKindTabs && (
               <div className="v1-discover-tabs" role="tablist" aria-label="Result kind">
                 {visibleKindTabs.map((tab) => {
@@ -924,7 +924,6 @@ function ResultsSection({
                 })}
               </div>
             )}
-            {hideKindTabs && <div />}
             <label className="v1-discover-city">
               <span className="v1-discover-city-lbl">Location</span>
               <span className="v1-discover-city-val">
@@ -973,7 +972,15 @@ function ResultsSection({
                     Drop · {chip.label}
                   </button>
                 ))}
-                <button type="button" className="v1-btn v1-btn-ghost" onClick={onReset}>
+                {/* Reset All shares the chip size/shape — using a full
+                    v1-btn made it tower over the drop chips. The .is-reset
+                    modifier tints it red so it's still clearly "the action"
+                    rather than another filter chip. */}
+                <button
+                  type="button"
+                  className="v1-chip v1-chip-reset"
+                  onClick={onReset}
+                >
                   ↺ Reset all
                 </button>
               </div>

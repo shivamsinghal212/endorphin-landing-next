@@ -682,8 +682,14 @@ body.nav-open { overflow: hidden; }
 .v1-discover-results {
   background: var(--jet);
   color: var(--bone);
-  padding: 56px 0 88px;
-  border-top: 0.5px solid rgba(245, 240, 235, 0.14);
+  padding: 72px 0 88px;
+  /* When the panel + results both live inside the hero (the embedded
+     pattern used on /clubs and /running-events) the chip row above
+     bleeds straight into "NO RESULTS" because they share the dark bg.
+     A solid 1px top edge in a brighter color gives a clear visual
+     break, and the larger top padding adds breathing room. */
+  border-top: 1px solid rgba(245, 240, 235, 0.22);
+  margin-top: 24px;
 }
 .v1-discover-head {
   display: grid; grid-template-columns: 1fr auto;
@@ -768,8 +774,15 @@ body.nav-open { overflow: hidden; }
   justify-content: space-between;
   gap: 16px;
   margin: 0 0 28px;
+  padding-bottom: 16px;
   border-bottom: 0.5px solid rgba(245, 240, 235, 0.14);
 }
+/* When kind tabs are hidden (kindLock-driven listing pages), the
+   toolbar contains only the location dropdown — center it instead of
+   pinning it to the right edge of the divider line. Driven by an
+   explicit `.is-no-tabs` modifier from the JSX for broad browser
+   support (instead of the modern :has() selector). */
+.v1-discover-toolbar.is-no-tabs { justify-content: center; }
 .v1-discover-tabs {
   display: flex;
   overflow-x: auto;
@@ -992,13 +1005,15 @@ body.nav-open { overflow: hidden; }
   to { background-position: -200% 0; }
 }
 
-/* Empty state */
+/* Empty state — centered horizontally so the panel doesn't float in
+   the left half of a wide viewport with empty space on the right. */
 .v1-discover-empty {
   position: relative;
   background: radial-gradient(ellipse 60% 100% at 100% 0%, rgba(230, 35, 42, 0.18) 0%, transparent 60%), #141414;
   border: 0.5px solid rgba(245, 240, 235, 0.14);
   padding: 48px 44px;
   max-width: 720px;
+  margin: 0 auto;
 }
 .v1-discover-empty::before {
   content: ''; position: absolute; left: 0; top: 0; bottom: 0;
@@ -1051,6 +1066,21 @@ body.nav-open { overflow: hidden; }
   cursor: pointer;
 }
 .v1-discover-empty-actions .v1-chip:hover { border-color: var(--bone); color: var(--bone); }
+
+/* "Reset all" reuses the chip shell (so it matches the drop chips
+   geometrically) but in red — clearly the primary action of the
+   empty state rather than another filter to drop. */
+.v1-discover-empty-actions .v1-chip-reset {
+  background: var(--red);
+  border-color: var(--red);
+  color: #fff;
+  font-weight: 700;
+}
+.v1-discover-empty-actions .v1-chip-reset:hover {
+  background: #c41e24;
+  border-color: #c41e24;
+  color: #fff;
+}
 
 .v1-discover-more {
   margin-top: 32px;
