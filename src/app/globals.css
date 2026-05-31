@@ -7242,3 +7242,107 @@ body { padding-top: var(--nav-h, 68px); }
     padding: 0 12px;
   }
 }
+
+/* ── Detail-page cross-nav (top of /clubs/[slug] + /running-events/[slug]) */
+.v1-detail-crossnav {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 16px 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+  font-family: var(--font-oswald), sans-serif;
+  font-weight: 500;
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(10, 10, 10, 0.55);
+}
+.v1-detail-crossnav-back,
+.v1-detail-crossnav-lateral {
+  color: rgba(10, 10, 10, 0.7);
+  transition: color 0.15s ease;
+}
+.v1-detail-crossnav-back:hover,
+.v1-detail-crossnav-lateral:hover {
+  color: #0A0A0A;
+}
+.v1-detail-crossnav-sep {
+  color: rgba(10, 10, 10, 0.25);
+}
+/* The race detail page has its own --v1rd-gutter system; the club page
+   uses the page wrapper's natural padding. Both work with the centered
+   max-width above. */
+.v1rd-page > .v1-detail-crossnav {
+  padding-left: var(--v1rd-gutter, 20px);
+  padding-right: var(--v1rd-gutter, 20px);
+  max-width: none;
+}
+
+/* ── 'Explore more' CTA strip — sits above the page-bottom CTA on both
+   detail pages so a reader who isn't ready to convert has a clear hop
+   into the other section. */
+.v1-explore-more {
+  background: #F5F0EB;
+  border-top: 1px solid rgba(10, 10, 10, 0.08);
+  border-bottom: 1px solid rgba(10, 10, 10, 0.08);
+  padding: 56px 20px;
+}
+.v1-explore-more-inner {
+  max-width: 720px;
+  margin: 0 auto;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+.v1-explore-more-eyebrow {
+  font-family: var(--font-oswald), sans-serif;
+  font-weight: 500;
+  font-size: 12px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: #E6232A;
+}
+.v1-explore-more-title {
+  font-family: var(--font-fraunces, 'Fraunces'), serif;
+  font-style: italic;
+  font-weight: 500;
+  font-size: 36px;
+  line-height: 1.1;
+  color: #0A0A0A;
+  margin: 0;
+}
+.v1-explore-more-body {
+  font-size: 15px;
+  line-height: 1.55;
+  color: rgba(10, 10, 10, 0.7);
+  max-width: 520px;
+  margin: 0;
+}
+.v1-explore-more-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 8px;
+  padding: 0 28px;
+  height: 48px;
+  background: #0A0A0A;
+  color: #F5F0EB;
+  font-family: var(--font-oswald), sans-serif;
+  font-weight: 600;
+  font-size: 13px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  transition: background 0.16s ease, color 0.16s ease;
+}
+.v1-explore-more-cta:hover {
+  background: #E6232A;
+  color: #fff;
+}
+@media (max-width: 640px) {
+  .v1-explore-more { padding: 40px 20px; }
+  .v1-explore-more-title { font-size: 28px; }
+  .v1-explore-more-body { font-size: 14px; }
+}

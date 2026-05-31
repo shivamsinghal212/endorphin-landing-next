@@ -10,6 +10,8 @@ import CouponTopStrip from '@/components/CouponTopStrip';
 import LoginModal from '@/components/LoginModal';
 import RaceCouponContext from '@/components/RaceCouponContext';
 import { ReminderButton } from '@/components/ReminderButton';
+import DetailCrossNav from '@/components/DetailCrossNav';
+import ExploreMoreStrip from '@/components/ExploreMoreStrip';
 import { couponCta } from '@/lib/coupon-cta';
 import type { Event, DistanceCategory } from '@/lib/api';
 import { useMyRegistrations } from '@/lib/runner-hooks';
@@ -287,9 +289,7 @@ export default function RaceDetailView({
         />
       )}
 
-      {/* Crumb removed on detail page — the page title is right below and
-          the back/Races nav is in the header. Keeps the discount strip
-          flush with the page top. */}
+      <DetailCrossNav kind="race" />
 
       <section className="v1rd-hero">
         <div className="v1rd-container">
@@ -648,6 +648,8 @@ export default function RaceDetailView({
           </div>
         </section>
       )}
+
+      <ExploreMoreStrip from="from-race" />
 
       <section className="v1rd-end-cta">
         <div className="v1rd-container">
