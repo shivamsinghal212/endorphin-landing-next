@@ -5,10 +5,10 @@ interface DetailCrossNavProps {
   kind: 'club' | 'race';
 }
 
-/** Small back-link + lateral cross-link rendered at the top of a detail
- *  page so users can jump out to the parent listing OR over to the
- *  other section. Replaces the dead-end feel of a detail page with no
- *  in-page navigation. */
+/** Top-of-page section switcher. Two affordances side by side: a back
+ *  link to the parent listing on the left, a lateral link to the other
+ *  section on the right, separated by a thin pipe. Replaces the
+ *  dead-end feel of a detail page with no in-page navigation. */
 export default function DetailCrossNav({ kind }: DetailCrossNavProps) {
   const back = kind === 'club'
     ? { href: '/clubs', label: 'All run clubs' }
@@ -19,13 +19,17 @@ export default function DetailCrossNav({ kind }: DetailCrossNavProps) {
 
   return (
     <nav className="v1-detail-crossnav" aria-label="Section navigation">
-      <Link href={back.href} className="v1-detail-crossnav-back">
-        <span aria-hidden="true">←</span> {back.label}
-      </Link>
-      <span className="v1-detail-crossnav-sep" aria-hidden="true">·</span>
-      <Link href={lateral.href} className="v1-detail-crossnav-lateral">
-        {lateral.label}
-      </Link>
+      <div className="v1-detail-crossnav-inner">
+        <Link href={back.href} className="v1-detail-crossnav-link is-back">
+          <span className="v1-detail-crossnav-arrow" aria-hidden="true">←</span>
+          <span className="v1-detail-crossnav-text">{back.label}</span>
+        </Link>
+        <span className="v1-detail-crossnav-divider" aria-hidden="true" />
+        <Link href={lateral.href} className="v1-detail-crossnav-link is-lateral">
+          <span className="v1-detail-crossnav-text">{lateral.label}</span>
+          <span className="v1-detail-crossnav-arrow" aria-hidden="true">↗</span>
+        </Link>
+      </div>
     </nav>
   );
 }

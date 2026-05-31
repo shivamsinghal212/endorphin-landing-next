@@ -7245,104 +7245,193 @@ body { padding-top: var(--nav-h, 68px); }
 
 /* ── Detail-page cross-nav (top of /clubs/[slug] + /running-events/[slug]) */
 .v1-detail-crossnav {
+  background: #F5F0EB;
+  border-bottom: 1px solid rgba(10, 10, 10, 0.08);
+}
+.v1-detail-crossnav-inner {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 16px 20px;
+  justify-content: space-between;
+  gap: 16px;
   max-width: 1200px;
   margin: 0 auto;
+  padding: 18px 20px;
+}
+.v1-detail-crossnav-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
   font-family: var(--font-oswald), sans-serif;
-  font-weight: 500;
-  font-size: 12px;
-  letter-spacing: 0.12em;
+  font-weight: 600;
+  font-size: 11px;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
-  color: rgba(10, 10, 10, 0.55);
+  color: rgba(10, 10, 10, 0.62);
+  transition: color 0.16s ease, transform 0.16s ease;
+  white-space: nowrap;
+  min-height: 44px;
+  padding: 0 4px;
+  align-self: center;
 }
-.v1-detail-crossnav-back,
-.v1-detail-crossnav-lateral {
-  color: rgba(10, 10, 10, 0.7);
-  transition: color 0.15s ease;
-}
-.v1-detail-crossnav-back:hover,
-.v1-detail-crossnav-lateral:hover {
+.v1-detail-crossnav-link:hover,
+.v1-detail-crossnav-link:focus-visible {
   color: #0A0A0A;
+  outline: none;
 }
-.v1-detail-crossnav-sep {
-  color: rgba(10, 10, 10, 0.25);
+.v1-detail-crossnav-link.is-back:hover .v1-detail-crossnav-arrow {
+  transform: translateX(-2px);
 }
-/* The race detail page has its own --v1rd-gutter system; the club page
-   uses the page wrapper's natural padding. Both work with the centered
-   max-width above. */
-.v1rd-page > .v1-detail-crossnav {
+.v1-detail-crossnav-link.is-lateral:hover .v1-detail-crossnav-arrow {
+  transform: translate(2px, -2px);
+}
+.v1-detail-crossnav-arrow {
+  display: inline-block;
+  font-size: 14px;
+  color: #E6232A;
+  transition: transform 0.16s ease;
+}
+.v1-detail-crossnav-link.is-lateral .v1-detail-crossnav-arrow {
+  font-size: 13px;
+}
+.v1-detail-crossnav-text { line-height: 1; }
+.v1-detail-crossnav-divider {
+  flex: 0 0 auto;
+  height: 14px;
+  width: 1px;
+  background: rgba(10, 10, 10, 0.18);
+}
+/* Race detail uses its own --v1rd-gutter system; align the cross-nav
+   gutters to match the rest of the page chrome. */
+.v1rd-page > .v1-detail-crossnav .v1-detail-crossnav-inner {
   padding-left: var(--v1rd-gutter, 20px);
   padding-right: var(--v1rd-gutter, 20px);
   max-width: none;
 }
+@media (max-width: 480px) {
+  .v1-detail-crossnav-inner { padding: 14px 16px; }
+  .v1-detail-crossnav-link { font-size: 10px; letter-spacing: 0.14em; gap: 6px; }
+  .v1-detail-crossnav-link.is-lateral .v1-detail-crossnav-text {
+    /* Drop the "All " prefix would be ideal but we keep the label
+       readable. The arrow stays as the affordance. */
+  }
+}
 
-/* ── 'Explore more' CTA strip — sits above the page-bottom CTA on both
-   detail pages so a reader who isn't ready to convert has a clear hop
-   into the other section. */
+/* ── 'Explore more' band — sits above the page-bottom CTA. Inverted
+   editorial treatment: jet bg, bone type, signal-red accents, sharp
+   left-aligned typography. Explicit colour overrides on the CTA
+   override the page-scoped `a { color: inherit }` rule. */
 .v1-explore-more {
-  background: #F5F0EB;
-  border-top: 1px solid rgba(10, 10, 10, 0.08);
-  border-bottom: 1px solid rgba(10, 10, 10, 0.08);
-  padding: 56px 20px;
+  background: #0A0A0A;
+  color: #F5F0EB;
+  padding: 80px 20px;
+  border-top: 1px solid rgba(245, 240, 235, 0.06);
+  border-bottom: 1px solid rgba(245, 240, 235, 0.06);
 }
 .v1-explore-more-inner {
-  max-width: 720px;
+  max-width: 880px;
   margin: 0 auto;
-  text-align: center;
   display: flex;
   flex-direction: column;
+  align-items: flex-start;
+  gap: 22px;
+}
+.v1-explore-more-eyebrow-row {
+  display: inline-flex;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
+}
+.v1-explore-more-rule {
+  display: inline-block;
+  width: 48px;
+  height: 1px;
+  background: #E6232A;
 }
 .v1-explore-more-eyebrow {
   font-family: var(--font-oswald), sans-serif;
-  font-weight: 500;
+  font-weight: 600;
   font-size: 12px;
-  letter-spacing: 0.22em;
+  letter-spacing: 0.28em;
   text-transform: uppercase;
   color: #E6232A;
+  line-height: 1;
 }
 .v1-explore-more-title {
   font-family: var(--font-fraunces, 'Fraunces'), serif;
   font-style: italic;
   font-weight: 500;
-  font-size: 36px;
-  line-height: 1.1;
-  color: #0A0A0A;
+  font-size: 64px;
+  line-height: 1.02;
+  letter-spacing: -0.015em;
+  color: #F5F0EB;
   margin: 0;
+  max-width: 14ch;
+}
+.v1-explore-more-title-accent {
+  color: #E6232A;
+  font-style: italic;
 }
 .v1-explore-more-body {
-  font-size: 15px;
+  font-size: 17px;
   line-height: 1.55;
-  color: rgba(10, 10, 10, 0.7);
-  max-width: 520px;
+  color: rgba(245, 240, 235, 0.72);
+  max-width: 56ch;
   margin: 0;
 }
-.v1-explore-more-cta {
+/* High-specificity selectors so the page-scoped `.v1rd-page a`/`.club-page a`
+   color-inherit rules don't repaint the CTA invisibly. */
+.v1rd-page .v1-explore-more .v1-explore-more-cta,
+.club-page .v1-explore-more .v1-explore-more-cta,
+.v1-explore-more .v1-explore-more-cta {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
-  margin-top: 8px;
+  gap: 14px;
+  margin-top: 10px;
   padding: 0 28px;
-  height: 48px;
-  background: #0A0A0A;
-  color: #F5F0EB;
+  height: 56px;
+  background: #F5F0EB;
+  color: #0A0A0A;
   font-family: var(--font-oswald), sans-serif;
   font-weight: 600;
   font-size: 13px;
-  letter-spacing: 0.14em;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
+  border: 0;
   transition: background 0.16s ease, color 0.16s ease;
 }
-.v1-explore-more-cta:hover {
+.v1rd-page .v1-explore-more .v1-explore-more-cta:hover,
+.club-page .v1-explore-more .v1-explore-more-cta:hover,
+.v1-explore-more .v1-explore-more-cta:hover {
   background: #E6232A;
-  color: #fff;
+  color: #F5F0EB;
+}
+.v1-explore-more-cta-label,
+.v1-explore-more-cta-arrow {
+  line-height: 1;
+  display: inline-block;
+}
+.v1-explore-more-cta-arrow {
+  font-size: 18px;
+  transition: transform 0.16s ease;
+}
+.v1-explore-more-cta:hover .v1-explore-more-cta-arrow {
+  transform: translateX(4px);
+}
+@media (max-width: 860px) {
+  .v1-explore-more { padding: 64px 20px; }
+  .v1-explore-more-title { font-size: 48px; }
 }
 @media (max-width: 640px) {
-  .v1-explore-more { padding: 40px 20px; }
-  .v1-explore-more-title { font-size: 28px; }
-  .v1-explore-more-body { font-size: 14px; }
+  .v1-explore-more { padding: 48px 20px; }
+  .v1-explore-more-inner { gap: 18px; }
+  .v1-explore-more-title { font-size: 36px; max-width: 12ch; }
+  .v1-explore-more-body { font-size: 15px; }
+  .v1-explore-more-rule { width: 32px; }
+  .v1-explore-more-eyebrow { font-size: 11px; letter-spacing: 0.22em; }
+  .v1rd-page .v1-explore-more .v1-explore-more-cta,
+  .club-page .v1-explore-more .v1-explore-more-cta,
+  .v1-explore-more .v1-explore-more-cta {
+    height: 52px;
+    padding: 0 22px;
+    font-size: 12px;
+  }
 }

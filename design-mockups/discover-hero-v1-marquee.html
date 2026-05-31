@@ -1,0 +1,558 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Discover · V1 Marquee · Endorfin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=Oswald:wght@400;500;600;700&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="./discover-hero-system.css" />
+<style>
+  /* ── V1: Marquee — search replaces the hero title ── */
+  .hero {
+    position: relative; overflow: hidden;
+    background: var(--jet); color: var(--bone);
+    padding: 112px 0 72px;
+  }
+  .hero-bg, .hero-bg::before, .hero-bg::after { position: absolute; inset: 0; }
+  .hero-bg { z-index: 0; pointer-events: none; overflow: hidden; }
+  .hero-bg::before {
+    content: ''; inset: -30px;
+    background:
+      linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 50%, #1a1a1a 100%),
+      radial-gradient(ellipse at 20% 30%, rgba(230,35,42,0.18), transparent 60%);
+    filter: grayscale(1) contrast(1.08) brightness(0.42);
+    transform: scale(1.06);
+  }
+  .hero-bg::after {
+    content: '';
+    background: linear-gradient(180deg, rgba(10,10,10,0.55) 0%, rgba(10,10,10,0.3) 40%, rgba(10,10,10,0.82) 100%);
+  }
+  .hero > .container { position: relative; z-index: 2; }
+
+  .hero-kicker {
+    font-family: 'Oswald', sans-serif; font-weight: 500;
+    font-size: 12px; letter-spacing: 0.24em; text-transform: uppercase;
+    color: rgba(245,240,235,0.55);
+    display: inline-flex; align-items: center; gap: 12px;
+    margin-bottom: 24px;
+  }
+  .hero-kicker .dot {
+    width: 6px; height: 6px; border-radius: 50%; background: var(--red);
+    box-shadow: 0 0 0 4px rgba(230,35,42,0.18);
+  }
+  .hero h1 {
+    font-family: 'Fraunces', serif; font-style: italic; font-weight: 700;
+    font-size: clamp(54px, 9vw, 128px); line-height: 0.92; letter-spacing: -0.035em;
+    color: var(--bone); margin: 0 0 36px; max-width: 14ch;
+  }
+  .hero h1 .red { color: var(--red); }
+
+  /* The big editorial search field — wide jet line with a single sharp red CTA */
+  .marquee-search {
+    display: grid;
+    grid-template-columns: 1fr 240px auto;
+    gap: 0;
+    background: rgba(245,240,235,0.04);
+    border: 0.5px solid rgba(245,240,235,0.22);
+    max-width: 1080px;
+  }
+  .marquee-search input {
+    background: transparent; border: 0; outline: 0;
+    color: var(--bone);
+    font-family: 'Fraunces', serif; font-style: italic;
+    font-weight: 400; font-size: 22px; letter-spacing: -0.01em;
+    padding: 0 28px; height: 76px;
+  }
+  .marquee-search input::placeholder { color: rgba(245,240,235,0.4); }
+  .marquee-search .picker {
+    display: flex; flex-direction: column; justify-content: center;
+    padding: 0 20px; border-left: 0.5px solid rgba(245,240,235,0.22);
+    cursor: pointer; transition: background 160ms;
+  }
+  .marquee-search .picker:hover { background: rgba(245,240,235,0.05); }
+  .marquee-search .picker .lbl {
+    font-family: 'Oswald', sans-serif; font-weight: 500;
+    font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase;
+    color: rgba(245,240,235,0.5); margin-bottom: 4px;
+  }
+  .marquee-search .picker .val {
+    font-family: 'Oswald', sans-serif; font-weight: 600;
+    font-size: 14px; letter-spacing: 0.06em; color: var(--bone);
+    display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  }
+  .marquee-search .go {
+    background: var(--red); color: #fff;
+    border: 0; cursor: pointer;
+    font-family: 'Oswald', sans-serif; font-weight: 700;
+    font-size: 13px; letter-spacing: 0.22em; text-transform: uppercase;
+    padding: 0 32px;
+    display: inline-flex; align-items: center; gap: 12px;
+    transition: background 160ms;
+  }
+  .marquee-search .go:hover { background: #c41e24; }
+
+  @media (max-width: 860px) {
+    .marquee-search { grid-template-columns: 1fr; }
+    .marquee-search input { font-size: 18px; height: 64px; padding: 0 18px; }
+    .marquee-search .picker { border-left: 0; border-top: 0.5px solid rgba(245,240,235,0.22); padding: 14px 18px; flex-direction: row; align-items: center; justify-content: space-between; }
+    .marquee-search .picker .lbl { margin: 0; }
+    .marquee-search .go { height: 60px; }
+  }
+
+  /* Chips row under search — same styling as the real filter strip but on dark */
+  .hero-chips {
+    display: flex; flex-wrap: wrap; gap: 8px;
+    margin-top: 32px;
+  }
+
+  /* Kind tabs (sharp editorial underline) */
+  .kind-tabs {
+    display: flex; gap: 0;
+    margin-top: 48px;
+    border-top: 0.5px solid rgba(245,240,235,0.14);
+    border-bottom: 0.5px solid rgba(245,240,235,0.14);
+  }
+  .kind-tab {
+    flex: 0 0 auto;
+    padding: 18px 28px;
+    font-family: 'Oswald', sans-serif; font-weight: 500;
+    font-size: 12px; letter-spacing: 0.22em; text-transform: uppercase;
+    color: rgba(245,240,235,0.5);
+    cursor: pointer; background: transparent; border: 0;
+    border-bottom: 2px solid transparent; margin-bottom: -1px;
+    transition: color 160ms, border-color 160ms;
+    display: inline-flex; align-items: center; gap: 10px;
+  }
+  .kind-tab:hover { color: var(--bone); }
+  .kind-tab.is-active { color: var(--bone); border-bottom-color: var(--red); }
+  .kind-tab .num {
+    font-family: 'Fraunces', serif; font-style: italic; font-weight: 700;
+    font-size: 11px; color: var(--red); text-transform: none; letter-spacing: 0;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Stats row under tabs (same as actual hero) */
+  .hero-stats {
+    display: flex; gap: 56px; margin-top: 40px; flex-wrap: wrap;
+    font-family: 'Oswald', sans-serif;
+  }
+  .hero-stats div .n {
+    font-weight: 700; font-size: 36px; line-height: 1;
+    letter-spacing: -0.01em; color: var(--bone);
+    font-variant-numeric: tabular-nums;
+  }
+  .hero-stats div .l {
+    margin-top: 6px; font-size: 11px; letter-spacing: 0.22em;
+    text-transform: uppercase; color: rgba(245,240,235,0.55);
+  }
+
+  /* Results filter strip — exact replica of the existing filter-strip */
+  .filter-strip {
+    background: var(--bone);
+    border-bottom: 0.5px solid var(--hairline);
+    padding: 22px 0;
+    position: relative;
+    box-shadow: 0 1px 0 var(--hairline);
+  }
+  .filter-row {
+    display: grid; grid-template-columns: 120px 1fr;
+    gap: 20px; align-items: center;
+  }
+  .filter-row .lbl {
+    font-family: 'Oswald', sans-serif; font-weight: 600;
+    font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase;
+    color: var(--text-secondary);
+  }
+  .filter-row .chips { display: flex; gap: 8px; flex-wrap: wrap; }
+  @media (max-width: 860px) {
+    .filter-row { grid-template-columns: 1fr; gap: 10px; }
+  }
+
+  /* Applied filters bar */
+  .applied {
+    display: flex; align-items: center; flex-wrap: wrap; gap: 10px;
+    padding: 18px 0; border-bottom: 0.5px solid rgba(245,240,235,0.14);
+    margin-bottom: 28px;
+  }
+  .applied .lbl {
+    font-family: 'Oswald', sans-serif; font-weight: 600;
+    font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase;
+    color: rgba(245,240,235,0.55);
+  }
+  .applied .pchip {
+    display: inline-flex; align-items: center; gap: 10px;
+    padding: 7px 12px; background: rgba(245,240,235,0.06);
+    border: 0.5px solid rgba(245,240,235,0.22);
+    font-family: 'Oswald', sans-serif; font-weight: 500;
+    font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--bone);
+  }
+  .applied .pchip .x { cursor: pointer; color: rgba(245,240,235,0.45); }
+  .applied .clear {
+    margin-left: auto;
+    color: var(--red); background: transparent; border: 0; cursor: pointer;
+    font-family: 'Oswald', sans-serif; font-weight: 600;
+    font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase;
+    text-decoration: underline; text-underline-offset: 4px;
+  }
+
+  /* Empty state */
+  .empty-card {
+    background: radial-gradient(ellipse 60% 100% at 100% 0%, rgba(230,35,42,0.18) 0%, transparent 60%), #141414;
+    border: 0.5px solid rgba(245,240,235,0.14);
+    position: relative;
+    padding: 64px 56px;
+    display: grid; grid-template-columns: 1.2fr 1fr;
+    gap: 48px; align-items: center;
+  }
+  .empty-card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--red); }
+  .empty-card h3 {
+    font-family: 'Fraunces', serif; font-style: italic; font-weight: 700;
+    font-size: 46px; line-height: 1.05; letter-spacing: -0.02em;
+    color: var(--bone); margin: 0 0 14px; max-width: 18ch;
+  }
+  .empty-card .lede {
+    color: rgba(245,240,235,0.65); font-size: 16px; line-height: 1.55;
+    margin: 0 0 24px; max-width: 50ch;
+  }
+  .loosen { display: flex; flex-direction: column; gap: 0; border-top: 0.5px solid rgba(245,240,235,0.14); }
+  .loosen-row {
+    display: grid; grid-template-columns: 1fr auto auto;
+    gap: 18px; align-items: center;
+    padding: 18px 0; border-bottom: 0.5px solid rgba(245,240,235,0.14);
+  }
+  .loosen-row .filt {
+    font-family: 'Oswald', sans-serif; font-weight: 500;
+    font-size: 12px; letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--bone);
+  }
+  .loosen-row .filt b { color: rgba(245,240,235,0.55); font-weight: 600; }
+  .loosen-row .delta {
+    font-family: 'Oswald', sans-serif; font-weight: 600;
+    font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--green);
+  }
+  .loosen-row .drop {
+    color: var(--red); background: transparent; border: 0; cursor: pointer;
+    font-family: 'Oswald', sans-serif; font-weight: 600;
+    font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase;
+  }
+  @media (max-width: 860px) {
+    .empty-card { grid-template-columns: 1fr; padding: 40px 24px; }
+    .empty-card h3 { font-size: 32px; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="brand">endorfin<b>.</b></div>
+  <div class="nav-links">
+    <a>Clubs</a><a>Races</a><a>Coaches</a><a>Studio</a><a>Get the app</a>
+  </div>
+</nav>
+
+<!-- ═══════════════ STATE 1: HERO + SEARCH ═══════════════ -->
+<section class="hero">
+  <div class="hero-bg" aria-hidden="true"></div>
+  <div class="container">
+    <div class="hero-kicker"><span class="dot"></span>India's running directory · 870+ listings · 25+ cities</div>
+
+    <h1>Find your<br>next <span class="red">run.</span></h1>
+
+    <!-- Marquee search bar -->
+    <div class="marquee-search" role="search">
+      <input placeholder="Try 'women-only run clubs in delhi'…" />
+      <div class="picker">
+        <span class="lbl">Where</span>
+        <span class="val">
+          <span>All India</span>
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="m6 9 6 6 6-6"/></svg>
+        </span>
+      </div>
+      <button class="go">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        Search
+      </button>
+    </div>
+
+    <!-- Chips on dark -->
+    <div class="hero-chips">
+      <span class="v1c-chip on-dark is-active">This weekend</span>
+      <span class="v1c-chip on-dark">Tomorrow</span>
+      <span class="v1c-chip on-dark">5K</span>
+      <span class="v1c-chip on-dark">10K</span>
+      <span class="v1c-chip on-dark">Half marathon</span>
+      <span class="v1c-chip on-dark">Trail</span>
+      <span class="v1c-chip on-dark">Women only</span>
+      <span class="v1c-chip on-dark">Beginner friendly</span>
+      <span class="v1c-chip on-dark">Free</span>
+    </div>
+
+    <!-- Kind tabs -->
+    <div class="kind-tabs">
+      <button class="kind-tab is-active"><span class="num">01</span>All <span style="opacity:.55">214</span></button>
+      <button class="kind-tab"><span class="num">02</span>Run clubs <span style="opacity:.55">52</span></button>
+      <button class="kind-tab"><span class="num">03</span>Races <span style="opacity:.55">38</span></button>
+      <button class="kind-tab"><span class="num">04</span>Club events <span style="opacity:.55">124</span></button>
+    </div>
+
+    <div class="hero-stats">
+      <div><div class="n">52</div><div class="l">Verified clubs</div></div>
+      <div><div class="n">500+</div><div class="l">Upcoming events</div></div>
+      <div><div class="n">25+</div><div class="l">Indian cities</div></div>
+      <div><div class="n">10K+</div><div class="l">Runners</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ribbon — matches existing -->
+<div style="background:var(--jet);height:30px;display:flex;align-items:center;border-top:0.5px solid rgba(245,240,235,0.1);overflow:hidden">
+  <div style="white-space:nowrap;font-family:Oswald,sans-serif;font-weight:600;font-size:11px;color:rgba(245,240,235,0.45);text-transform:uppercase;letter-spacing:.24em">
+    <span style="padding:0 18px">BHAG CLUB · </span><span style="padding:0 18px">MUMBAI ROAD RUNNERS · </span><span style="padding:0 18px">SISTERS IN SWEAT · </span><span style="padding:0 18px">THE SISTRA RUN · </span><span style="padding:0 18px">INDIRANAGAR RUN CLUB · </span><span style="padding:0 18px">STRIDERS BANDRA · </span><span style="padding:0 18px">PACEMAKERS BLR · </span><span style="padding:0 18px">SEA LINK STRIDERS · </span><span style="padding:0 18px">BHAG CLUB · </span><span style="padding:0 18px">MUMBAI ROAD RUNNERS · </span>
+  </div>
+</div>
+
+<!-- ═══════════════ STATE 2: RESULTS ═══════════════ -->
+
+<!-- bone filter strip (matches actual /clubs page) -->
+<div class="filter-strip">
+  <div class="container">
+    <div class="filter-row">
+      <span class="lbl">By City</span>
+      <div class="chips">
+        <button class="v1c-chip is-active">All India <span class="v1c-count">214</span></button>
+        <button class="v1c-chip">Mumbai <span class="v1c-count">87</span></button>
+        <button class="v1c-chip">Delhi NCR <span class="v1c-count">124</span></button>
+        <button class="v1c-chip">Bangalore <span class="v1c-count">92</span></button>
+        <button class="v1c-chip">Pune <span class="v1c-count">34</span></button>
+        <button class="v1c-chip">Gurgaon <span class="v1c-count">28</span></button>
+        <button class="v1c-chip">Chennai <span class="v1c-count">19</span></button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<section class="section on-dark">
+  <div class="container">
+    <div class="state-tag">State · Results</div>
+    <div class="v1c-section-header" style="margin-bottom:20px">
+      <h2 class="v1c-section-title" style="color:var(--bone)">Showing for <b>"run"</b> in <b class="v1c-red">Bangalore</b><br>· This weekend.</h2>
+      <span class="v1c-section-count" style="color:rgba(245,240,235,0.55)">214 results · sorted by upcoming</span>
+    </div>
+
+    <div class="applied">
+      <span class="lbl">Filters</span>
+      <span class="pchip">Bangalore <span class="x">✕</span></span>
+      <span class="pchip">This weekend <span class="x">✕</span></span>
+      <span class="pchip">Run clubs <span class="x">✕</span></span>
+      <span class="pchip">Women only <span class="x">✕</span></span>
+      <button class="clear">Clear all</button>
+    </div>
+
+    <!-- 3-col grid of club cards (real ClubCard replica) -->
+    <div class="results-grid">
+
+      <article class="v1c-club-card">
+        <div class="v1c-club-card-header has-img" style="--bg-img:url('https://images.unsplash.com/photo-1486218119243-13883505764c?w=800&q=80')">
+          <div class="v1c-club-card-header-fallback">SS</div>
+        </div>
+        <div class="v1c-club-card-body">
+          <div class="v1c-club-card-logo">SS</div>
+          <div class="v1c-club-card-top">
+            <h3 class="v1c-club-card-title">Sisters In Sweat</h3>
+            <span class="v1c-club-card-verified">
+              <svg width="15" height="15" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2a10 10 0 100 20 10 10 0 000-20zm4.7 7.3l-5.8 5.8a1 1 0 01-1.4 0L7 12.6a1 1 0 011.4-1.4l1.8 1.8 5.1-5.1a1 1 0 011.4 1.4z"/></svg>
+            </span>
+          </div>
+          <div class="v1c-club-card-city">Bangalore · Est 2019</div>
+          <div class="v1c-club-card-tags">
+            <span class="v1c-club-card-tag">Women only</span>
+            <span class="v1c-club-card-tag">All paces</span>
+            <span class="v1c-club-card-tag">Community</span>
+          </div>
+          <div class="v1c-club-card-foot">
+            <span class="v1c-club-card-stat"><strong>1,240</strong> members</span>
+            <span class="v1c-club-card-nextrun">Sun · 5K</span>
+          </div>
+        </div>
+        <div class="v1c-club-card-actions">
+          <button class="v1c-btn v1c-btn-primary">Join club</button>
+        </div>
+      </article>
+
+      <article class="v1c-club-card">
+        <div class="v1c-club-card-header has-img" style="--bg-img:url('https://images.unsplash.com/photo-1502904550040-7534597429ae?w=800&q=80')">
+          <div class="v1c-club-card-header-fallback">IRC</div>
+        </div>
+        <div class="v1c-club-card-body">
+          <div class="v1c-club-card-logo">IR</div>
+          <div class="v1c-club-card-top">
+            <h3 class="v1c-club-card-title">Indiranagar Run Club</h3>
+            <span class="v1c-club-card-verified">
+              <svg width="15" height="15" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2a10 10 0 100 20 10 10 0 000-20zm4.7 7.3l-5.8 5.8a1 1 0 01-1.4 0L7 12.6a1 1 0 011.4-1.4l1.8 1.8 5.1-5.1a1 1 0 011.4 1.4z"/></svg>
+            </span>
+          </div>
+          <div class="v1c-club-card-city">Bangalore · Est 2018</div>
+          <div class="v1c-club-card-tags">
+            <span class="v1c-club-card-tag">Beginner friendly</span>
+            <span class="v1c-club-card-tag">Sunday squad</span>
+          </div>
+          <div class="v1c-club-card-foot">
+            <span class="v1c-club-card-stat"><strong>842</strong> members</span>
+            <span class="v1c-club-card-nextrun">Sun · 5K</span>
+          </div>
+        </div>
+        <div class="v1c-club-card-actions">
+          <button class="v1c-btn v1c-btn-primary">Join club</button>
+        </div>
+      </article>
+
+      <article class="v1c-club-card">
+        <div class="v1c-club-card-header has-img" style="--bg-img:url('https://images.unsplash.com/photo-1571008887538-b36bb32f4571?w=800&q=80')">
+          <div class="v1c-club-card-header-fallback">PB</div>
+        </div>
+        <div class="v1c-club-card-body">
+          <div class="v1c-club-card-logo">PB</div>
+          <div class="v1c-club-card-top">
+            <h3 class="v1c-club-card-title">Pacemakers Bengaluru</h3>
+          </div>
+          <div class="v1c-club-card-city">Bangalore · Est 2021</div>
+          <div class="v1c-club-card-tags">
+            <span class="v1c-club-card-tag">Tempo</span>
+            <span class="v1c-club-card-tag">Intervals</span>
+            <span class="v1c-club-card-tag">Marathon</span>
+          </div>
+          <div class="v1c-club-card-foot">
+            <span class="v1c-club-card-stat"><strong>540</strong> members</span>
+            <span class="v1c-club-card-nextrun">Sat · 12K</span>
+          </div>
+        </div>
+        <div class="v1c-club-card-actions">
+          <button class="v1c-btn v1c-btn-primary">Join club</button>
+        </div>
+      </article>
+
+      <article class="v1c-club-card">
+        <div class="v1c-club-card-header has-img" style="--bg-img:url('https://images.unsplash.com/photo-1551698618-1dfe5d97d256?w=800&q=80')">
+          <div class="v1c-club-card-header-fallback">SR</div>
+        </div>
+        <div class="v1c-club-card-body">
+          <div class="v1c-club-card-logo">SR</div>
+          <div class="v1c-club-card-top">
+            <h3 class="v1c-club-card-title">Stride Run Club</h3>
+            <span class="v1c-club-card-verified">
+              <svg width="15" height="15" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2a10 10 0 100 20 10 10 0 000-20zm4.7 7.3l-5.8 5.8a1 1 0 01-1.4 0L7 12.6a1 1 0 011.4-1.4l1.8 1.8 5.1-5.1a1 1 0 011.4 1.4z"/></svg>
+            </span>
+          </div>
+          <div class="v1c-club-card-city">Bangalore · Est 2020</div>
+          <div class="v1c-club-card-tags">
+            <span class="v1c-club-card-tag">Social</span>
+            <span class="v1c-club-card-tag">Brunch run</span>
+          </div>
+          <div class="v1c-club-card-foot">
+            <span class="v1c-club-card-stat"><strong>410</strong> members</span>
+            <span class="v1c-club-card-nextrun">Sat · 5K</span>
+          </div>
+        </div>
+        <div class="v1c-club-card-actions">
+          <button class="v1c-btn v1c-btn-primary">Join club</button>
+        </div>
+      </article>
+
+      <article class="v1c-club-card">
+        <div class="v1c-club-card-header has-img" style="--bg-img:url('https://images.unsplash.com/photo-1532383282788-5ebef00cb909?w=800&q=80')">
+          <div class="v1c-club-card-header-fallback">CRC</div>
+        </div>
+        <div class="v1c-club-card-body">
+          <div class="v1c-club-card-logo">CR</div>
+          <div class="v1c-club-card-top">
+            <h3 class="v1c-club-card-title">Cubbon Run Crew</h3>
+          </div>
+          <div class="v1c-club-card-city">Bangalore · Est 2022</div>
+          <div class="v1c-club-card-tags">
+            <span class="v1c-club-card-tag">Park loops</span>
+            <span class="v1c-club-card-tag">All paces</span>
+          </div>
+          <div class="v1c-club-card-foot">
+            <span class="v1c-club-card-stat"><strong>286</strong> members</span>
+            <span class="v1c-club-card-nextrun">Sun · 7K</span>
+          </div>
+        </div>
+        <div class="v1c-club-card-actions">
+          <button class="v1c-btn v1c-btn-primary">Join club</button>
+        </div>
+      </article>
+
+      <article class="v1c-club-card">
+        <div class="v1c-club-card-header has-img" style="--bg-img:url('https://images.unsplash.com/photo-1517649763962-0c623066013b?w=800&q=80')">
+          <div class="v1c-club-card-header-fallback">W10K</div>
+        </div>
+        <div class="v1c-club-card-body">
+          <div class="v1c-club-card-logo">W</div>
+          <div class="v1c-club-card-top">
+            <h3 class="v1c-club-card-title" style="color:var(--red)">RACE · TCS World 10K</h3>
+          </div>
+          <div class="v1c-club-card-city">Bangalore · Sun · Jun 8</div>
+          <div class="v1c-club-card-tags">
+            <span class="v1c-club-card-tag">10 KM</span>
+            <span class="v1c-club-card-tag">Timed</span>
+            <span class="v1c-club-card-tag">Elite field</span>
+          </div>
+          <div class="v1c-club-card-foot">
+            <span class="v1c-club-card-stat"><strong>₹800</strong> entry</span>
+            <span class="v1c-club-card-nextrun">5:00 AM start</span>
+          </div>
+        </div>
+        <div class="v1c-club-card-actions">
+          <button class="v1c-btn v1c-btn-primary">Register</button>
+        </div>
+      </article>
+
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ STATE 3: EMPTY ═══════════════ -->
+<section class="section on-bone compact">
+  <div class="container">
+    <div class="state-tag">State · No results</div>
+    <h2 class="v1c-section-title" style="margin-bottom:36px">0 matches for<br><b>half marathon in Imphal · Tomorrow.</b></h2>
+
+    <div class="empty-card">
+      <div>
+        <span class="kicker" style="color:var(--red);font-family:Oswald,sans-serif;font-weight:600;font-size:11px;letter-spacing:.22em;text-transform:uppercase">Nothing on the calendar</span>
+        <h3>Looks empty<br>over here<span class="v1c-red">.</span></h3>
+        <p class="lede">We don't have a half marathon in Imphal tomorrow. Try a different distance, drop the city filter, or browse what's running this weekend instead.</p>
+        <button class="v1c-btn v1c-btn-ghost-light">↺ Reset all filters</button>
+      </div>
+      <div class="loosen">
+        <div class="loosen-row">
+          <span class="filt"><b>Distance ·</b> 21K+</span>
+          <span class="delta">→ 12 matches</span>
+          <button class="drop">Drop</button>
+        </div>
+        <div class="loosen-row">
+          <span class="filt"><b>City ·</b> Imphal</span>
+          <span class="delta">→ 27 matches</span>
+          <button class="drop">Drop</button>
+        </div>
+        <div class="loosen-row">
+          <span class="filt"><b>When ·</b> Tomorrow</span>
+          <span class="delta">→ 8 matches</span>
+          <button class="drop">Drop</button>
+        </div>
+        <div class="loosen-row" style="border-bottom:0">
+          <span class="filt"><b>Kind ·</b> Race</span>
+          <span class="delta">→ 4 matches</span>
+          <button class="drop">Drop</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+</body>
+</html>

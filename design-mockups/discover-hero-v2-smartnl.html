@@ -1,0 +1,364 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Discover · V2 Ask Kip · Endorfin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=Oswald:wght@400;500;600;700&family=Poppins:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="./discover-hero-system.css" />
+<style>
+  /* ── V2: Ask Kip — natural-language hero ── */
+  .hero {
+    position: relative; overflow: hidden;
+    background: var(--jet); color: var(--bone);
+    padding: 112px 0 96px;
+  }
+  .hero::before {
+    content: ''; position: absolute; inset: 0; z-index: 0; pointer-events: none;
+    background:
+      radial-gradient(ellipse 60% 70% at 50% 0%, rgba(230,35,42,0.20) 0%, transparent 55%),
+      radial-gradient(ellipse 40% 50% at 90% 100%, rgba(230,35,42,0.10) 0%, transparent 60%);
+  }
+  .hero > .container { position: relative; z-index: 2; max-width: 920px; margin: 0 auto; padding-left: max(28px, var(--gutter)); padding-right: max(28px, var(--gutter)); }
+
+  .ask-badge {
+    display: inline-flex; align-items: center; gap: 10px;
+    font-family: 'Oswald', sans-serif; font-weight: 600;
+    font-size: 11px; letter-spacing: 0.24em; text-transform: uppercase;
+    color: var(--red);
+    border: 0.5px solid rgba(230,35,42,0.55);
+    background: rgba(230,35,42,0.08);
+    padding: 8px 14px;
+  }
+  .ask-badge .sp {
+    width: 6px; height: 6px; background: var(--red); display: inline-block;
+    transform: rotate(45deg);
+  }
+
+  .hero h1 {
+    font-family: 'Fraunces', serif; font-style: italic; font-weight: 700;
+    font-size: clamp(48px, 7vw, 96px); line-height: 0.96; letter-spacing: -0.035em;
+    color: var(--bone); margin: 24px 0 18px; max-width: 14ch;
+  }
+  .hero h1 .red { color: var(--red); }
+  .hero .sub {
+    font-family: 'Poppins', sans-serif;
+    font-size: 18px; line-height: 1.55;
+    color: rgba(245,240,235,0.65); max-width: 52ch; margin: 0 0 44px;
+  }
+
+  /* Natural-language input — full width, single line, sharp jet field */
+  .nl-wrap {
+    position: relative;
+    border-top: 0.5px solid rgba(245,240,235,0.22);
+    border-bottom: 0.5px solid rgba(245,240,235,0.22);
+    background: rgba(245,240,235,0.03);
+  }
+  .nl-row {
+    display: grid; grid-template-columns: 32px 1fr auto;
+    gap: 18px; align-items: center;
+    padding: 22px 0;
+  }
+  .nl-row .sparkle { color: var(--red); }
+  .nl-row input {
+    background: transparent; border: 0; outline: 0;
+    color: var(--bone);
+    font-family: 'Fraunces', serif; font-style: italic;
+    font-weight: 400; font-size: clamp(20px, 2.4vw, 30px);
+    letter-spacing: -0.01em; line-height: 1.2;
+    padding: 8px 0;
+    width: 100%;
+  }
+  .nl-row input::placeholder { color: rgba(245,240,235,0.35); }
+  .nl-row .submit {
+    background: var(--red); color: #fff; border: 0; cursor: pointer;
+    font-family: 'Oswald', sans-serif; font-weight: 700;
+    font-size: 13px; letter-spacing: 0.22em; text-transform: uppercase;
+    padding: 16px 28px;
+    display: inline-flex; align-items: center; gap: 12px;
+    transition: background 160ms;
+  }
+  .nl-row .submit:hover { background: #c41e24; }
+
+  .nl-hint {
+    margin-top: 16px;
+    font-family: 'Oswald', sans-serif; font-weight: 500;
+    font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase;
+    color: rgba(245,240,235,0.45);
+    display: flex; align-items: center; gap: 12px;
+  }
+  .nl-hint kbd {
+    font-family: 'JetBrains Mono', monospace;
+    border: 0.5px solid rgba(245,240,235,0.22);
+    padding: 2px 7px; font-size: 11px; letter-spacing: 0;
+    color: rgba(245,240,235,0.7);
+  }
+
+  /* Example queries — small editorial list */
+  .examples {
+    margin-top: 56px;
+    display: grid; grid-template-columns: 1fr 1fr; gap: 0;
+    border-top: 0.5px solid rgba(245,240,235,0.14);
+  }
+  @media (max-width:780px){ .examples{ grid-template-columns: 1fr; } }
+  .ex {
+    padding: 22px 0;
+    border-bottom: 0.5px solid rgba(245,240,235,0.14);
+    display: flex; align-items: center; gap: 16px;
+    cursor: pointer; transition: background 160ms;
+    border-right: 0.5px solid rgba(245,240,235,0.14);
+    padding-right: 24px;
+  }
+  .ex:nth-child(2n) { border-right: 0; padding-right: 0; padding-left: 24px; }
+  .ex:hover { background: rgba(245,240,235,0.03); }
+  .ex .num {
+    font-family: 'Oswald', sans-serif; font-weight: 700;
+    font-size: 11px; letter-spacing: 0.22em; color: var(--red);
+    min-width: 28px;
+  }
+  .ex .q {
+    font-family: 'Fraunces', serif; font-style: italic;
+    font-weight: 400; font-size: 19px; letter-spacing: -0.01em;
+    color: var(--bone);
+  }
+  .ex .arrow { margin-left: auto; color: rgba(245,240,235,0.4); }
+
+  /* ─── Parsed-chips bar above results ─── */
+  .parsed-bar {
+    background: #141414;
+    border: 0.5px solid rgba(245,240,235,0.14);
+    padding: 24px 28px;
+    position: relative;
+    margin-bottom: 32px;
+  }
+  .parsed-bar::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--red); }
+  .parsed-bar .head {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 16px; gap: 16px; flex-wrap: wrap;
+  }
+  .parsed-bar .head .lbl {
+    font-family: 'Oswald', sans-serif; font-weight: 600;
+    font-size: 11px; letter-spacing: 0.24em; text-transform: uppercase;
+    color: var(--red); display: inline-flex; align-items: center; gap: 10px;
+  }
+  .parsed-bar .head .lbl .sp {
+    width: 6px; height: 6px; background: var(--red);
+    display: inline-block; transform: rotate(45deg);
+  }
+  .parsed-bar .conf {
+    font-family: 'Oswald', sans-serif; font-weight: 500;
+    font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase;
+    color: var(--green);
+  }
+  .parsed-bar .quoted {
+    font-family: 'Fraunces', serif; font-style: italic;
+    font-weight: 400; font-size: 22px; letter-spacing: -0.01em;
+    color: rgba(245,240,235,0.85); margin-bottom: 20px;
+  }
+  .parsed-bar .quoted::before { content: '"'; color: var(--red); margin-right: 4px; }
+  .parsed-bar .quoted::after { content: '"'; color: var(--red); margin-left: 4px; }
+  .parsed-bar .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .parsed-bar .pchip {
+    display: inline-flex; align-items: center; gap: 10px;
+    padding: 7px 12px;
+    background: rgba(245,240,235,0.06);
+    border: 0.5px solid rgba(245,240,235,0.22);
+    font-family: 'Oswald', sans-serif; font-weight: 500;
+    font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--bone);
+  }
+  .parsed-bar .pchip .typ { color: rgba(245,240,235,0.5); }
+  .parsed-bar .pchip .x { cursor: pointer; color: rgba(245,240,235,0.45); }
+  .parsed-bar .note {
+    margin-top: 16px; padding-top: 16px; border-top: 0.5px solid rgba(245,240,235,0.1);
+    font-family: 'Oswald', sans-serif; font-weight: 500;
+    font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase;
+    color: rgba(245,240,235,0.55);
+    display: flex; align-items: center; gap: 10px;
+  }
+
+  /* ─── Off-topic empty ─── */
+  .off-topic {
+    background: radial-gradient(ellipse 60% 100% at 0% 100%, rgba(230,35,42,0.20) 0%, transparent 60%), #141414;
+    border: 0.5px solid rgba(245,240,235,0.14);
+    position: relative;
+    padding: 80px 56px;
+    text-align: left;
+    max-width: 760px;
+  }
+  .off-topic::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--red); }
+  .off-topic .kic {
+    font-family: 'Oswald', sans-serif; font-weight: 600;
+    font-size: 11px; letter-spacing: 0.24em; text-transform: uppercase;
+    color: var(--red); display: inline-block; margin-bottom: 16px;
+  }
+  .off-topic h3 {
+    font-family: 'Fraunces', serif; font-style: italic; font-weight: 700;
+    font-size: 48px; line-height: 1.0; letter-spacing: -0.025em;
+    color: var(--bone); margin: 0 0 16px;
+  }
+  .off-topic h3 .red { color: var(--red); }
+  .off-topic p {
+    color: rgba(245,240,235,0.65);
+    font-size: 16px; line-height: 1.55;
+    margin: 0 0 28px; max-width: 50ch;
+  }
+  .off-topic .try {
+    font-family: 'Oswald', sans-serif; font-weight: 600;
+    font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase;
+    color: rgba(245,240,235,0.5); margin-bottom: 12px;
+  }
+  .off-topic .alt-list { border-top: 0.5px solid rgba(245,240,235,0.14); }
+  .off-topic .alt-list .ex { border-right: 0; padding-right: 0; }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="brand">endorfin<b>.</b></div>
+  <div class="nav-links">
+    <a>Clubs</a><a>Races</a><a>Coaches</a><a>Studio</a><a>Get the app</a>
+  </div>
+</nav>
+
+<!-- ═══════════════ STATE 1: HERO ═══════════════ -->
+<section class="hero">
+  <div class="container">
+    <span class="ask-badge"><span class="sp"></span>Ask Kip · Powered by smart search</span>
+
+    <h1>Tell us what kind of run<br>you're looking <span class="red">for.</span></h1>
+    <p class="sub">Type naturally — Kip turns your sentence into filters. No drop-downs. No checkboxes. Just one line.</p>
+
+    <div class="nl-wrap">
+      <div class="nl-row">
+        <span class="sparkle">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2 14 10 22 12 14 14 12 22 10 14 2 12 10 10z"/></svg>
+        </span>
+        <input value="women-only run clubs in delhi this weekend" />
+        <button class="submit">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg>
+          Ask Kip
+        </button>
+      </div>
+    </div>
+
+    <div class="nl-hint">
+      <kbd>⌘</kbd><kbd>K</kbd> Open Kip from anywhere on Endorfin
+    </div>
+
+    <!-- Editorial example grid -->
+    <div class="examples">
+      <div class="ex"><span class="num">01</span><span class="q">5K races in Mumbai next month</span><span class="arrow">→</span></div>
+      <div class="ex"><span class="num">02</span><span class="q">Beginner runs near Bandra this Sunday</span><span class="arrow">→</span></div>
+      <div class="ex"><span class="num">03</span><span class="q">Half marathon in September</span><span class="arrow">→</span></div>
+      <div class="ex" style="border-bottom:0"><span class="num">04</span><span class="q">Free club runs tomorrow</span><span class="arrow">→</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ STATE 2: PARSED RESULTS ═══════════════ -->
+<section class="section on-dark">
+  <div class="container">
+    <div class="state-tag">State · Smart-parsed results</div>
+
+    <div class="parsed-bar">
+      <div class="head">
+        <span class="lbl"><span class="sp"></span>Kip parsed your query</span>
+        <span class="conf">● Confidence 95%</span>
+      </div>
+      <div class="quoted">women-only run clubs in delhi this weekend</div>
+      <div class="chips">
+        <span class="pchip"><span class="typ">Kind ·</span>Run club <span class="x">✕</span></span>
+        <span class="pchip"><span class="typ">City ·</span>Delhi <span class="x">✕</span></span>
+        <span class="pchip"><span class="typ">Tag ·</span>Women only <span class="x">✕</span></span>
+        <span class="pchip"><span class="typ">When ·</span>This weekend <span class="x">✕</span></span>
+      </div>
+      <div class="note">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+        Edit a chip to refine. Removing one rebroadens the search.
+      </div>
+    </div>
+
+    <!-- Results — flagship-style horizontal rows (matches the editorial vibe) -->
+    <div style="background:#141414;border:0.5px solid rgba(245,240,235,0.14);padding:0 28px" class="on-dark">
+
+      <a class="event-row" href="#">
+        <div class="date-block">
+          <div class="day">3</div><div class="mo">Events<br>this week</div>
+        </div>
+        <div class="info">
+          <div class="kind">Run club · Verified</div>
+          <h3>The Sistra Run</h3>
+          <div class="meta">Delhi NCR · Women only · Beginner friendly</div>
+        </div>
+        <div class="when"><b>Sun 5:30 AM</b>Khan Market · 5K</div>
+        <span class="arrow"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 6 6 6-6 6"/></svg></span>
+      </a>
+
+      <a class="event-row" href="#">
+        <div class="date-block">
+          <div class="day">1</div><div class="mo">Event<br>this week</div>
+        </div>
+        <div class="info">
+          <div class="kind">Run club</div>
+          <h3>She Runs Delhi</h3>
+          <div class="meta">Delhi · Women only · All paces</div>
+        </div>
+        <div class="when"><b>Sat 6:00 AM</b>Lodhi Garden · 8K</div>
+        <span class="arrow"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 6 6 6-6 6"/></svg></span>
+      </a>
+
+      <a class="event-row" href="#">
+        <div class="date-block">
+          <div class="day">31</div><div class="mo">May<br>Sun</div>
+        </div>
+        <div class="info">
+          <div class="kind">Club event</div>
+          <h3>Sisterhood Sundowner — 3K shake-out</h3>
+          <div class="meta">Hosted by The Sistra Run · Khan Market · Free</div>
+        </div>
+        <div class="when"><b>6:00 PM</b>3 KM · Coffee after</div>
+        <span class="arrow"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 6 6 6-6 6"/></svg></span>
+      </a>
+
+      <a class="event-row" href="#" style="border-bottom:0">
+        <div class="date-block">
+          <div class="day">14</div><div class="mo">Jun<br>Sat</div>
+        </div>
+        <div class="info">
+          <div class="kind">Race</div>
+          <h3>Pinkathon Delhi 2026 — Women's 5K &amp; 10K</h3>
+          <div class="meta">India's largest women-only race · Jawaharlal Nehru Stadium</div>
+        </div>
+        <div class="when"><b>5:30 AM</b>Timed · ₹650</div>
+        <span class="arrow"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 6 6 6-6 6"/></svg></span>
+      </a>
+
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ STATE 3: OFF-TOPIC ═══════════════ -->
+<section class="section on-dark compact">
+  <div class="container">
+    <div class="state-tag">State · Off-topic query</div>
+    <div class="off-topic">
+      <span class="kic">Not a running query</span>
+      <h3>Kip's a run coach<br>not a food critic<span class="red">.</span></h3>
+      <p>You asked: <em style="color:rgba(245,240,235,0.85)">"best biryani in delhi"</em>. Kip didn't find filters for that — but here's what does work.</p>
+
+      <div class="try">Try one of these instead</div>
+      <div class="alt-list">
+        <div class="ex"><span class="num">01</span><span class="q">Run clubs in Bangalore</span><span class="arrow">→</span></div>
+        <div class="ex"><span class="num">02</span><span class="q">5K races this weekend</span><span class="arrow">→</span></div>
+        <div class="ex"><span class="num">03</span><span class="q">Beginner-friendly clubs near me</span><span class="arrow">→</span></div>
+        <div class="ex" style="border-bottom:0"><span class="num">04</span><span class="q">Half marathon in September</span><span class="arrow">→</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+</body>
+</html>

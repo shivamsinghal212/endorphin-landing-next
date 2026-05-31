@@ -1,0 +1,643 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Discover · V4 City-led · Endorfin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=Oswald:wght@400;500;600;700&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="./discover-hero-system.css" />
+<style>
+  /* ── V4: City-led — large city bento grid as the discovery surface ── */
+  .hero {
+    position: relative; overflow: hidden;
+    background: var(--jet); color: var(--bone);
+    padding: 96px 0 88px;
+  }
+  .hero::before {
+    content: ''; position: absolute; inset: 0; z-index: 0; pointer-events: none;
+    background:
+      linear-gradient(135deg, rgba(230,35,42,0.10), transparent 50%),
+      radial-gradient(ellipse 50% 60% at 100% 0%, rgba(230,35,42,0.14) 0%, transparent 55%);
+  }
+  .hero > .container { position: relative; z-index: 2; }
+
+  .hero-head { display: grid; grid-template-columns: 1.4fr 1fr; gap: 48px; align-items: end; margin-bottom: 56px; }
+  @media (max-width: 900px) { .hero-head { grid-template-columns: 1fr; gap: 28px; } }
+  .hero-head .kicker {
+    font-family: 'Oswald', sans-serif; font-weight: 500;
+    font-size: 12px; letter-spacing: 0.24em; text-transform: uppercase;
+    color: rgba(245,240,235,0.55);
+    display: inline-flex; align-items: center; gap: 12px;
+    margin-bottom: 24px;
+  }
+  .hero-head .kicker .dot {
+    width: 6px; height: 6px; border-radius: 50%; background: var(--red);
+    box-shadow: 0 0 0 4px rgba(230,35,42,0.18);
+  }
+  .hero-head h1 {
+    font-family: 'Fraunces', serif; font-style: italic; font-weight: 700;
+    font-size: clamp(54px, 8vw, 112px); line-height: 0.92; letter-spacing: -0.035em;
+    color: var(--bone); margin: 0; max-width: 14ch;
+  }
+  .hero-head h1 .red { color: var(--red); }
+
+  /* Quick search above the city grid */
+  .quick-search {
+    display: grid; grid-template-columns: 1fr auto; gap: 0;
+    border: 0.5px solid rgba(245,240,235,0.22);
+    background: rgba(245,240,235,0.04);
+    align-self: end;
+    max-width: 480px;
+  }
+  .quick-search input {
+    background: transparent; border: 0; outline: 0;
+    color: var(--bone);
+    font-family: 'Fraunces', serif; font-style: italic;
+    font-weight: 400; font-size: 16px; letter-spacing: -0.005em;
+    padding: 0 20px; height: 60px;
+  }
+  .quick-search input::placeholder { color: rgba(245,240,235,0.4); }
+  .quick-search button {
+    background: var(--red); color: #fff; border: 0; cursor: pointer;
+    font-family: 'Oswald', sans-serif; font-weight: 700;
+    font-size: 12px; letter-spacing: 0.22em; text-transform: uppercase;
+    padding: 0 24px;
+  }
+
+  /* City bento — bold, brutalist */
+  .city-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    grid-template-rows: auto auto;
+    gap: 0;
+    border: 0.5px solid rgba(245,240,235,0.14);
+  }
+  @media (max-width: 980px) { .city-grid { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 560px) { .city-grid { grid-template-columns: 1fr; } }
+  .city-tile {
+    position: relative;
+    padding: 32px;
+    border-right: 0.5px solid rgba(245,240,235,0.14);
+    border-bottom: 0.5px solid rgba(245,240,235,0.14);
+    background: #141414;
+    cursor: pointer;
+    transition: background 200ms;
+    min-height: 200px;
+    display: flex; flex-direction: column; justify-content: space-between;
+    overflow: hidden;
+  }
+  .city-tile:hover { background: #1a1a1a; }
+  .city-tile.featured { grid-row: span 2; min-height: 420px; padding: 40px; background: linear-gradient(180deg, #1a1a1a 0%, #141414 100%); }
+  .city-tile.featured::after {
+    content: ''; position: absolute; inset: 0;
+    background: radial-gradient(ellipse 70% 80% at 0% 100%, rgba(230,35,42,0.18) 0%, transparent 60%);
+    pointer-events: none;
+  }
+  .city-tile > * { position: relative; z-index: 1; }
+  .city-tile .num {
+    font-family: 'Oswald', sans-serif; font-weight: 600;
+    font-size: 11px; letter-spacing: 0.24em; text-transform: uppercase;
+    color: rgba(245,240,235,0.4);
+  }
+  .city-tile.featured .num { color: var(--red); }
+  .city-tile .name {
+    font-family: 'Fraunces', serif; font-style: italic; font-weight: 700;
+    font-size: 30px; line-height: 0.98; letter-spacing: -0.02em;
+    color: var(--bone); margin-top: 12px;
+  }
+  .city-tile.featured .name { font-size: 64px; line-height: 0.92; letter-spacing: -0.035em; }
+  .city-tile .meta {
+    display: flex; flex-direction: column; gap: 10px;
+    margin-top: 18px;
+  }
+  .city-tile .meta .row {
+    display: flex; justify-content: space-between; align-items: baseline;
+    font-family: 'Oswald', sans-serif;
+    font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase;
+    color: rgba(245,240,235,0.55);
+    padding-bottom: 6px; border-bottom: 0.5px dashed rgba(245,240,235,0.12);
+  }
+  .city-tile .meta .row b {
+    color: var(--bone); font-weight: 700;
+    font-size: 16px; letter-spacing: -0.01em;
+    font-variant-numeric: tabular-nums;
+  }
+  .city-tile .badge {
+    position: absolute; top: 20px; right: 20px;
+    font-family: 'Oswald', sans-serif; font-weight: 700;
+    font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase;
+    color: var(--red);
+    background: rgba(230,35,42,0.10);
+    border: 0.5px solid rgba(230,35,42,0.5);
+    padding: 4px 10px;
+  }
+  .city-tile .arrow {
+    align-self: flex-end; color: rgba(245,240,235,0.4);
+    margin-top: auto;
+  }
+  .city-tile:hover .arrow { color: var(--bone); }
+  .city-tile.featured .total {
+    font-family: 'Fraunces', serif; font-style: italic; font-weight: 700;
+    font-size: 88px; line-height: 0.9; color: var(--red);
+    letter-spacing: -0.04em;
+    font-variant-numeric: tabular-nums;
+  }
+  .city-tile.featured .total-l {
+    font-family: 'Oswald', sans-serif; font-weight: 600;
+    font-size: 11px; letter-spacing: 0.24em; text-transform: uppercase;
+    color: rgba(245,240,235,0.55); margin-top: 6px;
+  }
+
+  /* ─── Result rails (real club-card replicas) ─── */
+  .rail { margin-bottom: 72px; }
+  .rail:last-child { margin-bottom: 0; }
+  .rail-head {
+    display: flex; align-items: end; justify-content: space-between;
+    margin-bottom: 28px;
+  }
+  .rail-head h3 {
+    font-family: 'Fraunces', serif; font-style: italic; font-weight: 400;
+    font-size: 36px; line-height: 1.05; letter-spacing: -0.015em;
+    color: var(--bone); margin: 0;
+  }
+  .rail-head h3 b { font-weight: 700; }
+  .rail-head .sub3 {
+    font-family: 'Oswald', sans-serif; font-weight: 500;
+    font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase;
+    color: rgba(245,240,235,0.55); margin-top: 8px;
+  }
+  .rail-head .more {
+    font-family: 'Oswald', sans-serif; font-weight: 600;
+    font-size: 12px; letter-spacing: 0.22em; text-transform: uppercase;
+    color: var(--red);
+    text-decoration: none;
+    border-bottom: 1px solid var(--red);
+    padding-bottom: 2px;
+  }
+
+  .rail-track {
+    display: flex; gap: 18px;
+    overflow-x: auto; padding-bottom: 8px;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+  }
+  .rail-track::-webkit-scrollbar { display: none; }
+  .rail-track .v1c-club-card {
+    flex: 0 0 340px;
+    scroll-snap-align: start;
+  }
+
+  /* ─── Notify-me empty ─── */
+  .notify {
+    background: radial-gradient(ellipse 60% 100% at 100% 0%, rgba(230,35,42,0.18) 0%, transparent 60%), #141414;
+    border: 0.5px solid rgba(245,240,235,0.14);
+    position: relative;
+    padding: 56px;
+    display: grid; grid-template-columns: 1.2fr 1fr;
+    gap: 48px; align-items: center;
+    color: var(--bone);
+  }
+  .notify::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--red); }
+  .notify .kic {
+    font-family: 'Oswald', sans-serif; font-weight: 600;
+    font-size: 11px; letter-spacing: 0.24em; text-transform: uppercase;
+    color: var(--red); display: inline-block; margin-bottom: 16px;
+  }
+  .notify h3 {
+    font-family: 'Fraunces', serif; font-style: italic; font-weight: 700;
+    font-size: 46px; line-height: 1.0; letter-spacing: -0.025em;
+    color: var(--bone); margin: 0 0 14px;
+  }
+  .notify h3 .red { color: var(--red); }
+  .notify p {
+    color: rgba(245,240,235,0.65);
+    font-size: 16px; line-height: 1.55;
+    margin: 0 0 24px; max-width: 50ch;
+  }
+  .notify .nearby {
+    font-family: 'Oswald', sans-serif; font-weight: 600;
+    font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase;
+    color: rgba(245,240,235,0.5); margin-bottom: 12px;
+  }
+  .notify .nearby-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 28px; }
+  .notify-form { display: flex; gap: 0; }
+  .notify-form input {
+    background: rgba(245,240,235,0.04);
+    border: 1px solid rgba(245,240,235,0.22);
+    color: var(--bone); height: 52px; padding: 0 18px;
+    font-family: 'Oswald', sans-serif; font-size: 13px; letter-spacing: 0.06em;
+    outline: 0; flex: 1; min-width: 0;
+  }
+  .notify-form input::placeholder { color: rgba(245,240,235,0.4); }
+  .notify-form button {
+    background: var(--red); color: #fff; border: 0; cursor: pointer;
+    font-family: 'Oswald', sans-serif; font-weight: 700;
+    font-size: 12px; letter-spacing: 0.22em; text-transform: uppercase;
+    padding: 0 22px;
+  }
+  @media (max-width: 860px) {
+    .notify { grid-template-columns: 1fr; padding: 36px 28px; gap: 28px; }
+    .notify h3 { font-size: 32px; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="brand">endorfin<b>.</b></div>
+  <div class="nav-links">
+    <a>Clubs</a><a>Races</a><a>Coaches</a><a>Studio</a><a>Get the app</a>
+  </div>
+</nav>
+
+<!-- ═══════════════ STATE 1: HERO — city bento ═══════════════ -->
+<section class="hero">
+  <div class="container">
+    <div class="hero-head">
+      <div>
+        <div class="kicker"><span class="dot"></span>25 cities · 870+ listings · Updated hourly</div>
+        <h1>Where will you<br>run <span class="red">today?</span></h1>
+      </div>
+      <div class="quick-search">
+        <input placeholder="Or search ‘5K this weekend’…" />
+        <button>Search</button>
+      </div>
+    </div>
+
+    <!-- City bento -->
+    <div class="city-grid">
+      <!-- Featured top city -->
+      <div class="city-tile featured">
+        <div>
+          <span class="num">01 · Top city</span>
+          <h3 class="name">Delhi NCR</h3>
+        </div>
+        <div>
+          <div class="total">124</div>
+          <div class="total-l">Total listings</div>
+        </div>
+        <div class="meta">
+          <div class="row"><span>Run clubs</span><b>42</b></div>
+          <div class="row"><span>Upcoming races</span><b>18</b></div>
+          <div class="row"><span>Club events / wk</span><b>64</b></div>
+        </div>
+      </div>
+
+      <div class="city-tile">
+        <div>
+          <span class="num">02</span>
+          <h3 class="name">Mumbai</h3>
+        </div>
+        <div class="meta">
+          <div class="row"><span>Listings</span><b>87</b></div>
+        </div>
+        <span class="badge">Hot</span>
+        <span class="arrow"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 6 6 6-6 6"/></svg></span>
+      </div>
+
+      <div class="city-tile">
+        <div>
+          <span class="num">03</span>
+          <h3 class="name">Bangalore</h3>
+        </div>
+        <div class="meta">
+          <div class="row"><span>Listings</span><b>92</b></div>
+        </div>
+        <span class="badge">Hot</span>
+        <span class="arrow"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 6 6 6-6 6"/></svg></span>
+      </div>
+
+      <div class="city-tile">
+        <div>
+          <span class="num">04</span>
+          <h3 class="name">Pune</h3>
+        </div>
+        <div class="meta">
+          <div class="row"><span>Listings</span><b>34</b></div>
+        </div>
+        <span class="arrow"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 6 6 6-6 6"/></svg></span>
+      </div>
+
+      <div class="city-tile">
+        <div>
+          <span class="num">05</span>
+          <h3 class="name">Gurgaon</h3>
+        </div>
+        <div class="meta">
+          <div class="row"><span>Listings</span><b>28</b></div>
+        </div>
+        <span class="arrow"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 6 6 6-6 6"/></svg></span>
+      </div>
+
+      <div class="city-tile">
+        <div>
+          <span class="num">06</span>
+          <h3 class="name">Chennai</h3>
+        </div>
+        <div class="meta">
+          <div class="row"><span>Listings</span><b>19</b></div>
+        </div>
+        <span class="arrow"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 6 6 6-6 6"/></svg></span>
+      </div>
+
+      <div class="city-tile" style="border-right:0">
+        <div>
+          <span class="num">07 · +18 more</span>
+          <h3 class="name" style="color:rgba(245,240,235,0.55)">All cities →</h3>
+        </div>
+        <div class="meta">
+          <div class="row"><span>Total</span><b>870+</b></div>
+        </div>
+        <span class="arrow"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 6 6 6-6 6"/></svg></span>
+      </div>
+    </div>
+
+    <!-- chips below city grid -->
+    <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:32px;align-items:center">
+      <span style="font-family:'Oswald',sans-serif;font-weight:600;font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:rgba(245,240,235,0.55);margin-right:6px">Or jump to</span>
+      <button class="v1c-chip on-dark">This weekend</button>
+      <button class="v1c-chip on-dark">Tomorrow</button>
+      <button class="v1c-chip on-dark">5K</button>
+      <button class="v1c-chip on-dark">Half marathon</button>
+      <button class="v1c-chip on-dark">Women only</button>
+      <button class="v1c-chip on-dark">Trail</button>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ STATE 2: RESULTS — rails of real club cards ═══════════════ -->
+<section class="section on-dark">
+  <div class="container">
+    <div class="state-tag">State · Results · Mumbai</div>
+    <div class="v1c-section-header" style="margin-bottom:60px">
+      <h2 class="v1c-section-title" style="color:var(--bone)">What's running<br>in <b class="v1c-red">Mumbai</b>.</h2>
+      <span class="v1c-section-count" style="color:rgba(245,240,235,0.55)">87 listings · Grouped by intent</span>
+    </div>
+
+    <!-- Rail 1 — This weekend -->
+    <div class="rail">
+      <div class="rail-head">
+        <div>
+          <h3>Happening <b>this weekend</b></h3>
+          <div class="sub3">12 community runs &amp; races · Sat–Sun</div>
+        </div>
+        <a class="more">See all →</a>
+      </div>
+      <div class="rail-track">
+
+        <article class="v1c-club-card">
+          <div class="v1c-club-card-header has-img" style="--bg-img:url('https://images.unsplash.com/photo-1486218119243-13883505764c?w=800&q=80')">
+            <div class="v1c-club-card-header-fallback">CR</div>
+          </div>
+          <div class="v1c-club-card-body">
+            <div class="v1c-club-card-logo">BH</div>
+            <div class="v1c-club-card-top">
+              <h3 class="v1c-club-card-title">Carter Road Sunrise 5K</h3>
+            </div>
+            <div class="v1c-club-card-city">BHAG Club · Sat 30 May</div>
+            <div class="v1c-club-card-tags">
+              <span class="v1c-club-card-tag">5 KM</span>
+              <span class="v1c-club-card-tag">Free</span>
+              <span class="v1c-club-card-tag">Beginner</span>
+            </div>
+            <div class="v1c-club-card-foot">
+              <span class="v1c-club-card-stat"><strong>48</strong> going</span>
+              <span class="v1c-club-card-nextrun">5:30 AM</span>
+            </div>
+          </div>
+          <div class="v1c-club-card-actions">
+            <button class="v1c-btn v1c-btn-primary">RSVP</button>
+          </div>
+        </article>
+
+        <article class="v1c-club-card">
+          <div class="v1c-club-card-header has-img" style="--bg-img:url('https://images.unsplash.com/photo-1452626038306-9aae5e071dd3?w=800&q=80')">
+            <div class="v1c-club-card-header-fallback">MHM</div>
+          </div>
+          <div class="v1c-club-card-body">
+            <div class="v1c-club-card-logo">P</div>
+            <div class="v1c-club-card-top">
+              <h3 class="v1c-club-card-title" style="color:var(--red)">RACE · Mumbai Half</h3>
+            </div>
+            <div class="v1c-club-card-city">Procam · Sun 8 Jun</div>
+            <div class="v1c-club-card-tags">
+              <span class="v1c-club-card-tag">21 KM</span>
+              <span class="v1c-club-card-tag">Timed</span>
+              <span class="v1c-club-card-tag">BIB</span>
+            </div>
+            <div class="v1c-club-card-foot">
+              <span class="v1c-club-card-stat"><strong>₹1,200</strong> entry</span>
+              <span class="v1c-club-card-nextrun">5:00 AM</span>
+            </div>
+          </div>
+          <div class="v1c-club-card-actions">
+            <button class="v1c-btn v1c-btn-primary">Register</button>
+          </div>
+        </article>
+
+        <article class="v1c-club-card">
+          <div class="v1c-club-card-header has-img" style="--bg-img:url('https://images.unsplash.com/photo-1517649763962-0c623066013b?w=800&q=80')">
+            <div class="v1c-club-card-header-fallback">WS</div>
+          </div>
+          <div class="v1c-club-card-body">
+            <div class="v1c-club-card-logo">MR</div>
+            <div class="v1c-club-card-top">
+              <h3 class="v1c-club-card-title">Worli Sea Face Tempo</h3>
+            </div>
+            <div class="v1c-club-card-city">Mumbai Road Runners · Sat</div>
+            <div class="v1c-club-card-tags">
+              <span class="v1c-club-card-tag">8 KM</span>
+              <span class="v1c-club-card-tag">Tempo</span>
+            </div>
+            <div class="v1c-club-card-foot">
+              <span class="v1c-club-card-stat"><strong>22</strong> going</span>
+              <span class="v1c-club-card-nextrun">6:00 AM</span>
+            </div>
+          </div>
+          <div class="v1c-club-card-actions">
+            <button class="v1c-btn v1c-btn-primary">RSVP</button>
+          </div>
+        </article>
+
+        <article class="v1c-club-card">
+          <div class="v1c-club-card-header has-img" style="--bg-img:url('https://images.unsplash.com/photo-1502904550040-7534597429ae?w=800&q=80')">
+            <div class="v1c-club-card-header-fallback">TT</div>
+          </div>
+          <div class="v1c-club-card-body">
+            <div class="v1c-club-card-logo">B</div>
+            <div class="v1c-club-card-top">
+              <h3 class="v1c-club-card-title">Time Trials Mumbai</h3>
+            </div>
+            <div class="v1c-club-card-city">The Bhag · Sun</div>
+            <div class="v1c-club-card-tags">
+              <span class="v1c-club-card-tag">5 KM</span>
+              <span class="v1c-club-card-tag">Club</span>
+            </div>
+            <div class="v1c-club-card-foot">
+              <span class="v1c-club-card-stat"><strong>14</strong> going</span>
+              <span class="v1c-club-card-nextrun">5:30 AM</span>
+            </div>
+          </div>
+          <div class="v1c-club-card-actions">
+            <button class="v1c-btn v1c-btn-primary">RSVP</button>
+          </div>
+        </article>
+
+      </div>
+    </div>
+
+    <!-- Rail 2 — Verified clubs -->
+    <div class="rail">
+      <div class="rail-head">
+        <div>
+          <h3>Verified clubs in <b>Mumbai</b></h3>
+          <div class="sub3">18 active communities · All paces</div>
+        </div>
+        <a class="more">See all →</a>
+      </div>
+      <div class="rail-track">
+
+        <article class="v1c-club-card">
+          <div class="v1c-club-card-header has-img" style="--bg-img:url('https://images.unsplash.com/photo-1486218119243-13883505764c?w=800&q=80')">
+            <div class="v1c-club-card-header-fallback">BC</div>
+          </div>
+          <div class="v1c-club-card-body">
+            <div class="v1c-club-card-logo">BC</div>
+            <div class="v1c-club-card-top">
+              <h3 class="v1c-club-card-title">BHAG Club Mumbai</h3>
+              <span class="v1c-club-card-verified">
+                <svg width="15" height="15" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2a10 10 0 100 20 10 10 0 000-20zm4.7 7.3l-5.8 5.8a1 1 0 01-1.4 0L7 12.6a1 1 0 011.4-1.4l1.8 1.8 5.1-5.1a1 1 0 011.4 1.4z"/></svg>
+              </span>
+            </div>
+            <div class="v1c-club-card-city">Bandra · Carter Rd · Est 2019</div>
+            <div class="v1c-club-card-tags">
+              <span class="v1c-club-card-tag">Featured</span>
+              <span class="v1c-club-card-tag">All paces</span>
+              <span class="v1c-club-card-tag">Community</span>
+            </div>
+            <div class="v1c-club-card-foot">
+              <span class="v1c-club-card-stat"><strong>1,240</strong> members</span>
+              <span class="v1c-club-card-nextrun">Sat · 5K</span>
+            </div>
+          </div>
+          <div class="v1c-club-card-actions">
+            <button class="v1c-btn v1c-btn-primary">Join club</button>
+          </div>
+        </article>
+
+        <article class="v1c-club-card">
+          <div class="v1c-club-card-header has-img" style="--bg-img:url('https://images.unsplash.com/photo-1571008887538-b36bb32f4571?w=800&q=80')">
+            <div class="v1c-club-card-header-fallback">MR</div>
+          </div>
+          <div class="v1c-club-card-body">
+            <div class="v1c-club-card-logo">MR</div>
+            <div class="v1c-club-card-top">
+              <h3 class="v1c-club-card-title">Mumbai Road Runners</h3>
+              <span class="v1c-club-card-verified">
+                <svg width="15" height="15" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2a10 10 0 100 20 10 10 0 000-20zm4.7 7.3l-5.8 5.8a1 1 0 01-1.4 0L7 12.6a1 1 0 011.4-1.4l1.8 1.8 5.1-5.1a1 1 0 011.4 1.4z"/></svg>
+              </span>
+            </div>
+            <div class="v1c-club-card-city">Worli · Marine Dr · Est 2014</div>
+            <div class="v1c-club-card-tags">
+              <span class="v1c-club-card-tag">Long runs</span>
+              <span class="v1c-club-card-tag">Marathon</span>
+            </div>
+            <div class="v1c-club-card-foot">
+              <span class="v1c-club-card-stat"><strong>2,810</strong> members</span>
+              <span class="v1c-club-card-nextrun">Sun · 12K</span>
+            </div>
+          </div>
+          <div class="v1c-club-card-actions">
+            <button class="v1c-btn v1c-btn-primary">Join club</button>
+          </div>
+        </article>
+
+        <article class="v1c-club-card">
+          <div class="v1c-club-card-header has-img" style="--bg-img:url('https://images.unsplash.com/photo-1532383282788-5ebef00cb909?w=800&q=80')">
+            <div class="v1c-club-card-header-fallback">SB</div>
+          </div>
+          <div class="v1c-club-card-body">
+            <div class="v1c-club-card-logo">SB</div>
+            <div class="v1c-club-card-top">
+              <h3 class="v1c-club-card-title">Striders Bandra</h3>
+            </div>
+            <div class="v1c-club-card-city">Pali Hill · Est 2021</div>
+            <div class="v1c-club-card-tags">
+              <span class="v1c-club-card-tag">Tempo</span>
+              <span class="v1c-club-card-tag">Intervals</span>
+            </div>
+            <div class="v1c-club-card-foot">
+              <span class="v1c-club-card-stat"><strong>540</strong> members</span>
+              <span class="v1c-club-card-nextrun">Sat · 8K</span>
+            </div>
+          </div>
+          <div class="v1c-club-card-actions">
+            <button class="v1c-btn v1c-btn-primary">Join club</button>
+          </div>
+        </article>
+
+        <article class="v1c-club-card">
+          <div class="v1c-club-card-header has-img" style="--bg-img:url('https://images.unsplash.com/photo-1551698618-1dfe5d97d256?w=800&q=80')">
+            <div class="v1c-club-card-header-fallback">SLS</div>
+          </div>
+          <div class="v1c-club-card-body">
+            <div class="v1c-club-card-logo">SL</div>
+            <div class="v1c-club-card-top">
+              <h3 class="v1c-club-card-title">Sea Link Striders</h3>
+            </div>
+            <div class="v1c-club-card-city">Worli · BWSL · Est 2020</div>
+            <div class="v1c-club-card-tags">
+              <span class="v1c-club-card-tag">Long runs</span>
+            </div>
+            <div class="v1c-club-card-foot">
+              <span class="v1c-club-card-stat"><strong>386</strong> members</span>
+              <span class="v1c-club-card-nextrun">Sun · 18K</span>
+            </div>
+          </div>
+          <div class="v1c-club-card-actions">
+            <button class="v1c-btn v1c-btn-primary">Join club</button>
+          </div>
+        </article>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ STATE 3: EMPTY — notify me ═══════════════ -->
+<section class="section on-dark compact">
+  <div class="container">
+    <div class="state-tag">State · No coverage</div>
+    <h2 class="v1c-section-title" style="color:var(--bone);margin-bottom:36px">Nothing in <b>Imphal</b><br>· <b class="v1c-red">yet.</b></h2>
+
+    <div class="notify">
+      <div>
+        <span class="kic">Not on the map · 2026</span>
+        <h3>No clubs in Imphal<br>but the directory is <span class="red">growing.</span></h3>
+        <p>Endorfin covers 25 Indian cities right now. Imphal isn't one of them. Pick a city nearby, or tell us you want it added and we'll ping you when the first club lists.</p>
+
+        <div class="nearby">Closest cities</div>
+        <div class="nearby-chips">
+          <button class="v1c-chip on-dark">Guwahati · 6</button>
+          <button class="v1c-chip on-dark">Kolkata · 11</button>
+          <button class="v1c-chip on-dark">Shillong · 3</button>
+        </div>
+
+        <form class="notify-form" onsubmit="event.preventDefault()">
+          <input type="email" placeholder="your.email@runner.in" />
+          <button>Notify me</button>
+        </form>
+      </div>
+
+      <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;border-left:0.5px solid rgba(245,240,235,0.14);padding-left:48px">
+        <div style="font-family:'Fraunces',serif;font-style:italic;font-weight:700;font-size:112px;line-height:1;color:var(--red);letter-spacing:-0.045em;font-variant-numeric:tabular-nums">26<sup style="font-size:30px;color:rgba(245,240,235,0.7);font-style:normal;font-weight:600;margin-left:2px">th</sup></div>
+        <div style="font-family:'Oswald',sans-serif;font-weight:600;font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:rgba(245,240,235,0.55);margin-top:14px;text-align:center">If we launch Imphal,<br>you'll be the first to know</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+</body>
+</html>

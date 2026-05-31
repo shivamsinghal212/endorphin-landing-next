@@ -1,0 +1,461 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Discover · V3 Segmented · Endorfin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=Oswald:wght@400;500;600;700&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="./discover-hero-system.css" />
+<style>
+  /* ── V3: Segmented hero — sharp brutalist filter rail on cream ── */
+  .hero {
+    position: relative; overflow: hidden;
+    background: var(--cream); color: var(--jet);
+    padding: 96px 0 88px;
+    border-bottom: 1px solid var(--jet);
+  }
+
+  .hero h1 {
+    font-family: 'Fraunces', serif; font-style: italic; font-weight: 700;
+    font-size: clamp(48px, 7vw, 96px); line-height: 0.94; letter-spacing: -0.03em;
+    margin: 0 0 18px; max-width: 14ch;
+  }
+  .hero h1 .red { color: var(--red); }
+  .hero .sub {
+    font-family: 'Poppins', sans-serif;
+    font-size: 17px; line-height: 1.55;
+    color: rgba(10,10,10,0.65); max-width: 50ch; margin: 0 0 44px;
+  }
+  .hero .live {
+    font-family: 'Oswald', sans-serif; font-weight: 600;
+    font-size: 11px; letter-spacing: 0.24em; text-transform: uppercase;
+    color: var(--text-secondary);
+    display: inline-flex; align-items: center; gap: 12px;
+    margin-bottom: 24px;
+  }
+  .hero .live .pulse {
+    width: 6px; height: 6px; border-radius: 50%; background: var(--red);
+    box-shadow: 0 0 0 4px rgba(230,35,42,0.15);
+  }
+
+  /* Segmented bar — 4 cells + a sharp red CTA. Hairline borders, Oswald labels. */
+  .seg {
+    background: var(--bone);
+    border: 1px solid var(--jet);
+    display: grid;
+    grid-template-columns: 1.1fr 1fr 1fr 1fr auto;
+    max-width: 1100px;
+  }
+  .seg .cell {
+    padding: 18px 22px;
+    display: flex; flex-direction: column; gap: 6px; justify-content: center;
+    cursor: pointer;
+    border-right: 1px solid var(--jet);
+    transition: background 160ms;
+    min-height: 84px;
+  }
+  .seg .cell:hover { background: var(--cream); }
+  .seg .cell .lbl {
+    font-family: 'Oswald', sans-serif; font-weight: 600;
+    font-size: 10px; letter-spacing: 0.24em; text-transform: uppercase;
+    color: var(--text-secondary);
+  }
+  .seg .cell .val {
+    font-family: 'Fraunces', serif; font-style: italic;
+    font-weight: 700; font-size: 19px; letter-spacing: -0.01em;
+    color: var(--jet);
+    display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  }
+  .seg .cell .val.placeholder {
+    font-family: 'Poppins', sans-serif; font-style: normal;
+    font-weight: 400; font-size: 15px; color: var(--text-secondary);
+  }
+  .seg .cell .val .chev {
+    width: 12px; height: 12px; flex-shrink: 0; color: var(--text-secondary);
+  }
+  .seg .go {
+    background: var(--red); color: #fff; border: 0; cursor: pointer;
+    font-family: 'Oswald', sans-serif; font-weight: 700;
+    font-size: 13px; letter-spacing: 0.22em; text-transform: uppercase;
+    padding: 0 36px; min-width: 180px;
+    display: inline-flex; align-items: center; justify-content: center; gap: 12px;
+    transition: background 160ms;
+  }
+  .seg .go:hover { background: #c41e24; }
+  @media (max-width: 980px) {
+    .seg { grid-template-columns: 1fr 1fr; }
+    .seg .cell { border-right: 0; border-bottom: 1px solid var(--jet); }
+    .seg .cell:nth-child(1), .seg .cell:nth-child(3) { border-right: 1px solid var(--jet); }
+    .seg .go { grid-column: 1 / -1; padding: 22px; min-width: 0; }
+  }
+
+  /* Popular row */
+  .popular {
+    margin-top: 32px; display: flex; align-items: center; flex-wrap: wrap; gap: 10px;
+  }
+  .popular .lbl {
+    font-family: 'Oswald', sans-serif; font-weight: 600;
+    font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase;
+    color: var(--text-secondary); margin-right: 6px;
+  }
+
+  /* Trust strip — matches the existing hero stats but on cream */
+  .trust {
+    display: flex; gap: 64px; margin-top: 56px; flex-wrap: wrap;
+    padding-top: 32px; border-top: 0.5px solid var(--hairline);
+    font-family: 'Oswald', sans-serif;
+  }
+  .trust .stat .n {
+    font-weight: 700; font-size: 38px; line-height: 1;
+    letter-spacing: -0.01em; color: var(--jet);
+    font-variant-numeric: tabular-nums;
+  }
+  .trust .stat .l {
+    margin-top: 8px; font-size: 11px; letter-spacing: 0.22em;
+    text-transform: uppercase; color: var(--text-secondary);
+  }
+
+  /* ─── Directory list view (on cream) ─── */
+  .toolbar {
+    display: flex; align-items: center; justify-content: space-between;
+    flex-wrap: wrap; gap: 16px;
+    padding: 18px 0; border-bottom: 0.5px solid var(--hairline);
+    margin-bottom: 8px;
+  }
+  .toolbar .lf { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+  .toolbar .count {
+    font-family: 'Oswald', sans-serif; font-weight: 600;
+    font-size: 12px; letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--text-secondary);
+  }
+  .toolbar .count b { color: var(--jet); font-weight: 700; }
+  .toolbar .filters { display: flex; gap: 8px; flex-wrap: wrap; }
+  .toolbar .filters .pchip {
+    display: inline-flex; align-items: center; gap: 10px;
+    padding: 7px 12px;
+    border: 0.5px solid var(--hairline-strong);
+    background: var(--bone);
+    font-family: 'Oswald', sans-serif; font-weight: 500;
+    font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--jet);
+  }
+  .toolbar .filters .pchip .x { cursor: pointer; color: var(--text-secondary); }
+  .toolbar .sort {
+    font-family: 'Oswald', sans-serif; font-weight: 600;
+    font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--jet); display: inline-flex; align-items: center; gap: 8px;
+    cursor: pointer; padding: 6px 10px;
+  }
+  .toolbar .sort:hover { background: var(--cream); }
+
+  /* 2-col layout: facets + list */
+  .grid-2 { display: grid; grid-template-columns: 220px 1fr; gap: 48px; }
+  @media (max-width: 980px) { .grid-2 { grid-template-columns: 1fr; } .facets { display: none; } }
+  .facets { position: sticky; top: 24px; align-self: start; }
+  .facets .grp { margin-bottom: 28px; padding-bottom: 16px; border-bottom: 0.5px solid var(--hairline); }
+  .facets .grp:last-child { border-bottom: 0; }
+  .facets .grp h4 {
+    font-family: 'Oswald', sans-serif; font-weight: 700;
+    font-size: 10px; letter-spacing: 0.24em; text-transform: uppercase;
+    color: var(--text-secondary); margin: 0 0 12px;
+  }
+  .facets .row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 6px 0;
+    font-family: 'Oswald', sans-serif; font-weight: 500;
+    font-size: 13px; letter-spacing: 0.06em;
+    color: var(--jet); cursor: pointer;
+  }
+  .facets .row:hover { color: var(--red); }
+  .facets .row .c {
+    font-size: 11px; color: var(--text-secondary);
+    font-variant-numeric: tabular-nums;
+  }
+  .facets .row.active { color: var(--red); font-weight: 700; }
+  .facets .row.active .c { color: var(--red); }
+
+  /* Empty state — drop-filter table */
+  .empty-card {
+    background: var(--jet); color: var(--bone);
+    border: 0.5px solid rgba(245,240,235,0.14);
+    position: relative;
+    padding: 56px;
+    display: grid; grid-template-columns: 1.1fr 1fr;
+    gap: 56px; align-items: start;
+  }
+  .empty-card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--red); }
+  .empty-card .kic {
+    font-family: 'Oswald', sans-serif; font-weight: 600;
+    font-size: 11px; letter-spacing: 0.24em; text-transform: uppercase;
+    color: var(--red); display: inline-block; margin-bottom: 16px;
+  }
+  .empty-card h3 {
+    font-family: 'Fraunces', serif; font-style: italic; font-weight: 700;
+    font-size: 42px; line-height: 1.05; letter-spacing: -0.02em;
+    color: var(--bone); margin: 0 0 14px; max-width: 18ch;
+  }
+  .empty-card h3 .red { color: var(--red); }
+  .empty-card .lede {
+    color: rgba(245,240,235,0.65); font-size: 15.5px; line-height: 1.55;
+    margin: 0 0 28px; max-width: 50ch;
+  }
+  .loosen-list {
+    border-top: 0.5px solid rgba(245,240,235,0.14);
+    border-bottom: 0.5px solid rgba(245,240,235,0.14);
+  }
+  .loosen-row {
+    display: grid; grid-template-columns: 1fr auto auto;
+    gap: 18px; align-items: center;
+    padding: 16px 0;
+    border-bottom: 0.5px solid rgba(245,240,235,0.14);
+  }
+  .loosen-row:last-child { border-bottom: 0; }
+  .loosen-row .filt {
+    font-family: 'Oswald', sans-serif; font-weight: 600;
+    font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--bone);
+  }
+  .loosen-row .filt .typ { color: rgba(245,240,235,0.5); font-weight: 500; margin-right: 6px; }
+  .loosen-row .delta {
+    font-family: 'Oswald', sans-serif; font-weight: 600;
+    font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--green);
+  }
+  .loosen-row .drop {
+    color: var(--red); background: transparent; border: 0; cursor: pointer;
+    font-family: 'Oswald', sans-serif; font-weight: 700;
+    font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase;
+    text-decoration: underline; text-underline-offset: 4px;
+  }
+  @media (max-width: 860px) {
+    .empty-card { grid-template-columns: 1fr; padding: 36px 28px; gap: 32px; }
+    .empty-card h3 { font-size: 30px; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="brand">endorfin<b>.</b></div>
+  <div class="nav-links">
+    <a>Clubs</a><a>Races</a><a>Coaches</a><a>Studio</a><a>Get the app</a>
+  </div>
+</nav>
+
+<!-- ═══════════════ STATE 1: HERO ═══════════════ -->
+<section class="hero">
+  <div class="container">
+    <div class="live"><span class="pulse"></span>Live · 870 listings · 25 cities</div>
+
+    <h1>Discover India's<br>running <span class="red">scene.</span></h1>
+    <p class="sub">Filter by city, date, distance and kind. One unified feed across run clubs, races and community sessions.</p>
+
+    <!-- Segmented bar -->
+    <div class="seg" role="search">
+      <div class="cell">
+        <span class="lbl">What</span>
+        <span class="val">All listings <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="m6 9 6 6 6-6"/></svg></span>
+      </div>
+      <div class="cell">
+        <span class="lbl">Where</span>
+        <span class="val placeholder">Any city <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="m6 9 6 6 6-6"/></svg></span>
+      </div>
+      <div class="cell">
+        <span class="lbl">When</span>
+        <span class="val placeholder">Any date <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="m6 9 6 6 6-6"/></svg></span>
+      </div>
+      <div class="cell">
+        <span class="lbl">Distance</span>
+        <span class="val placeholder">Any distance <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="m6 9 6 6 6-6"/></svg></span>
+      </div>
+      <button class="go">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        Search
+      </button>
+    </div>
+
+    <!-- Popular searches as v1c-chips -->
+    <div class="popular">
+      <span class="lbl">Popular</span>
+      <button class="v1c-chip">Run clubs · Mumbai</button>
+      <button class="v1c-chip">5K · This weekend</button>
+      <button class="v1c-chip">Marathon training · Delhi</button>
+      <button class="v1c-chip">Trail runs · Bangalore</button>
+      <button class="v1c-chip">Women only</button>
+    </div>
+
+    <div class="trust">
+      <div class="stat"><div class="n">52</div><div class="l">Verified clubs</div></div>
+      <div class="stat"><div class="n">500+</div><div class="l">Upcoming events</div></div>
+      <div class="stat"><div class="n">25+</div><div class="l">Indian cities</div></div>
+      <div class="stat"><div class="n">10K+</div><div class="l">Runners on Endorfin</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ STATE 2: RESULTS — directory list with facets ═══════════════ -->
+<section class="section on-bone">
+  <div class="container">
+    <div class="state-tag">State · Results</div>
+    <div class="v1c-section-header" style="margin-bottom:24px">
+      <h2 class="v1c-section-title">Run clubs in <b>Mumbai</b><br>· This weekend.</h2>
+      <span class="v1c-section-count">38 results · Sorted by upcoming</span>
+    </div>
+
+    <div class="grid-2">
+      <aside class="facets">
+        <div class="grp">
+          <h4>Kind</h4>
+          <div class="row active">Run clubs <span class="c">38</span></div>
+          <div class="row">Races <span class="c">12</span></div>
+          <div class="row">Club events <span class="c">87</span></div>
+        </div>
+        <div class="grp">
+          <h4>City</h4>
+          <div class="row active">Mumbai <span class="c">38</span></div>
+          <div class="row">Bangalore <span class="c">29</span></div>
+          <div class="row">Delhi NCR <span class="c">42</span></div>
+          <div class="row">Pune <span class="c">14</span></div>
+          <div class="row">Gurgaon <span class="c">11</span></div>
+        </div>
+        <div class="grp">
+          <h4>Tags</h4>
+          <div class="row">Women only <span class="c">8</span></div>
+          <div class="row">Beginner friendly <span class="c">22</span></div>
+          <div class="row">Marathon training <span class="c">14</span></div>
+          <div class="row">Verified <span class="c">31</span></div>
+        </div>
+      </aside>
+
+      <div>
+        <div class="toolbar">
+          <div class="lf">
+            <span class="count"><b>38</b> results</span>
+            <div class="filters">
+              <span class="pchip">Mumbai <span class="x">✕</span></span>
+              <span class="pchip">This weekend <span class="x">✕</span></span>
+              <span class="pchip">Run clubs <span class="x">✕</span></span>
+            </div>
+          </div>
+          <span class="sort">Sort · Upcoming <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="m6 9 6 6 6-6"/></svg></span>
+        </div>
+
+        <!-- Editorial event-row list -->
+        <div>
+          <a class="event-row" href="#">
+            <div class="date-block">
+              <div class="day">30</div><div class="mo">May<br>Sat</div>
+            </div>
+            <div class="info">
+              <div class="kind">Run club · Verified · Featured</div>
+              <h3>BHAG Club Mumbai</h3>
+              <div class="meta">Bandra · Carter Road · 1,240 members · Est 2019</div>
+            </div>
+            <div class="when"><b>5:30 AM</b>Carter Rd · 5K</div>
+            <span class="arrow"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 6 6 6-6 6"/></svg></span>
+          </a>
+
+          <a class="event-row" href="#">
+            <div class="date-block">
+              <div class="day">31</div><div class="mo">May<br>Sun</div>
+            </div>
+            <div class="info">
+              <div class="kind">Run club · Verified</div>
+              <h3>Mumbai Road Runners</h3>
+              <div class="meta">Worli · Marine Drive · 2,810 members · Est 2014</div>
+            </div>
+            <div class="when"><b>6:00 AM</b>Marine Dr · 12K</div>
+            <span class="arrow"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 6 6 6-6 6"/></svg></span>
+          </a>
+
+          <a class="event-row" href="#">
+            <div class="date-block">
+              <div class="day">30</div><div class="mo">May<br>Sat</div>
+            </div>
+            <div class="info">
+              <div class="kind">Club event · Free</div>
+              <h3>Carter Road Sunrise 5K</h3>
+              <div class="meta">Hosted by BHAG Club · Carter Road Amphitheatre</div>
+            </div>
+            <div class="when"><b>5:30 AM</b>5 KM · 48 going</div>
+            <span class="arrow"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 6 6 6-6 6"/></svg></span>
+          </a>
+
+          <a class="event-row" href="#">
+            <div class="date-block">
+              <div class="day">08</div><div class="mo">Jun<br>Sun</div>
+            </div>
+            <div class="info">
+              <div class="kind">Race · Timed</div>
+              <h3>Mumbai Half Marathon 2026</h3>
+              <div class="meta">Procam · CSMT to Bandra Worli Sea Link · ₹1,200</div>
+            </div>
+            <div class="when"><b>5:00 AM</b>21 KM · BIB delivery</div>
+            <span class="arrow"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 6 6 6-6 6"/></svg></span>
+          </a>
+
+          <a class="event-row" href="#" style="border-bottom:0">
+            <div class="date-block">
+              <div class="day">30</div><div class="mo">May<br>Sat</div>
+            </div>
+            <div class="info">
+              <div class="kind">Run club · Verified</div>
+              <h3>Striders Bandra</h3>
+              <div class="meta">Pali Hill · 540 members · Est 2021</div>
+            </div>
+            <div class="when"><b>6:30 AM</b>Tempo · 8K</div>
+            <span class="arrow"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 6 6 6-6 6"/></svg></span>
+          </a>
+        </div>
+
+        <div style="display:flex;justify-content:center;margin-top:40px">
+          <button class="v1c-btn v1c-btn-ghost">Load 33 more</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ STATE 3: EMPTY — drop-filter ═══════════════ -->
+<section class="section on-cream compact">
+  <div class="container">
+    <div class="state-tag">State · No results</div>
+    <h2 class="v1c-section-title" style="margin-bottom:36px">0 results for<br><b>Trail · Hyderabad · 30K+ · Tomorrow.</b></h2>
+
+    <div class="empty-card">
+      <div>
+        <span class="kic">Tight squeeze</span>
+        <h3>Your filters left<br>nothing on the table<span class="red">.</span></h3>
+        <p class="lede">Endorfin doesn't have a 30K+ trail run in Hyderabad tomorrow. Here's what would open up if you removed each filter — drop one to keep exploring.</p>
+        <button class="v1c-btn v1c-btn-ghost-light">↺ Reset all filters</button>
+      </div>
+      <div class="loosen-list">
+        <div class="loosen-row">
+          <span class="filt"><span class="typ">Distance ·</span>30 KM+</span>
+          <span class="delta">→ 12 results</span>
+          <button class="drop">Drop</button>
+        </div>
+        <div class="loosen-row">
+          <span class="filt"><span class="typ">Kind ·</span>Trail</span>
+          <span class="delta">→ 4 results</span>
+          <button class="drop">Drop</button>
+        </div>
+        <div class="loosen-row">
+          <span class="filt"><span class="typ">When ·</span>Tomorrow</span>
+          <span class="delta">→ 8 results</span>
+          <button class="drop">Drop</button>
+        </div>
+        <div class="loosen-row">
+          <span class="filt"><span class="typ">City ·</span>Hyderabad</span>
+          <span class="delta">→ 27 results</span>
+          <button class="drop">Drop</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+</body>
+</html>

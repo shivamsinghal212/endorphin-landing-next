@@ -1,0 +1,325 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Discover Hero · 4 Variations · Endorfin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=Oswald:wght@400;500;600;700&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="./discover-hero-system.css" />
+<style>
+  body { background: var(--jet); color: var(--bone); }
+
+  .hero {
+    padding: 80px var(--gutter) 56px;
+    max-width: var(--container-max);
+    margin: 0 auto;
+    border-bottom: 0.5px solid rgba(245,240,235,0.14);
+  }
+  .hero .kicker {
+    font-family: 'Oswald', sans-serif; font-weight: 600;
+    font-size: 11px; letter-spacing: 0.24em; text-transform: uppercase;
+    color: var(--red);
+    display: inline-flex; align-items: center; gap: 12px; margin-bottom: 20px;
+  }
+  .hero .kicker .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--red); box-shadow: 0 0 0 4px rgba(230,35,42,0.18); }
+  .hero h1 {
+    font-family: 'Fraunces', serif; font-style: italic; font-weight: 700;
+    font-size: clamp(40px, 6vw, 78px); line-height: 0.96; letter-spacing: -0.03em;
+    margin: 0 0 18px; max-width: 18ch;
+  }
+  .hero h1 .red { color: var(--red); }
+  .hero p {
+    font-family: 'Poppins', sans-serif; font-size: 16px; line-height: 1.6;
+    color: rgba(245,240,235,0.7); max-width: 64ch; margin: 0;
+  }
+  .hero p code {
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    background: rgba(245,240,235,0.06);
+    border: 0.5px solid rgba(245,240,235,0.18);
+    padding: 1px 6px; font-size: 13px; color: var(--bone);
+  }
+
+  .grid {
+    max-width: var(--container-max);
+    margin: 0 auto;
+    padding: 64px var(--gutter);
+    display: grid; grid-template-columns: repeat(2, 1fr); gap: 32px;
+  }
+  @media (max-width: 880px) { .grid { grid-template-columns: 1fr; } }
+
+  a.card {
+    display: flex; flex-direction: column;
+    background: #141414;
+    border: 0.5px solid rgba(245,240,235,0.14);
+    text-decoration: none; color: var(--bone);
+    transition: all 200ms ease-out;
+    position: relative;
+  }
+  a.card:hover {
+    transform: translateY(-3px);
+    border-color: rgba(245,240,235,0.4);
+    box-shadow: 0 24px 48px -20px rgba(0,0,0,0.7);
+  }
+  a.card::before {
+    content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
+    background: var(--red); opacity: 0; transition: opacity 200ms;
+  }
+  a.card:hover::before { opacity: 1; }
+
+  .preview {
+    aspect-ratio: 16/9; position: relative; overflow: hidden;
+    border-bottom: 0.5px solid rgba(245,240,235,0.14);
+  }
+  .preview .num {
+    position: absolute; top: 16px; left: 16px;
+    font-family: 'Oswald', sans-serif; font-weight: 700;
+    font-size: 11px; letter-spacing: 0.24em; text-transform: uppercase;
+    color: var(--red);
+    background: rgba(230,35,42,0.10);
+    border: 0.5px solid rgba(230,35,42,0.5);
+    padding: 4px 10px;
+    z-index: 3;
+  }
+  .preview .mini-h {
+    position: relative; z-index: 2;
+    font-family: 'Fraunces', serif; font-style: italic; font-weight: 700;
+    font-size: 32px; line-height: 0.94; letter-spacing: -0.025em;
+    color: var(--bone); padding: 56px 28px 16px; max-width: 14ch;
+  }
+  .preview .mini-h .red { color: var(--red); }
+
+  /* Per-variant preview backgrounds + bar styles */
+  .v1 .preview {
+    background:
+      linear-gradient(180deg, rgba(10,10,10,0.5) 0%, rgba(10,10,10,0.8) 100%),
+      linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%);
+  }
+  .v2 .preview {
+    background:
+      radial-gradient(ellipse 70% 80% at 50% 50%, rgba(230,35,42,0.22) 0%, transparent 60%),
+      linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%);
+  }
+  .v3 .preview {
+    background: var(--cream); color: var(--jet);
+    border-bottom-color: var(--jet);
+  }
+  .v3 .preview .mini-h { color: var(--jet); }
+  .v4 .preview {
+    background: #141414;
+    background-image:
+      linear-gradient(135deg, rgba(230,35,42,0.10), transparent 60%),
+      repeating-linear-gradient(0deg, transparent 0, transparent 30%, rgba(245,240,235,0.06) 30%, rgba(245,240,235,0.06) 30.5%);
+  }
+
+  /* mini search affordance per variation */
+  .preview .bar {
+    position: absolute; bottom: 16px; left: 16px; right: 16px;
+    background: rgba(245,240,235,0.05);
+    border: 0.5px solid rgba(245,240,235,0.22);
+    color: rgba(245,240,235,0.6);
+    padding: 10px 14px; display: flex; align-items: center; gap: 10px;
+    font-family: 'Oswald', sans-serif; font-weight: 500;
+    font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase;
+    z-index: 2;
+  }
+  .preview .bar .go {
+    margin-left: auto; background: var(--red); color: #fff;
+    padding: 5px 10px; font-size: 10px; letter-spacing: 0.20em;
+    font-weight: 700;
+  }
+  /* v3 segmented preview bar */
+  .v3 .preview .bar {
+    background: var(--bone); border-color: var(--jet); color: var(--jet);
+  }
+  .v3 .preview .bar .sep { width: 1px; align-self: stretch; background: var(--jet); margin: 0 4px; }
+  .v3 .preview .bar b { color: var(--jet); font-weight: 700; }
+  .v3 .preview .bar .typ { color: var(--text-secondary); }
+
+  .body { padding: 24px 24px 28px; }
+  .body .tag {
+    font-family: 'Oswald', sans-serif; font-weight: 600;
+    font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase;
+    color: var(--red); margin-bottom: 10px;
+  }
+  .body h3 {
+    font-family: 'Fraunces', serif; font-style: italic; font-weight: 700;
+    font-size: 26px; line-height: 1.05; letter-spacing: -0.015em;
+    color: var(--bone); margin: 0 0 12px;
+  }
+  .body .desc {
+    font-family: 'Poppins', sans-serif; font-size: 14px; line-height: 1.55;
+    color: rgba(245,240,235,0.7); margin: 0 0 20px;
+  }
+  .body .pros {
+    display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 20px;
+  }
+  .body .pros span {
+    font-family: 'Oswald', sans-serif; font-weight: 500;
+    font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase;
+    color: rgba(245,240,235,0.65);
+    background: rgba(245,240,235,0.06);
+    border: 0.5px solid rgba(245,240,235,0.12);
+    padding: 4px 9px;
+  }
+  .body .api {
+    font-family: 'Oswald', sans-serif; font-size: 11px;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    color: rgba(245,240,235,0.45); margin-bottom: 18px;
+  }
+  .body .api code {
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 11px; letter-spacing: 0;
+    color: var(--bone); text-transform: none;
+    background: rgba(245,240,235,0.06); padding: 1px 6px;
+    border: 0.5px solid rgba(245,240,235,0.12);
+  }
+  .body .open {
+    font-family: 'Oswald', sans-serif; font-weight: 700;
+    font-size: 12px; letter-spacing: 0.22em; text-transform: uppercase;
+    color: var(--red);
+    display: inline-flex; align-items: center; gap: 10px;
+    border-bottom: 1px solid var(--red); padding-bottom: 2px;
+  }
+
+  .footer {
+    max-width: var(--container-max);
+    margin: 0 auto; padding: 24px var(--gutter) 80px;
+    border-top: 0.5px solid rgba(245,240,235,0.14);
+    font-family: 'Poppins', sans-serif;
+    font-size: 14px; line-height: 1.7;
+    color: rgba(245,240,235,0.7);
+  }
+  .footer h4 {
+    font-family: 'Oswald', sans-serif; font-weight: 600;
+    font-size: 11px; letter-spacing: 0.24em; text-transform: uppercase;
+    color: var(--red); margin: 32px 0 12px;
+  }
+  .footer code {
+    font-family: 'JetBrains Mono', monospace;
+    background: rgba(245,240,235,0.06);
+    border: 0.5px solid rgba(245,240,235,0.18);
+    padding: 1px 6px; font-size: 12px; color: var(--bone);
+  }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="brand">endorfin<b>.</b></div>
+  <div class="nav-links">
+    <a>Clubs</a><a>Races</a><a>Coaches</a><a>Studio</a><a>Get the app</a>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="kicker"><span class="dot"></span>Design exploration · /discover endpoint</div>
+  <h1>Hero → Search<br>· <span class="red">4 directions.</span></h1>
+  <p>Each variation is a full mockup with three states stacked vertically — initial hero with the search component, a results state, and an empty / no-results state. All built on Endorfin's actual brand system: Fraunces italic display, Oswald uppercase labels, sharp 0-radius edges, jet/bone/red palette, and the real ClubCard / event-row patterns from <code>/clubs</code>.</p>
+</section>
+
+<div class="grid">
+
+  <a class="card v1" href="./discover-hero-v1-marquee.html">
+    <div class="preview">
+      <span class="num">V1 · Marquee</span>
+      <div class="mini-h">Find your<br>next <span class="red">run.</span></div>
+      <div class="bar">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        Try 'women-only run clubs…'
+        <span class="go">Search</span>
+      </div>
+    </div>
+    <div class="body">
+      <div class="tag">Editorial · Maximum brand</div>
+      <h3>Marquee Search</h3>
+      <p class="desc">A bold Fraunces italic headline anchors the page; a wide, low-chrome jet input bar sits beneath, with an inline city picker and a red CTA. Chips and kind tabs continue the editorial system below.</p>
+      <div class="pros">
+        <span>Big Fraunces title</span><span>Inline city picker</span><span>Tag chips on dark</span><span>Kind tabs</span>
+      </div>
+      <div class="api">Calls · <code>/api/v1/discover?q=&amp;city=&amp;kind=&amp;tags=</code></div>
+      <span class="open">Open variation →</span>
+    </div>
+  </a>
+
+  <a class="card v2" href="./discover-hero-v2-smartnl.html">
+    <div class="preview">
+      <span class="num">V2 · Ask Kip</span>
+      <div class="mini-h">Tell us what kind<br>of run<span class="red">.</span></div>
+      <div class="bar">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="var(--red)"><path d="M12 2 14 10 22 12 14 14 12 22 10 14 2 12 10 10z"/></svg>
+        women-only run clubs in delhi…
+        <span class="go">Ask Kip</span>
+      </div>
+    </div>
+    <div class="body">
+      <div class="tag">AI-first · Brand differentiator</div>
+      <h3>Ask Kip — Natural Language</h3>
+      <p class="desc">A single natural-language input wired to <code style="font-family:JetBrains Mono,monospace;font-size:12px;background:rgba(245,240,235,0.06);padding:1px 5px">/discover/smart</code>. Kip parses the sentence into removable filter chips with a confidence badge. Editorial example queries sit below.</p>
+      <div class="pros">
+        <span>One input</span><span>Parsed chips</span><span>Confidence</span><span>Off-topic state</span>
+      </div>
+      <div class="api">Calls · <code>/api/v1/discover/smart?q=&lt;sentence&gt;</code></div>
+      <span class="open">Open variation →</span>
+    </div>
+  </a>
+
+  <a class="card v3" href="./discover-hero-v3-segmented.html">
+    <div class="preview">
+      <span class="num">V3 · Segmented</span>
+      <div class="mini-h">Discover India's<br>running <span class="red">scene.</span></div>
+      <div class="bar">
+        <span class="typ">What</span> <b>All</b>
+        <span class="sep"></span>
+        <span class="typ">Where</span> <b>Any</b>
+        <span class="sep"></span>
+        <span class="typ">When</span> <b>Any</b>
+        <span class="go" style="margin-left:auto">Search</span>
+      </div>
+    </div>
+    <div class="body">
+      <div class="tag">Marketplace · Familiar pattern</div>
+      <h3>Segmented Filter Bar</h3>
+      <p class="desc">Cream-background hero with a sharp 4-cell filter bar (What / Where / When / Distance) bordered in jet. Results render as editorial event-rows on bone with a left-side facet rail. Empty state surfaces filter-drop suggestions.</p>
+      <div class="pros">
+        <span>Cream / bone surfaces</span><span>4-cell filter bar</span><span>Facet rail</span><span>Drop-filter empty</span>
+      </div>
+      <div class="api">Calls · <code>/discover?kind=&amp;city=&amp;dateFrom=&amp;distanceMin=&amp;includeFacets=true</code></div>
+      <span class="open">Open variation →</span>
+    </div>
+  </a>
+
+  <a class="card v4" href="./discover-hero-v4-mapled.html">
+    <div class="preview">
+      <span class="num">V4 · City-led</span>
+      <div class="mini-h">Where will you<br>run <span class="red">today?</span></div>
+      <div class="bar">
+        Pick a city · Delhi · Mumbai · Bangalore…
+        <span class="go">Explore</span>
+      </div>
+    </div>
+    <div class="body">
+      <div class="tag">Geo-first · National coverage</div>
+      <h3>City Bento Grid</h3>
+      <p class="desc">A brutalist bento of city tiles is the hero — featured top city spans 2 rows, others stack to its right. Tap a city → results render as horizontal rails of real ClubCards grouped by intent ("This weekend", "Verified clubs"). Empty cities surface a notify-me form.</p>
+      <div class="pros">
+        <span>City bento</span><span>Featured tile</span><span>Result rails</span><span>Notify-me empty</span>
+      </div>
+      <div class="api">Calls · <code>/discover?city=&amp;eventsWindow=this_weekend</code> (per rail)</div>
+      <span class="open">Open variation →</span>
+    </div>
+  </a>
+
+</div>
+
+<div class="footer">
+  <h4>Brand fidelity</h4>
+  <p>All four use the actual <code>v1c-club-card</code>, <code>v1c-chip</code>, <code>v1c-btn-primary</code> patterns lifted verbatim from <code>src/app/globals.css</code>. Same Fraunces italic display, same Oswald uppercase labels and tags, same Poppins body, same jet / bone / red / cream palette, same 0-radius sharp edges. <code>discover-hero-system.css</code> in this folder is the shared partial.</p>
+
+  <h4>Recommendation</h4>
+  <p>Ship <b>V3's segmented bar</b> for the explicit-filter mode (highest familiarity) and <b>V2 "Ask Kip"</b> as an entry point above it — together they cover both filter and natural-language interactions, and V2 is the brand-defensible one because it leverages <code>/discover/smart</code> which you've already built. <b>V1</b> is the strongest "headline-first" hero if you want one unified surface. <b>V4</b> works better as a future <code>/explore</code> page than the homepage hero — the city bento eats a lot of above-the-fold real estate, but it's the right surface once people are inside the directory.</p>
+</div>
+
+</body>
+</html>
