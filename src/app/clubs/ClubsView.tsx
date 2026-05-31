@@ -505,6 +505,59 @@ function AdminPanel({ data }: { data: AdminPanelData }) {
   );
 }
 
+// ─── Pagination bar (top + bottom of the all-clubs grid) ──
+// Prev / page indicator / Next. Renders nothing when there's only one
+// page so we don't waste vertical space on small datasets.
+function PaginationBar({
+  pageIndex,
+  totalPages,
+  onChange,
+  position = 'top',
+}: {
+  pageIndex: number;
+  totalPages: number;
+  onChange: (next: number) => void;
+  position?: 'top' | 'bottom';
+}) {
+  if (totalPages <= 1) return null;
+  const isFirst = pageIndex === 0;
+  const isLast = pageIndex >= totalPages - 1;
+  return (
+    <nav
+      className={`v1c-pagination v1c-pagination-${position}`}
+      aria-label={position === 'top' ? 'Pagination, top' : 'Pagination, bottom'}
+    >
+      <button
+        type="button"
+        className="v1c-pagination-btn"
+        onClick={() => onChange(pageIndex - 1)}
+        disabled={isFirst}
+        aria-label="Previous page"
+      >
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" width="14" height="14">
+          <path d="M15 18l-6-6 6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+        Prev
+      </button>
+      <span className="v1c-pagination-pos" aria-live="polite">
+        Page <strong>{pageIndex + 1}</strong> of {totalPages}
+      </span>
+      <button
+        type="button"
+        className="v1c-pagination-btn"
+        onClick={() => onChange(pageIndex + 1)}
+        disabled={isLast}
+        aria-label="Next page"
+      >
+        Next
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" width="14" height="14">
+          <path d="M9 6l6 6-6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      </button>
+    </nav>
+  );
+}
+
 // ─── Main view ──────────────────────────────
 
 export default function ClubsView({
@@ -523,7 +576,11 @@ export default function ClubsView({
   userEmail?: string | null;
 }) {
   const [isSearching, setIsSearching] = useState(false);
-  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
+  // Page index instead of "visible count" — we paginate now (Prev/Next at
+  // top + bottom) rather than infinite-scroll appending. All cards stay
+  // in the SSR HTML for SEO; the page state just toggles which range is
+  // visible via .is-hidden.
+  const [pageIndex, setPageIndex] = useState(0);
   const [activeTab, setActiveTab] = useState<AdminTab>('members');
   const [modal, setModal] = useState<{ kind: 'join' | 'claim'; club: { name: string; slug: string } } | null>(null);
 
@@ -532,12 +589,25 @@ export default function ClubsView({
 
   const featured = useMemo(() => clubs.slice(0, 5), [clubs]);
   const totalClubs = clubs.length;
-  const showLoadMore = visibleCount < totalClubs;
+  const totalPages = Math.max(1, Math.ceil(totalClubs / PAGE_SIZE));
+  const visibleStart = pageIndex * PAGE_SIZE;
+  const visibleEnd = Math.min(visibleStart + PAGE_SIZE, totalClubs);
   const cityCount = useMemo(() => cityFacets.length, [cityFacets]);
 
-  const loadMore = useCallback(() => {
-    setVisibleCount((c) => Math.min(c + PAGE_SIZE, totalClubs));
-  }, [totalClubs]);
+  const gotoPage = useCallback(
+    (next: number) => {
+      const clamped = Math.max(0, Math.min(next, totalPages - 1));
+      setPageIndex(clamped);
+      // Scroll the user back to the top of the grid so they're not
+      // stuck mid-scroll after a page change. requestAnimationFrame so
+      // the layout commits first.
+      requestAnimationFrame(() => {
+        const el = document.querySelector('.v1c-clubs-section');
+        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+    },
+    [totalPages],
+  );
 
   const membershipFor = useCallback(
     (slug: string): Membership | null => membershipBySlug[slug] ?? null,
@@ -624,8 +694,10 @@ export default function ClubsView({
           )}
 
           {/* All clubs grid — ALL clubs in SSR HTML (SEO), visual-only
-              pagination via Load more. Cards use the original portrait
-              design with image + logo overlay + tags + members + next-run. */}
+              pagination via .is-hidden. Cards use the original portrait
+              design with image + logo overlay + tags + members + next-run.
+              Pagination shows at top AND bottom so the user can flip
+              pages without scrolling to the foot every time. */}
           <section className="v1c-clubs-section">
             <div className="v1c-container">
               <div className="v1c-section-header">
@@ -633,9 +705,16 @@ export default function ClubsView({
                   Every run club in <b className="v1c-red">India</b>
                 </h2>
                 <span className="v1c-section-count">
-                  Showing {Math.min(visibleCount, totalClubs)} of {totalClubs}
+                  Showing {visibleStart + 1}–{visibleEnd} of {totalClubs}
                 </span>
               </div>
+
+              <PaginationBar
+                pageIndex={pageIndex}
+                totalPages={totalPages}
+                onChange={gotoPage}
+              />
+
               <div className="v1c-clubs-grid">
                 {clubs.map((c, i) => (
                   <ClubCard
@@ -643,17 +722,17 @@ export default function ClubsView({
                     c={c}
                     membership={c.slug ? membershipFor(c.slug) : null}
                     onJoin={openJoin}
-                    hidden={i >= visibleCount}
+                    hidden={i < visibleStart || i >= visibleEnd}
                   />
                 ))}
               </div>
-              {showLoadMore && (
-                <div className="v1c-load-more">
-                  <button type="button" className="v1c-btn v1c-btn-ghost" onClick={loadMore}>
-                    Load {Math.min(PAGE_SIZE, totalClubs - visibleCount)} more
-                  </button>
-                </div>
-              )}
+
+              <PaginationBar
+                pageIndex={pageIndex}
+                totalPages={totalPages}
+                onChange={gotoPage}
+                position="bottom"
+              />
             </div>
           </section>
         </>

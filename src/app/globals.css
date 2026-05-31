@@ -2346,59 +2346,101 @@ body { padding-top: var(--nav-h, 68px); }
 .v1-clubs-page .v1c-red { color: var(--red); }
 
 /* ─── Featured strip (top-5-by-members) ───
-   Reuses the original .v1c-flagship-card design (2-col editorial card
-   with image bg, logo, tags, next-run footer). Desktop = 2-col grid;
-   mobile = horizontal scroll carousel with snap so all 5 featured
-   clubs are reachable without stacking them into a long column. */
+   The .v1c-flagship-card has an internal 2-column layout (main image-
+   +-title left, tags/next-run/CTAs right) that needs full width to
+   breathe — a 2-up grid crushed it into a 4-line wrapped title.
+   Use a horizontal scroll carousel at ALL screen sizes: one card
+   visible at a time with a peek of the next so the user knows to
+   swipe. Mirrors the original /clubs design pattern. */
 .v1-clubs-page .v1c-featured {
   background: var(--cream);
   padding: 64px 0 56px;
   border-bottom: 1px solid var(--jet);
 }
+.v1-clubs-page .v1c-featured .v1c-container {
+  /* Allow the carousel to bleed to the viewport edges on small screens
+     so cards align to padding rather than being clipped. */
+  padding-left: 0; padding-right: 0;
+}
+.v1-clubs-page .v1c-featured .v1c-section-header {
+  padding: 0 var(--v1c-gutter);
+}
 .v1-clubs-page .v1c-flagship-grid {
-  display: grid;
-  grid-template-columns: 1fr;
+  display: flex;
+  overflow-x: auto;
+  overflow-y: hidden;
   gap: 18px;
+  padding: 0 var(--v1c-gutter) 4px;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
 }
-@media (min-width: 1100px) {
-  .v1-clubs-page .v1c-flagship-grid { grid-template-columns: repeat(2, 1fr); }
+.v1-clubs-page .v1c-flagship-grid::-webkit-scrollbar { display: none; }
+.v1-clubs-page .v1c-flagship-grid > .v1c-flagship-card {
+  /* One card visible at a time, snap-stop so the user lands cleanly on
+     each. The 8px peek on the right hints "there's more — swipe." */
+  flex: 0 0 calc(100% - 32px);
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
 }
-/* Mobile/tablet: horizontal scroll carousel. Cards are 88vw so a peek
-   of the next one is visible, telling the user "there's more — swipe."
-   Scroll-snap keeps each card landing cleanly. */
-@media (max-width: 860px) {
-  .v1-clubs-page .v1c-featured {
-    padding: 48px 0 40px;
-  }
-  .v1-clubs-page .v1c-featured .v1c-section-header {
-    padding: 0 24px;
-  }
-  .v1-clubs-page .v1c-featured .v1c-container {
-    padding-left: 0; padding-right: 0;
-  }
-  .v1-clubs-page .v1c-flagship-grid {
-    display: flex;
-    grid-template-columns: none;
-    overflow-x: auto;
-    overflow-y: hidden;
-    gap: 14px;
-    padding: 0 24px;
-    scroll-snap-type: x mandatory;
-    scroll-behavior: smooth;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
-  }
-  .v1-clubs-page .v1c-flagship-grid::-webkit-scrollbar { display: none; }
+@media (min-width: 980px) {
   .v1-clubs-page .v1c-flagship-grid > .v1c-flagship-card {
+    /* On desktop, show 1.5 cards so the next-card peek is more obvious. */
     flex: 0 0 88%;
-    scroll-snap-align: start;
-    scroll-snap-stop: always;
+  }
+}
+@media (min-width: 1400px) {
+  .v1-clubs-page .v1c-flagship-grid > .v1c-flagship-card {
+    flex: 0 0 calc(50% - 20px);
   }
 }
 
-/* ─── All-clubs grid + Load more ───
-   2 columns is enough density on desktop — the flagship card design is
-   horizontal so a 3-col grid feels cramped. */
+/* ─── Pagination bar (top + bottom of all-clubs grid) ─── */
+.v1-clubs-page .v1c-pagination {
+  display: flex; align-items: center; justify-content: center;
+  gap: 16px;
+  padding: 16px 0;
+  font-family: var(--font-oswald), sans-serif;
+}
+.v1-clubs-page .v1c-pagination-top { margin-bottom: 28px; border-bottom: 0.5px solid rgba(245,240,235,0.14); }
+.v1-clubs-page .v1c-pagination-bottom { margin-top: 32px; border-top: 0.5px solid rgba(245,240,235,0.14); padding-top: 28px; }
+.v1-clubs-page .v1c-pagination-btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 10px 18px;
+  background: transparent;
+  border: 0.5px solid rgba(245, 240, 235, 0.28);
+  color: var(--bone);
+  font-family: inherit;
+  font-weight: 600;
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 160ms ease-out;
+}
+.v1-clubs-page .v1c-pagination-btn:hover:not(:disabled) {
+  background: var(--bone); color: var(--jet); border-color: var(--bone);
+}
+.v1-clubs-page .v1c-pagination-btn:disabled {
+  opacity: 0.35; cursor: not-allowed;
+}
+.v1-clubs-page .v1c-pagination-pos {
+  font-weight: 500;
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(245, 240, 235, 0.55);
+  font-variant-numeric: tabular-nums;
+}
+.v1-clubs-page .v1c-pagination-pos strong {
+  color: var(--bone); font-weight: 700;
+}
+
+/* ─── All-clubs grid ───
+   2-col is the minimum density everywhere — even on phone — because a
+   1-col stack with full-width portrait cards burns vertical space and
+   makes "showing 24 of 112" feel like an endless scroll. */
 .v1-clubs-page .v1c-clubs-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -2406,12 +2448,14 @@ body { padding-top: var(--nav-h, 68px); }
 }
 @media (max-width: 980px) { .v1-clubs-page .v1c-clubs-grid { grid-template-columns: repeat(2, 1fr); } }
 @media (max-width: 540px) {
-  /* On phone-sized screens, single column. Cap card height so it doesn't
-     blow up — the 16/9 header image is the main thing eating space. */
-  .v1-clubs-page .v1c-clubs-grid { grid-template-columns: 1fr; }
-  .v1-clubs-page .v1c-club-card { min-height: 0; max-width: 100%; }
-  .v1-clubs-page .v1c-club-card-header { aspect-ratio: 16 / 7; }
-  .v1-clubs-page .v1c-club-card-body { padding: 32px 18px 14px; }
+  /* Stay 2-col but tighten gap + card chrome so the cards still breathe. */
+  .v1-clubs-page .v1c-clubs-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .v1-clubs-page .v1c-club-card { min-height: 0; }
+  .v1-clubs-page .v1c-club-card-body { padding: 32px 12px 12px; }
+  .v1-clubs-page .v1c-club-card-title { font-size: 16px; }
+  .v1-clubs-page .v1c-club-card-actions { padding: 0 12px 12px; }
+  .v1-clubs-page .v1c-club-card-actions .v1c-btn { font-size: 10px; height: 36px; padding: 0 10px; }
+  .v1-clubs-page .v1c-club-card-tags { display: none; } /* tag chips don't fit in narrow cards */
 }
 
 /* Visual-only pagination: keep the anchor in the SSR HTML for SEO, only
