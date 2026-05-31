@@ -289,7 +289,7 @@ export default function RaceDetailView({
         />
       )}
 
-      <DetailCrossNav kind="race" />
+      {/* <DetailCrossNav kind="race" /> */}
 
       <section className="v1rd-hero">
         <div className="v1rd-container">
@@ -649,7 +649,7 @@ export default function RaceDetailView({
         </section>
       )}
 
-      <ExploreMoreStrip from="from-race" />
+      {/* <ExploreMoreStrip from="from-race" /> */}
 
       <section className="v1rd-end-cta">
         <div className="v1rd-container">

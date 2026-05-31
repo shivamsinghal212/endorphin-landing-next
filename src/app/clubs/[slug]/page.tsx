@@ -260,7 +260,7 @@ export default async function ClubPage({ params }: PageProps) {
       <ClubFaqJsonLd club={club} neighborhoods={neighborhoods} />
       <Header />
       <div className="club-page">
-        <DetailCrossNav kind="club" />
+        {/* <DetailCrossNav kind="club" /> */}
         <Hero
           club={club}
           isAuthed={isAuthed}
@@ -292,7 +292,7 @@ export default async function ClubPage({ params }: PageProps) {
         <CommentsSay events={pastEvents} />
         <BrandsStrip collaborations={club.collaborations} />
         {club.admins.length > 0 && <LedBy admins={club.admins} />}
-        <ExploreMoreStrip from="from-club" />
+        {/* <ExploreMoreStrip from="from-club" /> */}
         <CtaFooter club={club} />
       </div>
       <Footer />
