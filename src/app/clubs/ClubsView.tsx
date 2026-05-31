@@ -689,7 +689,7 @@ export default function ClubsView({
           </div>
 
           <h1 className="v1-hero-title">
-            Find India&apos;s most happening run clubs<span className="accent">.</span>
+            Find India&apos;s most <span className="accent">happening</span> run clubs<span className="accent">.</span>
           </h1>
 
           <HeroSearchPanel
