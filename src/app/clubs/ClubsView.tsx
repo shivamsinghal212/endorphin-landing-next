@@ -12,6 +12,7 @@ import HeroSearchPanel, {
 import { ClaimClubModal } from './[slug]/claim-club-link';
 import { JoinClubModal } from './[slug]/join-club-modal';
 import type { MyClubClaim, MyClubMembership } from '@/lib/api';
+import type { ApiClub, ClubEvent } from './page';
 
 type Membership = MyClubMembership;
 type Claim = MyClubClaim;
@@ -128,31 +129,44 @@ const VerifiedTick = ({ className }: { className?: string }) => (
 );
 
 // ─── Flagship card (top-5-by-members featured strip) ──
-// Editorial 2-column card matching the original /clubs design. Uses the
-// new DiscoverHit fields (tags, isVerified, establishedYear, nextEvent)
-// so it renders identically to the pre-discover version without the
-// per-slug detail fan-out.
+// Original /clubs design verbatim — full ApiClub data (4-stat block,
+// tags row, next-run with location + distance, CTAs). The featured 5
+// are fetched via the legacy /clubs/{slug} + /events endpoints in
+// page.tsx; the all-clubs grid below stays on the lean DiscoverHit.
+function pickNextEvent(events: ClubEvent[] | undefined): ClubEvent | null {
+  if (!events || events.length === 0) return null;
+  const now = Date.now();
+  const future = events
+    .filter((e) => {
+      const t = Date.parse(e.startTime);
+      return Number.isFinite(t) && t >= now;
+    })
+    .sort((a, b) => Date.parse(a.startTime) - Date.parse(b.startTime));
+  return future[0] || null;
+}
+
 function FlagshipCard({
   c,
   membership,
   onJoin,
   isLcp = false,
 }: {
-  c: DiscoverHit;
+  c: ApiClub;
   membership: Membership | null;
   onJoin: (club: { name: string; slug: string }) => void;
   isLcp?: boolean;
 }) {
-  if (!c.slug) return null;
+  const stats = c.stats || {};
+  const nr = pickNextEvent(c.events);
   const href = `/clubs/${c.slug}`;
-  const nr = c.nextEvent;
-  const bgImageUrl = c.imageUrl;
-  const membersFormatted = formatMembers(c.members);
+
+  const bgImageUrl = c.headerImageUrl || c.logoUrl || null;
+  const bgIsLogoFallback = !c.headerImageUrl && !!c.logoUrl;
 
   return (
     <article className="v1c-flagship-card">
       <div
-        className="v1c-flagship-card-bg"
+        className={`v1c-flagship-card-bg${bgIsLogoFallback ? ' is-logo-fallback' : ''}`}
         style={bgImageUrl ? { backgroundImage: `url('${bgImageUrl}')` } : undefined}
         aria-hidden
       />
@@ -169,37 +183,49 @@ function FlagshipCard({
           </div>
           <div className="v1c-flagship-head">
             <div className="v1c-flagship-logo">
-              {c.imageUrl ? (
+              {c.logoUrl ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
-                  src={c.imageUrl}
-                  alt={`${c.title} logo`}
+                  src={c.logoUrl}
+                  alt={`${c.name} logo`}
                   loading={isLcp ? 'eager' : 'lazy'}
                   decoding="async"
                   fetchPriority={isLcp ? 'high' : 'low'}
                 />
               ) : (
-                initials(c.title)
+                initials(c.name)
               )}
             </div>
-            <h3 className="v1c-flagship-title">{c.title}</h3>
+            <h3 className="v1c-flagship-title">{c.name}</h3>
           </div>
           {c.subtitle && <p className="v1c-flagship-subtitle">{c.subtitle}</p>}
         </div>
-        {membersFormatted && (
-          <div className="v1c-flagship-stats">
-            <div className="v1c-flagship-stat-block">
-              <div className="v1c-flagship-stat-label">Members</div>
-              <div className="v1c-flagship-stat-value">{membersFormatted}</div>
+        <div className="v1c-flagship-stats">
+          <div className="v1c-flagship-stat-block">
+            <div className="v1c-flagship-stat-label">Members</div>
+            <div className="v1c-flagship-stat-value">
+              {(stats.members || 0).toLocaleString('en-IN')}
             </div>
           </div>
-        )}
+          <div className="v1c-flagship-stat-block">
+            <div className="v1c-flagship-stat-label">Runs / month</div>
+            <div className="v1c-flagship-stat-value">{stats.runsThisMonth || 0}</div>
+          </div>
+          <div className="v1c-flagship-stat-block">
+            <div className="v1c-flagship-stat-label">Km / month</div>
+            <div className="v1c-flagship-stat-value">{stats.kmThisMonth || 0}</div>
+          </div>
+          <div className="v1c-flagship-stat-block">
+            <div className="v1c-flagship-stat-label">Years</div>
+            <div className="v1c-flagship-stat-value">{stats.yearsRunning || 0}</div>
+          </div>
+        </div>
       </div>
       <div className="v1c-flagship-side">
         <div>
           {c.tags && c.tags.length > 0 && (
             <div className="v1c-flagship-tags">
-              {c.tags.slice(0, 4).map((t) => (
+              {c.tags.map((t) => (
                 <span key={t} className="v1c-flagship-tag">{t}</span>
               ))}
             </div>
@@ -220,11 +246,14 @@ function FlagshipCard({
                   </>
                 )}
               </div>
+              {nr.goingCount ? (
+                <span className="v1c-flagship-nextrun-going">{nr.goingCount} going</span>
+              ) : null}
             </div>
           )}
         </div>
         <div className="v1c-flagship-ctas">
-          <MembershipCta name={c.title} slug={c.slug} membership={membership} onJoin={onJoin} />
+          <MembershipCta name={c.name} slug={c.slug} membership={membership} onJoin={onJoin} />
           <Link href={href} className="v1c-btn v1c-btn-ghost-light">
             View details →
           </Link>
@@ -562,13 +591,19 @@ function PaginationBar({
 
 export default function ClubsView({
   clubs,
+  featuredFull,
   cityFacets,
   membershipBySlug = {},
   claimBySlug = {},
   isAuthed = false,
   userEmail = null,
 }: {
+  // Lean shape powering the all-clubs grid (SSR'd ~112 anchors for SEO).
   clubs: DiscoverHit[];
+  // Rich shape powering the featured-5 strip — stats, tags, events.
+  // Fetched separately in page.tsx because /discover/smart doesn't
+  // surface runs_this_month / km_this_month / years_running / events[].
+  featuredFull: ApiClub[];
   cityFacets: { value: string; count: number }[];
   membershipBySlug?: Record<string, Membership>;
   claimBySlug?: Record<string, Claim>;
@@ -587,7 +622,8 @@ export default function ClubsView({
   const openJoin = useCallback((club: { name: string; slug: string }) => setModal({ kind: 'join', club }), []);
   const closeModal = useCallback(() => setModal(null), []);
 
-  const featured = useMemo(() => clubs.slice(0, 5), [clubs]);
+  // featuredFull is already top-5-by-members from page.tsx — no further
+  // slicing needed here.
   const totalClubs = clubs.length;
   const totalPages = Math.max(1, Math.ceil(totalClubs / PAGE_SIZE));
   const visibleStart = pageIndex * PAGE_SIZE;
@@ -667,23 +703,24 @@ export default function ClubsView({
 
       {!isSearching && (
         <>
-          {/* Featured — top 5 by member count, original FlagshipCard
-              design (image + logo + tags + members + next-run footer) */}
-          {featured.length > 0 && (
+          {/* Featured — top 5 by member count, full ApiClub data.
+              Original FlagshipCard verbatim: bg image, logo, 4-stat
+              grid, tags, next-run footer with location + distance. */}
+          {featuredFull.length > 0 && (
             <section className="v1c-featured">
               <div className="v1c-container">
                 <div className="v1c-section-header">
                   <h2 className="v1c-section-title">
                     Featured <b>clubs</b>
                   </h2>
-                  <span className="v1c-section-count">Top {featured.length} by members</span>
+                  <span className="v1c-section-count">Top {featuredFull.length} by members</span>
                 </div>
                 <div className="v1c-flagship-grid">
-                  {featured.map((c, i) => (
+                  {featuredFull.map((c, i) => (
                     <FlagshipCard
-                      key={c.id}
+                      key={c.slug}
                       c={c}
-                      membership={c.slug ? membershipFor(c.slug) : null}
+                      membership={membershipFor(c.slug)}
                       onJoin={openJoin}
                       isLcp={i === 0}
                     />

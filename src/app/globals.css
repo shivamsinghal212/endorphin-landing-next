@@ -2378,22 +2378,14 @@ body { padding-top: var(--nav-h, 68px); }
 }
 .v1-clubs-page .v1c-flagship-grid::-webkit-scrollbar { display: none; }
 .v1-clubs-page .v1c-flagship-grid > .v1c-flagship-card {
-  /* One card visible at a time, snap-stop so the user lands cleanly on
-     each. The 8px peek on the right hints "there's more — swipe." */
+  /* One card visible at a time across all breakpoints. The internal
+     2-col layout (main + side) needs ~1100px to breathe — a 50%
+     desktop card crushed the title to 4 wrapped lines and left the
+     side column with empty space. Now a small right-edge peek hints
+     "there's more — swipe." */
   flex: 0 0 calc(100% - 32px);
   scroll-snap-align: start;
   scroll-snap-stop: always;
-}
-@media (min-width: 980px) {
-  .v1-clubs-page .v1c-flagship-grid > .v1c-flagship-card {
-    /* On desktop, show 1.5 cards so the next-card peek is more obvious. */
-    flex: 0 0 88%;
-  }
-}
-@media (min-width: 1400px) {
-  .v1-clubs-page .v1c-flagship-grid > .v1c-flagship-card {
-    flex: 0 0 calc(50% - 20px);
-  }
 }
 
 /* ─── Pagination bar (top + bottom of all-clubs grid) ─── */
