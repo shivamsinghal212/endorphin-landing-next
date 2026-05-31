@@ -200,25 +200,36 @@ function FlagshipCard({
           </div>
           {c.subtitle && <p className="v1c-flagship-subtitle">{c.subtitle}</p>}
         </div>
+        {/* Skip any stat block whose value is 0 (or null/undefined).
+            Empty stats look like missing data rather than "this club is
+            new" — hiding them keeps the card honest. */}
         <div className="v1c-flagship-stats">
-          <div className="v1c-flagship-stat-block">
-            <div className="v1c-flagship-stat-label">Members</div>
-            <div className="v1c-flagship-stat-value">
-              {(stats.members || 0).toLocaleString('en-IN')}
+          {stats.members ? (
+            <div className="v1c-flagship-stat-block">
+              <div className="v1c-flagship-stat-label">Members</div>
+              <div className="v1c-flagship-stat-value">
+                {stats.members.toLocaleString('en-IN')}
+              </div>
             </div>
-          </div>
-          <div className="v1c-flagship-stat-block">
-            <div className="v1c-flagship-stat-label">Runs / month</div>
-            <div className="v1c-flagship-stat-value">{stats.runsThisMonth || 0}</div>
-          </div>
-          <div className="v1c-flagship-stat-block">
-            <div className="v1c-flagship-stat-label">Km / month</div>
-            <div className="v1c-flagship-stat-value">{stats.kmThisMonth || 0}</div>
-          </div>
-          <div className="v1c-flagship-stat-block">
-            <div className="v1c-flagship-stat-label">Years</div>
-            <div className="v1c-flagship-stat-value">{stats.yearsRunning || 0}</div>
-          </div>
+          ) : null}
+          {stats.runsThisMonth ? (
+            <div className="v1c-flagship-stat-block">
+              <div className="v1c-flagship-stat-label">Runs / month</div>
+              <div className="v1c-flagship-stat-value">{stats.runsThisMonth}</div>
+            </div>
+          ) : null}
+          {stats.kmThisMonth ? (
+            <div className="v1c-flagship-stat-block">
+              <div className="v1c-flagship-stat-label">Km / month</div>
+              <div className="v1c-flagship-stat-value">{stats.kmThisMonth}</div>
+            </div>
+          ) : null}
+          {stats.yearsRunning ? (
+            <div className="v1c-flagship-stat-block">
+              <div className="v1c-flagship-stat-label">Years</div>
+              <div className="v1c-flagship-stat-value">{stats.yearsRunning}</div>
+            </div>
+          ) : null}
         </div>
       </div>
       <div className="v1c-flagship-side">
