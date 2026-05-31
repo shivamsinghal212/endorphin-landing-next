@@ -372,3 +372,27 @@ export const kipWaitlistApi = {
       token,
     }),
 };
+
+// ─── Reminders (email + calendar invite) ──────────────────────────────────
+
+export type ReminderEventType = 'race' | 'club_event';
+
+export interface Reminder {
+  id: string;
+  eventType: ReminderEventType;
+  eventId: string;
+  remindAt: string;
+  status: string;
+  createdAt: string;
+}
+
+export const remindersApi = {
+  list: (token: string) => api<Reminder[]>('/reminders', { token }),
+
+  create: (eventType: ReminderEventType, eventId: string, token: string) =>
+    api<Reminder>('/reminders', {
+      method: 'POST',
+      body: JSON.stringify({ eventType, eventId }),
+      token,
+    }),
+};

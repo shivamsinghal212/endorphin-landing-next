@@ -3,7 +3,7 @@ import type { Metadata } from 'next';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { getClub, type Club, type ClubAdminPerson } from '@/lib/admin-api';
-import { clubsApi, type MyMembership } from '@/lib/api';
+import { clubsApi, remindersApi, type MyMembership, type Reminder } from '@/lib/api';
 import { getSessionEmail, getSessionToken } from '@/lib/session';
 import type { ClubEvent } from '../page';
 import { ClaimClubLink } from './claim-club-link';
@@ -217,18 +217,24 @@ function uniqueNeighborhoods(events: ClubEvent[]): string[] {
 export default async function ClubPage({ params }: PageProps) {
   const { slug } = await params;
   const token = await getSessionToken();
-  const [club, events, myMembership, userEmail] = await Promise.all([
+  const [club, events, myMembership, userEmail, myReminders] = await Promise.all([
     getClub(slug).catch(() => null),
     getClubEvents(slug),
     token
       ? clubsApi.getMyMembership(slug, token).catch(() => null)
       : Promise.resolve(null as MyMembership | null),
     getSessionEmail(),
+    token
+      ? remindersApi.list(token).catch(() => [] as Reminder[])
+      : Promise.resolve([] as Reminder[]),
   ]);
   if (!club || !club.publishedAt) notFound();
 
   const { nextEvent, upcomingEvents, pastEvents } = splitEvents(events);
   const isAuthed = !!token;
+  const reminderClubEventIds = new Set(
+    myReminders.filter((r) => r.eventType === 'club_event').map((r) => r.eventId),
+  );
 
   // Locality + activity context derived from existing event data so we
   // can enrich every metadata surface (JSON-LD, "Where we run" section,
@@ -265,6 +271,7 @@ export default async function ClubPage({ params }: PageProps) {
           club={club}
           isAuthed={isAuthed}
           myMembership={myMembership}
+          reminderEventIds={reminderClubEventIds}
         />
         {upcomingEvents.length > 0 && (
           <UpcomingList
@@ -275,6 +282,7 @@ export default async function ClubPage({ params }: PageProps) {
             requiresApproval={club.requiresApproval}
             isAuthed={isAuthed}
             myMembership={myMembership}
+            reminderEventIds={reminderClubEventIds}
           />
         )}
         {pastEvents.length > 0 && <PreviousRuns events={pastEvents} />}

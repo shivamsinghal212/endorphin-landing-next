@@ -5,6 +5,7 @@ import type { Club } from '@/lib/admin-api';
 import type { MyMembership } from '@/lib/api';
 import type { ClubEvent } from '../page';
 import { RsvpButton } from './rsvp-button';
+import { ReminderButton } from '@/components/ReminderButton';
 
 const TZ = 'Asia/Kolkata';
 const INITIAL_VISIBLE = 5;
@@ -38,6 +39,7 @@ export function UpcomingList({
   requiresApproval,
   isAuthed,
   myMembership,
+  reminderEventIds,
 }: {
   events: ClubEvent[];
   slug: string;
@@ -46,6 +48,7 @@ export function UpcomingList({
   requiresApproval: boolean;
   isAuthed: boolean;
   myMembership: MyMembership | null;
+  reminderEventIds: Set<string>;
 }) {
   const [expanded, setExpanded] = useState(false);
   const overflow = events.length > INITIAL_VISIBLE;
@@ -76,6 +79,7 @@ export function UpcomingList({
             requiresApproval={requiresApproval}
             isAuthed={isAuthed}
             myMembership={myMembership}
+            reminderIsSet={reminderEventIds.has(event.id)}
           />
         );
       })}
@@ -105,6 +109,7 @@ function UpcomingRow({
   requiresApproval,
   isAuthed,
   myMembership,
+  reminderIsSet,
 }: {
   event: ClubEvent;
   hidden?: boolean;
@@ -114,6 +119,7 @@ function UpcomingRow({
   requiresApproval: boolean;
   isAuthed: boolean;
   myMembership: MyMembership | null;
+  reminderIsSet: boolean;
 }) {
   const isRace = event.eventType === 'race_event';
   const tagLabel = isRace ? 'Race event' : 'Club run';
@@ -182,6 +188,15 @@ function UpcomingRow({
               variant="primary"
             />
           )}
+          <ReminderButton
+            eventType="club_event"
+            eventId={event.id}
+            eventStartTime={event.startTime}
+            eventTitle={event.title}
+            initialIsSet={reminderIsSet}
+            isAuthed={isAuthed}
+            variant="compact"
+          />
         </div>
       </div>
       {hasExtra && expanded && (

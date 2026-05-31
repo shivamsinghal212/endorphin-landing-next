@@ -9,6 +9,7 @@ import posthog from 'posthog-js';
 import CouponTopStrip from '@/components/CouponTopStrip';
 import LoginModal from '@/components/LoginModal';
 import RaceCouponContext from '@/components/RaceCouponContext';
+import { ReminderButton } from '@/components/ReminderButton';
 import { couponCta } from '@/lib/coupon-cta';
 import type { Event, DistanceCategory } from '@/lib/api';
 import { useMyRegistrations } from '@/lib/runner-hooks';
@@ -150,9 +151,11 @@ function HeroCarousel({ slides }: { slides: string[] }) {
 export default function RaceDetailView({
   event,
   isAuthed,
+  reminderIsSet,
 }: {
   event: Event;
   isAuthed: boolean;
+  reminderIsSet: boolean;
 }) {
   const router = useRouter();
   const [mounted, setMounted] = useState(false);
@@ -425,6 +428,14 @@ export default function RaceDetailView({
             ) : (
               <span className="v1rd-btn v1rd-btn-primary v1rd-disabled">Registration TBD</span>
             )}
+            <ReminderButton
+              eventType="race"
+              eventId={event.id}
+              eventStartTime={event.startTime}
+              eventTitle={event.title}
+              initialIsSet={reminderIsSet}
+              isAuthed={isAuthed}
+            />
             {event.registrationEndDate && (
               <span className="v1rd-cta-meta">
                 Reg closes {fmtFullDate(event.registrationEndDate)}

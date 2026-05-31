@@ -7144,3 +7144,101 @@ body { padding-top: var(--nav-h, 68px); }
 @media (prefers-reduced-motion: reduce) {
   .pulse-soft { animation: none; }
 }
+
+/* ── Reminder button (alongside RSVP / Register) ───────────────────────── */
+.v1-remind-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  height: 48px;
+  padding: 0 22px;
+  border: 1px solid #0A0A0A;
+  background: transparent;
+  color: #0A0A0A;
+  font-family: var(--font-oswald), sans-serif;
+  font-weight: 600;
+  font-size: 13px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  border-radius: 0;
+  cursor: pointer;
+  transition: background 0.16s ease, color 0.16s ease, border-color 0.16s ease, opacity 0.16s ease;
+  line-height: 1;
+  white-space: nowrap;
+}
+.v1-remind-btn:hover:not(:disabled) {
+  background: #0A0A0A;
+  color: #F5F0EB;
+}
+.v1-remind-btn:disabled {
+  cursor: default;
+}
+.v1-remind-btn.is-set {
+  border-color: #0A8A2E;
+  color: #0A8A2E;
+  background: #EEF7EF;
+  opacity: 1;
+}
+.v1-remind-btn.is-set:hover:not(:disabled) {
+  background: #EEF7EF;
+  color: #0A8A2E;
+}
+.v1-remind-btn.is-soon {
+  border-color: rgba(10, 10, 10, 0.35);
+  color: rgba(10, 10, 10, 0.55);
+  background: transparent;
+}
+.v1-remind-btn.is-error {
+  border-color: #E6232A;
+  color: #E6232A;
+}
+.v1-remind-btn svg { flex-shrink: 0; }
+.v1-remind-label { line-height: 1; }
+
+/* Compact variant — same visual treatment, slightly shorter so it can
+   sit in a dense row-action stack (e.g. upcoming-list row) next to a
+   42px primary RSVP button without dominating it. */
+.v1-remind-btn.is-compact {
+  height: 42px;
+  padding: 0 14px;
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  gap: 8px;
+}
+.v1-remind-btn.is-compact svg {
+  width: 14px;
+  height: 14px;
+}
+
+/* In a club-page row, match the row-scoped .btn sizing so the bell
+   never sticks out taller than the adjacent RSVP. */
+.club-page .row-actions .v1-remind-btn {
+  height: 42px;
+  padding: 0 14px;
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  gap: 8px;
+}
+@media (max-width: 860px) {
+  .club-page .row-actions .v1-remind-btn {
+    padding: 0 12px;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    height: 38px;
+  }
+}
+
+/* Narrow screens: the compact variant collapses to icon-only so it
+   doesn't crowd a tight row. State stays conveyed via colour + the
+   title/aria-pressed attributes. */
+@media (max-width: 480px) {
+  .v1-remind-btn.is-compact .v1-remind-label,
+  .club-page .row-actions .v1-remind-btn .v1-remind-label {
+    display: none;
+  }
+  .v1-remind-btn.is-compact,
+  .club-page .row-actions .v1-remind-btn {
+    padding: 0 12px;
+  }
+}

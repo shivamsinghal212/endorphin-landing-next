@@ -3,6 +3,7 @@ import type { Club } from '@/lib/admin-api';
 import type { MyMembership } from '@/lib/api';
 import type { ClubEvent } from '../page';
 import { RsvpButton } from './rsvp-button';
+import { ReminderButton } from '@/components/ReminderButton';
 
 // ─── helpers ────────────────────────────────────────
 
@@ -60,11 +61,13 @@ export function NextRun({
   club,
   isAuthed,
   myMembership,
+  reminderEventIds,
 }: {
   event: ClubEvent | null;
   club: Club;
   isAuthed: boolean;
   myMembership: MyMembership | null;
+  reminderEventIds: Set<string>;
 }) {
   if (!event) return null;
 
@@ -166,6 +169,14 @@ export function NextRun({
                 variant="primary"
               />
             )}
+            <ReminderButton
+              eventType="club_event"
+              eventId={event.id}
+              eventStartTime={event.startTime}
+              eventTitle={event.title}
+              initialIsSet={reminderEventIds.has(event.id)}
+              isAuthed={isAuthed}
+            />
             {event.goingCount > 0 && (
               <span className="nr-going">
                 <strong>{event.goingCount}</strong> going

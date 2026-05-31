@@ -2,7 +2,7 @@ import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-import { eventsApi, ApiError, type Event } from '@/lib/api';
+import { eventsApi, remindersApi, ApiError, type Event, type Reminder } from '@/lib/api';
 import { getSessionToken } from '@/lib/session';
 import { getStudioAuth } from '@/lib/studio/server-auth';
 import { RunnerProviders } from './register/_components/runner-providers';
@@ -155,6 +155,21 @@ export default async function RaceDetailPage({ params }: PageProps) {
   const event = await loadEvent(slug, token);
   if (!event) notFound();
 
+  // Once the event resolves we know its id — check if the signed-in user
+  // already has a reminder set so the bell renders pre-toggled. Fails
+  // soft to "not set" on any error.
+  let reminderIsSet = false;
+  if (token) {
+    try {
+      const reminders: Reminder[] = await remindersApi.list(token);
+      reminderIsSet = reminders.some(
+        (r) => r.eventType === 'race' && r.eventId === event.id,
+      );
+    } catch {
+      reminderIsSet = false;
+    }
+  }
+
   const jsonLd = buildJsonLd(event);
   const breadcrumbJsonLd = {
     '@context': 'https://schema.org',
@@ -191,7 +206,11 @@ export default async function RaceDetailPage({ params }: PageProps) {
        *  anonymous visitors; the hooks no-op via their `enabled: !!token`
        *  guard. Without this wrap, anonymous renders crashed with
        *  "No QueryClient set". */}
-      <RaceDetailWithRunnerContext event={event} isAuthed={!!token} />
+      <RaceDetailWithRunnerContext
+        event={event}
+        isAuthed={!!token}
+        reminderIsSet={reminderIsSet}
+      />
       <Footer />
     </main>
   );
@@ -204,14 +223,20 @@ export default async function RaceDetailPage({ params }: PageProps) {
 async function RaceDetailWithRunnerContext({
   event,
   isAuthed,
+  reminderIsSet,
 }: {
   event: Event;
   isAuthed: boolean;
+  reminderIsSet: boolean;
 }) {
   const studio = await getStudioAuth();
   return (
     <RunnerProviders studio={studio}>
-      <RaceDetailView event={event} isAuthed={isAuthed} />
+      <RaceDetailView
+        event={event}
+        isAuthed={isAuthed}
+        reminderIsSet={reminderIsSet}
+      />
     </RunnerProviders>
   );
 }
