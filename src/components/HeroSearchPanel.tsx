@@ -34,8 +34,13 @@ export interface DiscoverHit {
   clubId: string | null;
   clubSlug: string | null;
   clubName: string | null;
-  // Only populated for kind=club. Read from the server's join on clubs.stats.
+  // Only populated for kind=club (read from the server's join on
+  // clubs.stats / clubs.* / a batched next-event lookup).
   members: number | null;
+  tags: string[];
+  isVerified: boolean;
+  establishedYear: number | null;
+  nextEvent: ClubEventPreview | null;
   score: number;
   matchingEvents: ClubEventPreview[];
 }
@@ -194,12 +199,17 @@ function mergeParsedIntoFilters(prev: FilterState, parsed: SmartParsed): FilterS
 
 // Quick chips — mapped to the structured filters where possible, free text where not.
 // Each chip is exclusive within its group so toggling stays predictable.
-const QUICK_CHIPS: Array<{
+export type QuickChip = {
   key: string;
   label: string;
-  group: 'when' | 'distance' | 'tag';
+  group: 'when' | 'distance' | 'tag' | 'city';
   apply: (s: FilterState) => Partial<FilterState>;
-}> = [
+};
+
+// Default chip set used when no custom set is passed. Tailored for the
+// homepage (mixed-kind) experience. Listing pages (e.g. /clubs) pass a
+// kind-appropriate chip set via the quickChips prop.
+const DEFAULT_QUICK_CHIPS: QuickChip[] = [
   { key: 'weekend', label: 'This weekend', group: 'when', apply: () => applyWindow('this_weekend') },
   { key: 'tomorrow', label: 'Tomorrow', group: 'when', apply: () => applyWindow('tomorrow') },
   { key: '5k', label: '5K', group: 'distance', apply: () => ({ distanceMin: 5, distanceMax: 5 }) },
@@ -208,6 +218,24 @@ const QUICK_CHIPS: Array<{
   { key: 'women', label: 'Women only', group: 'tag', apply: (s) => ({ tags: toggleTag(s.tags, 'women-only') }) },
   { key: 'beginner', label: 'Beginner friendly', group: 'tag', apply: (s) => ({ tags: toggleTag(s.tags, 'beginner-friendly') }) },
 ];
+
+// Useful when callers want to compose their own chip set from familiar
+// pieces (e.g. /clubs uses TAG_CHIPS but skips the time/distance chips).
+export const TAG_CHIPS: QuickChip[] = [
+  DEFAULT_QUICK_CHIPS[5]!, // women only
+  DEFAULT_QUICK_CHIPS[6]!, // beginner friendly
+];
+
+// Build a city chip on the fly — useful when the caller wants top-N
+// cities from facet data driving the chip rail.
+export function cityChip(city: string, label?: string): QuickChip {
+  return {
+    key: `city:${city.toLowerCase()}`,
+    label: label ?? city,
+    group: 'city',
+    apply: () => ({ city }),
+  };
+}
 
 const KIND_TABS: { key: KindFilter; label: string }[] = [
   { key: 'all', label: 'All' },
@@ -303,6 +331,10 @@ export interface HeroSearchPanelProps {
   // below the chips — useful inside overlays. Omit on listing pages
   // where the search is permanently embedded.
   onClose?: () => void;
+  // Override the chip set. /clubs passes top-cities + Women only +
+  // Beginner friendly because club rows don't have a start time or
+  // distance — the default "5K / This weekend" chips are nonsensical.
+  quickChips?: QuickChip[];
 }
 
 function defaultPlaceholder(kindLock?: DiscoverKind): string {
@@ -318,7 +350,9 @@ const HeroSearchPanel = ({
   autoFocus = false,
   onSearchActiveChange,
   onClose,
+  quickChips,
 }: HeroSearchPanelProps) => {
+  const chips = quickChips ?? DEFAULT_QUICK_CHIPS;
   // Initial filters honor the kindLock if set, so even before the user
   // submits anything we know to scope by kind.
   const initialFilters = useMemo<FilterState>(
@@ -513,7 +547,7 @@ const HeroSearchPanel = ({
   }, [committedFilters]);
 
   const toggleChip = useCallback(
-    (chip: (typeof QUICK_CHIPS)[number]) => {
+    (chip: QuickChip) => {
       // Chip clicks ARE explicit actions — toggle the filter and commit
       // immediately so the result list updates without a second tap.
       const isActive = isChipActive(chip, filters);
@@ -521,6 +555,7 @@ const HeroSearchPanel = ({
       if (isActive) {
         if (chip.group === 'when') patch = clearWindow();
         else if (chip.group === 'distance') patch = { distanceMin: null, distanceMax: null };
+        else if (chip.group === 'city') patch = { city: '' };
         else patch = chip.apply(filters); // tag — toggle removes it
       } else {
         patch = chip.apply(filters);
@@ -574,6 +609,7 @@ const HeroSearchPanel = ({
             onSubmit={submit}
             onChipToggle={toggleChip}
             placeholder={effectivePlaceholder}
+            chips={chips}
           />
         </div>
       </div>
@@ -617,14 +653,16 @@ function SearchPanel({
   onSubmit,
   onChipToggle,
   placeholder,
+  chips,
 }: {
   filters: FilterState;
   update: (patch: Partial<FilterState>) => void;
   inputRef: React.MutableRefObject<HTMLInputElement | null>;
   onClose?: () => void;
   onSubmit: () => void;
-  onChipToggle: (chip: (typeof QUICK_CHIPS)[number]) => void;
+  onChipToggle: (chip: QuickChip) => void;
   placeholder: string;
+  chips: QuickChip[];
 }) {
   return (
     <>
@@ -665,7 +703,7 @@ function SearchPanel({
       <div className="v1-hero-search-chip-group">
         <div className="v1-hero-search-chip-group-label">Quick filters</div>
         <div className="v1-hero-search-chip-row" role="group" aria-label="Quick filters">
-          {QUICK_CHIPS.map((chip) => {
+          {chips.map((chip) => {
             const active = isChipActive(chip, filters);
             return (
               <button
@@ -731,7 +769,7 @@ function formatWindow(w: string) {
   }
 }
 
-function isChipActive(chip: (typeof QUICK_CHIPS)[number], f: FilterState): boolean {
+function isChipActive(chip: QuickChip, f: FilterState): boolean {
   if (chip.group === 'when') {
     // Compare eventsWindow only — dateFrom/dateTo in the patch will differ
     // every render because windowBounds() reads `new Date()`.
@@ -741,6 +779,10 @@ function isChipActive(chip: (typeof QUICK_CHIPS)[number], f: FilterState): boole
   if (chip.group === 'distance') {
     const patch = chip.apply(f);
     return f.distanceMin === patch.distanceMin && f.distanceMax === patch.distanceMax;
+  }
+  if (chip.group === 'city') {
+    const patch = chip.apply(f);
+    return f.city === patch.city;
   }
   if (chip.group === 'tag') {
     // chip.apply toggles, so check the input would be present in current state

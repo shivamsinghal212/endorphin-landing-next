@@ -3,7 +3,12 @@
 import Link from 'next/link';
 import { useCallback, useMemo, useState } from 'react';
 import posthog from 'posthog-js';
-import HeroSearchPanel, { type DiscoverHit } from '@/components/HeroSearchPanel';
+import HeroSearchPanel, {
+  cityChip,
+  TAG_CHIPS,
+  type DiscoverHit,
+  type QuickChip,
+} from '@/components/HeroSearchPanel';
 import { ClaimClubModal } from './[slug]/claim-club-link';
 import { JoinClubModal } from './[slug]/join-club-modal';
 import type { MyClubClaim, MyClubMembership } from '@/lib/api';
@@ -12,6 +17,8 @@ type Membership = MyClubMembership;
 type Claim = MyClubClaim;
 
 const PAGE_SIZE = 24;
+
+// ─── small utilities ────────────────────────
 
 function initials(name: string) {
   const w = (name || '').trim().split(/\s+/);
@@ -24,10 +31,38 @@ function formatMembers(n: number | null | undefined): string | null {
   return n.toLocaleString('en-IN');
 }
 
+// Pin to IST so SSR (UTC server) and the client (any TZ) format dates
+// identically — without timeZone, locale formatting uses the runtime's
+// local zone and hydration mismatches (React #418) for anyone outside it.
+const IST = 'Asia/Kolkata';
+
+function fmtDayShort(iso?: string | null) {
+  if (!iso) return '';
+  const d = new Date(iso.includes('T') ? iso : `${iso}T00:00:00`);
+  if (Number.isNaN(d.getTime())) return '';
+  return d.toLocaleString('en-GB', { day: 'numeric', month: 'short', timeZone: IST });
+}
+
+function fmtDateFull(iso?: string | null) {
+  if (!iso) return '';
+  const d = new Date(iso.includes('T') ? iso : `${iso}T00:00:00`);
+  if (Number.isNaN(d.getTime())) return '';
+  return d.toLocaleString('en-GB', { day: 'numeric', month: 'long', timeZone: IST });
+}
+
+function fmtTimeShort(iso?: string | null) {
+  if (!iso) return '';
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return '';
+  return d.toLocaleString('en-GB', {
+    hour: 'numeric',
+    minute: '2-digit',
+    hour12: true,
+    timeZone: IST,
+  });
+}
+
 // ─── Membership CTA ─────────────────────────
-// Same logic as before, just driven by name+slug from DiscoverHit instead
-// of the old ApiClub shape. Click handler still receives slug+name so the
-// JoinClubModal can fetch full details once opened.
 
 function MembershipCta({
   name,
@@ -83,7 +118,6 @@ function MembershipCta({
   );
 }
 
-// ─── Verified tick (inline svg) ─────────────
 const VerifiedTick = ({ className }: { className?: string }) => (
   <svg className={className} width="15" height="15" viewBox="0 0 24 24" aria-label="Verified">
     <path
@@ -93,8 +127,12 @@ const VerifiedTick = ({ className }: { className?: string }) => (
   </svg>
 );
 
-// ─── Featured card (large, for the top-5-by-members strip) ──
-function FeaturedCard({
+// ─── Flagship card (top-5-by-members featured strip) ──
+// Editorial 2-column card matching the original /clubs design. Uses the
+// new DiscoverHit fields (tags, isVerified, establishedYear, nextEvent)
+// so it renders identically to the pre-discover version without the
+// per-slug detail fan-out.
+function FlagshipCard({
   c,
   membership,
   onJoin,
@@ -107,41 +145,99 @@ function FeaturedCard({
 }) {
   if (!c.slug) return null;
   const href = `/clubs/${c.slug}`;
+  const nr = c.nextEvent;
+  const bgImageUrl = c.imageUrl;
   const membersFormatted = formatMembers(c.members);
+
   return (
-    <article className="v1c-feature-card">
-      <Link href={href} className="v1c-feature-card-link" aria-label={`View ${c.title}`}>
-        <div className="v1c-feature-card-media">
-          <div className="v1c-feature-card-fallback">{initials(c.title)}</div>
-          {c.imageUrl && (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={c.imageUrl}
-              alt=""
-              loading={isLcp ? 'eager' : 'lazy'}
-              fetchPriority={isLcp ? 'high' : 'low'}
-            />
-          )}
+    <article className="v1c-flagship-card">
+      <div
+        className="v1c-flagship-card-bg"
+        style={bgImageUrl ? { backgroundImage: `url('${bgImageUrl}')` } : undefined}
+        aria-hidden
+      />
+      <div className="v1c-flagship-main">
+        <div>
+          <div className="v1c-flagship-kicker">
+            {c.city}
+            {c.establishedYear ? ` · Est ${c.establishedYear}` : ''}
+            {c.isVerified && (
+              <span className="v1c-flagship-verified" aria-label="Verified">
+                <VerifiedTick />
+              </span>
+            )}
+          </div>
+          <div className="v1c-flagship-head">
+            <div className="v1c-flagship-logo">
+              {c.imageUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={c.imageUrl}
+                  alt={`${c.title} logo`}
+                  loading={isLcp ? 'eager' : 'lazy'}
+                  decoding="async"
+                  fetchPriority={isLcp ? 'high' : 'low'}
+                />
+              ) : (
+                initials(c.title)
+              )}
+            </div>
+            <h3 className="v1c-flagship-title">{c.title}</h3>
+          </div>
+          {c.subtitle && <p className="v1c-flagship-subtitle">{c.subtitle}</p>}
         </div>
-        <div className="v1c-feature-card-body">
-          {c.city && <div className="v1c-feature-card-kicker">{c.city}</div>}
-          <h3 className="v1c-feature-card-title">{c.title}</h3>
-          {c.subtitle && <p className="v1c-feature-card-sub">{c.subtitle}</p>}
-          {membersFormatted && (
-            <div className="v1c-feature-card-stat">
-              <strong>{membersFormatted}</strong> members
+        {membersFormatted && (
+          <div className="v1c-flagship-stats">
+            <div className="v1c-flagship-stat-block">
+              <div className="v1c-flagship-stat-label">Members</div>
+              <div className="v1c-flagship-stat-value">{membersFormatted}</div>
+            </div>
+          </div>
+        )}
+      </div>
+      <div className="v1c-flagship-side">
+        <div>
+          {c.tags && c.tags.length > 0 && (
+            <div className="v1c-flagship-tags">
+              {c.tags.slice(0, 4).map((t) => (
+                <span key={t} className="v1c-flagship-tag">{t}</span>
+              ))}
+            </div>
+          )}
+          {nr && (
+            <div className="v1c-flagship-nextrun">
+              <div className="v1c-flagship-nextrun-kicker">
+                Next run · {fmtDateFull(nr.startTime)}
+                {fmtTimeShort(nr.startTime) ? ` · ${fmtTimeShort(nr.startTime)}` : ''}
+              </div>
+              <div className="v1c-flagship-nextrun-title">{nr.title || 'Next run'}</div>
+              <div className="v1c-flagship-nextrun-meta">
+                {nr.locationName || '—'}
+                {nr.distanceKm != null && (
+                  <>
+                    <span className="v1c-dot">·</span>
+                    {nr.distanceKm}K
+                  </>
+                )}
+              </div>
             </div>
           )}
         </div>
-      </Link>
-      <div className="v1c-feature-card-actions">
-        <MembershipCta name={c.title} slug={c.slug} membership={membership} onJoin={onJoin} />
+        <div className="v1c-flagship-ctas">
+          <MembershipCta name={c.title} slug={c.slug} membership={membership} onJoin={onJoin} />
+          <Link href={href} className="v1c-btn v1c-btn-ghost-light">
+            View details →
+          </Link>
+        </div>
       </div>
     </article>
   );
 }
 
-// ─── Compact club card (all-clubs grid) ──────
+// ─── Compact club card (all-clubs grid) ──
+// Matches the original portrait card design — header image with vignette,
+// floating logo, title + verified tick, city + est year, tags, member
+// count footer with next-event indicator.
 function ClubCard({
   c,
   membership,
@@ -151,41 +247,68 @@ function ClubCard({
   c: DiscoverHit;
   membership: Membership | null;
   onJoin: (club: { name: string; slug: string }) => void;
-  // True when the card is past the visible cutoff. We KEEP the anchor in
-  // the SSR'd HTML for SEO link equity — only display:none it via the
-  // `is-hidden` modifier. "Load more" toggles the class off, no network.
+  // Hidden cards stay in the SSR HTML for SEO; only display:none'd
+  // via the .is-hidden modifier. "Load more" toggles the class off.
   hidden: boolean;
 }) {
   if (!c.slug) return null;
   const href = `/clubs/${c.slug}`;
+  const nr = c.nextEvent;
+  const headerImg = c.imageUrl;
   const membersFormatted = formatMembers(c.members);
+
   return (
     <article className={`v1c-club-card ${hidden ? 'is-hidden' : ''}`}>
       <Link href={href} className="v1c-club-card-body-link" aria-label={`View ${c.title}`}>
         <div className="v1c-club-card-header">
           <div className="v1c-club-card-header-fallback">{initials(c.title)}</div>
-          {c.imageUrl && (
+          {headerImg && (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={c.imageUrl} alt={c.title} loading="lazy" />
+            <img
+              src={headerImg}
+              alt={c.title}
+              loading="lazy"
+              className="is-logo-fallback"
+            />
           )}
         </div>
         <div className="v1c-club-card-body">
           <div className="v1c-club-card-logo">
             {c.imageUrl ? (
               // eslint-disable-next-line @next/next/no-img-element
-              <img src={c.imageUrl} alt="" loading="lazy" />
+              <img src={c.imageUrl} alt={`${c.title} logo`} loading="lazy" />
             ) : (
               initials(c.title)
             )}
           </div>
           <div className="v1c-club-card-top">
             <h3 className="v1c-club-card-title">{c.title}</h3>
+            {c.isVerified && (
+              <span className="v1c-club-card-verified" aria-label="Verified">
+                <VerifiedTick />
+              </span>
+            )}
           </div>
-          {c.city && <div className="v1c-club-card-city">{c.city}</div>}
+          <div className="v1c-club-card-city">
+            {c.city}
+            {c.establishedYear ? ` · Est ${c.establishedYear}` : ''}
+          </div>
+          {c.tags && c.tags.length > 0 && (
+            <div className="v1c-club-card-tags">
+              {c.tags.slice(0, 3).map((t) => (
+                <span key={t} className="v1c-club-card-tag">{t}</span>
+              ))}
+            </div>
+          )}
           <div className="v1c-club-card-foot">
             {membersFormatted && (
               <span className="v1c-club-card-stat">
                 <strong>{membersFormatted}</strong> members
+              </span>
+            )}
+            {nr && (
+              <span className="v1c-club-card-nextrun">
+                {fmtDayShort(nr.startTime)} · {nr.distanceKm != null ? `${nr.distanceKm}K` : '—'}
               </span>
             )}
           </div>
@@ -204,7 +327,7 @@ function ClubCard({
   );
 }
 
-// ─── Onboard banner (kept verbatim from the previous ClubsView) ──
+// ─── Onboard banner (unchanged) ──
 function OnboardClubBanner() {
   const [handle, setHandle] = useState('');
   const [submitted, setSubmitted] = useState(false);
@@ -227,9 +350,7 @@ function OnboardClubBanner() {
       `I'd like to get my run club listed on Endorfin.\n\n` +
       `Instagram: https://instagram.com/${cleaned}\n\n` +
       `Looking forward to hearing from you.`;
-    const mailto = `mailto:hello@endorfin.run?subject=${encodeURIComponent(
-      subject,
-    )}&body=${encodeURIComponent(body)}`;
+    const mailto = `mailto:hello@endorfin.run?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
     window.location.href = mailto;
     setSubmitted(true);
   }
@@ -283,21 +404,14 @@ function OnboardClubBanner() {
   );
 }
 
-// ─── Studio admin promotion tabs (kept verbatim) ──
+// ─── Studio admin promotion tabs (unchanged) ──
 type AdminTab = 'members' | 'events' | 'rsvps' | 'profile';
 interface AdminMockRow {
-  avatar: string;
-  avatarRed?: boolean;
-  name: string;
-  meta: string;
-  action: string;
+  avatar: string; avatarRed?: boolean; name: string; meta: string; action: string;
   actionKind: 'yes' | 'muted' | 'gold';
 }
 interface AdminPanelData {
-  num: string;
-  heading: string;
-  copy: string;
-  bullets: string[];
+  num: string; heading: string; copy: string; bullets: string[];
   mock: { title: string; titleStrong: string; rightMeta: string; rows: AdminMockRow[] };
 }
 const ADMIN_PANELS: Record<AdminTab, AdminPanelData> = {
@@ -306,69 +420,49 @@ const ADMIN_PANELS: Record<AdminTab, AdminPanelData> = {
     heading: 'Approve the runners who’ll show up.',
     copy: 'Every join request lands in Studio with the answers you asked for — pace, goals, whatever you put on the form. Approve in a tap. Promote anyone to co-admin.',
     bullets: ['Pending requests with full join-form answers', 'Approve, decline (with optional reason)', 'Promote members → co-admins'],
-    mock: {
-      titleStrong: 'Pending',
-      title: ' · 3 requests',
-      rightMeta: 'Today',
+    mock: { titleStrong: 'Pending', title: ' · 3 requests', rightMeta: 'Today',
       rows: [
         { avatar: 'AK', name: 'Aarav Kapoor', meta: '5:30/km · training for ADHM', action: 'Approve', actionKind: 'yes' },
         { avatar: 'SM', name: 'Simran Mehta', meta: '6:10/km · returning runner', action: 'Approve', actionKind: 'yes' },
         { avatar: 'VI', name: 'Vikram Iyer', meta: '4:50/km · sub-90 half goal', action: 'Approve', actionKind: 'yes' },
         { avatar: 'NP', name: 'Neel Patil', meta: 'New to running · friend of Aarav', action: 'Review', actionKind: 'muted' },
-      ],
-    },
-  },
+      ] } },
   events: {
     num: '02',
     heading: 'Plan runs, not logistics.',
     copy: 'Schedule the next run with start time, meet point, and distance. Members see it in the app the moment you publish. Free or paid — your call. No more "where do we meet?" at 5am.',
     bullets: ['Date, time, start point, distance', 'Free runs or paid events with ₹ at signup', 'Upcoming + past archive in one place'],
-    mock: {
-      titleStrong: 'Upcoming',
-      title: ' · this week',
-      rightMeta: '+ New event',
+    mock: { titleStrong: 'Upcoming', title: ' · this week', rightMeta: '+ New event',
       rows: [
         { avatar: 'SU', avatarRed: true, name: 'Sunday Long Run · 25K', meta: '26 May · 5:30 am · Marine Drive', action: '48 going', actionKind: 'muted' },
         { avatar: 'TT', name: 'Track Workout · paid', meta: '28 May · 6:00 am · ₹300 · 14 paid', action: '₹300', actionKind: 'gold' },
         { avatar: 'TE', name: 'Tempo Tuesday · 8K', meta: '29 May · 6:00 am · JLN Track', action: '22 going', actionKind: 'muted' },
         { avatar: 'RR', name: 'Recovery Saturday · 5K', meta: '03 Jun · 7:00 am · Lodhi Garden', action: '12 going', actionKind: 'muted' },
-      ],
-    },
-  },
+      ] } },
   rsvps: {
     num: '03',
     heading: 'Know who’s actually showing up.',
     copy: 'Pick any upcoming run. See the full roster — first-timers, regulars, the people you should say hi to. No more flying blind to the start point.',
     bullets: ['Per-event roster with avatars + names', 'Live going count, refreshed in real time', 'Spot first-timers before they arrive'],
-    mock: {
-      titleStrong: 'Sunday Long Run',
-      title: ' · 25K · 48 going',
-      rightMeta: 'Live',
+    mock: { titleStrong: 'Sunday Long Run', title: ' · 25K · 48 going', rightMeta: 'Live',
       rows: [
         { avatar: 'RJ', name: 'Rhea Joshi', meta: 'Regular · 14 runs with the club', action: 'Going', actionKind: 'yes' },
         { avatar: 'DK', name: 'Dev Khurana', meta: 'Regular · 11 runs', action: 'Going', actionKind: 'yes' },
         { avatar: 'AP', avatarRed: true, name: 'Anu Prasad', meta: 'First-timer · joined yesterday', action: 'Going', actionKind: 'gold' },
         { avatar: 'SM', name: 'Sanjay Mishra', meta: 'Regular · PB chase day', action: 'Going', actionKind: 'yes' },
-      ],
-    },
-  },
+      ] } },
   profile: {
     num: '04',
     heading: 'A public listing that represents you.',
     copy: 'Tagline, city, year, tags. Link WhatsApp, Instagram, Strava. Customise the join form. Add co-admins so you’re not the bottleneck. Your club, the way you want it on the internet.',
     bullets: ['About · tagline · tags · established year', 'Linked channels: WhatsApp · Instagram · Strava', 'Custom join form + approval toggle'],
-    mock: {
-      titleStrong: 'Public listing',
-      title: ' · Live',
-      rightMeta: 'View public →',
+    mock: { titleStrong: 'Public listing', title: ' · Live', rightMeta: 'View public →',
       rows: [
         { avatar: '✎', name: 'About', meta: 'Morning runs across South Delhi · since 2019', action: 'Edit', actionKind: 'yes' },
         { avatar: '◎', name: 'Social & links', meta: 'WhatsApp ✓ · Instagram ✓ · Strava —', action: 'Edit', actionKind: 'yes' },
         { avatar: '✦', name: 'Join form', meta: '3 questions · approval required', action: 'Customise', actionKind: 'yes' },
         { avatar: '◐', name: 'Co-admins', meta: 'You + 2 others can edit this club', action: 'Manage', actionKind: 'yes' },
-      ],
-    },
-  },
+      ] } },
 };
 const TAB_ORDER: { key: AdminTab; label: string }[] = [
   { key: 'members', label: '01 · Members' },
@@ -376,7 +470,6 @@ const TAB_ORDER: { key: AdminTab; label: string }[] = [
   { key: 'rsvps', label: '03 · RSVPs' },
   { key: 'profile', label: '04 · Profile' },
 ];
-
 function AdminPanel({ data }: { data: AdminPanelData }) {
   return (
     <div className="v1c-admin-panel" role="tabpanel">
@@ -392,10 +485,7 @@ function AdminPanel({ data }: { data: AdminPanelData }) {
       </div>
       <div className="v1c-admin-mock">
         <div className="v1c-admin-mock-head">
-          <span>
-            <strong>{data.mock.titleStrong}</strong>
-            {data.mock.title}
-          </span>
+          <span><strong>{data.mock.titleStrong}</strong>{data.mock.title}</span>
           <span>{data.mock.rightMeta}</span>
         </div>
         <div className="v1c-admin-mock-rows">
@@ -440,55 +530,72 @@ export default function ClubsView({
   const openJoin = useCallback((club: { name: string; slug: string }) => setModal({ kind: 'join', club }), []);
   const closeModal = useCallback(() => setModal(null), []);
 
-  // Top 5 by members for the featured strip. `clubs` is already sorted
-  // by members desc at SSR time.
   const featured = useMemo(() => clubs.slice(0, 5), [clubs]);
   const totalClubs = clubs.length;
   const showLoadMore = visibleCount < totalClubs;
+  const cityCount = useMemo(() => cityFacets.length, [cityFacets]);
 
   const loadMore = useCallback(() => {
     setVisibleCount((c) => Math.min(c + PAGE_SIZE, totalClubs));
   }, [totalClubs]);
 
-  const cityCount = useMemo(() => cityFacets.length, [cityFacets]);
   const membershipFor = useCallback(
     (slug: string): Membership | null => membershipBySlug[slug] ?? null,
     [membershipBySlug],
   );
 
+  // Custom chip set for /clubs: top 5 cities BY CLUB COUNT (sorted desc;
+  // the API doesn't sort facets, so the first 5 in the raw response are
+  // arbitrary) + the two tag chips. Time/distance chips are dropped
+  // because they don't apply to clubs (clubs have no startTime/distance).
+  const clubChips: QuickChip[] = useMemo(() => {
+    const topCities = [...cityFacets]
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 5)
+      .map((c) => cityChip(c.value));
+    return [...topCities, ...TAG_CHIPS];
+  }, [cityFacets]);
+
   return (
     <>
-      {/* Slim hero — kicker, short title, two-stat line */}
+      {/* Slim hero — kicker + new copy + homepage-style stats bar */}
       <section className="v1c-hero">
         <div className="v1c-hero-bg" aria-hidden />
         <div className="v1c-container">
           <span className="v1c-hero-kicker">Run clubs · India&apos;s verified directory</span>
           <h1 className="v1c-hero-title">
-            Find your <span className="v1c-red">crew.</span>
+            Find India&apos;s most<br />
+            <span className="v1c-red">happening</span> run clubs.
           </h1>
-          <div className="v1c-hero-stats-row">
-            <span><strong>{totalClubs}</strong> clubs</span>
-            <span><strong>{cityCount}</strong> cities</span>
+          <div className="v1c-hero-stats-bar">
+            <span className="v1c-hero-stat">
+              <span className="v1c-hero-stat-n">{totalClubs}</span>
+              <span className="v1c-hero-stat-l">Clubs</span>
+            </span>
+            <span className="v1c-hero-stat">
+              <span className="v1c-hero-stat-n">{cityCount}</span>
+              <span className="v1c-hero-stat-l">Cities</span>
+            </span>
           </div>
         </div>
       </section>
 
-      {/* Always-expanded search panel locked to clubs. When the user
-          actually commits a search, `isSearching` flips true and the
-          static sections below collapse. */}
+      {/* Embedded search — kindLock=club, custom chip set scoped to clubs */}
       <section className="v1c-search-section">
         <div className="v1c-container">
           <HeroSearchPanel
             kindLock="club"
             placeholder="Search clubs by name, city, or vibe…"
             onSearchActiveChange={setIsSearching}
+            quickChips={clubChips}
           />
         </div>
       </section>
 
       {!isSearching && (
         <>
-          {/* Featured strip — top 5 clubs by member count */}
+          {/* Featured — top 5 by member count, original FlagshipCard
+              design (image + logo + tags + members + next-run footer) */}
           {featured.length > 0 && (
             <section className="v1c-featured">
               <div className="v1c-container">
@@ -498,9 +605,9 @@ export default function ClubsView({
                   </h2>
                   <span className="v1c-section-count">Top {featured.length} by members</span>
                 </div>
-                <div className="v1c-feature-grid">
+                <div className="v1c-flagship-grid">
                   {featured.map((c, i) => (
-                    <FeaturedCard
+                    <FlagshipCard
                       key={c.id}
                       c={c}
                       membership={c.slug ? membershipFor(c.slug) : null}
@@ -513,8 +620,9 @@ export default function ClubsView({
             </section>
           )}
 
-          {/* All clubs grid — ENTIRE SSR HTML payload, paginated visually
-              only. Crawlers see every anchor; users see 24 at a time. */}
+          {/* All clubs grid — ALL clubs in SSR HTML (SEO), visual-only
+              pagination via Load more. Cards use the original portrait
+              design with image + logo overlay + tags + members + next-run. */}
           <section className="v1c-clubs-section">
             <div className="v1c-container">
               <div className="v1c-section-header">
@@ -548,15 +656,14 @@ export default function ClubsView({
         </>
       )}
 
-      {/* Onboard banner — always visible, even during search, since it's
-          a CTA for club organisers (not noise to a searcher). */}
+      {/* Onboard banner — always visible */}
       <section className="v1c-onboard-section">
         <div className="v1c-container">
           <OnboardClubBanner />
         </div>
       </section>
 
-      {/* Studio promotion tabs — also always visible */}
+      {/* Studio promotion tabs — always visible */}
       <section className="v1c-admin-section">
         <div className="v1c-container">
           <div className="v1c-admin-head">
@@ -608,10 +715,6 @@ export default function ClubsView({
         isAuthed={isAuthed}
         userEmail={userEmail}
       />
-      {/* claimBySlug is still passed by the page in case we want to render
-          claim CTAs later; for now we keep the modal mounted but don't
-          surface "Claim this club" on the listing cards (it was a niche
-          path and the card density is better without it). */}
       {claimBySlug && null}
     </>
   );
