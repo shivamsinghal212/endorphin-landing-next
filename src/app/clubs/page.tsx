@@ -4,23 +4,15 @@ import Footer from '@/components/Footer';
 import ClubsView from './ClubsView';
 import { clubsApi, type MyClubClaim, type MyClubMembership } from '@/lib/api';
 import { getSessionEmail, getSessionToken } from '@/lib/session';
+import type { DiscoverHit } from '@/components/HeroSearchPanel';
 import type { JoinFormField } from '@/lib/admin-api';
 
-export const metadata: Metadata = {
-  title: 'Run clubs in India — every crew, listed',
-  description:
-    'Find your crew. Morning runs, marathon training, trail weekends — a verified directory of run clubs across India. Show up with people who run your pace.',
-  alternates: { canonical: 'https://www.endorfin.run/clubs' },
-  openGraph: {
-    type: 'website',
-    url: 'https://www.endorfin.run/clubs',
-    title: 'Run clubs in India — every crew, listed | Endorfin',
-    description:
-      'A verified directory of run clubs across India. Browse clubs in Delhi, Mumbai, Bengaluru, Hyderabad, Chennai and beyond.',
-    siteName: 'Endorfin',
-    locale: 'en_IN',
-  },
-};
+// ─── Re-exported types (consumed by /clubs/[slug] and /run-clubs/[city]) ──
+// Kept here because moving them to a separate file is a larger refactor;
+// the /clubs LIST page itself no longer uses these shapes — it works
+// against DiscoverHit from the unified discover endpoint. The detail
+// pages and the city-landing pages still hit the legacy /api/v1/clubs/{slug}
+// endpoints which return these richer shapes.
 
 export interface ApiClubStats {
   members?: number;
@@ -105,49 +97,89 @@ export interface ApiClub {
   updatedAt?: string | null;
 }
 
-interface ListedClub {
-  slug: string;
-  name: string;
-  city: string;
-  updatedAt?: string | null;
+export const metadata: Metadata = {
+  title: 'Run clubs in India — every crew, listed',
+  description:
+    'Find your crew. Morning runs, marathon training, trail weekends — a verified directory of run clubs across India. Show up with people who run your pace.',
+  alternates: { canonical: 'https://www.endorfin.run/clubs' },
+  openGraph: {
+    type: 'website',
+    url: 'https://www.endorfin.run/clubs',
+    title: 'Run clubs in India — every crew, listed | Endorfin',
+    description:
+      'A verified directory of run clubs across India. Browse clubs in Delhi, Mumbai, Bengaluru, Hyderabad, Chennai and beyond.',
+    siteName: 'Endorfin',
+    locale: 'en_IN',
+  },
+};
+
+const API = 'https://api.endorfin.run/api/v1';
+const PAGE_SIZE = 50;
+// Hard cap so a runaway dataset can't blow up SSR. Currently ~50 clubs in
+// production; this gives us 10× headroom before we need real pagination.
+const MAX_PAGES = 10;
+
+interface DiscoverPage {
+  items: DiscoverHit[];
+  total: number;
+  facets?: {
+    cities?: { value: string; count: number }[];
+  } | null;
 }
 
-async function getClubs(): Promise<ApiClub[]> {
+/**
+ * Fetches every published club via /discover/smart, paginated 50 at a time
+ * in parallel. The unified discover endpoint returns the same minimal
+ * shape we need for cards (name, slug, city, logo via image_url, members
+ * count via the recent backend extension), so we don't need the old
+ * per-slug N+1 detail fetch.
+ *
+ * Returns clubs sorted by member count desc — featured strip slices the
+ * top 5; the all-clubs grid uses the rest in the same order.
+ */
+async function getAllClubs(): Promise<{ clubs: DiscoverHit[]; cityFacets: { value: string; count: number }[] }> {
   try {
-    const res = await fetch('https://api.endorfin.run/api/v1/clubs', {
-      next: { revalidate: 3600 },
-    });
-    if (!res.ok) return [];
-    const listed = (await res.json()) as ListedClub[];
-    if (!Array.isArray(listed) || listed.length === 0) return [];
-
-    const settled = await Promise.all(
-      listed.map(async (c): Promise<ApiClub | null> => {
-        try {
-          const [detailRes, eventsRes] = await Promise.all([
-            fetch(`https://api.endorfin.run/api/v1/clubs/${c.slug}`, {
-              next: { revalidate: 3600 },
-            }),
-            fetch(`https://api.endorfin.run/api/v1/clubs/${c.slug}/events`, {
-              next: { revalidate: 3600 },
-            }),
-          ]);
-          if (!detailRes.ok) return null;
-          const d = (await detailRes.json()) as ApiClub;
-          const events = eventsRes.ok ? ((await eventsRes.json()) as ClubEvent[]) : [];
-          return { ...d, events: Array.isArray(events) ? events : [] };
-        } catch {
-          return null;
-        }
-      })
+    const firstRes = await fetch(
+      `${API}/discover/smart?kind=club&limit=${PAGE_SIZE}&offset=0&includeFacets=true&sort=newest`,
+      { next: { revalidate: 3600 } },
     );
-    return settled.filter((c): c is ApiClub => !!c && !!c.slug);
+    if (!firstRes.ok) return { clubs: [], cityFacets: [] };
+    const first = (await firstRes.json()) as DiscoverPage;
+
+    const total = first.total ?? first.items.length;
+    const additional = Math.min(
+      Math.max(0, Math.ceil(total / PAGE_SIZE) - 1),
+      MAX_PAGES - 1,
+    );
+
+    const restPages =
+      additional > 0
+        ? await Promise.all(
+            Array.from({ length: additional }, (_, i) =>
+              fetch(
+                `${API}/discover/smart?kind=club&limit=${PAGE_SIZE}&offset=${(i + 1) * PAGE_SIZE}&sort=newest`,
+                { next: { revalidate: 3600 } },
+              )
+                .then((r) => (r.ok ? (r.json() as Promise<DiscoverPage>) : Promise.resolve({ items: [], total: 0 })))
+                .catch(() => ({ items: [], total: 0 })),
+            ),
+          )
+        : [];
+
+    const all = [first, ...restPages].flatMap((p) => p.items);
+
+    // Sort by members desc, nulls last. The featured strip and all-clubs
+    // grid both consume this ordering so users see the biggest clubs first.
+    all.sort((a, b) => (b.members ?? 0) - (a.members ?? 0));
+
+    const cityFacets = first.facets?.cities ?? [];
+    return { clubs: all, cityFacets };
   } catch {
-    return [];
+    return { clubs: [], cityFacets: [] };
   }
 }
 
-function buildJsonLd(clubs: ApiClub[]) {
+function buildJsonLd(clubs: DiscoverHit[]) {
   if (!clubs.length) return null;
   return {
     '@context': 'https://schema.org',
@@ -157,13 +189,16 @@ function buildJsonLd(clubs: ApiClub[]) {
       'A verified directory of run clubs across India — morning crews, marathon training groups, trail collectives.',
     url: 'https://www.endorfin.run/clubs',
     numberOfItems: clubs.length,
-    itemListElement: clubs.slice(0, 30).map((c, i) => ({
+    // Mirror EVERY club in the structured data — same surface as the
+    // SSR'd HTML, so crawlers see the full directory regardless of
+    // which cards are visually shown above the Load more button.
+    itemListElement: clubs.map((c, i) => ({
       '@type': 'ListItem',
       position: i + 1,
       item: {
         '@type': 'SportsClub',
-        name: c.name,
-        url: `https://www.endorfin.run/clubs/${c.slug}`,
+        name: c.title,
+        url: c.slug ? `https://www.endorfin.run/clubs/${c.slug}` : undefined,
         description: c.subtitle || c.description || undefined,
         sport: 'Running',
         address: {
@@ -171,8 +206,7 @@ function buildJsonLd(clubs: ApiClub[]) {
           addressLocality: c.city || undefined,
           addressCountry: 'IN',
         },
-        ...(c.establishedYear && { foundingDate: String(c.establishedYear) }),
-        ...(c.logoUrl && { logo: c.logoUrl, image: c.logoUrl }),
+        ...(c.imageUrl && { logo: c.imageUrl, image: c.imageUrl }),
       },
     })),
   };
@@ -189,8 +223,8 @@ const breadcrumbJsonLd = {
 
 export default async function ClubsPage() {
   const token = await getSessionToken();
-  const [clubs, myClubs, userEmail] = await Promise.all([
-    getClubs(),
+  const [{ clubs, cityFacets }, myClubs, userEmail] = await Promise.all([
+    getAllClubs(),
     token
       ? clubsApi.listMyClubs(token, 'all', { includePending: true }).catch(() => [])
       : Promise.resolve([]),
@@ -221,6 +255,7 @@ export default async function ClubsPage() {
       <div className="v1-clubs-page">
         <ClubsView
           clubs={clubs}
+          cityFacets={cityFacets}
           membershipBySlug={membershipBySlug}
           claimBySlug={claimBySlug}
           isAuthed={isAuthed}
