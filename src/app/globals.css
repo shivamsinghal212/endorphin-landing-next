@@ -7243,10 +7243,12 @@ body { padding-top: var(--nav-h, 68px); }
   }
 }
 
-/* ── Detail-page cross-nav (top of /clubs/[slug] + /running-events/[slug]) */
+/* ── Detail-page cross-nav (top of /clubs/[slug] + /running-events/[slug])
+   Transparent, low-profile chrome — no background band, no border, no
+   divider — so the eye flows straight into the hero. Arrows use inline
+   SVG so they read as line icons, not text glyphs. */
 .v1-detail-crossnav {
-  background: #F5F0EB;
-  border-bottom: 1px solid rgba(10, 10, 10, 0.08);
+  background: transparent;
 }
 .v1-detail-crossnav-inner {
   display: flex;
@@ -7255,7 +7257,7 @@ body { padding-top: var(--nav-h, 68px); }
   gap: 16px;
   max-width: 1200px;
   margin: 0 auto;
-  padding: 18px 20px;
+  padding: 10px 20px;
 }
 .v1-detail-crossnav-link {
   display: inline-flex;
@@ -7264,56 +7266,44 @@ body { padding-top: var(--nav-h, 68px); }
   font-family: var(--font-oswald), sans-serif;
   font-weight: 600;
   font-size: 11px;
-  letter-spacing: 0.18em;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: rgba(10, 10, 10, 0.62);
-  transition: color 0.16s ease, transform 0.16s ease;
+  color: rgba(10, 10, 10, 0.55);
+  transition: color 0.16s ease;
   white-space: nowrap;
-  min-height: 44px;
-  padding: 0 4px;
-  align-self: center;
+  padding: 6px 4px;
 }
 .v1-detail-crossnav-link:hover,
 .v1-detail-crossnav-link:focus-visible {
   color: #0A0A0A;
   outline: none;
 }
-.v1-detail-crossnav-link.is-back:hover .v1-detail-crossnav-arrow {
-  transform: translateX(-2px);
-}
-.v1-detail-crossnav-link.is-lateral:hover .v1-detail-crossnav-arrow {
-  transform: translate(2px, -2px);
-}
 .v1-detail-crossnav-arrow {
-  display: inline-block;
-  font-size: 14px;
-  color: #E6232A;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: currentColor;
   transition: transform 0.16s ease;
 }
-.v1-detail-crossnav-link.is-lateral .v1-detail-crossnav-arrow {
-  font-size: 13px;
+.v1-detail-crossnav-link.is-back:hover .v1-detail-crossnav-arrow {
+  transform: translateX(-3px);
+}
+.v1-detail-crossnav-link.is-lateral:hover .v1-detail-crossnav-arrow {
+  transform: translateX(3px);
 }
 .v1-detail-crossnav-text { line-height: 1; }
-.v1-detail-crossnav-divider {
-  flex: 0 0 auto;
-  height: 14px;
-  width: 1px;
-  background: rgba(10, 10, 10, 0.18);
-}
-/* Race detail uses its own --v1rd-gutter system; align the cross-nav
-   gutters to match the rest of the page chrome. */
+/* Race detail uses its own --v1rd-gutter system; align gutters. */
 .v1rd-page > .v1-detail-crossnav .v1-detail-crossnav-inner {
   padding-left: var(--v1rd-gutter, 20px);
   padding-right: var(--v1rd-gutter, 20px);
   max-width: none;
 }
+/* On the club page, the hero sits on a dark cover image; the cross-nav
+   above it sits on the bone .club-page background, so jet text is
+   correct. No override needed there. */
 @media (max-width: 480px) {
-  .v1-detail-crossnav-inner { padding: 14px 16px; }
-  .v1-detail-crossnav-link { font-size: 10px; letter-spacing: 0.14em; gap: 6px; }
-  .v1-detail-crossnav-link.is-lateral .v1-detail-crossnav-text {
-    /* Drop the "All " prefix would be ideal but we keep the label
-       readable. The arrow stays as the affordance. */
-  }
+  .v1-detail-crossnav-inner { padding: 8px 16px; gap: 12px; }
+  .v1-detail-crossnav-link { font-size: 10px; letter-spacing: 0.12em; gap: 6px; }
 }
 
 /* ── 'Explore more' band — sits above the page-bottom CTA. Inverted
