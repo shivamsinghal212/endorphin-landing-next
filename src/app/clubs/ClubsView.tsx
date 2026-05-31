@@ -340,15 +340,23 @@ function ClubCard({
               ))}
             </div>
           )}
+          {/* Dedicated next-event row — date + title, not just "Sun · 5K".
+              Gives the card real signal about why someone might join this
+              club (not just "342 members"). */}
+          {nr && (
+            <div className="v1c-club-card-nextevent">
+              <div className="v1c-club-card-nextevent-kicker">
+                Next run · {fmtDayShort(nr.startTime)}
+                {fmtTimeShort(nr.startTime) ? ` · ${fmtTimeShort(nr.startTime)}` : ''}
+                {nr.distanceKm != null ? ` · ${nr.distanceKm}K` : ''}
+              </div>
+              <div className="v1c-club-card-nextevent-title">{nr.title || 'Next run'}</div>
+            </div>
+          )}
           <div className="v1c-club-card-foot">
             {membersFormatted && (
               <span className="v1c-club-card-stat">
                 <strong>{membersFormatted}</strong> members
-              </span>
-            )}
-            {nr && (
-              <span className="v1c-club-card-nextrun">
-                {fmtDayShort(nr.startTime)} · {nr.distanceKm != null ? `${nr.distanceKm}K` : '—'}
               </span>
             )}
           </div>
@@ -379,26 +387,29 @@ function OnboardClubBanner() {
       .replace(/\/+$/, '')
       .replace(/^@/, '');
 
-  function onSubmit(e: React.FormEvent) {
+  async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     const cleaned = cleanHandle(handle);
     if (!cleaned) return;
     posthog.capture('club_onboard_request', { instagram_handle: cleaned });
-    const subject = `Onboard my run club — @${cleaned}`;
-    const body =
-      `Hi Endorfin team,\n\n` +
-      `I'd like to get my run club listed on Endorfin.\n\n` +
-      `Instagram: https://instagram.com/${cleaned}\n\n` +
-      `Looking forward to hearing from you.`;
-    const mailto = `mailto:hello@endorfin.run?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-    window.location.href = mailto;
+    // POST to the backend queue. We don't gate on success — even if the
+    // API write fails (offline, server down) the mailto still fires
+    // so the request reaches us out-of-band.
+    try {
+      await fetch('https://api.endorfin.run/api/v1/clubs/onboard-requests', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ instagramHandle: cleaned }),
+      });
+    } catch {
+      // Swallow — mailto is the fallback path.
+    }
     setSubmitted(true);
   }
 
   return (
     <div className="v1c-onboard-card">
       <div className="v1c-onboard-copy">
-        <span className="v1c-onboard-kicker">For club organisers</span>
         <h2 className="v1c-onboard-title">
           Don&rsquo;t see your club here<span className="v1c-red">?</span>
         </h2>
@@ -411,7 +422,7 @@ function OnboardClubBanner() {
         <div className="v1c-onboard-thanks" role="status" aria-live="polite">
           <strong>Thanks — we&rsquo;ll be in touch.</strong>
           <span>
-            If your email client didn&rsquo;t open, write to{' '}
+            We&rsquo;ve logged your request. If anything urgent, reach us at{' '}
             <a href="mailto:hello@endorfin.run">hello@endorfin.run</a>.
           </span>
         </div>
@@ -697,6 +708,19 @@ export default function ClubsView({
             placeholder="Search clubs by name, city, or vibe…"
             onSearchActiveChange={setIsSearching}
             quickChips={clubChips}
+            // Render search results with the SAME ClubCard the static
+            // listing uses — same Join CTA, same members, tags, next-
+            // event line — so the UI doesn't visually change when the
+            // user submits a search.
+            renderCard={(hit) => (
+              <ClubCard
+                key={hit.id}
+                c={hit}
+                membership={hit.slug ? membershipFor(hit.slug) : null}
+                onJoin={openJoin}
+                hidden={false}
+              />
+            )}
           />
 
           <div className="v1-hero-stats-bar">

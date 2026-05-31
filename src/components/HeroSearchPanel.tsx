@@ -335,6 +335,11 @@ export interface HeroSearchPanelProps {
   // Beginner friendly because club rows don't have a start time or
   // distance — the default "5K / This weekend" chips are nonsensical.
   quickChips?: QuickChip[];
+  // Override how each result hit gets rendered. Lets listing pages
+  // use their own card design (e.g. /clubs uses the rich ClubCard
+  // with Join CTA + members + next-event) instead of the generic
+  // v1-discover-card. When omitted, falls back to the generic card.
+  renderCard?: (hit: DiscoverHit) => React.ReactNode;
 }
 
 function defaultPlaceholder(kindLock?: DiscoverKind): string {
@@ -351,6 +356,7 @@ const HeroSearchPanel = ({
   onSearchActiveChange,
   onClose,
   quickChips,
+  renderCard,
 }: HeroSearchPanelProps) => {
   const chips = quickChips ?? DEFAULT_QUICK_CHIPS;
   // Initial filters honor the kindLock if set, so even before the user
@@ -633,6 +639,7 @@ const HeroSearchPanel = ({
           // Hide the kind tab strip when locked to a single kind — there's
           // nothing for the user to toggle between.
           hideKindTabs={Boolean(kindLock)}
+          renderCard={renderCard}
           onDropChip={onDropChip}
           onReset={resetAll}
         />
@@ -810,6 +817,7 @@ function ResultsSection({
   kindFacets,
   cityFacets,
   hideKindTabs = false,
+  renderCard,
   sectionRef,
 }: {
   filters: FilterState;
@@ -827,6 +835,7 @@ function ResultsSection({
   kindFacets: Record<string, number>;
   cityFacets: { value: string; count: number }[];
   hideKindTabs?: boolean;
+  renderCard?: (hit: DiscoverHit) => React.ReactNode;
   sectionRef: React.RefObject<HTMLDivElement | null>;
 }) {
   // Hide a kind tab if its facet count is 0. The "All" tab always renders.
@@ -869,9 +878,10 @@ function ResultsSection({
             </button>
           </div>
 
-          {parsed && parsed.notes && (
-            <p className="v1-discover-note">{parsed.notes}</p>
-          )}
+          {/* parsed.notes is the parser's debug breadcrumb ("Tag
+              identified but kind and city are ambiguous…") — useful in
+              dev, jarring for users. Keep the off-topic guard (real
+              user-facing message) but hide the verbose notes. */}
           {parsed && parsed.offTopic && (
             <p className="v1-discover-note">
               That doesn&rsquo;t look like a running query. Try &ldquo;run clubs in Bangalore&rdquo; or &ldquo;5K races this weekend&rdquo;.
@@ -988,10 +998,16 @@ function ResultsSection({
           )}
 
           {status === 'ok' && results && (
-            <div className="v1-discover-grid">
-              {results.map((hit) => (
-                <ResultCard key={`${hit.kind}-${hit.id}`} hit={hit} />
-              ))}
+            // Caller-provided card renderer? Use a layout class the caller
+            // can target (`.v1-discover-grid-custom`) and React expects
+            // the rendered nodes to carry their own keys. Falls back to
+            // the generic ResultCard otherwise.
+            <div className={renderCard ? 'v1-discover-grid-custom' : 'v1-discover-grid'}>
+              {results.map((hit) =>
+                renderCard
+                  ? renderCard(hit)
+                  : <ResultCard key={`${hit.kind}-${hit.id}`} hit={hit} />,
+              )}
             </div>
           )}
 

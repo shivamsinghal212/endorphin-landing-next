@@ -2460,24 +2460,19 @@ body { padding-top: var(--nav-h, 68px); }
 }
 
 /* ─── All-clubs grid ───
-   2-col is the minimum density everywhere — even on phone — because a
-   1-col stack with full-width portrait cards burns vertical space and
-   makes "showing 24 of 112" feel like an endless scroll. */
+   Desktop 3-col, tablet 2-col, phone 1-col. The rich ClubCard (header
+   image + logo + title + tags + next-event row + members + Join CTA)
+   needs room to breathe — 2-col on phone crushed the next-event title
+   and the Join button. */
 .v1-clubs-page .v1c-clubs-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 18px;
 }
 @media (max-width: 980px) { .v1-clubs-page .v1c-clubs-grid { grid-template-columns: repeat(2, 1fr); } }
-@media (max-width: 540px) {
-  /* Stay 2-col but tighten gap + card chrome so the cards still breathe. */
-  .v1-clubs-page .v1c-clubs-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+@media (max-width: 640px) {
+  .v1-clubs-page .v1c-clubs-grid { grid-template-columns: 1fr; gap: 14px; }
   .v1-clubs-page .v1c-club-card { min-height: 0; }
-  .v1-clubs-page .v1c-club-card-body { padding: 32px 12px 12px; }
-  .v1-clubs-page .v1c-club-card-title { font-size: 16px; }
-  .v1-clubs-page .v1c-club-card-actions { padding: 0 12px 12px; }
-  .v1-clubs-page .v1c-club-card-actions .v1c-btn { font-size: 10px; height: 36px; padding: 0 10px; }
-  .v1-clubs-page .v1c-club-card-tags { display: none; } /* tag chips don't fit in narrow cards */
 }
 
 /* Visual-only pagination: keep the anchor in the SSR HTML for SEO, only
@@ -3146,6 +3141,53 @@ body { padding-top: var(--nav-h, 68px); }
   overflow: hidden; text-overflow: ellipsis;
   white-space: nowrap; max-width: 16ch;
 }
+
+/* Dedicated next-event row on small ClubCards. Replaces the cramped
+   "Sun · 5K" footer line with a two-line block (kicker + title) that
+   actually tells the user what the next run is. Sits below the tags
+   and above the members footer. */
+.v1-clubs-page .v1c-club-card-nextevent {
+  margin-top: 12px; padding-top: 12px;
+  border-top: 0.5px dashed rgba(245, 240, 235, 0.18);
+  display: flex; flex-direction: column; gap: 4px;
+}
+.v1-clubs-page .v1c-club-card-nextevent-kicker {
+  font-family: var(--font-oswald), sans-serif;
+  font-weight: 600;
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #7de28e;
+  font-variant-numeric: tabular-nums;
+}
+.v1-clubs-page .v1c-club-card-nextevent-title {
+  font-family: var(--font-fraunces), serif;
+  font-style: italic;
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 1.25;
+  letter-spacing: -0.005em;
+  color: var(--bone);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+@media (max-width: 540px) {
+  .v1-clubs-page .v1c-club-card-nextevent-title { font-size: 13px; }
+  .v1-clubs-page .v1c-club-card-nextevent-kicker { font-size: 9px; letter-spacing: 0.14em; }
+}
+
+/* Search-result grid for custom-rendered cards. Mirrors v1c-clubs-grid
+   so search results look identical to the static listing. */
+.v1-clubs-page .v1-discover-grid-custom {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+}
+@media (max-width: 980px) { .v1-clubs-page .v1-discover-grid-custom { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 640px) { .v1-clubs-page .v1-discover-grid-custom { grid-template-columns: 1fr; gap: 14px; } }
 
 @media (max-width: 640px) {
   .v1-clubs-page .v1c-clubs-section { padding: 56px 0 72px; }
