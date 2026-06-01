@@ -1115,6 +1115,8 @@ function ResultCard({ hit }: { hit: DiscoverHit }) {
   // ResultsSection which is gated behind expanded + hasAnyInput, so it
   // never reaches SSR and can't cause a hydration mismatch.
   const isPast = hit.startTime ? new Date(hit.startTime).getTime() < Date.now() : false;
+  const isClub = hit.kind === 'club';
+  const membersFormatted = formatMembers(hit.members);
 
   return (
     <Link className="v1-discover-card" href={href}>
@@ -1128,23 +1130,84 @@ function ResultCard({ hit }: { hit: DiscoverHit }) {
       </div>
       <div className="v1-discover-card-body">
         <div className="v1-discover-card-kind">{kindLabel}{hit.city ? ` · ${hit.city}` : ''}</div>
-        <h3 className="v1-discover-card-title">{hit.title}</h3>
+        <h3 className="v1-discover-card-title">
+          {hit.title}
+          {isClub && hit.isVerified && <VerifiedTick className="v1-discover-card-verified" />}
+        </h3>
         {hit.subtitle && <p className="v1-discover-card-sub">{hit.subtitle}</p>}
-        <div className="v1-discover-card-meta">
-          {hit.startTime && <span>{formatDateShort(hit.startTime)}</span>}
-          {hit.distanceKm != null && <span>{hit.distanceKm}K</span>}
-          {hit.locationName && <span>{hit.locationName}</span>}
-          {hit.clubName && hit.kind === 'club_event' && <span>{hit.clubName}</span>}
-        </div>
-        {hit.kind === 'club' && hit.matchingEvents.length > 0 && (
-          <div className="v1-discover-card-events">
-            {hit.matchingEvents.length} event{hit.matchingEvents.length === 1 ? '' : 's'} in window
+
+        {/* Clubs have no start_time/distance of their own — show the next
+            run (batched onto the hit server-side) instead of event meta,
+            then a foot with member count + an explicit CTA. Mirrors the
+            /clubs ClubCard so search results aren't a bare downgrade. */}
+        {isClub ? (
+          <>
+            {hit.nextEvent && (
+              <div className="v1-discover-card-nextrun">
+                <span className="v1-discover-card-nextrun-k">
+                  Next run · {formatNextRun(hit.nextEvent)}
+                </span>
+                {hit.nextEvent.title && (
+                  <span className="v1-discover-card-nextrun-t">{hit.nextEvent.title}</span>
+                )}
+              </div>
+            )}
+            <div className="v1-discover-card-foot">
+              {membersFormatted && (
+                <span className="v1-discover-card-members">
+                  <strong>{membersFormatted}</strong> members
+                </span>
+              )}
+              <span className="v1-discover-card-cta">View club →</span>
+            </div>
+          </>
+        ) : (
+          <div className="v1-discover-card-meta">
+            {hit.startTime && <span>{formatDateShort(hit.startTime)}</span>}
+            {hit.distanceKm != null && <span>{hit.distanceKm}K</span>}
+            {hit.locationName && <span>{hit.locationName}</span>}
+            {hit.clubName && hit.kind === 'club_event' && <span>{hit.clubName}</span>}
           </div>
         )}
       </div>
     </Link>
   );
 }
+
+// Compact "Sun · 5:30 AM · 5K" line for a club's next event.
+function formatNextRun(ev: ClubEventPreview): string {
+  const parts: string[] = [];
+  const d = new Date(ev.startTime);
+  if (!Number.isNaN(d.getTime())) {
+    parts.push(d.toLocaleDateString('en-GB', { weekday: 'short', timeZone: 'Asia/Kolkata' }));
+    parts.push(
+      d.toLocaleTimeString('en-GB', {
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true,
+        timeZone: 'Asia/Kolkata',
+      }),
+    );
+  }
+  if (ev.distanceKm != null) parts.push(`${ev.distanceKm}K`);
+  return parts.join(' · ');
+}
+
+// "1.2K" / "342" — mirrors the /clubs members formatter.
+function formatMembers(n: number | null): string | null {
+  if (n == null || n <= 0) return null;
+  if (n >= 1000) return `${(Math.floor(n / 100) / 10).toLocaleString('en-IN')}K`;
+  return n.toLocaleString('en-IN');
+}
+
+const VerifiedTick = ({ className }: { className?: string }) => (
+  <svg className={className} width="14" height="14" viewBox="0 0 24 24" aria-label="Verified">
+    <path
+      fill="currentColor"
+      d="M12 2a10 10 0 100 20 10 10 0 000-20zm4.7 7.3l-5.8 5.8a1 1 0 01-1.4 0L7 12.6a1 1 0 011.4-1.4l1.8 1.8 5.1-5.1a1 1 0 011.4 1.4z"
+    />
+  </svg>
+);
 
 function pickInitials(name: string) {
   const words = (name || '').trim().split(/\s+/);

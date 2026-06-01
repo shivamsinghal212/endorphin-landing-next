@@ -994,6 +994,71 @@ body.nav-open { overflow: hidden; }
   text-transform: uppercase;
   color: #7de28e;
 }
+/* Club result cards: verified tick beside the title, next-run line, and a
+   foot with member count + a CTA — parity with the /clubs ClubCard. */
+.v1-discover-card-verified {
+  display: inline-block;
+  vertical-align: middle;
+  margin-left: 6px;
+  color: var(--red);
+}
+.v1-discover-card-nextrun {
+  margin: 0 0 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.v1-discover-card-nextrun-k {
+  font-family: var(--font-oswald), sans-serif;
+  font-weight: 600;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #7de28e;
+}
+.v1-discover-card-nextrun-t {
+  font-size: 13px;
+  color: rgba(245, 240, 235, 0.7);
+  line-height: 1.35;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.v1-discover-card-foot {
+  margin-top: auto;
+  padding-top: 12px;
+  border-top: 0.5px solid rgba(245, 240, 235, 0.12);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.v1-discover-card-members {
+  font-family: var(--font-oswald), sans-serif;
+  font-weight: 500;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(245, 240, 235, 0.55);
+}
+.v1-discover-card-members strong {
+  color: var(--bone);
+  font-weight: 700;
+}
+.v1-discover-card-cta {
+  font-family: var(--font-oswald), sans-serif;
+  font-weight: 600;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--red);
+  white-space: nowrap;
+  transition: transform 0.18s ease;
+}
+.v1-discover-card:hover .v1-discover-card-cta {
+  transform: translateX(3px);
+}
 .v1-discover-card.is-skeleton {
   background: linear-gradient(90deg, #141414 0%, #1c1c1c 50%, #141414 100%);
   background-size: 200% 100%;
