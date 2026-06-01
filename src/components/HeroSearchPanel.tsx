@@ -390,6 +390,19 @@ const HeroSearchPanel = ({
   const inputRef = useRef<HTMLInputElement | null>(null);
   const abortRef = useRef<AbortController | null>(null);
   const resultsRef = useRef<HTMLDivElement | null>(null);
+  // Which structured slots the user set EXPLICITLY (chip / tab / city
+  // dropdown) vs. which were filled in by the NL parser. Without this we
+  // can't tell a user-typed "21K" from a parser-inferred 21, so a second
+  // NL query ("5k in gurugram" after "hm in gurgaon") couldn't override the
+  // first query's parsed distance — the stale value stuck in the chips AND
+  // got re-sent to the backend, where explicit params beat the fresh parse.
+  // A ref (not state) because nothing renders off it directly; it's read at
+  // submit/merge time. Keys: 'kind' | 'city' | 'distance' | 'when' | 'tags'.
+  const explicitRef = useRef<Set<string>>(new Set());
+  const setExplicit = useCallback((key: string, on: boolean) => {
+    if (on) explicitRef.current.add(key);
+    else explicitRef.current.delete(key);
+  }, []);
 
   const update = useCallback((patch: Partial<FilterState>) => {
     setFilters((prev) => ({ ...prev, ...patch }));
@@ -408,12 +421,40 @@ const HeroSearchPanel = ({
     });
   }, []);
 
+  // Reset every structured slot the user did NOT explicitly set back to its
+  // empty value, leaving `q` and the user's own chips/tabs intact. Run on a
+  // fresh free-text submit so the new query gets re-parsed from scratch
+  // instead of inheriting the previous query's parser-filled filters.
+  const clearNonExplicit = useCallback(
+    (f: FilterState): FilterState => {
+      const ex = explicitRef.current;
+      return {
+        ...f,
+        kind: ex.has('kind') ? f.kind : (kindLock ?? 'all'),
+        city: ex.has('city') ? f.city : '',
+        tags: ex.has('tags') ? f.tags : [],
+        eventsWindow: ex.has('when') ? f.eventsWindow : '',
+        dateFrom: ex.has('when') ? f.dateFrom : '',
+        dateTo: ex.has('when') ? f.dateTo : '',
+        distanceMin: ex.has('distance') ? f.distanceMin : null,
+        distanceMax: ex.has('distance') ? f.distanceMax : null,
+      };
+    },
+    [kindLock],
+  );
+
   // Submit whatever's currently in `filters`. Wired to the form's onSubmit
-  // (Enter key) and the → button's onClick.
+  // (Enter key) and the → button's onClick. Functional update reads the
+  // latest `filters` (incl. the just-typed q) and strips stale parser-filled
+  // slots before committing.
   const submit = useCallback(() => {
     setOffset(0);
-    setCommittedFilters({ ...filters });
-  }, [filters]);
+    setFilters((prev) => {
+      const next = clearNonExplicit(prev);
+      setCommittedFilters(next);
+      return next;
+    });
+  }, [clearNonExplicit]);
 
   // Bump offset by PAGE_SIZE to fetch the next page. Results get appended,
   // not replaced — see the fetch effect below.
@@ -430,6 +471,7 @@ const HeroSearchPanel = ({
     setOffset(0);
     setKindFacets({});
     setCityFacets([]);
+    explicitRef.current.clear();
   }, [initialFilters]);
 
   // Auto-focus on mount when caller wants it (overlays / "/" keyboard
@@ -557,32 +599,41 @@ const HeroSearchPanel = ({
       // Chip clicks ARE explicit actions — toggle the filter and commit
       // immediately so the result list updates without a second tap.
       const isActive = isChipActive(chip, filters);
+      const exKey = chip.group === 'tag' ? 'tags' : chip.group; // when|distance|city|tags
       let patch: Partial<FilterState>;
       if (isActive) {
         if (chip.group === 'when') patch = clearWindow();
         else if (chip.group === 'distance') patch = { distanceMin: null, distanceMax: null };
         else if (chip.group === 'city') patch = { city: '' };
         else patch = chip.apply(filters); // tag — toggle removes it
+        // Tags can have several active at once; only drop the explicit mark
+        // when the toggle leaves none behind.
+        setExplicit(exKey, chip.group === 'tag' ? (patch.tags?.length ?? 0) > 0 : false);
       } else {
         patch = chip.apply(filters);
+        setExplicit(exKey, true);
       }
       commitWithUpdate(patch);
     },
-    [filters, commitWithUpdate],
+    [filters, commitWithUpdate, setExplicit],
   );
 
   const setCity = useCallback(
     (city: string) => {
+      setExplicit('city', Boolean(city));
       commitWithUpdate({ city });
     },
-    [commitWithUpdate],
+    [commitWithUpdate, setExplicit],
   );
 
   const setKind = useCallback(
     (kind: KindFilter) => {
+      // Picking "All" is a deliberate "no kind preference", so it clears the
+      // explicit mark and lets a later NL query infer the kind again.
+      setExplicit('kind', kind !== 'all');
       commitWithUpdate({ kind });
     },
-    [commitWithUpdate],
+    [commitWithUpdate, setExplicit],
   );
 
   const appliedChips = useMemo(() => buildAppliedChips(filters), [filters]);
@@ -593,14 +644,28 @@ const HeroSearchPanel = ({
   // since there's nothing to switch between.
   const onDropChip = useCallback(
     (chip: AppliedChip) => {
+      // Dropping an applied chip also clears its explicit mark, so the slot
+      // is free for the NL parser to fill on the next query.
       if (chip.group === 'q') commitWithUpdate({ q: '' });
-      else if (chip.group === 'kind') commitWithUpdate({ kind: kindLock ?? 'all' });
-      else if (chip.group === 'city') commitWithUpdate({ city: '' });
-      else if (chip.group === 'when') commitWithUpdate(clearWindow());
-      else if (chip.group === 'distance') commitWithUpdate({ distanceMin: null, distanceMax: null });
-      else if (chip.group === 'tag') commitWithUpdate({ tags: filters.tags.filter((t) => t !== chip.value) });
+      else if (chip.group === 'kind') {
+        setExplicit('kind', false);
+        commitWithUpdate({ kind: kindLock ?? 'all' });
+      } else if (chip.group === 'city') {
+        setExplicit('city', false);
+        commitWithUpdate({ city: '' });
+      } else if (chip.group === 'when') {
+        setExplicit('when', false);
+        commitWithUpdate(clearWindow());
+      } else if (chip.group === 'distance') {
+        setExplicit('distance', false);
+        commitWithUpdate({ distanceMin: null, distanceMax: null });
+      } else if (chip.group === 'tag') {
+        const tags = filters.tags.filter((t) => t !== chip.value);
+        setExplicit('tags', tags.length > 0);
+        commitWithUpdate({ tags });
+      }
     },
-    [commitWithUpdate, kindLock, filters.tags],
+    [commitWithUpdate, kindLock, filters.tags, setExplicit],
   );
 
   return (
