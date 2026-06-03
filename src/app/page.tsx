@@ -38,37 +38,12 @@ export interface HeroStats {
   cities: number;
 }
 
-const FALLBACK_STATS: HeroStats = { clubs: 50, races: 500, clubEvents: 100, cities: 25 };
-
-// /discover?includeFacets=true exposes kind + city counts at the top level —
-// cheaper than three separate listing fetches. Cached for an hour because the
-// numbers move slowly.
-async function getHeroStats(): Promise<HeroStats> {
-  try {
-    const res = await fetch(
-      'https://api.endorfin.run/api/v1/discover?includeFacets=true&limit=1',
-      { next: { revalidate: 3600 } },
-    );
-    if (!res.ok) return FALLBACK_STATS;
-    const data = (await res.json()) as {
-      facets: {
-        kinds: { value: string; count: number }[];
-        cities: { value: string; count: number }[];
-      } | null;
-    };
-    if (!data.facets) return FALLBACK_STATS;
-    const kindCount = (v: string) =>
-      data.facets!.kinds.find((k) => k.value === v)?.count ?? 0;
-    return {
-      clubs: kindCount('club'),
-      races: kindCount('race'),
-      clubEvents: kindCount('club_event'),
-      cities: data.facets.cities.length,
-    };
-  } catch {
-    return FALLBACK_STATS;
-  }
-}
+// Curated marketing numbers. We used to derive these from
+// /discover?includeFacets=true, but the backend folded that route into
+// /discover/smart (the old URL 404s, so the fallback always rendered) and its
+// facet counts don't match the marketing claims anyway — club_event counts
+// every occurrence ever and cities counts raw name variants.
+const HERO_STATS: HeroStats = { clubs: 110, races: 500, clubEvents: 200, cities: 30 };
 
 function buildEventsJsonLd(events: ApiEvent[]) {
   if (!events.length) return null;
@@ -127,7 +102,7 @@ function buildEventsJsonLd(events: ApiEvent[]) {
 }
 
 export default async function Home() {
-  const [events, heroStats] = await Promise.all([getUpcomingEvents(), getHeroStats()]);
+  const events = await getUpcomingEvents();
   const eventsJsonLd = buildEventsJsonLd(events);
 
   return (
@@ -139,7 +114,7 @@ export default async function Home() {
         />
       )}
       <Header />
-      <HeroSearch stats={heroStats} />
+      <HeroSearch stats={HERO_STATS} />
       <PillarsAccordion />
       <ManageClubSection />
       <CTASection />

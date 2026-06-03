@@ -67,7 +67,7 @@ const HeroSearch = ({ stats }: HeroSearchProps) => {
         <div className="container">
           <div className="v1-hero-topline">
             <span className="v1-hero-kicker">Powering India&apos;s running landscape</span>
-            <span className="v1-hero-meta">Est. 2025 · Made in India</span>
+            <span className="v1-hero-meta">Est. 2026 · Made in India</span>
           </div>
 
           <h1 className="v1-hero-title">
@@ -104,7 +104,7 @@ const HeroSearch = ({ stats }: HeroSearchProps) => {
 
           <div className="v1-hero-stats-bar">
             <span className="v1-hero-stat">
-              <span className="v1-hero-stat-n">{stats ? formatStat(stats.clubs) : '50+'}</span>
+              <span className="v1-hero-stat-n">{stats ? formatStat(stats.clubs) : '110+'}</span>
               <span className="v1-hero-stat-l">Run Clubs</span>
             </span>
             <span className="v1-hero-stat">
@@ -112,11 +112,11 @@ const HeroSearch = ({ stats }: HeroSearchProps) => {
               <span className="v1-hero-stat-l">Races</span>
             </span>
             <span className="v1-hero-stat">
-              <span className="v1-hero-stat-n">{stats ? formatStat(stats.clubEvents) : '100+'}</span>
+              <span className="v1-hero-stat-n">{stats ? formatStat(stats.clubEvents) : '200+'}</span>
               <span className="v1-hero-stat-l">Club Events</span>
             </span>
             <span className="v1-hero-stat">
-              <span className="v1-hero-stat-n">{stats ? formatStat(stats.cities) : '25+'}</span>
+              <span className="v1-hero-stat-n">{stats ? formatStat(stats.cities) : '30+'}</span>
               <span className="v1-hero-stat-l">Cities Covered</span>
             </span>
           </div>
