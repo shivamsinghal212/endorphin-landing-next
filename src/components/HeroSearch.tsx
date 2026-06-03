@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import posthog from 'posthog-js';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { APP_STORE_URL, PLAY_STORE_URL } from '@/lib/store-links';
 import HeroSearchPanel from './HeroSearchPanel';
@@ -43,7 +44,10 @@ const HeroSearch = ({ stats }: HeroSearchProps) => {
   const panelRef = useRef<HTMLDivElement | null>(null);
   // Focus the input inside the panel once expanded. The panel handles its
   // own focus via the `autoFocus` prop on the input.
-  const expand = useCallback(() => setExpanded(true), []);
+  const expand = useCallback(() => {
+    setExpanded(true);
+    posthog.capture('search_opened', { source: 'home_hero' });
+  }, []);
   const collapse = useCallback(() => setExpanded(false), []);
 
   // `/` keyboard shortcut expands the panel from anywhere on the page.

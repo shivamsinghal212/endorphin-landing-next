@@ -1,5 +1,7 @@
 'use client';
 
+import posthog from 'posthog-js';
+
 import Link from 'next/link';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
@@ -576,13 +578,39 @@ const HeroSearchPanel = ({
         }
         setStatus(offset === 0 && data.items.length === 0 ? 'empty' : 'ok');
         setLoadingMore(false);
+        // Single funnel point for analytics — every commit path (Enter, →,
+        // chip, kind tab, city dropdown) lands here, so we capture once with
+        // the filters the API actually used. $current_url distinguishes the
+        // homepage search from /clubs.
+        if (offset === 0) {
+          posthog.capture('search_performed', {
+            query: committedFilters.q || null,
+            kind: committedFilters.kind,
+            city: committedFilters.city || null,
+            tags: committedFilters.tags,
+            events_window: committedFilters.eventsWindow || null,
+            distance_min: committedFilters.distanceMin,
+            distance_max: committedFilters.distanceMax,
+            results_total: data.total,
+            zero_results: data.total === 0,
+            nl_parsed: Boolean(data.parsed),
+            off_topic: data.parsed?.offTopic ?? false,
+            kind_lock: kindLock ?? null,
+          });
+        } else {
+          posthog.capture('search_load_more', {
+            query: committedFilters.q || null,
+            offset,
+            results_total: data.total,
+          });
+        }
       })
       .catch((err) => {
         if (err?.name === 'AbortError') return;
         setStatus('error');
         setLoadingMore(false);
       });
-  }, [committedFilters, offset]);
+  }, [committedFilters, offset, kindLock]);
 
   // Scroll the results section into view on every commit — initial Enter/→
   // submit, chip click, tab change, or city dropdown change. Runs in an
@@ -1068,10 +1096,21 @@ function ResultsSection({
             // the rendered nodes to carry their own keys. Falls back to
             // the generic ResultCard otherwise.
             <div className={renderCard ? 'v1-discover-grid-custom' : 'v1-discover-grid'}>
-              {results.map((hit) =>
+              {results.map((hit, i) =>
                 renderCard
-                  ? renderCard(hit)
-                  : <ResultCard key={`${hit.kind}-${hit.id}`} hit={hit} />,
+                  ? (
+                    // display:contents keeps the wrapper out of the grid
+                    // layout while still catching the bubbled click for
+                    // analytics — caller-rendered cards stay untouched.
+                    <div
+                      key={`${hit.kind}-${hit.id}`}
+                      style={{ display: 'contents' }}
+                      onClick={() => captureResultClick(hit, i)}
+                    >
+                      {renderCard(hit)}
+                    </div>
+                  )
+                  : <ResultCard key={`${hit.kind}-${hit.id}`} hit={hit} position={i} />,
               )}
             </div>
           )}
@@ -1100,7 +1139,18 @@ function ResultsSection({
 
 // ─── Single result card ────────────────────────────────────────────────
 
-function ResultCard({ hit }: { hit: DiscoverHit }) {
+function captureResultClick(hit: DiscoverHit, position: number) {
+  posthog.capture('search_result_clicked', {
+    kind: hit.kind,
+    id: hit.id,
+    slug: hit.slug ?? hit.clubSlug ?? null,
+    title: hit.title,
+    city: hit.city ?? null,
+    position,
+  });
+}
+
+function ResultCard({ hit, position }: { hit: DiscoverHit; position: number }) {
   const href =
     hit.kind === 'club' && hit.slug
       ? `/clubs/${hit.slug}`
@@ -1119,7 +1169,11 @@ function ResultCard({ hit }: { hit: DiscoverHit }) {
   const membersFormatted = formatMembers(hit.members);
 
   return (
-    <Link className="v1-discover-card" href={href}>
+    <Link
+      className="v1-discover-card"
+      href={href}
+      onClick={() => captureResultClick(hit, position)}
+    >
       <div className="v1-discover-card-header">
         <div className="v1-discover-card-fallback">{initials}</div>
         {hit.imageUrl && (

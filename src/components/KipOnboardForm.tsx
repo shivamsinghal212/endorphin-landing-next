@@ -67,11 +67,9 @@ export default function KipOnboardForm() {
           required
         />
       </div>
-      <button
-        type="submit"
-        className="v1-btn v1-btn-primary v1-kip-onboard-submit"
-        disabled={!cleanHandle(handle)}
-      >
+      {/* Not disabled-while-empty: the input is required and onSubmit guards,
+          and the 50%-opacity disabled look read as broken on the dark bg. */}
+      <button type="submit" className="v1-btn v1-btn-primary v1-kip-onboard-submit">
         Get my club listed
       </button>
     </form>
