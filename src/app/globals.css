@@ -1444,6 +1444,44 @@ body.nav-open { overflow: hidden; }
 .v1-kip-features { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 36px; }
 .v1-kip-chip { padding: 8px 14px; border: 0.5px solid rgba(245, 240, 235, 0.22); font-family: var(--font-oswald), sans-serif; font-weight: 500; font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(245, 240, 235, 0.85); }
 
+/* Onboard form (Instagram handle capture, mirrors /clubs onboard banner) */
+.v1-kip-onboard-form { display: flex; gap: 12px; max-width: 480px; }
+.v1-kip-onboard-input-wrap { position: relative; flex: 1; min-width: 0; }
+.v1-kip-onboard-input-prefix {
+  position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+  font-family: var(--font-oswald), sans-serif; font-weight: 600; font-size: 15px;
+  color: var(--red); pointer-events: none;
+}
+.v1-kip-onboard-input {
+  width: 100%; height: 48px;
+  padding: 0 14px 0 34px;
+  background: rgba(245, 240, 235, 0.06);
+  border: 0.5px solid rgba(245, 240, 235, 0.28);
+  color: var(--bone);
+  font-family: var(--font-poppins), sans-serif; font-size: 14px;
+  outline: 0;
+  transition: border-color 160ms ease, background 160ms ease;
+}
+.v1-kip-onboard-input::placeholder { color: rgba(245, 240, 235, 0.4); }
+.v1-kip-onboard-input:focus { border-color: var(--bone); background: rgba(245, 240, 235, 0.1); }
+.v1-kip-onboard-submit { flex-shrink: 0; }
+.v1-kip-onboard-submit:disabled { opacity: 0.5; cursor: not-allowed; }
+.v1-kip-onboard-thanks {
+  display: flex; flex-direction: column; gap: 4px;
+  max-width: 480px;
+  padding: 14px 16px;
+  border-left: 3px solid var(--red);
+  background: rgba(245, 240, 235, 0.06);
+  font-size: 13px; line-height: 1.55;
+  color: rgba(245, 240, 235, 0.72);
+}
+.v1-kip-onboard-thanks strong { color: var(--bone); }
+.v1-kip-onboard-thanks a { color: var(--bone); border-bottom: 0.5px solid rgba(245, 240, 235, 0.4); }
+@media (max-width: 560px) {
+  .v1-kip-onboard-form { flex-direction: column; }
+  .v1-kip-onboard-submit { width: 100%; }
+}
+
 .v1-kip-phone-stage { display: flex; justify-content: center; align-items: center; }
 .v1-kip-phone {
   width: 340px;

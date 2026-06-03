@@ -1,4 +1,4 @@
-import Link from 'next/link';
+import KipOnboardForm from './KipOnboardForm';
 
 const CHIPS = [
   'Approve members',
@@ -59,9 +59,7 @@ const ManageClubSection = () => (
             <span key={c} className="v1-kip-chip">{c}</span>
           ))}
         </div>
-        <Link href="/clubs#download" className="v1-btn v1-btn-primary">
-          Get my club listed
-        </Link>
+        <KipOnboardForm />
       </div>
 
       <div className="v1-kip-phone-stage">
