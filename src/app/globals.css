@@ -515,6 +515,18 @@ body.nav-open { overflow: hidden; }
   color: rgba(245, 240, 235, 0.85);
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
+.v1-hero-search-caret {
+  display: inline-block;
+  width: 2px; height: 1em;
+  margin-left: 3px;
+  background: var(--red);
+  vertical-align: -0.12em;
+  animation: v1-caret-blink 1.1s steps(1) infinite;
+}
+@keyframes v1-caret-blink { 50% { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) {
+  .v1-hero-search-caret { animation: none; }
+}
 .v1-hero-search-kbd {
   font-family: 'JetBrains Mono', ui-monospace, monospace;
   font-style: normal;

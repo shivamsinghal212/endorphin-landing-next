@@ -8,6 +8,78 @@ import HeroSearchPanel from './HeroSearchPanel';
 
 const RIBBON_ITEMS = ['5K', '10K', 'Half Marathon', 'Marathon', 'Ultra', 'Trail', 'Run', 'Connect', 'Train', 'Repeat'];
 
+// Real queries the discover search can answer — cycled in the collapsed
+// trigger pill with a typewriter effect so visitors learn by example what
+// the search understands (clubs by city/vibe, races by distance/date).
+const SEARCH_EXAMPLES = [
+  'run clubs in Mumbai',
+  '5K races this weekend',
+  'half marathon in Delhi',
+  'women-only run clubs',
+  'HYROX training clubs',
+  'trail runs in Bangalore',
+  'community runs in Gurgaon',
+];
+
+const TYPE_MS = 55;
+const DELETE_MS = 28;
+const HOLD_FULL_MS = 1900;
+const HOLD_EMPTY_MS = 400;
+
+/**
+ * Typewriter line for the collapsed search pill. SSR renders the first
+ * example fully typed (no hydration mismatch, sane no-JS fallback); the
+ * cycle starts client-side after mount. Honors prefers-reduced-motion by
+ * staying static. `paused` (panel expanded) stops the timers.
+ */
+function TypingExamples({ paused }: { paused: boolean }) {
+  const [text, setText] = useState(SEARCH_EXAMPLES[0]);
+
+  useEffect(() => {
+    if (paused) return;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    let phraseIdx = 0;
+    let charIdx = SEARCH_EXAMPLES[0].length;
+    let deleting = true;
+    let t: ReturnType<typeof setTimeout>;
+
+    const tick = () => {
+      const phrase = SEARCH_EXAMPLES[phraseIdx];
+      if (deleting) {
+        charIdx -= 1;
+        setText(phrase.slice(0, charIdx));
+        if (charIdx <= 0) {
+          deleting = false;
+          phraseIdx = (phraseIdx + 1) % SEARCH_EXAMPLES.length;
+          t = setTimeout(tick, HOLD_EMPTY_MS);
+        } else {
+          t = setTimeout(tick, DELETE_MS);
+        }
+      } else {
+        charIdx += 1;
+        setText(phrase.slice(0, charIdx));
+        t = setTimeout(tick, charIdx >= phrase.length ? HOLD_FULL_MS : TYPE_MS);
+        if (charIdx >= phrase.length) deleting = true;
+      }
+    };
+
+    // Restart cleanly from the first phrase whenever we unpause.
+    setText(SEARCH_EXAMPLES[0]);
+    t = setTimeout(tick, HOLD_FULL_MS);
+    return () => clearTimeout(t);
+  }, [paused]);
+
+  return (
+    // aria-hidden: the button's aria-label is the stable accessible name;
+    // a ticking text node would be noise for screen readers.
+    <span className="v1-hero-search-trigger-text" aria-hidden="true">
+      {text}
+      <span className="v1-hero-search-caret" />
+    </span>
+  );
+}
+
 interface HeroStats {
   clubs: number;
   races: number;
@@ -93,9 +165,7 @@ const HeroSearch = ({ stats }: HeroSearchProps) => {
               tabIndex={expanded ? -1 : 0}
             >
               <SearchIcon />
-              <span className="v1-hero-search-trigger-text">
-                Search 870+ clubs, races and community runs
-              </span>
+              <TypingExamples paused={expanded} />
               <span className="v1-hero-search-kbd" aria-hidden="true">/</span>
             </button>
             {expanded && (
