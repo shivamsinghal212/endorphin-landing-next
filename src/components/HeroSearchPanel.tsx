@@ -4,6 +4,7 @@ import posthog from 'posthog-js';
 
 import Link from 'next/link';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useTypewriter } from '@/lib/use-typewriter';
 
 const DISCOVER_BASE = 'https://api.endorfin.run/api/v1';
 
@@ -342,6 +343,10 @@ export interface HeroSearchPanelProps {
   // with Join CTA + members + next-event) instead of the generic
   // v1-discover-card. When omitted, falls back to the generic card.
   renderCard?: (hit: DiscoverHit) => React.ReactNode;
+  // Cycle these example queries in the input placeholder with a typewriter
+  // effect (see useTypewriter). Takes precedence over `placeholder`. Must be
+  // referentially stable — pass a module-level const.
+  placeholderExamples?: readonly string[];
 }
 
 function defaultPlaceholder(kindLock?: DiscoverKind): string {
@@ -359,6 +364,7 @@ const HeroSearchPanel = ({
   onClose,
   quickChips,
   renderCard,
+  placeholderExamples,
 }: HeroSearchPanelProps) => {
   const chips = quickChips ?? DEFAULT_QUICK_CHIPS;
   // Initial filters honor the kindLock if set, so even before the user
@@ -665,7 +671,15 @@ const HeroSearchPanel = ({
   );
 
   const appliedChips = useMemo(() => buildAppliedChips(filters), [filters]);
-  const effectivePlaceholder = placeholder ?? defaultPlaceholder(kindLock);
+  // Typewriter placeholder pauses once the user starts composing — the
+  // placeholder is invisible behind their text anyway, no point ticking.
+  const typedPlaceholder = useTypewriter(
+    placeholderExamples ?? null,
+    Boolean(filters.q),
+  );
+  const effectivePlaceholder = placeholderExamples
+    ? typedPlaceholder
+    : (placeholder ?? defaultPlaceholder(kindLock));
 
   // When kindLock is set, dropping a kind chip resets to the locked kind
   // (not 'all'). Same for the kind tab — but we hide the tab strip entirely

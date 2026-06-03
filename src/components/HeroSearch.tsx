@@ -4,6 +4,7 @@ import Link from 'next/link';
 import posthog from 'posthog-js';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { APP_STORE_URL, PLAY_STORE_URL } from '@/lib/store-links';
+import { useTypewriter } from '@/lib/use-typewriter';
 import HeroSearchPanel from './HeroSearchPanel';
 
 const RIBBON_ITEMS = ['5K', '10K', 'Half Marathon', 'Marathon', 'Ultra', 'Trail', 'Run', 'Connect', 'Train', 'Repeat'];
@@ -21,54 +22,12 @@ const SEARCH_EXAMPLES = [
   'community runs in Gurgaon',
 ];
 
-const TYPE_MS = 55;
-const DELETE_MS = 28;
-const HOLD_FULL_MS = 1900;
-const HOLD_EMPTY_MS = 400;
-
 /**
- * Typewriter line for the collapsed search pill. SSR renders the first
- * example fully typed (no hydration mismatch, sane no-JS fallback); the
- * cycle starts client-side after mount. Honors prefers-reduced-motion by
- * staying static. `paused` (panel expanded) stops the timers.
+ * Typewriter line for the collapsed search pill. `paused` (panel expanded)
+ * stops the timers. See useTypewriter for SSR/reduced-motion behavior.
  */
 function TypingExamples({ paused }: { paused: boolean }) {
-  const [text, setText] = useState(SEARCH_EXAMPLES[0]);
-
-  useEffect(() => {
-    if (paused) return;
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-
-    let phraseIdx = 0;
-    let charIdx = SEARCH_EXAMPLES[0].length;
-    let deleting = true;
-    let t: ReturnType<typeof setTimeout>;
-
-    const tick = () => {
-      const phrase = SEARCH_EXAMPLES[phraseIdx];
-      if (deleting) {
-        charIdx -= 1;
-        setText(phrase.slice(0, charIdx));
-        if (charIdx <= 0) {
-          deleting = false;
-          phraseIdx = (phraseIdx + 1) % SEARCH_EXAMPLES.length;
-          t = setTimeout(tick, HOLD_EMPTY_MS);
-        } else {
-          t = setTimeout(tick, DELETE_MS);
-        }
-      } else {
-        charIdx += 1;
-        setText(phrase.slice(0, charIdx));
-        t = setTimeout(tick, charIdx >= phrase.length ? HOLD_FULL_MS : TYPE_MS);
-        if (charIdx >= phrase.length) deleting = true;
-      }
-    };
-
-    // Restart cleanly from the first phrase whenever we unpause.
-    setText(SEARCH_EXAMPLES[0]);
-    t = setTimeout(tick, HOLD_FULL_MS);
-    return () => clearTimeout(t);
-  }, [paused]);
+  const text = useTypewriter(SEARCH_EXAMPLES, paused);
 
   return (
     // aria-hidden: the button's aria-label is the stable accessible name;

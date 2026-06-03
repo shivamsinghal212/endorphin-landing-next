@@ -32,6 +32,18 @@ function formatMembers(n: number | null | undefined): string | null {
   return n.toLocaleString('en-IN');
 }
 
+// Real club queries the discover search can answer — cycled in the search
+// input placeholder with a typewriter effect (module-level const: the
+// useTypewriter hook needs a referentially stable array).
+const CLUB_SEARCH_EXAMPLES = [
+  'run clubs in Mumbai',
+  'women-only run clubs',
+  'HYROX training clubs',
+  'beginner friendly clubs in Delhi',
+  'trail running clubs in Bangalore',
+  'early morning run clubs in Pune',
+];
+
 // Pin to IST so SSR (UTC server) and the client (any TZ) format dates
 // identically — without timeZone, locale formatting uses the runtime's
 // local zone and hydration mismatches (React #418) for anyone outside it.
@@ -705,7 +717,7 @@ export default function ClubsView({
 
           <HeroSearchPanel
             kindLock="club"
-            placeholder="Search clubs by name, city, or vibe…"
+            placeholderExamples={CLUB_SEARCH_EXAMPLES}
             onSearchActiveChange={setIsSearching}
             quickChips={clubChips}
             // Render search results with the SAME ClubCard the static
