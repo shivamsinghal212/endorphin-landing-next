@@ -39,7 +39,7 @@ const CLUB_SEARCH_EXAMPLES = [
   'run clubs in Mumbai',
   'women-only run clubs',
   'HYROX training clubs',
-  'beginner friendly clubs in Delhi',
+  'marathon training clubs in Delhi',
   'trail running clubs in Bangalore',
   'early morning run clubs in Pune',
 ];

@@ -219,14 +219,12 @@ const DEFAULT_QUICK_CHIPS: QuickChip[] = [
   { key: '10k', label: '10K', group: 'distance', apply: () => ({ distanceMin: 10, distanceMax: 10 }) },
   { key: 'half', label: 'Half marathon', group: 'distance', apply: () => ({ distanceMin: 21, distanceMax: 21 }) },
   { key: 'women', label: 'Women only', group: 'tag', apply: (s) => ({ tags: toggleTag(s.tags, 'women-only') }) },
-  { key: 'beginner', label: 'Beginner friendly', group: 'tag', apply: (s) => ({ tags: toggleTag(s.tags, 'beginner-friendly') }) },
 ];
 
 // Useful when callers want to compose their own chip set from familiar
 // pieces (e.g. /clubs uses TAG_CHIPS but skips the time/distance chips).
 export const TAG_CHIPS: QuickChip[] = [
   DEFAULT_QUICK_CHIPS[5]!, // women only
-  DEFAULT_QUICK_CHIPS[6]!, // beginner friendly
 ];
 
 // Build a city chip on the fly — useful when the caller wants top-N
@@ -334,9 +332,9 @@ export interface HeroSearchPanelProps {
   // below the chips — useful inside overlays. Omit on listing pages
   // where the search is permanently embedded.
   onClose?: () => void;
-  // Override the chip set. /clubs passes top-cities + Women only +
-  // Beginner friendly because club rows don't have a start time or
-  // distance — the default "5K / This weekend" chips are nonsensical.
+  // Override the chip set. /clubs passes top-cities + Women only
+  // because club rows don't have a start time or distance — the
+  // default "5K / This weekend" chips are nonsensical.
   quickChips?: QuickChip[];
   // Override how each result hit gets rendered. Lets listing pages
   // use their own card design (e.g. /clubs uses the rich ClubCard
@@ -900,7 +898,7 @@ function isChipActive(chip: QuickChip, f: FilterState): boolean {
   }
   if (chip.group === 'tag') {
     // chip.apply toggles, so check the input would be present in current state
-    const tag = chip.key === 'women' ? 'women-only' : chip.key === 'beginner' ? 'beginner-friendly' : '';
+    const tag = chip.key === 'women' ? 'women-only' : '';
     return tag ? f.tags.includes(tag) : false;
   }
   return false;
