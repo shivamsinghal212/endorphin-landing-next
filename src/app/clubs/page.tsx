@@ -105,14 +105,14 @@ export interface ApiClub {
 }
 
 export const metadata: Metadata = {
-  title: 'Run clubs in India — every crew, listed',
+  title: 'Run clubs in India — the most happening clubs',
   description:
-    'Find your crew. Morning runs, marathon training, trail weekends — a verified directory of run clubs across India. Show up with people who run your pace.',
+    'A verified directory of run clubs across India — marathon training, weekend trail runs, and social meetups. Show up with people who run your pace.',
   alternates: { canonical: 'https://www.endorfin.run/clubs' },
   openGraph: {
     type: 'website',
     url: 'https://www.endorfin.run/clubs',
-    title: 'Run clubs in India — every crew, listed | Endorfin',
+    title: 'Run clubs in India — the most happening clubs | Endorfin',
     description:
       'A verified directory of run clubs across India. Browse clubs in Delhi, Mumbai, Bengaluru, Hyderabad, Chennai and beyond.',
     siteName: 'Endorfin',
@@ -218,7 +218,7 @@ function buildJsonLd(clubs: DiscoverHit[]) {
     '@type': 'ItemList',
     name: 'Run Clubs in India',
     description:
-      'A verified directory of run clubs across India — morning crews, marathon training groups, trail collectives.',
+      'A verified directory of run clubs across India — marathon training groups, social runs, and trail collectives.',
     url: 'https://www.endorfin.run/clubs',
     numberOfItems: clubs.length,
     // Mirror EVERY club in the structured data — same surface as the
