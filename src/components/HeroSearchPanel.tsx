@@ -206,6 +206,9 @@ export type QuickChip = {
   key: string;
   label: string;
   group: 'when' | 'distance' | 'tag' | 'city';
+  // For 'tag' chips: the canonical club tag this chip toggles. Lets
+  // isChipActive resolve the active state without re-parsing apply().
+  tag?: string;
   apply: (s: FilterState) => Partial<FilterState>;
 };
 
@@ -218,13 +221,18 @@ const DEFAULT_QUICK_CHIPS: QuickChip[] = [
   { key: '5k', label: '5K', group: 'distance', apply: () => ({ distanceMin: 5, distanceMax: 5 }) },
   { key: '10k', label: '10K', group: 'distance', apply: () => ({ distanceMin: 10, distanceMax: 10 }) },
   { key: 'half', label: 'Half marathon', group: 'distance', apply: () => ({ distanceMin: 21, distanceMax: 21 }) },
-  { key: 'women', label: 'Women only', group: 'tag', apply: (s) => ({ tags: toggleTag(s.tags, 'women-only') }) },
+  { key: 'women', label: 'Women only', group: 'tag', tag: 'women-only', apply: (s) => ({ tags: toggleTag(s.tags, 'women-only') }) },
 ];
 
-// Useful when callers want to compose their own chip set from familiar
-// pieces (e.g. /clubs uses TAG_CHIPS but skips the time/distance chips).
+// Tag quick-filters for the club listing pages (/clubs and
+// /run-clubs/[city]). Each toggles one canonical club tag from the
+// normalized taxonomy in the clubs table. Time/distance chips are
+// dropped — clubs have neither a start time nor a distance.
 export const TAG_CHIPS: QuickChip[] = [
-  DEFAULT_QUICK_CHIPS[5]!, // women only
+  { key: 'women', label: 'Women only', group: 'tag', tag: 'women-only', apply: (s) => ({ tags: toggleTag(s.tags, 'women-only') }) },
+  { key: 'hyrox', label: 'HYROX', group: 'tag', tag: 'hyrox', apply: (s) => ({ tags: toggleTag(s.tags, 'hyrox') }) },
+  { key: 'marathon', label: 'Marathon', group: 'tag', tag: 'marathon-training', apply: (s) => ({ tags: toggleTag(s.tags, 'marathon-training') }) },
+  { key: 'social', label: 'Social', group: 'tag', tag: 'social-run', apply: (s) => ({ tags: toggleTag(s.tags, 'social-run') }) },
 ];
 
 // Build a city chip on the fly — useful when the caller wants top-N
@@ -897,9 +905,8 @@ function isChipActive(chip: QuickChip, f: FilterState): boolean {
     return f.city === patch.city;
   }
   if (chip.group === 'tag') {
-    // chip.apply toggles, so check the input would be present in current state
-    const tag = chip.key === 'women' ? 'women-only' : '';
-    return tag ? f.tags.includes(tag) : false;
+    // chip.apply toggles, so check the chip's tag is present in current state
+    return chip.tag ? f.tags.includes(chip.tag) : false;
   }
   return false;
 }
