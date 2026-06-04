@@ -8,7 +8,7 @@ const poppins = Poppins({ subsets: ['latin'], weight: ['300', '400', '500', '600
 const fraunces = Fraunces({ subsets: ['latin'], weight: ['400', '500', '600', '700'], style: ['italic', 'normal'], variable: '--font-fraunces', display: 'swap' });
 
 export const metadata: Metadata = {
-  title: { default: 'Endorfin — Find Running Events, Marathons & 10Ks in India', template: '%s | Endorfin' },
+  title: { default: 'Endorfin — Run Clubs & Running Events in India', template: '%s | Endorfin' },
   description: "India's platform for run clubs and running events. Find verified clubs near you, RSVP to the next group run, and discover 500+ marathons, 10K & 5K events.",
   keywords: ['run clubs India', 'run clubs near me', 'run clubs in Delhi', 'run clubs in Mumbai', 'run clubs in Bangalore', 'running club', 'join a run club', 'running events India', 'marathon India', 'half marathon', '10K run', '5K run', 'running app', 'running event finder', 'marathon near me', 'running events Mumbai', 'running events Delhi', 'running events Bangalore', 'community runs', 'trail running India', 'fun run', 'event registration', 'running community'],
   authors: [{ name: 'Endorfin' }],
@@ -17,7 +17,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     url: 'https://www.endorfin.run/',
-    title: 'Endorfin — Find Running Events, Marathons & 10Ks in India',
+    title: 'Endorfin — Run Clubs & Running Events in India',
     description: "India's platform for run clubs and running events. Find verified clubs near you, RSVP to the next group run, and discover 500+ marathons, 10K & 5K events.",
     siteName: 'Endorfin',
     locale: 'en_IN',
@@ -25,7 +25,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Endorfin — Find Running Events & Marathons in India',
+    title: 'Endorfin — Run Clubs & Running Events in India',
     description: "India's platform for run clubs and running events. Find verified clubs near you, RSVP to the next group run, and discover 500+ marathons, 10K & 5K events.",
     images: ['https://www.endorfin.run/og-image.png'],
     site: '@endorfinapp',
