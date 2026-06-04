@@ -1,9 +1,12 @@
 import type { Metadata } from 'next';
-import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import ClubsView from '@/app/clubs/ClubsView';
 import type { ApiClub } from '@/app/clubs/page';
+import type { DiscoverHit } from '@/components/HeroSearchPanel';
+import { clubsApi, type MyClubClaim, type MyClubMembership } from '@/lib/api';
+import { getSessionEmail, getSessionToken } from '@/lib/session';
 import {
   CLUB_CITY_PAGES,
   MIN_CLUBS_PER_CITY,
@@ -11,6 +14,7 @@ import {
   getClubCityPage,
 } from '@/lib/club-city-pages';
 import { fetchAllClubsList } from '@/lib/clubs-list';
+import { fetchFeaturedFull } from '@/lib/clubs-featured';
 
 const SITE = 'https://www.endorfin.run';
 
@@ -20,18 +24,41 @@ export const revalidate = 3600;
 // >= MIN_CLUBS_PER_CITY) is the authoritative gate. Keeps dev rendering
 // working even when generateStaticParams ran with a transient API miss.
 
-// The list endpoint already carries every field the city cards + JSON-LD
-// render (city, logo, header, tags, establishedYear, stats.members), so we
-// no longer N+1 the per-club detail/events endpoints just to filter by
-// city. fetchAllClubsList paginates past the 50-per-page cap — without it,
-// cities whose clubs sit on page 2+ (e.g. Gurgaon) under-counted and 404'd.
-async function getClubs(): Promise<ApiClub[]> {
-  const clubs = await fetchAllClubsList<ApiClub>();
-  return clubs.filter((c) => !!c.slug);
+// The list endpoint carries every field the grid cards + JSON-LD need
+// (city, logo, tags, establishedYear, stats.members), so we map it straight
+// into the DiscoverHit shape ClubsView's grid consumes — no per-club N+1.
+// nextEvent is left null here; the featured-5 strip gets the rich
+// detail+events via fetchFeaturedFull below.
+function toDiscoverHit(c: ApiClub): DiscoverHit {
+  return {
+    kind: 'club',
+    id: c.slug,
+    slug: c.slug,
+    title: c.name,
+    subtitle: c.subtitle ?? null,
+    description: c.description ?? null,
+    imageUrl: c.logoUrl ?? c.headerImageUrl ?? null,
+    city: c.city ?? null,
+    locationName: null,
+    startTime: null,
+    endTime: null,
+    distanceKm: null,
+    eventType: null,
+    clubId: null,
+    clubSlug: null,
+    clubName: null,
+    members: c.stats?.members ?? null,
+    tags: c.tags ?? [],
+    isVerified: c.isVerified ?? false,
+    establishedYear: c.establishedYear ?? null,
+    nextEvent: null,
+    score: 0,
+    matchingEvents: [],
+  };
 }
 
 export async function generateStaticParams() {
-  const clubs = await getClubs();
+  const clubs = await fetchAllClubsList<ApiClub>();
   return CLUB_CITY_PAGES
     .filter((p) => clubsForCityPage(clubs, p).length >= MIN_CLUBS_PER_CITY)
     .map((p) => ({ city: p.slug }));
@@ -70,65 +97,6 @@ export async function generateMetadata(
       description,
     },
   };
-}
-
-function initials(name: string) {
-  const w = (name || '').trim().split(/\s+/);
-  return ((w[0] || '')[0] || '').toUpperCase() + ((w[1] || '')[0] || '').toUpperCase();
-}
-
-function ClubCard({ c }: { c: ApiClub }) {
-  const headerImg = c.headerImageUrl || c.logoUrl || null;
-  const headerIsLogoFallback = !c.headerImageUrl && !!c.logoUrl;
-  const members = c.stats?.members ?? 0;
-
-  return (
-    <Link href={`/clubs/${c.slug}`} className="v1c-club-card">
-      <div className="v1c-club-card-header">
-        <div className="v1c-club-card-header-fallback">{initials(c.name)}</div>
-        {headerImg && (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={headerImg}
-            alt={c.name}
-            loading="lazy"
-            className={headerIsLogoFallback ? 'is-logo-fallback' : ''}
-          />
-        )}
-      </div>
-      <div className="v1c-club-card-body">
-        <div className="v1c-club-card-logo">
-          {c.logoUrl ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={c.logoUrl} alt={`${c.name} logo`} />
-          ) : (
-            initials(c.name)
-          )}
-        </div>
-        <div className="v1c-club-card-top">
-          <h3 className="v1c-club-card-title">{c.name}</h3>
-        </div>
-        <div className="v1c-club-card-city">
-          {c.city}
-          {c.establishedYear ? ` · Est ${c.establishedYear}` : ''}
-        </div>
-        {c.tags && c.tags.length > 0 && (
-          <div className="v1c-club-card-tags">
-            {c.tags.slice(0, 3).map((t) => (
-              <span key={t} className="v1c-club-card-tag">
-                {t}
-              </span>
-            ))}
-          </div>
-        )}
-        <div className="v1c-club-card-foot">
-          <span className="v1c-club-card-stat">
-            <strong>{members.toLocaleString('en-IN')}</strong> members
-          </span>
-        </div>
-      </div>
-    </Link>
-  );
 }
 
 function buildJsonLd(
@@ -193,15 +161,35 @@ export default async function RunClubsCityPage(
   const page = getClubCityPage(city);
   if (!page) notFound();
 
-  const allClubs = await getClubs();
-  const cityClubs = clubsForCityPage(allClubs, page);
+  const token = await getSessionToken();
+  const [allClubs, myClubs, userEmail] = await Promise.all([
+    fetchAllClubsList<ApiClub>(),
+    token
+      ? clubsApi.listMyClubs(token, 'all', { includePending: true }).catch(() => [])
+      : Promise.resolve([]),
+    getSessionEmail(),
+  ]);
+
+  // City-scoped, biggest clubs first (mirrors /clubs' members-desc order so
+  // the featured strip and grid show the most prominent clubs first).
+  const cityClubs = clubsForCityPage(allClubs, page)
+    .filter((c) => !!c.slug)
+    .sort((a, b) => (b.stats?.members ?? 0) - (a.stats?.members ?? 0));
   if (cityClubs.length < MIN_CLUBS_PER_CITY) notFound();
 
-  const otherCities = CLUB_CITY_PAGES.filter((p) => {
-    if (p.slug === page.slug) return false;
-    return clubsForCityPage(allClubs, p).length >= MIN_CLUBS_PER_CITY;
-  });
+  const clubs = cityClubs.map(toDiscoverHit);
+  const featuredSlugs = cityClubs.slice(0, 5).map((c) => c.slug);
+  const featuredFull = await fetchFeaturedFull(featuredSlugs);
 
+  const membershipBySlug: Record<string, MyClubMembership> = {};
+  const claimBySlug: Record<string, MyClubClaim> = {};
+  for (const c of myClubs) {
+    if (c.membership) membershipBySlug[c.slug] = c.membership;
+    if (c.claim) claimBySlug[c.slug] = c.claim;
+  }
+
+  // Single-city facet so the hero/chips know they're scoped to one city.
+  const cityFacets = [{ value: page.name, count: cityClubs.length }];
   const jsonLd = buildJsonLd(page, cityClubs);
 
   return (
@@ -214,101 +202,16 @@ export default async function RunClubsCityPage(
       )}
       <Header />
       <div className="v1-clubs-page">
-        {/* Hero */}
-        <section className="v1c-hero">
-          <div className="v1c-hero-bg" aria-hidden />
-          <div className="v1c-container">
-            <nav aria-label="Breadcrumb" style={{ marginBottom: 16, fontSize: 14, opacity: 0.75 }}>
-              <Link href="/clubs">All clubs</Link>
-              <span aria-hidden> · </span>
-              <span>{page.name}</span>
-            </nav>
-            <h1 className="v1c-hero-title">
-              Run clubs in<br /><span className="v1c-red">{page.name}.</span>
-            </h1>
-            <div className="v1c-hero-foot">
-              <p className="v1c-hero-sub">{page.intro}</p>
-              <div className="v1c-hero-stats">
-                <div>
-                  <div className="v1c-hero-stat-n">{cityClubs.length}</div>
-                  <div className="v1c-hero-stat-l">Clubs</div>
-                </div>
-                <div>
-                  <div className="v1c-hero-stat-n">{page.region}</div>
-                  <div className="v1c-hero-stat-l">Region</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Listing */}
-        <section className="v1c-featured" aria-label={`Run clubs in ${page.name}`}>
-          <div className="v1c-container">
-            <div className="v1c-section-header">
-              <h2 className="v1c-section-title">
-                Every run club in <b>{page.name}</b>
-              </h2>
-              <span className="v1c-section-count">
-                {cityClubs.length === 1 ? '1 club' : `${cityClubs.length} clubs`}
-              </span>
-            </div>
-
-            <div
-              className="v1c-grid"
-              style={{
-                display: 'grid',
-                gap: 18,
-                gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
-                marginTop: 24,
-              }}
-            >
-              {cityClubs.map((c) => (
-                <ClubCard key={c.slug} c={c} />
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* Other cities */}
-        {otherCities.length > 0 && (
-          <section className="v1c-featured" aria-label="Browse run clubs in other cities">
-            <div className="v1c-container">
-              <div className="v1c-section-header">
-                <h2 className="v1c-section-title">
-                  Run clubs in <b>other cities</b>
-                </h2>
-              </div>
-              <ul
-                style={{
-                  display: 'flex',
-                  flexWrap: 'wrap',
-                  gap: 10,
-                  listStyle: 'none',
-                  padding: 0,
-                  marginTop: 16,
-                }}
-              >
-                {otherCities.map((p) => (
-                  <li key={p.slug}>
-                    <Link
-                      href={`/run-clubs/${p.slug}`}
-                      className="v1c-chip"
-                      style={{ textDecoration: 'none' }}
-                    >
-                      Run clubs in {p.name}
-                    </Link>
-                  </li>
-                ))}
-                <li>
-                  <Link href="/clubs" className="v1c-chip" style={{ textDecoration: 'none' }}>
-                    All clubs across India
-                  </Link>
-                </li>
-              </ul>
-            </div>
-          </section>
-        )}
+        <ClubsView
+          clubs={clubs}
+          featuredFull={featuredFull}
+          cityFacets={cityFacets}
+          membershipBySlug={membershipBySlug}
+          claimBySlug={claimBySlug}
+          isAuthed={!!token}
+          userEmail={userEmail}
+          cityName={page.name}
+        />
       </div>
       <Footer />
     </main>

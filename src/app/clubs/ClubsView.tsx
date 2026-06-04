@@ -631,6 +631,7 @@ export default function ClubsView({
   claimBySlug = {},
   isAuthed = false,
   userEmail = null,
+  cityName,
 }: {
   // Lean shape powering the all-clubs grid (SSR'd ~112 anchors for SEO).
   clubs: DiscoverHit[];
@@ -643,6 +644,11 @@ export default function ClubsView({
   claimBySlug?: Record<string, Claim>;
   isAuthed?: boolean;
   userEmail?: string | null;
+  // When set, the view scopes to a single city (/run-clubs/[city]): the
+  // hero kicker, H1, and grid heading switch to that city for SEO, the
+  // second stat becomes "Verified", and the city quick-chips are dropped.
+  // Undefined = the national /clubs experience (unchanged).
+  cityName?: string;
 }) {
   const [isSearching, setIsSearching] = useState(false);
   // Page index instead of "visible count" — we paginate now (Prev/Next at
@@ -663,6 +669,12 @@ export default function ClubsView({
   const visibleStart = pageIndex * PAGE_SIZE;
   const visibleEnd = Math.min(visibleStart + PAGE_SIZE, totalClubs);
   const cityCount = useMemo(() => cityFacets.length, [cityFacets]);
+  // City pages show "Verified" as the second stat instead of "Cities"
+  // (a single-city page counting "1 city" reads oddly).
+  const verifiedCount = useMemo(
+    () => clubs.filter((c) => c.isVerified).length,
+    [clubs],
+  );
 
   const gotoPage = useCallback(
     (next: number) => {
@@ -689,12 +701,15 @@ export default function ClubsView({
   // arbitrary) + the two tag chips. Time/distance chips are dropped
   // because they don't apply to clubs (clubs have no startTime/distance).
   const clubChips: QuickChip[] = useMemo(() => {
+    // City pages: drop the top-cities chips (we're already in one city);
+    // keep the tag chips (women-only, HYROX, …) for cross-city discovery.
+    if (cityName) return [...TAG_CHIPS];
     const topCities = [...cityFacets]
       .sort((a, b) => b.count - a.count)
       .slice(0, 5)
       .map((c) => cityChip(c.value));
     return [...topCities, ...TAG_CHIPS];
-  }, [cityFacets]);
+  }, [cityFacets, cityName]);
 
   return (
     <>
@@ -707,12 +722,22 @@ export default function ClubsView({
         <div className="v1-hero-bg" aria-hidden="true" />
         <div className="container">
           <div className="v1-hero-topline">
-            <span className="v1-hero-kicker">Run clubs · India&apos;s verified directory</span>
+            <span className="v1-hero-kicker">
+              {cityName ? `Run clubs · ${cityName}` : "Run clubs · India's verified directory"}
+            </span>
             <span className="v1-hero-meta">{totalClubs} listed</span>
           </div>
 
           <h1 className="v1-hero-title">
-            Find India&apos;s most <span className="accent">happening</span> run clubs<span className="accent">.</span>
+            {cityName ? (
+              <>
+                Run clubs in <span className="accent">{cityName}</span><span className="accent">.</span>
+              </>
+            ) : (
+              <>
+                Find India&apos;s most <span className="accent">happening</span> run clubs<span className="accent">.</span>
+              </>
+            )}
           </h1>
 
           <HeroSearchPanel
@@ -741,8 +766,8 @@ export default function ClubsView({
               <span className="v1-hero-stat-l">Clubs</span>
             </span>
             <span className="v1-hero-stat">
-              <span className="v1-hero-stat-n">{cityCount}</span>
-              <span className="v1-hero-stat-l">Cities</span>
+              <span className="v1-hero-stat-n">{cityName ? verifiedCount : cityCount}</span>
+              <span className="v1-hero-stat-l">{cityName ? 'Verified' : 'Cities'}</span>
             </span>
           </div>
         </div>
@@ -786,7 +811,7 @@ export default function ClubsView({
             <div className="v1c-container">
               <div className="v1c-section-header">
                 <h2 className="v1c-section-title">
-                  Every run club in <b className="v1c-red">India</b>
+                  Every run club in <b className="v1c-red">{cityName ?? 'India'}</b>
                 </h2>
                 <span className="v1c-section-count">
                   Showing {visibleStart + 1}–{visibleEnd} of {totalClubs}

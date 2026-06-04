@@ -6,13 +6,7 @@ import { clubsApi, type MyClubClaim, type MyClubMembership } from '@/lib/api';
 import { getSessionEmail, getSessionToken } from '@/lib/session';
 import type { DiscoverHit } from '@/components/HeroSearchPanel';
 import type { JoinFormField } from '@/lib/admin-api';
-// Featured strip uses the legacy /clubs/{slug} + /events endpoints
-// because /discover/smart's hit shape doesn't carry runs/month, km/month,
-// years_running, or an events array — and the original FlagshipCard
-// design depends on those. We only fetch detail for the top 5 (capped),
-// so this is at most 10 parallel requests, not the old 50-per-slug
-// storm.
-const LEGACY_CLUBS_API = 'https://api.endorfin.run/api/v1';
+import { fetchFeaturedFull } from '@/lib/clubs-featured';
 
 // ─── Re-exported types (consumed by /clubs/[slug] and /run-clubs/[city]) ──
 // Kept here because moving them to a separate file is a larger refactor;
@@ -144,31 +138,6 @@ interface DiscoverPage {
  * Returns clubs sorted by member count desc — featured strip slices the
  * top 5; the all-clubs grid uses the rest in the same order.
  */
-// Fetch full ApiClub detail + events for a set of slugs in parallel.
-// Used to back the featured strip with the rich card data (stats grid,
-// tags, next-event, etc.) that DiscoverHit doesn't carry. Bounded to a
-// small N (top 5 featured), so this is not the old per-slug storm.
-async function getFeaturedFull(slugs: string[]): Promise<ApiClub[]> {
-  if (slugs.length === 0) return [];
-  const results = await Promise.all(
-    slugs.map(async (slug): Promise<ApiClub | null> => {
-      try {
-        const [detailRes, eventsRes] = await Promise.all([
-          fetch(`${LEGACY_CLUBS_API}/clubs/${slug}`, { next: { revalidate: 3600 } }),
-          fetch(`${LEGACY_CLUBS_API}/clubs/${slug}/events`, { next: { revalidate: 3600 } }),
-        ]);
-        if (!detailRes.ok) return null;
-        const d = (await detailRes.json()) as ApiClub;
-        const events = eventsRes.ok ? ((await eventsRes.json()) as ClubEvent[]) : [];
-        return { ...d, events: Array.isArray(events) ? events : [] };
-      } catch {
-        return null;
-      }
-    }),
-  );
-  return results.filter((c): c is ApiClub => !!c && !!c.slug);
-}
-
 async function getAllClubs(): Promise<{ clubs: DiscoverHit[]; cityFacets: { value: string; count: number }[] }> {
   try {
     const firstRes = await fetch(
@@ -269,7 +238,7 @@ export default async function ClubsPage() {
     .slice(0, 5)
     .map((c) => c.slug)
     .filter((s): s is string => Boolean(s));
-  const featuredFull = await getFeaturedFull(featuredSlugs);
+  const featuredFull = await fetchFeaturedFull(featuredSlugs);
   const membershipBySlug: Record<string, MyClubMembership> = {};
   const claimBySlug: Record<string, MyClubClaim> = {};
   for (const c of myClubs) {
