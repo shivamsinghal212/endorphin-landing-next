@@ -9,8 +9,8 @@ const fraunces = Fraunces({ subsets: ['latin'], weight: ['400', '500', '600', '7
 
 export const metadata: Metadata = {
   title: { default: 'Endorfin — Find Running Events, Marathons & 10Ks in India', template: '%s | Endorfin' },
-  description: 'Discover 500+ running events across India. Find marathons, half marathons, 10K & 5K events near you. RSVP instantly, create community runs, and connect with runners.',
-  keywords: ['running events India', 'marathon India', 'half marathon', '10K run', '5K run', 'running app', 'running event finder', 'marathon near me', 'running events Mumbai', 'running events Delhi', 'running events Bangalore', 'community runs', 'trail running India', 'fun run', 'event registration', 'running community'],
+  description: "India's platform for run clubs and running events. Find verified clubs near you, RSVP to the next group run, and discover 500+ marathons, 10K & 5K events.",
+  keywords: ['run clubs India', 'run clubs near me', 'run clubs in Delhi', 'run clubs in Mumbai', 'run clubs in Bangalore', 'running club', 'join a run club', 'running events India', 'marathon India', 'half marathon', '10K run', '5K run', 'running app', 'running event finder', 'marathon near me', 'running events Mumbai', 'running events Delhi', 'running events Bangalore', 'community runs', 'trail running India', 'fun run', 'event registration', 'running community'],
   authors: [{ name: 'Endorfin' }],
   robots: { index: true, follow: true, 'max-image-preview': 'large', 'max-snippet': -1 },
   alternates: { canonical: 'https://www.endorfin.run/' },
@@ -18,7 +18,7 @@ export const metadata: Metadata = {
     type: 'website',
     url: 'https://www.endorfin.run/',
     title: 'Endorfin — Find Running Events, Marathons & 10Ks in India',
-    description: 'Discover 500+ running events across India. Find marathons, half marathons, 10K & 5K events near you. RSVP instantly and connect with runners.',
+    description: "India's platform for run clubs and running events. Find verified clubs near you, RSVP to the next group run, and discover 500+ marathons, 10K & 5K events.",
     siteName: 'Endorfin',
     locale: 'en_IN',
     images: [{ url: 'https://www.endorfin.run/og-image.png', width: 1200, height: 630 }],
@@ -26,7 +26,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Endorfin — Find Running Events & Marathons in India',
-    description: 'Discover 500+ running events across India. Find marathons, half marathons, 10K & 5K events near you. RSVP instantly and connect with runners.',
+    description: "India's platform for run clubs and running events. Find verified clubs near you, RSVP to the next group run, and discover 500+ marathons, 10K & 5K events.",
     images: ['https://www.endorfin.run/og-image.png'],
     site: '@endorfinapp',
   },
@@ -38,39 +38,70 @@ export const metadata: Metadata = {
   },
 };
 
-const appJsonLd = {
-  '@context': 'https://schema.org',
-  '@type': 'MobileApplication',
-  name: 'Endorfin',
-  url: 'https://www.endorfin.run',
-  applicationCategory: 'SportsApplication',
+// One app, two store listings. Each MobileApplication node carries the
+// aggregateRating for its own store so the figure matches a verifiable
+// source (Play Store / App Store) — Google surfaces whichever fits the
+// query. Shared fields flow through buildAppJsonLd to stay in sync.
+function buildAppJsonLd({
+  operatingSystem,
+  ratingValue,
+  ratingCount,
+  storeUrl,
+}: {
+  operatingSystem: string;
+  ratingValue: string;
+  ratingCount: string;
+  storeUrl: string;
+}) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'MobileApplication',
+    name: 'Endorfin',
+    url: 'https://www.endorfin.run',
+    applicationCategory: 'SportsApplication',
+    operatingSystem,
+    description: "India's platform for run clubs and running events. Discover verified run clubs in your city, join the next group run, and browse 500+ marathons, half marathons, 10K and 5K events. RSVP instantly, host community runs, and connect with runners.",
+    featureList: [
+      'Verified run club directory across 25+ Indian cities',
+      'Discover and join local run clubs',
+      'Running event discovery — marathons, half marathons, 10K & 5K',
+      'One-tap RSVP for club runs and events',
+      'Create and host community runs',
+      'Per-event and club discussion threads',
+      'Runner social profiles and following',
+      'City-based smart search and filters',
+      'Push notifications for new runs and events',
+    ],
+    screenshot: 'https://www.endorfin.run/og-image.png',
+    aggregateRating: {
+      '@type': 'AggregateRating',
+      ratingValue,
+      bestRating: '5',
+      ratingCount,
+    },
+    offers: {
+      '@type': 'Offer',
+      price: '0',
+      priceCurrency: 'INR',
+      url: storeUrl,
+    },
+    installUrl: storeUrl,
+  };
+}
+
+const appJsonLdAndroid = buildAppJsonLd({
   operatingSystem: 'Android',
-  description: 'Discover 500+ running events across India. Find marathons, half marathons, 10K and 5K events near you. RSVP instantly, create community runs, and connect with runners.',
-  featureList: [
-    'Running event discovery across 25+ Indian cities',
-    'One-tap RSVP for marathons and running events',
-    'Create and host community runs',
-    'Per-event discussion threads',
-    'Runner social profiles and following',
-    'City-based smart search and filters',
-    'Push notifications for new events',
-    'Curated event feed',
-  ],
-  screenshot: 'https://www.endorfin.run/og-image.png',
-  aggregateRating: {
-    '@type': 'AggregateRating',
-    ratingValue: '4.8',
-    bestRating: '5',
-    ratingCount: '120',
-  },
-  offers: {
-    '@type': 'Offer',
-    price: '0',
-    priceCurrency: 'INR',
-    url: 'https://play.google.com/store/apps/details?id=com.endorfin.app',
-  },
-  installUrl: 'https://play.google.com/store/apps/details?id=com.endorfin.app',
-};
+  ratingValue: '4.8',
+  ratingCount: '120',
+  storeUrl: 'https://play.google.com/store/apps/details?id=com.endorfin.app',
+});
+
+const appJsonLdIos = buildAppJsonLd({
+  operatingSystem: 'iOS',
+  ratingValue: '4.7',
+  ratingCount: '87',
+  storeUrl: 'https://apps.apple.com/app/endorfin/id6762107286',
+});
 
 const orgJsonLd = {
   '@context': 'https://schema.org',
@@ -83,7 +114,7 @@ const orgJsonLd = {
     width: 512,
     height: 512,
   },
-  description: "India's running community app. Discover events, RSVP instantly, and build your running crew.",
+  description: "India's platform for run clubs and running events. Discover clubs and events, RSVP instantly, and build your running community.",
   contactPoint: {
     '@type': 'ContactPoint',
     email: 'hello@endorfin.run',
@@ -102,7 +133,7 @@ const websiteJsonLd = {
   '@type': 'WebSite',
   name: 'Endorfin',
   url: 'https://www.endorfin.run',
-  description: 'Discover 500+ running events across India. Find marathons, half marathons, 10K and 5K events near you.',
+  description: "India's platform for run clubs and running events. Find verified clubs near you and discover 500+ marathons, 10K & 5K events.",
   inLanguage: 'en-IN',
   potentialAction: {
     '@type': 'SearchAction',
@@ -149,7 +180,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
-            __html: JSON.stringify(appJsonLd).replace(/</g, '\\u003c'),
+            __html: JSON.stringify(appJsonLdAndroid).replace(/</g, '\\u003c'),
+          }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(appJsonLdIos).replace(/</g, '\\u003c'),
           }}
         />
         <script

@@ -76,10 +76,10 @@ export async function generateMetadata(
   const page = getClubCityPage(city);
   if (!page) return { title: 'Not found' };
 
-  const title = `Run clubs in ${page.name} — every crew, listed`;
+  const title = `Run clubs in ${page.name} — India's most happening clubs`;
   const socialTitle = `${title} | Endorfin`;
   const description =
-    `Find a run club in ${page.name}. A verified directory of morning crews, ` +
+    `Find a run club in ${page.name}. A verified directory of run clubs, ` +
     `marathon training groups, and weekend trail collectives across ${page.name}. ` +
     `RSVP to the next club run with Endorfin.`;
   const url = `${SITE}/run-clubs/${page.slug}`;
@@ -175,8 +175,8 @@ function buildJsonLd(
     '@type': 'ItemList',
     name: `Run Clubs in ${page.name}`,
     description:
-      `A verified directory of run clubs in ${page.name} — morning crews, ` +
-      `marathon training groups, and trail collectives.`,
+      `A verified directory of run clubs in ${page.name} — marathon ` +
+      `training groups and weekend trail collectives.`,
     url,
     numberOfItems: clubs.length,
     itemListElement: clubs.slice(0, 30).map((c, i) => ({
