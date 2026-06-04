@@ -11,6 +11,7 @@ import {
   filterRacesForCityScope,
   passesQualityGate,
 } from '@/lib/race-city-pages';
+import { fetchAllClubsList } from '@/lib/clubs-list';
 
 const SITE = 'https://www.endorfin.run';
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE || 'https://api.endorfin.run';
@@ -69,39 +70,35 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${SITE}/support`, lastModified: new Date('2026-04-10'), changeFrequency: 'yearly', priority: 0.3 },
   ];
 
-  try {
-    const res = await fetch(`${API_BASE}/api/v1/clubs`, { next: { revalidate: 3600 } });
-    if (res.ok) {
-      const allClubs = (await res.json()) as ListedClub[];
-      // Drop unpublished clubs: /clubs/[slug] sets robots:noindex for them,
-      // so emitting them in the sitemap wastes Googlebot's crawl budget on
-      // pages it isn't allowed to index.
-      const clubs = allClubs.filter((c) => c.publishedAt);
-      for (const c of clubs) {
-        staticRoutes.push({
-          url: `${SITE}/clubs/${c.slug}`,
-          lastModified: c.updatedAt ? new Date(c.updatedAt) : new Date(),
-          changeFrequency: 'weekly',
-          priority: 0.8,
-        });
-      }
+  // Paginated: the list endpoint caps at 50/page, so a single fetch would
+  // drop every club past the first 50 from the sitemap (and undercount the
+  // city landers below). fetchAllClubsList swallows its own errors and
+  // returns what it has, so a backend hiccup just ships fewer entries.
+  const allClubs = await fetchAllClubsList<ListedClub>();
+  // Drop unpublished clubs: /clubs/[slug] sets robots:noindex for them,
+  // so emitting them in the sitemap wastes Googlebot's crawl budget on
+  // pages it isn't allowed to index.
+  const clubs = allClubs.filter((c) => c.publishedAt);
+  for (const c of clubs) {
+    staticRoutes.push({
+      url: `${SITE}/clubs/${c.slug}`,
+      lastModified: c.updatedAt ? new Date(c.updatedAt) : new Date(),
+      changeFrequency: 'weekly',
+      priority: 0.8,
+    });
+  }
 
-      // SEO city landers — only emit a page when the city has enough clubs
-      // to avoid thin/doorway content.
-      for (const page of CLUB_CITY_PAGES) {
-        const matched = clubsForCityPage(clubs, page);
-        if (matched.length < MIN_CLUBS_PER_CITY) continue;
-        staticRoutes.push({
-          url: `${SITE}/run-clubs/${page.slug}`,
-          lastModified: new Date(),
-          changeFrequency: 'weekly',
-          priority: 0.85,
-        });
-      }
-    }
-  } catch {
-    // If the backend is unreachable at build/revalidate time, ship the
-    // static routes rather than failing the sitemap entirely.
+  // SEO city landers — only emit a page when the city has enough clubs
+  // to avoid thin/doorway content.
+  for (const page of CLUB_CITY_PAGES) {
+    const matched = clubsForCityPage(clubs, page);
+    if (matched.length < MIN_CLUBS_PER_CITY) continue;
+    staticRoutes.push({
+      url: `${SITE}/run-clubs/${page.slug}`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly',
+      priority: 0.85,
+    });
   }
 
   // Race city × scope SEO landers. Fetched separately so a clubs-API

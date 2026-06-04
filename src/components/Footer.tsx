@@ -15,6 +15,7 @@ import {
   passesQualityGate,
   type RaceScope,
 } from '@/lib/race-city-pages';
+import { fetchAllClubsList } from '@/lib/clubs-list';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE || 'https://api.endorfin.run';
 const SITE = 'https://www.endorfin.run';
@@ -41,17 +42,11 @@ const INSTAGRAM_URL = 'https://www.instagram.com/hacknflex/';
 
 type ListedClub = { slug: string; name: string; city: string };
 
-async function fetchClubs(): Promise<ListedClub[]> {
-  try {
-    const res = await fetch(`${API_BASE}/api/v1/clubs`, {
-      next: { revalidate: 3600 },
-    });
-    if (!res.ok) return [];
-    const data = (await res.json()) as ListedClub[];
-    return Array.isArray(data) ? data : [];
-  } catch {
-    return [];
-  }
+// Paginated via fetchAllClubsList: the list endpoint caps at 50/page, so a
+// single fetch would hide clubs past the first 50 and undercount the SEO
+// city links below (the bug that 404'd /run-clubs/gurgaon).
+function fetchClubs(): Promise<ListedClub[]> {
+  return fetchAllClubsList<ListedClub>();
 }
 
 async function fetchRaces(): Promise<ApiEvent[]> {

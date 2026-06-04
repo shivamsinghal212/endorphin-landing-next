@@ -3,16 +3,16 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-import type { ApiClub, ClubEvent } from '@/app/clubs/page';
+import type { ApiClub } from '@/app/clubs/page';
 import {
   CLUB_CITY_PAGES,
   MIN_CLUBS_PER_CITY,
   clubsForCityPage,
   getClubCityPage,
 } from '@/lib/club-city-pages';
+import { fetchAllClubsList } from '@/lib/clubs-list';
 
 const SITE = 'https://www.endorfin.run';
-const API_BASE = 'https://api.endorfin.run';
 
 export const revalidate = 3600;
 // dynamicParams left at default (true): unknown slugs render on-demand and
@@ -20,46 +20,14 @@ export const revalidate = 3600;
 // >= MIN_CLUBS_PER_CITY) is the authoritative gate. Keeps dev rendering
 // working even when generateStaticParams ran with a transient API miss.
 
-interface ListedClub {
-  slug: string;
-  name: string;
-  city: string;
-  updatedAt?: string | null;
-}
-
+// The list endpoint already carries every field the city cards + JSON-LD
+// render (city, logo, header, tags, establishedYear, stats.members), so we
+// no longer N+1 the per-club detail/events endpoints just to filter by
+// city. fetchAllClubsList paginates past the 50-per-page cap — without it,
+// cities whose clubs sit on page 2+ (e.g. Gurgaon) under-counted and 404'd.
 async function getClubs(): Promise<ApiClub[]> {
-  try {
-    const res = await fetch(`${API_BASE}/api/v1/clubs`, {
-      next: { revalidate: 3600 },
-    });
-    if (!res.ok) return [];
-    const listed = (await res.json()) as ListedClub[];
-    if (!Array.isArray(listed) || listed.length === 0) return [];
-
-    const settled = await Promise.all(
-      listed.map(async (c): Promise<ApiClub | null> => {
-        try {
-          const [detailRes, eventsRes] = await Promise.all([
-            fetch(`${API_BASE}/api/v1/clubs/${c.slug}`, {
-              next: { revalidate: 3600 },
-            }),
-            fetch(`${API_BASE}/api/v1/clubs/${c.slug}/events`, {
-              next: { revalidate: 3600 },
-            }),
-          ]);
-          if (!detailRes.ok) return null;
-          const d = (await detailRes.json()) as ApiClub;
-          const events = eventsRes.ok ? ((await eventsRes.json()) as ClubEvent[]) : [];
-          return { ...d, events: Array.isArray(events) ? events : [] };
-        } catch {
-          return null;
-        }
-      }),
-    );
-    return settled.filter((c): c is ApiClub => !!c && !!c.slug);
-  } catch {
-    return [];
-  }
+  const clubs = await fetchAllClubsList<ApiClub>();
+  return clubs.filter((c) => !!c.slug);
 }
 
 export async function generateStaticParams() {
