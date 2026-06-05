@@ -38,70 +38,50 @@ export const metadata: Metadata = {
   },
 };
 
-// One app, two store listings. Each MobileApplication node carries the
-// aggregateRating for its own store so the figure matches a verifiable
-// source (Play Store / App Store) — Google surfaces whichever fits the
-// query. Shared fields flow through buildAppJsonLd to stay in sync.
-function buildAppJsonLd({
-  operatingSystem,
-  ratingValue,
-  ratingCount,
-  storeUrl,
-}: {
-  operatingSystem: string;
-  ratingValue: string;
-  ratingCount: string;
-  storeUrl: string;
-}) {
-  return {
-    '@context': 'https://schema.org',
-    '@type': 'MobileApplication',
-    name: 'Endorfin',
-    url: 'https://www.endorfin.run',
-    applicationCategory: 'SportsApplication',
-    operatingSystem,
-    description: "India's platform for run clubs and running events. Discover verified run clubs in your city, join the next group run, and browse 500+ marathons, half marathons, 10K and 5K events. RSVP instantly, host community runs, and connect with runners.",
-    featureList: [
-      'Verified run club directory across 25+ Indian cities',
-      'Discover and join local run clubs',
-      'Running event discovery — marathons, half marathons, 10K & 5K',
-      'One-tap RSVP for club runs and events',
-      'Create and host community runs',
-      'Per-event and club discussion threads',
-      'Runner social profiles and following',
-      'City-based smart search and filters',
-      'Push notifications for new runs and events',
-    ],
-    screenshot: 'https://www.endorfin.run/og-image.png',
-    aggregateRating: {
-      '@type': 'AggregateRating',
-      ratingValue,
-      bestRating: '5',
-      ratingCount,
-    },
-    offers: {
-      '@type': 'Offer',
-      price: '0',
-      priceCurrency: 'INR',
-      url: storeUrl,
-    },
-    installUrl: storeUrl,
-  };
-}
+// ONE app = ONE MobileApplication node. It's a single product available on
+// two stores, so it must be a single schema entity — splitting it into
+// per-store nodes with the same name+url but different aggregateRating reads
+// as one entity with contradictory ratings, and Google drops the rating rich
+// result. Both platforms go in `operatingSystem`; both store listings are
+// associated via `sameAs`. The aggregateRating mirrors the Play Store figure.
+const PLAY_STORE_URL = 'https://play.google.com/store/apps/details?id=com.endorfin.app';
+const APP_STORE_URL = 'https://apps.apple.com/app/endorfin/id6762107286';
 
-const appJsonLdAndroid = buildAppJsonLd({
-  operatingSystem: 'Android',
-  ratingValue: '4.8',
-  ratingCount: '120',
-  storeUrl: 'https://play.google.com/store/apps/details?id=com.endorfin.app',
-});
-
-const appJsonLdIos = buildAppJsonLd({
-  operatingSystem: 'iOS',
-  ratingValue: '4.7',
-  ratingCount: '87',
-  storeUrl: 'https://apps.apple.com/app/endorfin/id6762107286',
-});
+const appJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'MobileApplication',
+  name: 'Endorfin',
+  url: 'https://www.endorfin.run',
+  applicationCategory: 'SportsApplication',
+  operatingSystem: 'Android, iOS',
+  description: "India's platform for run clubs and running events. Discover verified run clubs in your city, join the next group run, and browse 500+ marathons, half marathons, 10K and 5K events. RSVP instantly, host community runs, and connect with runners.",
+  featureList: [
+    'Verified run club directory across 25+ Indian cities',
+    'Discover and join local run clubs',
+    'Running event discovery — marathons, half marathons, 10K & 5K',
+    'One-tap RSVP for club runs and events',
+    'Create and host community runs',
+    'Per-event and club discussion threads',
+    'Runner social profiles and following',
+    'City-based smart search and filters',
+    'Push notifications for new runs and events',
+  ],
+  screenshot: 'https://www.endorfin.run/og-image.png',
+  aggregateRating: {
+    '@type': 'AggregateRating',
+    ratingValue: '4.8',
+    bestRating: '5',
+    ratingCount: '120',
+  },
+  offers: {
+    '@type': 'Offer',
+    price: '0',
+    priceCurrency: 'INR',
+    url: PLAY_STORE_URL,
+  },
+  installUrl: PLAY_STORE_URL,
+  sameAs: [PLAY_STORE_URL, APP_STORE_URL],
+};
 
 const orgJsonLd = {
   '@context': 'https://schema.org',
@@ -180,13 +160,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
-            __html: JSON.stringify(appJsonLdAndroid).replace(/</g, '\\u003c'),
-          }}
-        />
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify(appJsonLdIos).replace(/</g, '\\u003c'),
+            __html: JSON.stringify(appJsonLd).replace(/</g, '\\u003c'),
           }}
         />
         <script
