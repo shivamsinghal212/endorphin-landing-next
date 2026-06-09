@@ -588,8 +588,15 @@ export interface MyMembership {
 export const getMyMembership = (token: string, slug: string) =>
   clubFetch<MyMembership>(`/clubs/${encodeURIComponent(slug)}/my-membership`, token);
 
-export const listMyClubs = (token: string, role: 'admin' | 'all' = 'admin') =>
-  clubFetch<Club[]>(`/clubs/mine?role=${role}`, token);
+export const listMyClubs = (
+  token: string,
+  role: 'admin' | 'all' = 'admin',
+  allClubs = false,
+) =>
+  clubFetch<Club[]>(
+    `/clubs/mine?role=${role}${allClubs ? '&all_clubs=true' : ''}`,
+    token,
+  );
 
 export const patchClub = (token: string, slug: string, patch: Record<string, unknown>) =>
   clubFetch<Club>(`/clubs/${encodeURIComponent(slug)}`, token, {

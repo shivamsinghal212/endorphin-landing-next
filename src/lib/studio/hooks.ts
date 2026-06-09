@@ -44,11 +44,11 @@ export function describeError(e: unknown): string {
 
 // ── Queries ────────────────────────────────────────────────────────────────
 
-export function useMyClubs(role: 'admin' | 'all' = 'admin') {
+export function useMyClubs(role: 'admin' | 'all' = 'admin', allClubs = false) {
   const token = useAdminToken();
   return useQuery({
-    queryKey: studioKeys.myClubs(role),
-    queryFn: () => listMyClubs(token!, role),
+    queryKey: studioKeys.myClubs(role, allClubs),
+    queryFn: () => listMyClubs(token!, role, allClubs),
     enabled: !!token,
     staleTime: 30_000,
   });

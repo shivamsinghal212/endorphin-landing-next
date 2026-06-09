@@ -1,7 +1,8 @@
 /** React Query keys for the owner Studio surface. Centralised so mutations
  *  can invalidate without typos. */
 export const studioKeys = {
-  myClubs: (role: 'admin' | 'all' = 'admin') => ['studio', 'my-clubs', role] as const,
+  myClubs: (role: 'admin' | 'all' = 'admin', allClubs = false) =>
+    ['studio', 'my-clubs', role, allClubs] as const,
   club: (slug: string) => ['studio', 'club', slug] as const,
   membership: (slug: string) => ['studio', 'membership', slug] as const,
   members: (slug: string) => ['studio', 'members', slug] as const,
