@@ -182,12 +182,17 @@ export function AdminsContent({
         </div>
       )}
 
-      {club.admins && club.admins.length > 0 && (
-        <p className="text-[11px] text-jet/40 mt-4">
-          {club.admins.length} co-admin{club.admins.length === 1 ? '' : 's'} can
-          manage this club.
-        </p>
-      )}
+      {(() => {
+        // Exclude auto-derived owner/admin cards — they mirror the roster above,
+        // they're not hand-curated co-admin cards.
+        const curated = (club.admins ?? []).filter((a) => !a.derived);
+        return curated.length > 0 ? (
+          <p className="text-[11px] text-jet/40 mt-4">
+            {curated.length} co-admin{curated.length === 1 ? '' : 's'} can manage
+            this club.
+          </p>
+        ) : null;
+      })()}
     </ManageShell>
   );
 }

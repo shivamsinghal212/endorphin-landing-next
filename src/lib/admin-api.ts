@@ -285,6 +285,10 @@ export interface ClubAdminPerson {
   whatsappUrl?: string | null;
   instagramUrl?: string | null;
   stravaUrl?: string | null;
+  // Set by the backend for cards auto-derived from the owner/admin membership
+  // roster (not stored in clubs.admins[]). Read-only in the editor and excluded
+  // from the save payload so they're never persisted as curated cards.
+  derived?: boolean;
 }
 
 export type JoinFormFieldType = 'text' | 'textarea' | 'select' | 'number';

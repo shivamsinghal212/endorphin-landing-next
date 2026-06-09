@@ -122,6 +122,9 @@ function buildPayload(
   joinForm: JoinFormField[],
 ): Record<string, unknown> {
   const cleanedAdmins = admins
+    // Drop auto-derived owner/admin cards — they're rendered from the membership
+    // roster at read time and must never be persisted into clubs.admins[].
+    .filter((a) => !a.derived)
     .map((a) => ({
       name: a.name.trim(),
       role: a.role?.trim() || null,
