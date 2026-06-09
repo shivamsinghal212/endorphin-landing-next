@@ -278,6 +278,13 @@ function MobileSectionList({
             club.requiresApproval ? 'Approval required' : 'Free to join'
           } · ${club.joinForm?.length ?? 0} questions`}
         />
+        <DrillRow
+          href={`${base}/collaborations`}
+          label="Brand & Instagram"
+          subtitle={`${club.collaborations?.length ?? 0} partner${
+            (club.collaborations?.length ?? 0) === 1 ? '' : 's'
+          } · sync from Instagram`}
+        />
         <div className="flex items-center gap-3 px-4 py-3.5 opacity-60">
           <div className="flex-1 min-w-0">
             <p className="text-sm font-medium">Insights</p>
@@ -722,6 +729,38 @@ function DesktopBento({
                 <li key={f.id}>· {f.label}{f.required ? ' (required)' : ''}</li>
               ))}
             </ul>
+          )}
+        </Link>
+
+        {/* Brand & Instagram */}
+        <Link
+          href={`${base}/collaborations`}
+          className="col-span-12 lg:col-span-6 rounded-2xl bg-white border border-jet/10 p-5 hover:border-jet/30 transition-colors"
+        >
+          <div className="flex items-center justify-between mb-3">
+            <p className="font-display uppercase text-sm font-bold">
+              Brand &amp; Instagram
+            </p>
+            <span className="text-xs text-signal">Open</span>
+          </div>
+          <p className="text-sm text-jet/70 mb-2">
+            <span className="font-medium">
+              {club.collaborations?.length ?? 0} brand partner
+              {(club.collaborations?.length ?? 0) === 1 ? '' : 's'}
+            </span>{' '}
+            · sync events &amp; partners from Instagram
+          </p>
+          {club.collaborations && club.collaborations.length > 0 && (
+            <div className="flex flex-wrap gap-1.5">
+              {club.collaborations.slice(0, 4).map((c) => (
+                <span
+                  key={c.id}
+                  className="text-[10px] px-2 py-0.5 rounded-full bg-[#F8F6F3] border border-jet/10"
+                >
+                  {c.brandName}
+                </span>
+              ))}
+            </div>
           )}
         </Link>
 

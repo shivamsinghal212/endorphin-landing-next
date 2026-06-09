@@ -10,10 +10,13 @@ import {
   addClubAdmin,
   approveJoinRequest,
   changeMemberRole,
+  createClubCollaboration,
   createClubEvent,
+  deleteClubCollaboration,
   deleteClubEvent,
   getClub,
   getMyMembership,
+  getStudioScrapeHistory,
   kickMember,
   listClubEvents,
   listClubMembers,
@@ -25,6 +28,9 @@ import {
   patchClubEvent,
   rejectJoinRequest,
   removeClubAdmin,
+  triggerStudioScrape,
+  updateClubCollaboration,
+  type ClubCollaborationInput,
 } from '@/lib/admin-api';
 import { studioKeys } from './keys';
 import { useAdminToken } from '@/lib/use-admin-token';
@@ -133,6 +139,67 @@ export function usePatchClub(slug: string) {
       qc.setQueryData(studioKeys.club(slug), club);
       qc.invalidateQueries({ queryKey: studioKeys.myClubs('admin') });
     },
+  });
+}
+
+// ── Brand collaborations ─────────────────────────────────────────────────
+// Reads ride on the club detail (club.collaborations), so all mutations just
+// invalidate the club query.
+
+export function useCreateCollaboration(slug: string) {
+  const token = useAdminToken();
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (body: ClubCollaborationInput) =>
+      createClubCollaboration(token!, slug, body),
+    onSuccess: () => qc.invalidateQueries({ queryKey: studioKeys.club(slug) }),
+  });
+}
+
+export function useUpdateCollaboration(slug: string) {
+  const token = useAdminToken();
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({
+      id,
+      body,
+    }: {
+      id: string;
+      body: Partial<ClubCollaborationInput>;
+    }) => updateClubCollaboration(token!, slug, id, body),
+    onSuccess: () => qc.invalidateQueries({ queryKey: studioKeys.club(slug) }),
+  });
+}
+
+export function useDeleteCollaboration(slug: string) {
+  const token = useAdminToken();
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => deleteClubCollaboration(token!, slug, id),
+    onSuccess: () => qc.invalidateQueries({ queryKey: studioKeys.club(slug) }),
+  });
+}
+
+// ── Instagram re-sync ────────────────────────────────────────────────────
+
+export function useStudioScrapeHistory(slug: string, poll = false) {
+  const token = useAdminToken();
+  return useQuery({
+    queryKey: studioKeys.scrapeHistory(slug),
+    queryFn: () => getStudioScrapeHistory(token!, slug),
+    enabled: !!slug && !!token,
+    // While a run is pending the page asks us to poll for live status.
+    refetchInterval: poll ? 4000 : false,
+  });
+}
+
+export function useTriggerScrape(slug: string) {
+  const token = useAdminToken();
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: () => triggerStudioScrape(token!, slug),
+    onSuccess: () =>
+      qc.invalidateQueries({ queryKey: studioKeys.scrapeHistory(slug) }),
   });
 }
 

@@ -604,6 +604,74 @@ export const patchClub = (token: string, slug: string, patch: Record<string, unk
     body: JSON.stringify(patch),
   });
 
+// ── Brand collaborations (Studio CRUD) ──────────────────────────────────────
+// Reads arrive on the club detail (club.collaborations); these mutate. All
+// authorised by club membership (owner/admin) or platform admin.
+
+export interface ClubCollaborationInput {
+  brandName: string;
+  role?: string | null;
+  handle?: string | null;
+  logoUrl?: string | null;
+  evidencePostUrl?: string | null;
+}
+
+export const createClubCollaboration = (
+  token: string,
+  slug: string,
+  body: ClubCollaborationInput,
+) =>
+  clubFetch<ClubCollaboration>(
+    `/clubs/${encodeURIComponent(slug)}/collaborations`,
+    token,
+    { method: 'POST', body: JSON.stringify(body) },
+  );
+
+export const updateClubCollaboration = (
+  token: string,
+  slug: string,
+  collabId: string,
+  body: Partial<ClubCollaborationInput>,
+) =>
+  clubFetch<ClubCollaboration>(
+    `/clubs/${encodeURIComponent(slug)}/collaborations/${encodeURIComponent(collabId)}`,
+    token,
+    { method: 'PATCH', body: JSON.stringify(body) },
+  );
+
+export const deleteClubCollaboration = (
+  token: string,
+  slug: string,
+  collabId: string,
+) =>
+  clubFetch<void>(
+    `/clubs/${encodeURIComponent(slug)}/collaborations/${encodeURIComponent(collabId)}`,
+    token,
+    { method: 'DELETE' },
+  );
+
+// ── Club-scoped Instagram re-sync (Studio) ──────────────────────────────────
+// Refetches this club's IG using its stored instagram_url. Authorised by
+// membership — distinct from the platform-admin /admin/clubs/scrape.
+
+export interface StudioScrapeResponse {
+  ok: boolean;
+  instagramUsername: string;
+}
+
+export const triggerStudioScrape = (token: string, slug: string) =>
+  clubFetch<StudioScrapeResponse>(
+    `/clubs/${encodeURIComponent(slug)}/scrape`,
+    token,
+    { method: 'POST' },
+  );
+
+export const getStudioScrapeHistory = (token: string, slug: string, limit = 20) =>
+  clubFetch<{ runs: ClubScrapeRun[] }>(
+    `/clubs/${encodeURIComponent(slug)}/scrape/history?limit=${limit}`,
+    token,
+  );
+
 // ── Members + join requests ────────────────────────────────────────────────
 
 export interface ClubMember {

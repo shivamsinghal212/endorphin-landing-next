@@ -12,4 +12,5 @@ export const studioKeys = {
   event: (slug: string, eventId: string) => ['studio', 'event', slug, eventId] as const,
   rsvps: (slug: string, eventId: string) => ['studio', 'rsvps', slug, eventId] as const,
   rsvpSummary: (slug: string) => ['studio', 'rsvp-summary', slug] as const,
+  scrapeHistory: (slug: string) => ['studio', 'scrape-history', slug] as const,
 };

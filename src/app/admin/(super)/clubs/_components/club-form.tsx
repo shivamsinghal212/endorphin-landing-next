@@ -19,6 +19,7 @@ import { CheckboxField, Field } from './field';
 import { ImageUploadField } from './image-upload';
 import { TagsField } from './tags-field';
 import { AdminsEditor } from './admins-editor';
+import { CollaborationsEditor } from './collaborations-editor';
 import { JoinFormEditor } from './join-form-editor';
 
 // ── form state shape (mirrors ClubIn on the server) ───────────────────────
@@ -472,46 +473,22 @@ export function ClubFormContent({
           </Card>
 
           {!isNew && initialClub && (
-            <Card title="Instagram scrape">
-              <p className="font-body text-xs text-jet/50">
-                {initialClub.lastScrapedAt
-                  ? `Last scraped ${new Date(initialClub.lastScrapedAt).toLocaleString()}`
-                  : 'Never scraped — run scripts/scrape_instagram_club.py to pull data from Instagram.'}
-              </p>
-              {initialClub.collaborations && initialClub.collaborations.length > 0 && (
-                <div className="mt-3">
-                  <p className="font-body text-xs font-medium text-jet/50 mb-2">
-                    Brand collaborations ({initialClub.collaborations.length})
-                  </p>
-                  <ul className="space-y-2 max-h-72 overflow-y-auto pr-1">
-                    {initialClub.collaborations.map((c) => (
-                      <li
-                        key={c.id}
-                        className="rounded-lg border border-jet/10 p-2 font-body text-xs"
-                      >
-                        <div className="flex items-center justify-between gap-2">
-                          <span className="font-medium text-jet truncate">{c.brandName}</span>
-                          {c.handle && (
-                            <a
-                              href={`https://instagram.com/${c.handle.replace(/^@/, '')}`}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="text-jet/40 hover:text-jet hover:underline shrink-0"
-                            >
-                              {c.handle}
-                            </a>
-                          )}
-                        </div>
-                        {c.role && <div className="text-jet/60">{c.role}</div>}
-                      </li>
-                    ))}
-                  </ul>
-                  <p className="mt-2 font-body text-xs text-jet/40">
-                    Read-only — managed by the scraper.
-                  </p>
-                </div>
-              )}
-            </Card>
+            <>
+              <Card title="Instagram scrape">
+                <p className="font-body text-xs text-jet/50">
+                  {initialClub.lastScrapedAt
+                    ? `Last scraped ${new Date(initialClub.lastScrapedAt).toLocaleString()}`
+                    : 'Never scraped — run scripts/scrape_instagram_club.py to pull data from Instagram.'}
+                </p>
+              </Card>
+
+              <Card title="Brand collaborations">
+                <CollaborationsEditor
+                  slug={initialClub.slug}
+                  initial={initialClub.collaborations ?? []}
+                />
+              </Card>
+            </>
           )}
 
           {!isNew && (
