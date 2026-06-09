@@ -1,13 +1,16 @@
 'use client';
 
+import Link from 'next/link';
 import { useState } from 'react';
 import type { Club } from '@/lib/admin-api';
 import type { MyMembership } from '@/lib/api';
 import type { ClubEvent } from '../page';
 import { RsvpButton } from './rsvp-button';
 import { ReminderButton } from '@/components/ReminderButton';
+import ShareEventButton from '@/components/ShareEventButton';
 
 const TZ = 'Asia/Kolkata';
+const SITE = 'https://www.endorfin.run';
 const INITIAL_VISIBLE = 5;
 
 function parseDate(iso: string | null | undefined): Date | null {
@@ -124,6 +127,13 @@ function UpcomingRow({
   const isRace = event.eventType === 'race_event';
   const tagLabel = isRace ? 'Race event' : 'Club run';
   const meta = [event.locationName, fmtTime(event.startTime)].filter(Boolean).join(' · ');
+  const eventPath = `/clubs/${slug}/events/${event.slug || event.id}`;
+  const shareDateLabel = [
+    fmtIn(event.startTime, { weekday: 'short', day: 'numeric', month: 'short' }),
+    fmtTime(event.startTime),
+  ]
+    .filter(Boolean)
+    .join(' · ');
 
   // Only render the expand affordance if there's something worth showing
   // beyond what the compact row already covers.
@@ -197,6 +207,18 @@ function UpcomingRow({
             isAuthed={isAuthed}
             variant="compact"
           />
+          {!isRace && (
+            <ShareEventButton
+              url={`${SITE}${eventPath}`}
+              title={event.title}
+              dateLabel={shareDateLabel}
+              locationLabel={event.locationName}
+              clubName={clubName}
+              eventSlug={event.slug || event.id}
+              source="club_page_list"
+              variant="icon"
+            />
+          )}
         </div>
       </div>
       {hasExtra && expanded && (
@@ -215,6 +237,14 @@ function UpcomingRow({
           )}
           {description && (
             <p className="upcoming-row-description">{description}</p>
+          )}
+          {!isRace && (
+            <Link
+              href={eventPath}
+              className="inline-block mt-3 text-[13px] font-medium text-signal hover:underline underline-offset-2"
+            >
+              View event page →
+            </Link>
           )}
         </div>
       )}

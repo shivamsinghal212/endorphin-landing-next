@@ -53,6 +53,57 @@ async function fetchAllRaces(): Promise<ApiEvent[]> {
   );
 }
 
+type ListedClubEvent = {
+  id: string;
+  slug: string | null;
+  startTime: string;
+  updatedAt: string | null;
+};
+
+/**
+ * Fetch each club's *future* events for the sitemap. One request per club,
+ * run in bounded chunks so we never open hundreds of sockets at once. Each
+ * fetch swallows its own errors, so a single slow club just contributes no
+ * entries rather than failing the whole sitemap. Past events are dropped —
+ * their pages still resolve but carry no crawl value once they're over.
+ */
+async function fetchClubEventUrls(
+  clubs: ListedClub[],
+): Promise<MetadataRoute.Sitemap> {
+  const CHUNK = 8;
+  const cutoff = Date.now() - 86_400_000;
+  const out: MetadataRoute.Sitemap = [];
+
+  for (let i = 0; i < clubs.length; i += CHUNK) {
+    const chunk = clubs.slice(i, i + CHUNK);
+    const results = await Promise.all(
+      chunk.map(async (club) => {
+        try {
+          const res = await fetch(
+            `${API_BASE}/api/v1/clubs/${encodeURIComponent(club.slug)}/events`,
+            { next: { revalidate: 3600 } },
+          );
+          if (!res.ok) return [] as MetadataRoute.Sitemap;
+          const events = (await res.json()) as ListedClubEvent[];
+          if (!Array.isArray(events)) return [] as MetadataRoute.Sitemap;
+          return events
+            .filter((e) => e.startTime && new Date(e.startTime).getTime() >= cutoff)
+            .map((e) => ({
+              url: `${SITE}/clubs/${club.slug}/events/${e.slug || e.id}`,
+              lastModified: e.updatedAt ? new Date(e.updatedAt) : new Date(e.startTime),
+              changeFrequency: 'weekly' as const,
+              priority: 0.7,
+            }));
+        } catch {
+          return [] as MetadataRoute.Sitemap;
+        }
+      }),
+    );
+    for (const r of results) out.push(...r);
+  }
+  return out;
+}
+
 // Cached at edge for 1h so the sitemap isn't hammered by crawlers.
 export const revalidate = 3600;
 
@@ -87,6 +138,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.8,
     });
   }
+
+  // Individual upcoming club-event pages — emitted so Google indexes the
+  // shareable RSVP pages directly instead of waiting to crawl them via
+  // internal links.
+  const clubEventUrls = await fetchClubEventUrls(clubs);
+  staticRoutes.push(...clubEventUrls);
 
   // SEO city landers — only emit a page when the city has enough clubs
   // to avoid thin/doorway content.
