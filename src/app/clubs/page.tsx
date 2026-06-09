@@ -56,6 +56,9 @@ export interface ClubEventComment {
 export interface ClubEvent {
   id: string;
   clubId: string;
+  // Public-URL slug for the shareable event page. NULL on legacy rows not yet
+  // backfilled — callers fall back to `id`. Build links with `slug || id`.
+  slug: string | null;
   title: string;
   description: string | null;
   locationName: string | null;

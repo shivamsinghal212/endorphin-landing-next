@@ -396,6 +396,8 @@ export interface ClubEventComment {
 export interface ClubEvent {
   id: string;
   clubId: string;
+  // Public-URL slug for the shareable event page; null on un-backfilled rows.
+  slug: string | null;
   title: string;
   description: string | null;
   locationName: string | null;

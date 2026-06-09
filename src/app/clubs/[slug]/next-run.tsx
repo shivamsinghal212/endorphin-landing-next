@@ -1,9 +1,13 @@
+import Link from 'next/link';
 import type { CSSProperties } from 'react';
 import type { Club } from '@/lib/admin-api';
 import type { MyMembership } from '@/lib/api';
 import type { ClubEvent } from '../page';
 import { RsvpButton } from './rsvp-button';
 import { ReminderButton } from '@/components/ReminderButton';
+import ShareEventButton from '@/components/ShareEventButton';
+
+const SITE = 'https://www.endorfin.run';
 
 // ─── helpers ────────────────────────────────────────
 
@@ -83,6 +87,8 @@ export function NextRun({
   const distance = event.distanceKm != null ? fmtDistance(event.distanceKm) : '—';
   const where = event.locationName || '—';
   const after = event.recap?.after?.trim() || '';
+  const eventPath = `/clubs/${club.slug}/events/${event.slug || event.id}`;
+  const shareDateLabel = [fmtFullDate(event.startTime), time].filter(Boolean).join(' · ');
 
   const fgStyle: CSSProperties | undefined = hasImage
     ? ({
@@ -177,12 +183,28 @@ export function NextRun({
               initialIsSet={reminderEventIds.has(event.id)}
               isAuthed={isAuthed}
             />
+            <ShareEventButton
+              url={`${SITE}${eventPath}`}
+              title={event.title}
+              dateLabel={shareDateLabel}
+              locationLabel={event.locationName}
+              clubName={club.name}
+              eventSlug={event.slug || event.id}
+              source="club_page_next"
+              variant="icon"
+            />
             {event.goingCount > 0 && (
               <span className="nr-going">
                 <strong>{event.goingCount}</strong> going
               </span>
             )}
           </div>
+          <Link
+            href={eventPath}
+            className="nr-pagelink inline-block mt-3 text-[13px] font-medium text-signal hover:underline underline-offset-2"
+          >
+            View event page →
+          </Link>
         </div>
       </div>
     </section>

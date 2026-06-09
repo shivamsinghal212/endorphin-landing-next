@@ -30,6 +30,8 @@ import {
 } from '../../../../(super)/clubs/_components/image-upload';
 import { VideoUploadField } from '../../../../(super)/clubs/_components/video-upload';
 
+const SITE = 'https://www.endorfin.run';
+
 interface FormState {
   title: string;
   description: string;
@@ -340,6 +342,22 @@ export function EventEditor({
             <p className="px-2.5 py-1 text-xs text-jet/50">
               For <span className="font-medium text-jet">{clubName}</span>
             </p>
+            {!isNew && existing && existing.eventType !== 'race_event' && (
+              <button
+                onClick={async () => {
+                  const url = `${SITE}/clubs/${slug}/events/${existing.slug || existing.id}?utm_source=instagram_bio&utm_medium=bio&utm_campaign=club_event`;
+                  try {
+                    await navigator.clipboard.writeText(url);
+                    toast.success('Link copied — paste it in your Instagram bio');
+                  } catch {
+                    toast.error('Couldn’t copy the link');
+                  }
+                }}
+                className="w-full text-left px-2.5 py-1.5 rounded-md text-jet/70 hover:bg-jet/5 hover:text-jet text-xs"
+              >
+                Copy shareable link
+              </button>
+            )}
             {!isNew && (
               <button
                 onClick={handleDelete}

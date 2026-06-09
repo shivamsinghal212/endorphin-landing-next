@@ -2,12 +2,52 @@
 
 import Link from 'next/link';
 import { useMemo, useState } from 'react';
-import type { Club } from '@/lib/admin-api';
+import { toast } from 'sonner';
+import type { Club, ClubEvent } from '@/lib/admin-api';
 import { describeError, useStudioEvents } from '@/lib/studio/hooks';
 import { ManageShell } from '../_components/manage-shell';
 import { EmptyState, ErrorState, Skeleton } from '../../_components/ui';
 
 type Tab = 'upcoming' | 'past';
+
+const SITE = 'https://www.endorfin.run';
+
+/** Public, shareable URL for an event — UTM-tagged for the Instagram-bio
+ *  use case so bio clicks are attributable. Falls back to the UUID id when
+ *  the slug hasn't been backfilled yet. */
+function shareUrl(clubSlug: string, event: ClubEvent): string {
+  const base = `${SITE}/clubs/${clubSlug}/events/${event.slug || event.id}`;
+  return `${base}?utm_source=instagram_bio&utm_medium=bio&utm_campaign=club_event`;
+}
+
+/** Copy-link affordance for the events list. Sits above the row's navigation
+ *  overlay (z-10) and swallows the click so copying never opens the editor. */
+function CopyLinkButton({ url }: { url: string }) {
+  const onClick = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    try {
+      await navigator.clipboard.writeText(url);
+      toast.success('Link copied — paste it in your Instagram bio');
+    } catch {
+      toast.error('Couldn’t copy the link');
+    }
+  };
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-label="Copy shareable event link"
+      title="Copy shareable link"
+      className="relative z-10 inline-flex items-center justify-center w-8 h-8 rounded-lg border border-jet/15 text-jet/70 hover:bg-jet/5 hover:text-jet"
+    >
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+        <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+      </svg>
+    </button>
+  );
+}
 
 export function EventsListContent({
   slug,
@@ -108,13 +148,19 @@ export function EventsListContent({
             const d = new Date(e.startTime);
             const isLast = i === visible.length - 1;
             return (
-              <Link
+              <div
                 key={e.id}
-                href={`${base}/events/${e.id}`}
-                className={`grid grid-cols-[64px_1fr_auto_auto] gap-3 items-center px-4 py-3 ${
+                className={`relative grid grid-cols-[64px_1fr_auto_auto] gap-3 items-center px-4 py-3 ${
                   isLast ? '' : 'border-b border-jet/5'
                 } hover:bg-jet/[0.015]`}
               >
+                {/* Full-row navigation overlay — keeps the row a single click
+                    target without nesting a button inside an anchor. */}
+                <Link
+                  href={`${base}/events/${e.id}`}
+                  aria-label={`Edit ${e.title}`}
+                  className="absolute inset-0"
+                />
                 <div className="w-12 h-12 rounded-lg bg-jet text-bone flex flex-col items-center justify-center flex-shrink-0">
                   <span className="text-[9px] uppercase tracking-wider">
                     {d.toLocaleDateString('en-IN', { month: 'short' })}
@@ -139,22 +185,27 @@ export function EventsListContent({
                   <span className="font-medium tabular-nums">{e.goingCount}</span>{' '}
                   going
                 </span>
-                <span
-                  className={`text-[10px] px-2 py-0.5 rounded-full font-medium uppercase whitespace-nowrap ${
-                    e.recap
-                      ? 'bg-blue-100 text-blue-800'
+                <div className="flex items-center gap-2 whitespace-nowrap">
+                  {e.eventType !== 'race_event' && (
+                    <CopyLinkButton url={shareUrl(slug, e)} />
+                  )}
+                  <span
+                    className={`text-[10px] px-2 py-0.5 rounded-full font-medium uppercase ${
+                      e.recap
+                        ? 'bg-blue-100 text-blue-800'
+                        : e.eventType === 'race_event'
+                          ? 'bg-amber-100 text-amber-800'
+                          : 'bg-jet/5 text-jet/60'
+                    }`}
+                  >
+                    {e.recap
+                      ? 'Recapped'
                       : e.eventType === 'race_event'
-                        ? 'bg-amber-100 text-amber-800'
-                        : 'bg-jet/5 text-jet/60'
-                  }`}
-                >
-                  {e.recap
-                    ? 'Recapped'
-                    : e.eventType === 'race_event'
-                      ? 'Race'
-                      : 'Run'}
-                </span>
-              </Link>
+                        ? 'Race'
+                        : 'Run'}
+                  </span>
+                </div>
+              </div>
             );
           })}
         </div>
