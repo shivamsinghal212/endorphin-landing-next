@@ -1,0 +1,86 @@
+/* Club event detail page — reuses the club page's `.club-page` design
+ * tokens + the `.nr-*` editorial-poster block. Only the back link, top
+ * spacing, and the optional "extra" block need their own rules. */
+
+.club-page .cep-top,
+.club-page .cep-extra {
+  /* Same fluid gutter the club page sections use, so the back link and
+     address block line up with the poster's left edge. */
+  padding-left: max(28px, calc((100% - var(--container-max)) / 2));
+  padding-right: max(28px, calc((100% - var(--container-max)) / 2));
+}
+
+.club-page .cep-top {
+  padding-top: 28px;
+  padding-bottom: 18px;
+}
+
+.club-page .cep-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-oswald), sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  text-decoration: none;
+  transition: color 0.16s ease;
+}
+.club-page .cep-back:hover {
+  color: var(--red);
+}
+
+.club-page .cep-extra {
+  padding-top: 36px;
+  padding-bottom: 56px;
+}
+.club-page .cep-extra-label {
+  font-family: var(--font-oswald), sans-serif;
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+}
+.club-page .cep-extra-body {
+  font-family: var(--font-poppins), sans-serif;
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--jet);
+  max-width: 60ch;
+}
+
+/* The poster CTA row carries 3 actions here (RSVP + Remind + Share) plus a
+   going count. Normalise the two button families to one height and let them
+   wrap as a left-aligned group rather than pushing RSVP to the far right. */
+.club-page .cep-cta {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.club-page .cep-cta .btn,
+.club-page .cep-cta .v1-remind-btn {
+  height: 48px;
+  margin-left: 0;
+  order: 0;
+}
+.club-page .cep-cta .nr-going {
+  width: 100%;
+  order: -1;
+  margin-bottom: 2px;
+}
+
+/* Small phones: stack the CTAs full-width for comfortable tap targets. */
+@media (max-width: 520px) {
+  .club-page .cep-cta > * {
+    flex: 1 1 100%;
+  }
+  .club-page .cep-cta .btn,
+  .club-page .cep-cta .v1-remind-btn {
+    width: 100%;
+  }
+}

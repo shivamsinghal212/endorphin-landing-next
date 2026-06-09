@@ -865,8 +865,13 @@
 @media (max-width: 860px) {
   .club-page .upcoming { padding: 36px 20px 24px; }
   .club-page .upcoming-title { font-size: 24px; }
-  .club-page .upcoming-row { grid-template-columns: minmax(0, 1fr) auto; gap: 14px; padding: 16px 0; }
+  /* Stack on mobile: content (date + title + meta) on top, action buttons
+     on their own full-width row below. Keeping the 2-col grid here made a
+     long title collide with the RSVP/Remind/Share buttons. */
+  .club-page .upcoming-row { grid-template-columns: 1fr; gap: 12px; padding: 16px 0; }
   .club-page .upcoming-row-trigger { grid-template-columns: 56px minmax(0, 1fr); gap: 14px; }
+  /* Action row sits on its own full-width line, right-aligned. */
+  .club-page .row-actions { justify-content: flex-end; gap: 10px; }
   .club-page .upcoming-row-details { padding-left: 70px; flex-wrap: wrap; }
   .club-page .upcoming-row-flyer { width: 100%; max-width: 100%; aspect-ratio: 4 / 5; }
   /* Going-pill is inlined into the meta line on mobile to save the
@@ -1753,20 +1758,18 @@
 .club-page .nr-cta {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 14px;
+  justify-content: flex-end;
+  gap: 12px;
   flex-wrap: wrap;
 }
 .club-page .nr-cta .btn {
-  height: 46px;
+  height: 48px;
 }
-.club-page .nr-cta .btn,
-.club-page .nr-cta .next-run-rsvp {
-  margin-left: auto;
-  order: 2;
-}
-.club-page .nr-going {
-  order: 1;
+/* All action buttons (RSVP + Remind + Share) stay grouped on the right; the
+   going count is pushed to the far left of the same row. */
+.club-page .nr-cta .nr-going {
+  order: -1;
+  margin-right: auto;
 }
 .club-page .nr-going {
   font-family: var(--font-poppins), sans-serif;
@@ -1827,7 +1830,22 @@
   }
   .club-page .nr-meta dt { font-size: 9px; letter-spacing: 0.2em; margin-bottom: 4px; }
   .club-page .nr-meta dd { font-size: 16px; }
-  .club-page .nr-cta { gap: 12px; }
+  /* Keep all three actions on one right-aligned row; going count rides on
+     its own line above so the buttons never wrap onto a second line. */
+  .club-page .nr-cta { gap: 10px; justify-content: flex-end; }
+  .club-page .nr-cta .nr-going { order: -1; width: 100%; margin-right: 0; }
+}
+
+/* Phones: compact the trio so RSVP + Remind + Share fit one line. */
+@media (max-width: 520px) {
+  .club-page .nr-cta { gap: 8px; }
+  .club-page .nr-cta .btn {
+    height: 42px; padding: 0 13px; font-size: 11px; letter-spacing: 0.06em;
+  }
+  .club-page .nr-cta .v1-remind-btn {
+    height: 42px; padding: 0 11px; font-size: 11px; letter-spacing: 0.06em; gap: 6px;
+  }
+  .club-page .nr-cta .v1-remind-btn svg { width: 14px; height: 14px; }
 }
 
 /* ════════════════════════════════════════════════════════════

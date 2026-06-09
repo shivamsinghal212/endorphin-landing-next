@@ -27,8 +27,8 @@ export interface ShareEventButtonProps {
   clubName?: string | null;
   /** For analytics — which surface the share fired from. */
   source?: string;
-  /** 'button' = full labelled CTA (event page); 'icon' = compact icon-only (lists). */
-  variant?: 'button' | 'icon';
+  /** 'button' = full size (matches Remind Me); 'compact' = shorter (event rows). */
+  variant?: 'button' | 'compact';
   eventSlug?: string;
   className?: string;
 }
@@ -159,6 +159,12 @@ export default function ShareEventButton({
     </svg>
   );
 
+  // Reuse the global Remind-Me button styling so Share sits flush beside it:
+  // bordered ghost, uppercase Oswald, jet→fill on hover. `is-compact` shrinks
+  // it to match the compact reminder button used in event rows.
+  const btnClass =
+    className ?? `v1-remind-btn${variant === 'compact' ? ' is-compact' : ''}`;
+
   return (
     <div ref={wrapRef} className="relative inline-flex">
       <button
@@ -167,15 +173,10 @@ export default function ShareEventButton({
         aria-label="Share this event"
         aria-haspopup="menu"
         aria-expanded={open}
-        className={
-          className ??
-          (variant === 'icon'
-            ? 'inline-flex items-center justify-center w-9 h-9 rounded-lg border border-jet/15 text-jet hover:bg-jet/5'
-            : 'inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-jet/15 text-jet text-sm font-medium hover:bg-jet/5')
-        }
+        className={btnClass}
       >
         {ShareIcon}
-        {variant === 'button' && 'Share'}
+        <span className="v1-remind-label">Share</span>
       </button>
 
       {open && (

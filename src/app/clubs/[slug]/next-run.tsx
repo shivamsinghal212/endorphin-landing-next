@@ -116,9 +116,15 @@ export function NextRun({
               height={1500}
             />
             <div className="nr-photo-scrim" aria-hidden="true" />
+            {/* Whole flyer is clickable → event detail page. */}
+            <Link
+              href={eventPath}
+              aria-label={`View ${titleClean}`}
+              className="absolute inset-0 z-10"
+            />
           </div>
         ) : (
-          <div className="nr-empty">
+          <Link href={eventPath} aria-label={`View ${titleClean}`} className="nr-empty">
             <div className="nr-empty-date" aria-hidden="true">
               <span className="nr-empty-weekday">{fmtWeekdayShort(event.startTime)}</span>
               <span className="nr-empty-num">{fmtDayNum(event.startTime)}</span>
@@ -128,15 +134,20 @@ export function NextRun({
             <span className="nr-empty-stencil">
               {[event.locationName, time].filter(Boolean).join(' · ')}
             </span>
-          </div>
+          </Link>
         )}
 
         <div className="nr-content">
           <div className="nr-content-top">
             {kicker && <span className="nr-kicker">{kicker}</span>}
             <h3 className="nr-title">
-              {titleClean}
-              <span aria-hidden="true">.</span>
+              <Link
+                href={eventPath}
+                className="no-underline text-inherit hover:underline decoration-1 underline-offset-4"
+              >
+                {titleClean}
+                <span aria-hidden="true">.</span>
+              </Link>
             </h3>
             {summary && <p className="nr-summary">{summary}</p>}
           </div>
@@ -191,7 +202,6 @@ export function NextRun({
               clubName={club.name}
               eventSlug={event.slug || event.id}
               source="club_page_next"
-              variant="icon"
             />
             {event.goingCount > 0 && (
               <span className="nr-going">
@@ -199,12 +209,6 @@ export function NextRun({
               </span>
             )}
           </div>
-          <Link
-            href={eventPath}
-            className="nr-pagelink inline-block mt-3 text-[13px] font-medium text-signal hover:underline underline-offset-2"
-          >
-            View event page →
-          </Link>
         </div>
       </div>
     </section>

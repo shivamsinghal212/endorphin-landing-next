@@ -216,7 +216,7 @@ function UpcomingRow({
               clubName={clubName}
               eventSlug={event.slug || event.id}
               source="club_page_list"
-              variant="icon"
+              variant="compact"
             />
           )}
         </div>
@@ -227,24 +227,18 @@ function UpcomingRow({
           className="upcoming-row-details"
         >
           {event.coverImageUrl && (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              className="upcoming-row-flyer"
-              src={event.coverImageUrl}
-              alt=""
-              loading="lazy"
-            />
+            <Link href={eventPath} aria-label={`View ${event.title}`}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                className="upcoming-row-flyer"
+                src={event.coverImageUrl}
+                alt=""
+                loading="lazy"
+              />
+            </Link>
           )}
           {description && (
             <p className="upcoming-row-description">{description}</p>
-          )}
-          {!isRace && (
-            <Link
-              href={eventPath}
-              className="inline-block mt-3 text-[13px] font-medium text-signal hover:underline underline-offset-2"
-            >
-              View event page →
-            </Link>
           )}
         </div>
       )}

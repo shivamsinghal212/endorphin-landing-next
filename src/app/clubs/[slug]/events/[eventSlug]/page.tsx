@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
+import type { CSSProperties } from 'react';
 import type { Metadata } from 'next';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
@@ -10,6 +11,8 @@ import { clubsApi, remindersApi, type MyMembership, type Reminder } from '@/lib/
 import { getSessionToken } from '@/lib/session';
 import type { ClubEvent } from '../../../page';
 import { RsvpButton } from '../../rsvp-button';
+import '../../club-page.css';
+import './event-detail.css';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE || 'https://api.endorfin.run';
 const SITE = 'https://www.endorfin.run';
@@ -18,6 +21,16 @@ const TZ = 'Asia/Kolkata';
 interface PageProps {
   params: Promise<{ slug: string; eventSlug: string }>;
 }
+
+const EVENT_TYPE_LABEL: Record<string, string> = {
+  club_run: 'Run',
+  club_race: 'Race',
+  club_workshop: 'Workshop',
+  club_social: 'Social',
+  club_meetup: 'Meetup',
+  club_cross_train: 'Cross-train',
+  race_event: 'Race',
+};
 
 /**
  * Fetch a single club event by slug (or UUID) from the public endpoint.
@@ -191,119 +204,141 @@ export default async function ClubEventPage({ params }: PageProps) {
     (r) => r.eventType === 'club_event' && r.eventId === event.id,
   );
   const isRace = event.eventType === 'race_event';
+  const typeLabel = EVENT_TYPE_LABEL[event.eventType as string] || 'Run';
+  const titleClean = event.title.trim().replace(/[.!?…]+$/, '');
   const dateLabel = fmtDate(event.startTime);
   const timeLabel = fmtTime(event.startTime);
   const shareDateLabel = [dateLabel, timeLabel].filter(Boolean).join(' · ');
   const url = canonicalUrl(club.slug, event);
+  const kicker = [club.name, typeLabel].filter(Boolean).join(' · ');
+
+  const hasImage = !!event.coverImageUrl;
+  const fgStyle: CSSProperties | undefined = hasImage
+    ? ({ ['--nr-flyer' as string]: `url('${event.coverImageUrl}')` } as CSSProperties)
+    : undefined;
 
   return (
     <main id="main-content" className="overflow-x-hidden">
       <EventJsonLd club={club} event={event} />
       <Header />
 
-      <article className="mx-auto max-w-3xl px-5 py-10 sm:py-14">
-        {/* Breadcrumb / back to club */}
-        <nav className="mb-6 text-sm text-jet/50">
-          <Link href={`/clubs/${club.slug}`} className="hover:text-jet underline-offset-2 hover:underline">
+      <div className="club-page">
+        <div className="cep-top">
+          <Link href={`/clubs/${club.slug}`} className="cep-back">
             ← {club.name}
           </Link>
-        </nav>
-
-        {event.coverImageUrl && (
-          <div className="mb-7 overflow-hidden rounded-2xl border border-jet/10">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={event.coverImageUrl}
-              alt={event.title}
-              width={1200}
-              height={900}
-              className="w-full h-auto object-cover"
-            />
-          </div>
-        )}
-
-        <p className="text-[11px] uppercase tracking-widest text-signal font-medium mb-3">
-          {[club.name, isRace ? 'Race' : 'Run'].filter(Boolean).join(' · ')}
-        </p>
-        <h1 className="font-display text-3xl sm:text-4xl font-bold tracking-tight text-jet leading-tight">
-          {event.title}
-        </h1>
-
-        {/* Key facts */}
-        <dl className="mt-6 grid grid-cols-2 sm:grid-cols-4 gap-y-4 gap-x-3 border-y border-jet/10 py-5">
-          <div>
-            <dt className="text-[10px] uppercase tracking-widest text-jet/45">Date</dt>
-            <dd className="mt-1 text-sm font-medium text-jet">{dateLabel || '—'}</dd>
-          </div>
-          <div>
-            <dt className="text-[10px] uppercase tracking-widest text-jet/45">Start</dt>
-            <dd className="mt-1 text-sm font-medium text-jet">{timeLabel || '—'}</dd>
-          </div>
-          <div>
-            <dt className="text-[10px] uppercase tracking-widest text-jet/45">Where</dt>
-            <dd className="mt-1 text-sm font-medium text-jet">{event.locationName || '—'}</dd>
-          </div>
-          <div>
-            <dt className="text-[10px] uppercase tracking-widest text-jet/45">Distance</dt>
-            <dd className="mt-1 text-sm font-medium text-jet">
-              {event.distanceKm != null ? `${event.distanceKm}K` : '—'}
-            </dd>
-          </div>
-        </dl>
-
-        {/* CTA row */}
-        <div className="mt-6 flex flex-wrap items-center gap-3">
-          {!isRace && (
-            <RsvpButton
-              slug={club.slug}
-              clubName={club.name}
-              eventId={event.id}
-              joinForm={club.joinForm}
-              requiresApproval={club.requiresApproval}
-              isAuthed={isAuthed}
-              myMembership={myMembership}
-              variant="primary"
-            />
-          )}
-          <ReminderButton
-            eventType="club_event"
-            eventId={event.id}
-            eventStartTime={event.startTime}
-            eventTitle={event.title}
-            initialIsSet={reminderIsSet}
-            isAuthed={isAuthed}
-          />
-          <ShareEventButton
-            url={url}
-            title={event.title}
-            dateLabel={shareDateLabel}
-            locationLabel={event.locationName}
-            clubName={club.name}
-            eventSlug={event.slug || event.id}
-            source="event_page"
-          />
-          {event.goingCount > 0 && (
-            <span className="text-sm text-jet/55">
-              <strong className="text-jet">{event.goingCount}</strong> going
-            </span>
-          )}
         </div>
 
-        {event.description && (
-          <div className="mt-9 text-[15px] leading-relaxed text-jet/80 whitespace-pre-line">
-            {event.description}
+        <section className="nr-section" aria-label={event.title}>
+          <div className="nr-inner">
+            {hasImage ? (
+              <div className="nr-photo" style={fgStyle}>
+                <div className="nr-photo-bg" aria-hidden="true" />
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  className="nr-photo-img"
+                  src={event.coverImageUrl as string}
+                  alt={event.title}
+                  width={1200}
+                  height={1500}
+                />
+                <div className="nr-photo-scrim" aria-hidden="true" />
+                <span className="nr-photo-tag">{typeLabel}</span>
+              </div>
+            ) : (
+              <div className="nr-empty">
+                <div className="nr-empty-date" aria-hidden="true">
+                  <span className="nr-empty-weekday">
+                    {fmtIn(event.startTime, { weekday: 'short' })}
+                  </span>
+                  <span className="nr-empty-num">
+                    {fmtIn(event.startTime, { day: 'numeric' })}
+                  </span>
+                  <span className="nr-empty-month">
+                    {fmtIn(event.startTime, { month: 'long' })}
+                  </span>
+                </div>
+                <span className="nr-empty-stencil">
+                  {[event.locationName, timeLabel].filter(Boolean).join(' · ')}
+                </span>
+              </div>
+            )}
+
+            <div className="nr-content">
+              <div className="nr-content-top">
+                <span className="nr-kicker">{kicker}</span>
+                <h1 className="nr-title">{titleClean}</h1>
+                {event.description && (
+                  <p className="nr-summary">{event.description}</p>
+                )}
+              </div>
+
+              <dl className="nr-meta">
+                <div>
+                  <dt>Date</dt>
+                  <dd>{dateLabel || '—'}</dd>
+                </div>
+                <div>
+                  <dt>Start</dt>
+                  <dd>{timeLabel || '—'}</dd>
+                </div>
+                <div>
+                  <dt>Where</dt>
+                  <dd>{event.locationName || '—'}</dd>
+                </div>
+                <div>
+                  <dt>Distance</dt>
+                  <dd>{event.distanceKm != null ? `${event.distanceKm}K` : '—'}</dd>
+                </div>
+              </dl>
+
+              <div className="nr-cta cep-cta">
+                {!isRace && (
+                  <RsvpButton
+                    slug={club.slug}
+                    clubName={club.name}
+                    eventId={event.id}
+                    joinForm={club.joinForm}
+                    requiresApproval={club.requiresApproval}
+                    isAuthed={isAuthed}
+                    myMembership={myMembership}
+                    variant="primary"
+                  />
+                )}
+                <ReminderButton
+                  eventType="club_event"
+                  eventId={event.id}
+                  eventStartTime={event.startTime}
+                  eventTitle={event.title}
+                  initialIsSet={reminderIsSet}
+                  isAuthed={isAuthed}
+                />
+                <ShareEventButton
+                  url={url}
+                  title={event.title}
+                  dateLabel={shareDateLabel}
+                  locationLabel={event.locationName}
+                  clubName={club.name}
+                  eventSlug={event.slug || event.id}
+                  source="event_page"
+                />
+                {event.goingCount > 0 && (
+                  <span className="nr-going">
+                    <strong>{event.goingCount}</strong> going
+                  </span>
+                )}
+              </div>
+            </div>
           </div>
-        )}
+        </section>
 
         {event.locationAddress && (
-          <p className="mt-6 text-sm text-jet/55">
-            <span className="text-[10px] uppercase tracking-widest text-jet/45 block mb-1">
-              Address
-            </span>
-            {event.locationAddress}
-          </p>
+          <section className="cep-extra" aria-label="Location">
+            <p className="cep-extra-label">Address</p>
+            <p className="cep-extra-body">{event.locationAddress}</p>
+          </section>
         )}
-      </article>
+      </div>
 
       <Footer />
     </main>
