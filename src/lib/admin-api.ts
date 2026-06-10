@@ -44,6 +44,21 @@ export interface DashboardStats {
 export const getStats = (token: string) =>
   adminFetch<DashboardStats>('/stats', token);
 
+export interface AnalyticsOverview {
+  totalUsers: number;
+  totalEvents: number;
+  totalClubs: number;
+  claimedClubs: number;
+  totalRsvps: number;
+  totalReminders: number;
+  totalJoinRequests: number;
+  hottestClub: { slug: string; name: string; requestCount: number } | null;
+  brandCollaborations: { brandName: string; count: number }[];
+}
+
+export const getAnalytics = (token: string) =>
+  adminFetch<AnalyticsOverview>('/analytics', token);
+
 // ── Events ─────────────────────────────────────────────────────────────────
 
 export interface AdminEvent {
