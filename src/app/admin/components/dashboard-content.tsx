@@ -3,7 +3,18 @@
 import { useEffect, useState } from 'react';
 import { useAdminToken } from '@/lib/use-admin-token';
 import { getAnalytics, type AnalyticsOverview } from '@/lib/admin-api';
-import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
+import {
+  PieChart,
+  Pie,
+  Cell,
+  ResponsiveContainer,
+  Tooltip,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+} from 'recharts';
 import {
   Users,
   CalendarDays,
@@ -115,6 +126,11 @@ export function DashboardContent() {
     brandSlices.push({ name: `Other (${tail.length})`, value: tailTotal, color: OTHER_COLOR });
   }
   const pct = (v: number) => (totalCollabs > 0 ? (v / totalCollabs) * 100 : 0);
+
+  // Join-request distribution: clubs are pre-sorted desc by the backend (top 12).
+  const clubDist = data.joinRequestsByClub;
+  const distHeight = Math.max(200, clubDist.length * 40 + 24);
+  const truncate = (s: string, n = 22) => (s.length > n ? `${s.slice(0, n - 1)}…` : s);
 
   return (
     <div>
@@ -242,6 +258,63 @@ export function DashboardContent() {
             </div>
           )}
         </div>
+      </div>
+
+      {/* Join requests distribution across clubs */}
+      <div className="mt-6 bg-white rounded-xl border border-jet/10 p-5">
+        <div className="flex items-center gap-2 mb-4">
+          <UserPlus className="w-4 h-4 text-jet/40" />
+          <h2 className="font-display text-sm font-semibold uppercase text-jet/70">
+            Join Requests by Club
+          </h2>
+          {clubDist.length === 12 && (
+            <span className="ml-auto font-body text-xs text-jet/40">top 12</span>
+          )}
+        </div>
+
+        {clubDist.length === 0 ? (
+          <p className="font-body text-sm text-jet/50 py-12 text-center">No join requests yet.</p>
+        ) : (
+          <div style={{ height: distHeight }}>
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart
+                data={clubDist}
+                layout="vertical"
+                margin={{ top: 4, right: 24, bottom: 4, left: 8 }}
+                barCategoryGap="25%"
+              >
+                <CartesianGrid horizontal={false} stroke="rgba(10,10,10,0.06)" />
+                <XAxis
+                  type="number"
+                  allowDecimals={false}
+                  tick={{ fontSize: 11, fontFamily: 'var(--font-poppins)', fill: '#666' }}
+                  axisLine={false}
+                  tickLine={false}
+                />
+                <YAxis
+                  type="category"
+                  dataKey="name"
+                  width={150}
+                  tickFormatter={(v: string) => truncate(v)}
+                  tick={{ fontSize: 12, fontFamily: 'var(--font-poppins)', fill: '#0A0A0A' }}
+                  axisLine={false}
+                  tickLine={false}
+                />
+                <Tooltip
+                  cursor={{ fill: 'rgba(10,10,10,0.04)' }}
+                  formatter={(value) => [nf.format(Number(value)), 'Requests']}
+                  contentStyle={{
+                    borderRadius: 8,
+                    border: '1px solid rgba(10,10,10,0.1)',
+                    fontSize: 12,
+                    fontFamily: 'var(--font-poppins)',
+                  }}
+                />
+                <Bar dataKey="requestCount" fill="#E6232A" radius={[0, 4, 4, 0]} maxBarSize={28} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        )}
       </div>
     </div>
   );

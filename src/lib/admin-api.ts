@@ -53,6 +53,7 @@ export interface AnalyticsOverview {
   totalReminders: number;
   totalJoinRequests: number;
   hottestClub: { slug: string; name: string; requestCount: number } | null;
+  joinRequestsByClub: { slug: string; name: string; requestCount: number }[];
   brandCollaborations: { brandName: string; count: number }[];
 }
 
