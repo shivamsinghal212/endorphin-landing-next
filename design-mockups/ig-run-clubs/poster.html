@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>IG Run Club Poster</title>
+<style>
+  @font-face {
+    font-family: 'Caveat Brush';
+    src: url('assets/caveat-brush.woff2') format('woff2');
+  }
+  @font-face {
+    font-family: 'Caveat';
+    font-weight: 700;
+    src: url('assets/caveat-700.woff2') format('woff2');
+  }
+  @font-face {
+    font-family: 'Archivo';
+    font-weight: 100 900;
+    src: url('assets/archivo.woff2') format('woff2');
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 1080px; height: 1350px; overflow: hidden; }
+
+  .poster {
+    position: relative;
+    width: 1080px;
+    height: 1350px;
+    background: #1c1c1e;
+    color: #f3efe6;
+    font-family: 'Archivo', sans-serif;
+    overflow: hidden;
+  }
+
+  /* ---- background atmosphere ---- */
+  .bg-glow {
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(ellipse 90% 55% at 50% 0%, var(--accent-glow) 0%, transparent 60%),
+      radial-gradient(ellipse 70% 45% at 85% 100%, var(--accent-glow) 0%, transparent 65%),
+      radial-gradient(ellipse 120% 80% at 50% 50%, transparent 55%, rgba(0,0,0,0.55) 100%);
+  }
+  .grain {
+    position: absolute; inset: 0;
+    opacity: 0.5;
+    mix-blend-mode: overlay;
+  }
+
+  /* ---- header strip ---- */
+  .header {
+    position: absolute;
+    top: 64px; left: 72px; right: 72px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    font-size: 22px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    opacity: 0.92;
+  }
+  .header .col { line-height: 1.45; }
+  .header .col.right { text-align: right; }
+  .header .glyphs { margin-top: -6px; }
+
+  .hairline {
+    position: absolute;
+    top: 148px; left: 72px; right: 72px;
+    height: 1px;
+    background: rgba(243,239,230,0.28);
+  }
+
+  /* ---- hero ---- */
+  .eyebrow {
+    position: absolute;
+    top: 208px; left: 0; right: 0;
+    text-align: center;
+    font-size: 26px;
+    font-weight: 600;
+    letter-spacing: 0.42em;
+    text-transform: uppercase;
+    color: var(--accent-soft);
+  }
+  .title {
+    position: absolute;
+    top: 240px; left: 50px; right: 50px;
+    text-align: center;
+    font-family: 'Caveat Brush', cursive;
+    font-size: var(--title-size, 218px);
+    line-height: 0.92;
+    transform: rotate(-2.5deg);
+    text-shadow: 0 4px 28px rgba(0,0,0,0.45);
+  }
+  .kicker {
+    position: absolute;
+    top: var(--kicker-top, 568px);
+    left: 0; right: 0;
+    text-align: center;
+    font-family: 'Caveat', cursive;
+    font-weight: 700;
+    font-size: 64px;
+    transform: rotate(-1.2deg);
+    color: var(--accent-soft);
+  }
+  .desc {
+    position: absolute;
+    top: var(--desc-top, 680px);
+    left: 50%;
+    transform: translateX(-50%);
+    width: 660px;
+    text-align: center;
+    font-size: 27px;
+    line-height: 1.55;
+    font-weight: 400;
+    color: rgba(243,239,230,0.82);
+  }
+
+  /* ---- info row ---- */
+  .info {
+    position: absolute;
+    top: var(--info-top, 856px);
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 76px;
+    text-align: center;
+  }
+  .info .cell .label {
+    font-size: 19px;
+    font-weight: 600;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: rgba(243,239,230,0.5);
+    margin-bottom: 10px;
+  }
+  .info .cell .value {
+    font-size: 28px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+  }
+
+  /* ---- vertical edge text ---- */
+  .edge {
+    position: absolute;
+    font-size: 21px;
+    font-weight: 600;
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    opacity: 0.72;
+    white-space: nowrap;
+  }
+  .edge.left {
+    left: 36px; bottom: 330px;
+    transform: rotate(180deg);
+    writing-mode: vertical-rl;
+  }
+  .edge.right {
+    right: 36px; top: 330px;
+    writing-mode: vertical-rl;
+  }
+
+  /* ---- sparkle ---- */
+  .spark {
+    position: absolute;
+    right: 130px;
+    top: var(--info-top, 856px);
+    width: 56px; height: 56px;
+    opacity: 0.9;
+  }
+
+  /* ---- runners ---- */
+  .runners {
+    position: absolute;
+    left: 0; right: 0;
+    bottom: 168px;
+    display: flex;
+    justify-content: center;
+  }
+
+  /* ---- footer ---- */
+  .footer {
+    position: absolute;
+    left: 72px; right: 72px; bottom: 64px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .footer .brand {
+    display: flex;
+    align-items: center;
+    gap: 22px;
+  }
+  .footer .logo {
+    width: 86px; height: 86px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid rgba(243,239,230,0.35);
+  }
+  .footer .brand .name {
+    font-size: 25px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .footer .brand .sub {
+    margin-top: 6px;
+    font-size: 20px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    color: rgba(243,239,230,0.55);
+  }
+  .footer .cta {
+    font-family: 'Caveat', cursive;
+    font-weight: 700;
+    font-size: 46px;
+    transform: rotate(-2deg);
+    color: var(--accent-soft);
+  }
+  .footer-hairline {
+    position: absolute;
+    left: 72px; right: 72px; bottom: 188px;
+    height: 1px;
+    background: rgba(243,239,230,0.28);
+  }
+</style>
+</head>
+<body>
+<div class="poster" id="poster">
+  <div class="bg-glow"></div>
+
+  <svg class="grain" width="1080" height="1350">
+    <filter id="noise">
+      <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" stitchTiles="stitch"/>
+      <feColorMatrix type="saturate" values="0"/>
+    </filter>
+    <rect width="100%" height="100%" filter="url(#noise)"/>
+  </svg>
+
+  <div class="header">
+    <div class="col">Community<br/>Event</div>
+    <div class="col glyphs">
+      <svg width="150" height="56" viewBox="0 0 150 56">
+        <g opacity="0.95">
+          <use href="#runnerSolid" transform="translate(8,4) scale(0.42)"/>
+          <use href="#runnerSolid" transform="translate(58,4) scale(0.42)"/>
+          <use href="#runnerSolid" transform="translate(108,4) scale(0.42)"/>
+        </g>
+      </svg>
+    </div>
+    <div class="col right">Free<br/>Entry</div>
+  </div>
+  <div class="hairline"></div>
+
+  <div class="eyebrow" id="eyebrow"></div>
+  <h1 class="title" id="title"></h1>
+  <div class="kicker" id="kicker"></div>
+  <p class="desc" id="desc"></p>
+
+  <div class="info">
+    <div class="cell">
+      <div class="label">Find Us</div>
+      <div class="value" id="handle"></div>
+    </div>
+    <div class="cell">
+      <div class="label">City</div>
+      <div class="value" id="city"></div>
+    </div>
+    <div class="cell">
+      <div class="label">Weekly Runs</div>
+      <div class="value">Free · All Paces</div>
+    </div>
+  </div>
+
+  <div class="edge left" id="edgeLeft"></div>
+  <div class="edge right">Run · Move · Belong</div>
+
+  <svg class="spark" viewBox="0 0 56 56">
+    <path d="M28 0 L31 25 L56 28 L31 31 L28 56 L25 31 L0 28 L25 25 Z" fill="#f3efe6"/>
+  </svg>
+
+  <div class="runners">
+    <svg width="880" height="240" viewBox="0 0 880 240">
+      <defs>
+        <pattern id="dots" width="9" height="9" patternUnits="userSpaceOnUse">
+          <circle cx="4.5" cy="4.5" r="2.6" fill="#fff"/>
+        </pattern>
+        <mask id="runnerMask">
+          <g id="pack" stroke="#fff" fill="#fff">
+            <use href="#runnerSolid" transform="translate(40,62) scale(1.18)"/>
+            <use href="#runnerSolid" transform="translate(240,42) scale(1.34)"/>
+            <use href="#runnerSolid" transform="translate(470,52) scale(1.26)"/>
+            <use href="#runnerSolid" transform="translate(680,68) scale(1.14)"/>
+          </g>
+        </mask>
+        <g id="runnerSolid" stroke="#fff" fill="none" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="62" cy="16" r="13" fill="#fff" stroke="none"/>
+          <path d="M56 30 Q46 52 42 72" stroke-width="19"/>
+          <path d="M53 42 Q68 50 80 44" stroke-width="11"/>
+          <path d="M51 44 Q36 50 28 64" stroke-width="11"/>
+          <path d="M42 72 Q62 80 72 94 Q76 108 72 122" stroke-width="14"/>
+          <path d="M42 72 Q28 88 12 92 Q2 94 -6 104" stroke-width="14"/>
+        </g>
+      </defs>
+      <rect width="880" height="240" fill="url(#dots)" mask="url(#runnerMask)"/>
+    </svg>
+  </div>
+
+  <div class="footer-hairline"></div>
+  <div class="footer">
+    <div class="brand">
+      <img class="logo" id="logo" src="" alt=""/>
+      <div>
+        <div class="name" id="footName"></div>
+        <div class="sub" id="footSub"></div>
+      </div>
+    </div>
+    <div class="cta">come run with us!</div>
+  </div>
+</div>
+
+<script>
+const CLUBS = {
+  stridetribe: {
+    eyebrow: "Run Club Spotlight",
+    title: "stridetribe",
+    titleSize: "228px",
+    kicker: "One TRIBE. Endless STRIDES.",
+    desc: "High-energy running & fitness community. Free weekly runs paired with functional training, MMA, bouldering and pickleball — wrapped up with social games, cafe pop-ups and community celebrations.",
+    handle: "@stridetribe_runclub",
+    city: "Pune",
+    edgeLeft: "Pune · India",
+    logo: "assets/stridetribe.jpg",
+    accentGlow: "rgba(46, 92, 110, 0.55)",
+    accentSoft: "#a8d8d0"
+  },
+  aavjo: {
+    eyebrow: "Run Club Spotlight",
+    title: "AAVJO",
+    titleSize: "260px",
+    kicker: "MORE THAN JUST A RUNCLUB",
+    desc: "Running & movement community across Ahmedabad and Gandhinagar. 5Ks, cold plunges, Zumba and self-defense workshops — all paces welcome.",
+    handle: "@aavjoclub",
+    city: "Ahmedabad",
+    edgeLeft: "Ahmedabad · India",
+    logo: "assets/aavjo.jpg",
+    accentGlow: "rgba(26, 60, 220, 0.42)",
+    accentSoft: "#9db4ff"
+  },
+  tez: {
+    eyebrow: "Run Club Spotlight",
+    title: "Tez Run Club",
+    titleSize: "188px",
+    kicker: "It's never about the pace.",
+    desc: "Coimbatore's youth-centric fitness community. Weekend runs, pickleball, turf games, wellness carnivals — and cold brews after.",
+    handle: "@thetezclub",
+    city: "Coimbatore",
+    edgeLeft: "Coimbatore · India",
+    logo: "assets/tez.jpg",
+    accentGlow: "rgba(120, 48, 110, 0.5)",
+    accentSoft: "#d9a8d0"
+  }
+};
+
+const key = new URLSearchParams(location.search).get("club") || "stridetribe";
+const c = CLUBS[key];
+const p = document.getElementById("poster");
+p.style.setProperty("--accent-glow", c.accentGlow);
+p.style.setProperty("--accent-soft", c.accentSoft);
+p.style.setProperty("--title-size", c.titleSize);
+document.getElementById("eyebrow").textContent = c.eyebrow;
+document.getElementById("title").textContent = c.title;
+document.getElementById("kicker").textContent = c.kicker;
+document.getElementById("desc").textContent = c.desc;
+document.getElementById("handle").textContent = c.handle;
+document.getElementById("city").textContent = c.city;
+document.getElementById("edgeLeft").textContent = c.edgeLeft;
+document.getElementById("logo").src = c.logo;
+document.getElementById("footName").textContent = c.title;
+document.getElementById("footSub").textContent = c.handle;
+</script>
+</body>
+</html>
