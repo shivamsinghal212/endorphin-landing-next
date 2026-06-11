@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>endorfin — new clubs carousel</title>
+<style>
+  @font-face { font-family: 'Archivo'; font-weight: 100 900; src: url('assets/archivo.woff2') format('woff2'); }
+  @font-face { font-family: 'Archivo Black'; src: url('assets/archivo-black.woff2') format('woff2'); }
+  @font-face { font-family: 'Caveat'; font-weight: 700; src: url('assets/caveat-700.woff2') format('woff2'); }
+
+  :root {
+    --jet: #0A0A0A;
+    --signal: #E6232A;
+    --bone: #F5F0EB;
+    --aavjo-blue: #1638E8;
+    --tez-plum: #3A1638;
+    --tez-cream: #EFE3CE;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 1080px; height: 1350px; overflow: hidden; }
+  body { font-family: 'Archivo', sans-serif; }
+  .slide { position: relative; width: 1080px; height: 1350px; overflow: hidden; display: none; }
+  .slide.active { display: block; }
+
+  /* ---------- shared ---------- */
+  .lockup { display: flex; align-items: center; gap: 16px; }
+  .lockup img { width: 56px; height: 56px; border-radius: 14px; }
+  .lockup .word { font-weight: 700; font-size: 34px; letter-spacing: -0.01em; }
+  .chip {
+    display: inline-block;
+    padding: 14px 28px;
+    border-radius: 999px;
+    font-weight: 600;
+    font-size: 26px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+  .index { font-weight: 600; font-size: 26px; letter-spacing: 0.18em; }
+
+  /* ---------- slide 1 : cover ---------- */
+  #s1 { background: var(--signal); color: var(--bone); }
+  #s1 .top {
+    position: absolute; top: 64px; left: 72px; right: 72px;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  #s1 .headline {
+    position: absolute; top: 330px; left: 72px; right: 72px;
+    font-family: 'Archivo Black', sans-serif;
+    font-size: 88px; line-height: 1.18; letter-spacing: -0.015em;
+    white-space: nowrap;
+  }
+  #s1 .headline .dark { color: var(--jet); }
+  #s1 .subline {
+    position: absolute; top: 610px; left: 72px; right: 72px;
+    font-size: 50px; font-weight: 600; line-height: 1.3;
+  }
+  #s1 .swipe {
+    position: absolute; bottom: 360px; left: 0; right: 0;
+    text-align: center;
+    font-family: 'Caveat', cursive; font-weight: 700; font-size: 58px;
+    transform: rotate(-2deg);
+  }
+  #s1 .peek {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    display: flex; justify-content: center; gap: 64px;
+  }
+  #s1 .peek img {
+    width: 250px; height: 250px; border-radius: 50%;
+    border: 8px solid var(--bone);
+    transform: translateY(38%);
+    object-fit: cover;
+    box-shadow: 0 -12px 50px rgba(0,0,0,0.3);
+  }
+
+  /* ---------- slide 2 : stridetribe — full-bleed photo editorial ---------- */
+  #s2 { background: var(--jet); color: var(--bone); }
+  #s2 .photo {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%; object-fit: cover; object-position: 60% 30%;
+  }
+  #s2 .shade {
+    position: absolute; inset: 0;
+    background: linear-gradient(180deg, rgba(10,10,10,0.42) 0%, rgba(10,10,10,0) 26%, rgba(10,10,10,0) 38%, rgba(10,10,10,0.94) 78%);
+  }
+  #s2 .top {
+    position: absolute; top: 64px; left: 72px; right: 72px;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  #s2 .chip.new { background: var(--signal); color: var(--bone); }
+  #s2 .block { position: absolute; left: 72px; right: 72px; bottom: 84px; }
+  #s2 .idrow { display: flex; align-items: center; gap: 28px; margin-bottom: 26px; }
+  #s2 .idrow img {
+    width: 124px; height: 124px; border-radius: 50%;
+    border: 5px solid var(--bone); object-fit: cover;
+  }
+  #s2 .idrow .city { font-size: 30px; font-weight: 600; letter-spacing: 0.3em; text-transform: uppercase; opacity: 0.85; }
+  #s2 h1 {
+    font-family: 'Archivo Black', sans-serif;
+    font-size: 110px; line-height: 1; letter-spacing: -0.01em;
+    margin-bottom: 18px;
+  }
+  #s2 .quote {
+    font-family: 'Caveat', cursive; font-weight: 700;
+    font-size: 66px; color: #FF9A9E;
+    transform: rotate(-1.2deg); transform-origin: left;
+    margin-bottom: 30px;
+  }
+  #s2 .desc { font-size: 33px; line-height: 1.5; max-width: 850px; color: rgba(245,240,235,0.9); margin-bottom: 38px; }
+  #s2 .chip.handle { border: 2px solid rgba(245,240,235,0.6); font-size: 28px; text-transform: none; letter-spacing: 0.03em; }
+
+  /* ---------- slide 3 : aavjo — color-block split ---------- */
+  #s3 { background: var(--aavjo-blue); color: var(--bone); }
+  #s3 .photo {
+    position: absolute; top: 0; left: 0; right: 0; height: 600px;
+    width: 100%; object-fit: cover; object-position: 50% 38%;
+  }
+  #s3 .top {
+    position: absolute; top: 64px; left: 72px; right: 72px;
+    display: flex; justify-content: space-between; align-items: center;
+    z-index: 3;
+  }
+  #s3 .chip.new { background: var(--bone); color: var(--aavjo-blue); }
+  #s3 .badge {
+    position: absolute; top: 600px; left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 2;
+  }
+  #s3 .badge img {
+    width: 200px; height: 200px; border-radius: 50%;
+    border: 9px solid var(--bone); object-fit: cover;
+    box-shadow: 0 18px 60px rgba(0,0,0,0.45);
+  }
+  #s3 .panel {
+    position: absolute; top: 600px; bottom: 0; left: 0; right: 0;
+    text-align: center; padding: 150px 90px 0;
+  }
+  #s3 .eyebrow { font-size: 28px; font-weight: 600; letter-spacing: 0.34em; text-transform: uppercase; opacity: 0.85; margin-bottom: 22px; }
+  #s3 h1 {
+    font-family: 'Archivo Black', sans-serif;
+    font-size: 168px; line-height: 1; letter-spacing: 0.01em;
+    margin-bottom: 14px;
+  }
+  #s3 .quote {
+    font-family: 'Caveat', cursive; font-weight: 700;
+    font-size: 64px; transform: rotate(-1.5deg);
+    margin-bottom: 34px;
+  }
+  #s3 .desc { font-size: 32px; line-height: 1.52; max-width: 760px; margin: 0 auto 40px; color: rgba(245,240,235,0.92); }
+  #s3 .chip.handle { border: 2px solid rgba(245,240,235,0.7); font-size: 28px; text-transform: none; letter-spacing: 0.03em; }
+
+  /* ---------- slide 4 : tez — duotone zine poster ---------- */
+  #s4 { background: var(--tez-plum); color: var(--tez-cream); }
+  #s4 .top {
+    position: absolute; top: 64px; left: 72px; right: 72px;
+    display: flex; justify-content: space-between; align-items: center;
+    z-index: 4;
+  }
+  #s4 .chip.new { background: var(--tez-cream); color: var(--tez-plum); }
+  #s4 .frame {
+    position: absolute; top: 196px; left: 50%;
+    width: 800px; height: 520px;
+    transform: translateX(-50%) rotate(-2.4deg);
+    background: var(--tez-cream); padding: 18px 18px 64px;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.5);
+    z-index: 1;
+  }
+  #s4 .frame .ph { position: relative; width: 100%; height: 100%; overflow: hidden; }
+  #s4 .frame img.shot {
+    width: 100%; height: 100%; object-fit: cover; object-position: 50% 20%;
+    filter: grayscale(1) contrast(1.15) brightness(0.95);
+  }
+  #s4 .frame .tint { position: absolute; inset: 0; background: var(--tez-plum); mix-blend-mode: screen; opacity: 0.28; }
+  #s4 .frame .tint2 { position: absolute; inset: 0; background: #7E3C78; mix-blend-mode: multiply; opacity: 0.55; }
+  #s4 .frame .cap {
+    position: absolute; left: 6px; bottom: -52px;
+    font-family: 'Caveat', cursive; font-weight: 700; font-size: 38px; color: var(--tez-plum);
+  }
+  #s4 .badge {
+    position: absolute; top: 168px; right: 92px; z-index: 3;
+    transform: rotate(6deg);
+  }
+  #s4 .badge img {
+    width: 168px; height: 168px; border-radius: 50%;
+    border: 7px solid var(--tez-cream); object-fit: cover;
+    box-shadow: 0 14px 44px rgba(0,0,0,0.5);
+  }
+  #s4 .block { position: absolute; left: 72px; right: 72px; top: 824px; }
+  #s4 .eyebrow { font-size: 28px; font-weight: 600; letter-spacing: 0.34em; text-transform: uppercase; opacity: 0.8; margin-bottom: 18px; }
+  #s4 h1 {
+    font-family: 'Archivo Black', sans-serif;
+    font-size: 98px; line-height: 0.98; letter-spacing: -0.005em;
+    white-space: nowrap;
+    margin-bottom: 16px;
+  }
+  #s4 .quote {
+    font-family: 'Caveat', cursive; font-weight: 700;
+    font-size: 62px; color: #E9A6E0; transform: rotate(-1.2deg); transform-origin: left;
+    margin-bottom: 28px;
+  }
+  #s4 .desc { font-size: 31px; line-height: 1.5; max-width: 840px; color: rgba(239,227,206,0.92); margin-bottom: 34px; }
+  #s4 .stickers { display: flex; gap: 18px; align-items: center; }
+  #s4 .stickers .chip { background: var(--tez-cream); color: var(--tez-plum); font-size: 24px; }
+  #s4 .stickers .chip:nth-child(1) { transform: rotate(-2deg); }
+  #s4 .stickers .chip:nth-child(2) { transform: rotate(1.6deg); }
+  #s4 .stickers .chip:nth-child(3) { transform: rotate(-1.2deg); }
+  #s4 .stickers .chip.handle { background: transparent; color: var(--tez-cream); border: 2px solid rgba(239,227,206,0.7); text-transform: none; letter-spacing: 0.03em; font-size: 26px; }
+
+  /* ---------- slide 5 : cta — logo wall ---------- */
+  #s5 { background: var(--jet); color: var(--bone); }
+  #s5 .wall {
+    position: absolute; inset: -40px;
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 26px; padding: 0 10px;
+    align-content: center;
+  }
+  #s5 .wall img {
+    width: 100%; aspect-ratio: 1; border-radius: 50%;
+    object-fit: cover;
+    filter: grayscale(1) brightness(0.9);
+    opacity: 0.4;
+  }
+  #s5 .veil {
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse 78% 60% at 50% 50%, rgba(10,10,10,0.97) 0%, rgba(10,10,10,0.86) 45%, rgba(10,10,10,0.42) 100%);
+  }
+  #s5 .top { position: absolute; top: 64px; left: 0; right: 0; display: flex; justify-content: center; }
+  #s5 .center {
+    position: absolute; top: 50%; left: 90px; right: 90px;
+    transform: translateY(-50%);
+    text-align: center;
+  }
+  #s5 .big {
+    font-family: 'Archivo Black', sans-serif;
+    font-size: 96px; line-height: 1.12; letter-spacing: -0.01em;
+    margin-bottom: 54px;
+  }
+  #s5 .big .red { color: var(--signal); }
+  #s5 .find { font-size: 52px; font-weight: 600; line-height: 1.55; margin-bottom: 64px; }
+  #s5 .find b { font-weight: 700; }
+  #s5 .cta {
+    display: inline-flex; align-items: center; gap: 20px;
+    background: var(--signal); color: var(--bone);
+    padding: 26px 52px; border-radius: 999px;
+    font-size: 40px; font-weight: 700;
+  }
+  #s5 .cta img { width: 56px; height: 56px; border-radius: 50%; background: #fff; }
+  #s5 .sub { margin-top: 26px; font-size: 28px; font-weight: 500; color: rgba(245,240,235,0.65); letter-spacing: 0.06em; }
+</style>
+</head>
+<body>
+
+<!-- ============ SLIDE 1 — COVER ============ -->
+<section class="slide" id="s1">
+  <div class="top">
+    <div class="lockup">
+      <img src="../../public/logo.png" alt="endorfin"/>
+      <span class="word">endorfin</span>
+    </div>
+    <span class="index">01 / 05</span>
+  </div>
+  <div class="headline">
+    3 new run clubs.<br/>
+    <span class="dark">3 new cities.</span>
+  </div>
+  <div class="subline">Added to endorfin this week&nbsp;🏃</div>
+  <div class="swipe">swipe to meet them →</div>
+  <div class="peek">
+    <img src="assets/stridetribe.jpg" alt="stridetribe"/>
+    <img src="assets/aavjo.jpg" alt="AAVJO"/>
+    <img src="assets/tez.jpg" alt="Tez Run Club"/>
+  </div>
+</section>
+
+<!-- ============ SLIDE 2 — STRIDETRIBE ============ -->
+<section class="slide" id="s2">
+  <img class="photo" src="../../public/images/hero-clubs.webp" alt=""/>
+  <div class="shade"></div>
+  <div class="top">
+    <span class="chip new">New club · 01/03</span>
+    <span class="index">02 / 05</span>
+  </div>
+  <div class="block">
+    <div class="idrow">
+      <img src="assets/stridetribe.jpg" alt="stridetribe logo"/>
+      <span class="city">Pune</span>
+    </div>
+    <h1>STRIDETRIBE</h1>
+    <div class="quote">“One tribe. Endless strides.”</div>
+    <p class="desc">Free weekly runs + functional training, MMA, bouldering, even pickleball. Then everyone piles into a local café.</p>
+    <span class="chip handle">@stridetribe_runclub</span>
+  </div>
+</section>
+
+<!-- ============ SLIDE 3 — AAVJO ============ -->
+<section class="slide" id="s3">
+  <img class="photo" src="../../public/images/ext/runners-hero-bg.webp" alt=""/>
+  <div class="top">
+    <span class="chip new">New club · 02/03</span>
+    <span class="index">03 / 05</span>
+  </div>
+  <div class="panel">
+    <div class="eyebrow">Ahmedabad · Gandhinagar</div>
+    <h1>AAVJO</h1>
+    <div class="quote">“More than just a run club.”</div>
+    <p class="desc">Runs across Ahmedabad &amp; Gandhinagar — plus cold plunges, Zumba, even self-defense workshops. Every pace welcome.</p>
+    <span class="chip handle">@aavjoclub</span>
+  </div>
+  <div class="badge"><img src="assets/aavjo.jpg" alt="AAVJO logo"/></div>
+</section>
+
+<!-- ============ SLIDE 4 — TEZ RUN CLUB ============ -->
+<section class="slide" id="s4">
+  <div class="top">
+    <span class="chip new">New club · 03/03</span>
+    <span class="index">04 / 05</span>
+  </div>
+  <div class="frame">
+    <div class="ph">
+      <img class="shot" src="../../public/images/ext/pillars-races.webp" alt=""/>
+      <div class="tint2"></div>
+      <div class="tint"></div>
+    </div>
+    <div class="cap">sunday mornings, coimbatore</div>
+  </div>
+  <div class="badge"><img src="assets/tez.jpg" alt="Tez logo"/></div>
+  <div class="block">
+    <div class="eyebrow">Coimbatore</div>
+    <h1>TEZ RUN CLUB</h1>
+    <div class="quote">“It’s never about the pace.”</div>
+    <p class="desc">Coimbatore’s youth-run crew. Short runs, pickleball, turf games, wellness carnivals — and cold brews after.</p>
+    <div class="stickers">
+      <span class="chip">Turf games</span>
+      <span class="chip">Pickleball</span>
+      <span class="chip">Cold brews</span>
+      <span class="chip handle">@thetezclub</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SLIDE 5 — CTA ============ -->
+<section class="slide" id="s5">
+  <div class="wall" id="wall"></div>
+  <div class="veil"></div>
+  <div class="top">
+    <div class="lockup">
+      <img src="../../public/logo.png" alt="endorfin"/>
+      <span class="word">endorfin</span>
+    </div>
+  </div>
+  <div class="center">
+    <div class="big"><span class="red">100+ clubs.</span><br/>Every major city.</div>
+    <div class="find">
+      Find your <b>vibe</b>.<br/>
+      Find your <b>people</b>.<br/>
+      Find your <b>club</b>.
+    </div>
+    <div class="cta"><img src="../../public/logo.png" alt=""/>endorfin · link in bio</div>
+    <div class="sub">free to join · every pace welcome</div>
+  </div>
+</section>
+
+<script>
+const WALL = ["365represent.jpg","5amsocialrunclub.jpg","7am-clubb.jpg","9onerunclub.jpg","aarunbh-rrr.jpg","aditus-fit.jpg","anabolic-club.jpg","ananta-runclub.jpg","awaken-circle.jpg","bae-run-club.jpg","batclub.jpg","bengalurufrontrunners.jpg","bhagclub.jpg","bombayonfoot.jpg","bombayrunning.jpg","brew-burn.jpg","brewrun-club.jpg","burnnwarriors.jpg","cardioclub-srt.jpg","cloka-club.jpg","coffee-run-btown.jpg","d3xrunningclub.jpg","daudle-runclub.jpg","delhiruncollective.jpg","dkarverunclub.jpg","east-delhi-run-club.jpg","ethcurefitnessclub.jpg","flare-runclub-noida.jpg","frcsurat.jpg","garminrunclubindia.jpg","gati-crew.jpg","genesis-runclub.jpg","geno-move.jpg","ghaziabadroadrunners.jpg","go-runclub.jpg","goflorun.jpg","gurgaonrunners.jpg","gwaliorrunclub.jpg","gymgirls-club.jpg","hydra-run-club.jpg","jaagopowai.jpg","labzenith.jpg","laced-runclub.jpg","lonavalavarshamarathon.jpg","mberunclub.jpg","mile-runclub.jpg","nammarunclub.jpg","ncrunnerss.jpg","newdelhiroadrunners.jpg","nextmile-runclub.jpg","noidaextensionrunners.jpg","nothingbut-run.jpg","orr-club.jpg","pacepartnersclub-pune.jpg","phabclub.jpg","risenrun-club.jpg","rove-runclub.jpg","rukna-manahai.jpg","run-withaudacityrunclub.jpg","runandroast-runclub.jpg","runcrew-in.jpg","runhaus-hyd.jpg","runnexisclub.jpg","runninglatebybreve.jpg","runnrave-hyd.jpg","runofchampions.jpg","runrallyclub.jpg","runrawclub.jpg","runwithme-club.jpg","sistersinsweat-in.jpg","sole-runcrew.jpg","southsideruns.jpg","stridersmiles.jpg","sunlinecircuit.jpg","sweatlikeagirl.jpg","tejrunclub.jpg","the-altitude-crew.jpg","theavgrunclub.jpg","thegoodsoleclub.jpg","thegymcollective.jpg","themovementclubmeerut.jpg","themumbai-runclub.jpg","thepaceprojectgoa.jpg","therunbayclub.jpg","theuprunclub.jpg","tilaknagarrunningclub.jpg","we-run-club.jpg","westernghatsrunning.jpg","whitefieldrunclub.jpg"];
+
+const slide = new URLSearchParams(location.search).get("slide") || "1";
+document.getElementById("s" + slide).classList.add("active");
+
+if (slide === "5") {
+  const wall = document.getElementById("wall");
+  // 7 cols x 9 rows = 63 cells
+  const featured = ["../assets/stridetribe.jpg", "../assets/aavjo.jpg", "../assets/tez.jpg"];
+  const files = WALL.map(f => "assets/wall/" + f).concat(featured.map(f => "assets/wall/" + f));
+  for (let i = 0; i < 63; i++) {
+    const img = document.createElement("img");
+    img.src = files[i % files.length];
+    wall.appendChild(img);
+  }
+}
+</script>
+</body>
+</html>
