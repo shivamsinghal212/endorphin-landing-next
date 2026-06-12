@@ -1,11 +1,12 @@
 import type { Metadata } from 'next';
 import Script from 'next/script';
-import { Oswald, Poppins, Fraunces } from 'next/font/google';
+import { Oswald, Poppins, Fraunces, JetBrains_Mono } from 'next/font/google';
 import './globals.css';
 
 const oswald = Oswald({ subsets: ['latin'], variable: '--font-oswald', display: 'swap' });
 const poppins = Poppins({ subsets: ['latin'], weight: ['300', '400', '500', '600'], variable: '--font-poppins', display: 'swap' });
 const fraunces = Fraunces({ subsets: ['latin'], weight: ['400', '500', '600', '700'], style: ['italic', 'normal'], variable: '--font-fraunces', display: 'swap' });
+const jetbrainsMono = JetBrains_Mono({ subsets: ['latin'], weight: ['400', '500'], variable: '--font-jetbrains-mono', display: 'swap' });
 
 export const metadata: Metadata = {
   title: { default: 'Endorfin — Run Clubs & Running Events in India', template: '%s | Endorfin' },
@@ -129,7 +130,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html
       lang="en-IN"
-      className={`${oswald.variable} ${poppins.variable} ${fraunces.variable}`}
+      className={`${oswald.variable} ${poppins.variable} ${fraunces.variable} ${jetbrainsMono.variable}`}
       data-scroll-behavior="smooth"
     >
       <head>

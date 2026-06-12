@@ -10,9 +10,7 @@ import { useStoreLink } from '@/lib/use-store-link';
 const NAV_LINKS = [
   { label: 'Running Events', href: '/running-events', soon: false, primary: true },
   { label: 'Clubs', href: '/clubs', soon: false, primary: true },
-  { label: 'Runners', href: '/runners', soon: false, primary: false },
-  { label: 'Workout Plan', href: '/workout-plan', soon: true, primary: false },
-  { label: 'Coaches', href: '/coaches', soon: true, primary: false },
+  { label: 'For club owners', href: '/for-clubs', soon: false, primary: false },
 ];
 
 function isLinkActive(pathname: string | null, href: string) {

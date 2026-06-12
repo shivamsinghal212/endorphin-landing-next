@@ -112,6 +112,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${SITE}/`,        lastModified: new Date(), changeFrequency: 'weekly',  priority: 1.0 },
     { url: `${SITE}/running-events`,   lastModified: new Date(), changeFrequency: 'daily',   priority: 0.9 },
     { url: `${SITE}/clubs`,   lastModified: new Date(), changeFrequency: 'daily',   priority: 0.9 },
+    { url: `${SITE}/for-clubs`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.8 },
     { url: `${SITE}/runners`, lastModified: new Date(), changeFrequency: 'weekly',  priority: 0.85 },
     { url: `${SITE}/coaches`, lastModified: new Date(), changeFrequency: 'weekly',  priority: 0.85 },
     { url: `${SITE}/workout-plan`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.7 },

@@ -22,10 +22,8 @@ const SITE = 'https://www.endorfin.run';
 
 const PRODUCT = [
   { label: 'Running Events', href: '/running-events' },
-  { label: 'Runners', href: '/runners' },
   { label: 'Clubs', href: '/clubs' },
-  { label: 'Workout Plan', href: '/workout-plan' },
-  { label: 'Coaches', href: '/coaches' },
+  { label: 'For club owners', href: '/for-clubs' },
 ];
 
 const COMPANY = [

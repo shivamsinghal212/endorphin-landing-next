@@ -34,18 +34,6 @@ const PANELS: Panel[] = [
   },
   {
     num: '02',
-    name: 'Runners',
-    vertical: 'Runners',
-    bg: 'bg-jet',
-    image: "image-set(url('/images/ext/pillars-runners.avif') type('image/avif'), url('/images/ext/pillars-runners.webp') type('image/webp'))",
-    position: 'center 10%',
-    title: 'Connect with the\npeople who run India.',
-    sub: "Follow runners in your city. See who's racing where. Show up knowing familiar faces will be there.",
-    href: '/runners',
-    cta: 'Meet runners →',
-  },
-  {
-    num: '03',
     name: 'Clubs',
     vertical: 'Clubs',
     bg: 'bg-bone',
@@ -55,32 +43,6 @@ const PANELS: Panel[] = [
     sub: 'Find verified clubs near you — training groups, weekend long-run crews, beginner-friendly pods. Your crew is out there.',
     href: '/clubs',
     cta: 'Find a club →',
-  },
-  {
-    num: '04',
-    name: 'Workout Plan',
-    vertical: 'Training',
-    bg: 'bg-jet',
-    image: "image-set(url('/images/workout-plan.avif') type('image/avif'), url('/images/workout-plan.webp') type('image/webp'))",
-    position: 'center 30%',
-    soon: true,
-    title: 'Training that adapts\nevery week.',
-    sub: 'Plans that read your Health Connect data and adjust on Sunday night based on how you actually ran. Powered by Kip.',
-    href: '/workout-plan',
-    cta: 'Get early access →',
-  },
-  {
-    num: '05',
-    name: 'Coaches',
-    vertical: 'Coaches',
-    bg: 'bg-red',
-    image: "image-set(url('/images/ext/pillars-coaches.avif') type('image/avif'), url('/images/ext/pillars-coaches.webp') type('image/webp'))",
-    filter: 'brightness(0.40)',
-    soon: true,
-    title: "Human coaches, when\nyou're ready to level up.",
-    sub: 'Work with verified coaches in your city. Get a training plan tailored to your goal, your body, your life.',
-    href: '/coaches',
-    cta: 'Join waitlist →',
   },
 ];
 
@@ -97,7 +59,7 @@ const PillarsAccordion = () => {
       <div className="v1-pillars-header">
         {/* <div className="v1-pillars-kicker">The five pillars</div> */}
         <h2 className="v1-pillars-title">
-          Running events, runners, clubs, training,<br />and coaches. One <b>app.</b>
+          Running events and clubs.<br />One <b>app.</b>
         </h2>
       </div>
 
