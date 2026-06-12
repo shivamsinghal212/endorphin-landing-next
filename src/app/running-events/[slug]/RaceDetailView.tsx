@@ -13,6 +13,7 @@ import { ReminderButton } from '@/components/ReminderButton';
 import DetailCrossNav from '@/components/DetailCrossNav';
 import ExploreMoreStrip from '@/components/ExploreMoreStrip';
 import { couponCta } from '@/lib/coupon-cta';
+import { buildEventNarrative } from '@/lib/event-seo';
 import type { Event, DistanceCategory } from '@/lib/api';
 import { useMyRegistrations } from '@/lib/runner-hooks';
 
@@ -454,21 +455,22 @@ export default function RaceDetailView({
         </div>
       </section>
 
-      {(event.description || event.fullDescription) && (
-        <section className="v1rd-block">
-          <div className="v1rd-container">
-            <div className="v1rd-block-h">
-              <h2>About this event</h2>
-              {event.source && (
-                <span className="v1rd-block-meta">Source · {event.source}</span>
-              )}
-            </div>
-            <div className="v1rd-prose">
-              <ReactMarkdown>{event.description || ''}</ReactMarkdown>
-            </div>
+      {/* buildEventNarrative always returns text — real prose when we have it,
+       *  else a factual summary synthesised from the event's structured
+       *  fields — so every race page has a crawlable "About" section. */}
+      <section className="v1rd-block">
+        <div className="v1rd-container">
+          <div className="v1rd-block-h">
+            <h2>About this event</h2>
+            {event.source && (
+              <span className="v1rd-block-meta">Source · {event.source}</span>
+            )}
           </div>
-        </section>
-      )}
+          <div className="v1rd-prose">
+            <ReactMarkdown>{buildEventNarrative(event)}</ReactMarkdown>
+          </div>
+        </div>
+      </section>
 
       {event.distanceCategories.length > 0 && (
         <section className="v1rd-block">

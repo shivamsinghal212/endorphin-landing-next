@@ -113,6 +113,42 @@ export const CLUB_CITY_PAGES: ClubCityPage[] = [
       'Ahmedabad has the Sabarmati Riverfront — a flat, paved, lit, 11.5km stretch that\'s arguably the best urban running corridor in India. Most of the city\'s clubs meet here at dawn. Endorfin lists every active run club in Ahmedabad: Riverfront runners, SG Highway social groups, marathon training squads, and weekend long-run collectives. Browse below and join a club that runs your weekly mileage.',
     landmarks: ['Sabarmati Riverfront', 'Kankaria Lake', 'SG Highway'],
   },
+  {
+    slug: 'surat',
+    name: 'Surat',
+    aliases: ['surat'],
+    region: 'Gujarat',
+    intro:
+      'Surat runs along the Tapi. The riverfront stretch, the sea-facing Dumas Road, and the Gopi Talav promenade are where the city laces up before the diamond markets and textile mills open. Endorfin lists every active run club in Surat: dawn riverfront groups, marathon training squads building toward the Surat Night Marathon, and weekend long-run collectives. Browse the directory below, find a club that runs your pace, and turn solo kilometres into a standing weekly plan.',
+    landmarks: ['Tapi Riverfront', 'Dumas Road', 'Gopi Talav', 'Sarthana'],
+  },
+  {
+    slug: 'ghaziabad',
+    name: 'Ghaziabad',
+    aliases: ['ghaziabad'],
+    region: 'Uttar Pradesh (Delhi NCR)',
+    intro:
+      'Ghaziabad runs on the eastern edge of NCR. The Hindon riverfront, Swarn Jayanti Park, and the wide Indirapuram and Raj Nagar Extension roads give the city flat, open kilometres most mornings. Endorfin lists every active run club across Ghaziabad: training groups prepping for ADHM and the Delhi Marathon, casual society groups, and weekend long-run squads. Browse the directory below, see who meets near your sector, and join a club that runs your weekly mileage.',
+    landmarks: ['Hindon Riverfront', 'Swarn Jayanti Park', 'Indirapuram', 'City Forest'],
+  },
+  {
+    slug: 'nagpur',
+    name: 'Nagpur',
+    aliases: ['nagpur'],
+    region: 'Maharashtra',
+    intro:
+      'Nagpur runs around its lakes. Futala and Ambazari draw the biggest morning crowds, Seminary Hills has the shaded climbs, and the Telankhedi loop is where most of the city does its weekday tempo work. Endorfin lists every active run club in the Orange City: marathon training groups, social dawn-run crews, and the weekend collectives that head out past the Zero Mile. Browse below, find runners at your pace, and show up at the next session.',
+    landmarks: ['Futala Lake', 'Ambazari Lake', 'Seminary Hills', 'Telankhedi'],
+  },
+  {
+    slug: 'vadodara',
+    name: 'Vadodara',
+    aliases: ['vadodara', 'baroda'],
+    region: 'Gujarat',
+    intro:
+      'Vadodara — Baroda to most who run here — meets at Sayaji Baug. The Kamati Baug loop, the Sur Sagar lakefront, and the Akota–Vishwamitri stretch are the city\'s go-to morning routes. Endorfin lists every active run club in Vadodara: riverside dawn groups, marathon training squads, and weekend long-run collectives. Browse the directory below, find a club that runs your distance, and turn a solo habit into a weekly one with people who show up.',
+    landmarks: ['Sayaji Baug', 'Sur Sagar Lake', 'Akota', 'Vishwamitri'],
+  },
 ];
 
 const SLUG_INDEX = new Map(CLUB_CITY_PAGES.map((c) => [c.slug, c]));

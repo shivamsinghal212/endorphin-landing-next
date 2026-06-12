@@ -7,6 +7,11 @@ import { getSessionToken } from '@/lib/session';
 import { getStudioAuth } from '@/lib/studio/server-auth';
 import { RunnerProviders } from './register/_components/runner-providers';
 import RaceDetailView from './RaceDetailView';
+import {
+  buildEventTitle,
+  buildEventMetaDescription,
+  buildEventNarrative,
+} from '@/lib/event-seo';
 import './race-detail.css';
 
 interface PageProps {
@@ -79,15 +84,17 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   if (!event) return { title: 'Event not found' };
 
   const url = `https://www.endorfin.run/running-events/${event.slug || event.id}`;
+  const metaDescription = buildEventMetaDescription(event);
   return {
-    title: event.title,
-    description: event.description?.slice(0, 200) || `Register for ${event.title} on Endorfin.`,
+    title: buildEventTitle(event),
+    description: metaDescription,
     alternates: { canonical: url },
     openGraph: {
       type: 'website',
       url,
+      // Social cards read cleaner without the "| Endorfin" suffix.
       title: event.title,
-      description: event.description?.slice(0, 200) || undefined,
+      description: metaDescription,
       images: event.imageUrl ? [{ url: event.imageUrl }] : undefined,
       siteName: 'Endorfin',
     },
@@ -96,11 +103,9 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 function buildJsonLd(event: Event) {
   const organizerName = event.organizerName || 'Endorfin';
-  const locationLabel = event.locationName || 'India';
-  const description =
-    event.description ||
-    event.fullDescription ||
-    `Register for ${event.title} on Endorfin — a ${event.category || 'running'} event in ${locationLabel}.`;
+  // Same factual text as the visible "About" section — never empty, so the
+  // structured data always carries a real description for thin events.
+  const description = buildEventNarrative(event);
   // No reliable backend signal for when registration opens — anchor 90 days
   // before the deadline (or before start, if no deadline). validThrough below
   // is the real, sourced value.
