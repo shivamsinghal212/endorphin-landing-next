@@ -24,8 +24,10 @@ export default function HomeStreak() {
     let samples: Array<[number, number]> = [];
 
     const build = () => {
+      const rootRect = root.getBoundingClientRect();
       const localH = root.scrollHeight;
       const w = root.clientWidth;
+      const vh = window.innerHeight;
       streakWrap.style.height = `${localH}px`;
       streakWrap.innerHTML = '';
       const svg = document.createElementNS(NS, 'svg');
@@ -33,23 +35,34 @@ export default function HomeStreak() {
       svg.setAttribute('preserveAspectRatio', 'none');
       svg.style.height = `${localH}px`;
 
-      const anchors = Array.from(root.querySelectorAll<HTMLElement>('section, header'));
-      const lo = w < 720 ? 0.2 : 0.12;
+      const lo = w < 720 ? 0.18 : 0.12;
       const hi = 1 - lo;
-      const MIN_GAP = Math.max(520, window.innerHeight * 0.7);
-      const pts: Array<[number, number]> = [[w * hi, 60]];
+      // tighter gap + per-section mid-bends so tall mobile sections still weave
+      const MIN_GAP = Math.max(340, vh * 0.5);
+      const localTop = (el: HTMLElement) => el.getBoundingClientRect().top - rootRect.top;
+
+      // Start at the top so the at-rest line is one continuous streak (not a
+      // floating segment), then route it down THROUGH the hero search bar so
+      // it threads behind it.
+      const pts: Array<[number, number]> = [[w * hi, 40]];
+      const searchEl = root.querySelector<HTMLElement>('.v1-hero-search') || root.querySelector<HTMLElement>('.v1-hero-search-trigger');
+      if (searchEl) {
+        const r = searchEl.getBoundingClientRect();
+        pts.push([r.left - rootRect.left + r.width * 0.5, r.top - rootRect.top + r.height * 0.5]);
+      }
       let flip = 0;
       const addPt = (y: number) => {
-        if (y - pts[pts.length - 1][1] < MIN_GAP) return;
+        if (pts.length && y - pts[pts.length - 1][1] < MIN_GAP) return;
         pts.push([flip++ % 2 === 0 ? w * lo : w * hi, y]);
       };
+      const anchors = Array.from(root.querySelectorAll<HTMLElement>('section, header'));
       anchors.forEach((s) => {
-        const top = s.offsetTop;
-        const h = s.offsetHeight;
+        const top = localTop(s);
+        const h = s.getBoundingClientRect().height;
         addPt(top + h * 0.45);
-        if (h > 1600) addPt(top + h * 0.85);
+        if (h > vh * 1.0) addPt(top + h * 0.8);
       });
-      if (localH - 120 - pts[pts.length - 1][1] > 420) pts.push([w * 0.5, localH - 100]);
+      if (localH - 100 - pts[pts.length - 1][1] > 340) pts.push([w * 0.5, localH - 90]);
 
       let d = `M${pts[0][0]},${pts[0][1]}`;
       for (let i = 1; i < pts.length; i++) {
@@ -122,8 +135,9 @@ export default function HomeStreak() {
 
     const draw = () => {
       if (!built || reduce || !core || !glow) return;
-      const mainTop = root.getBoundingClientRect().top + window.scrollY;
-      const localTipY = window.scrollY + window.innerHeight * 0.58 - mainTop;
+      // Tip is driven directly by scroll depth: 0 at the very top (nothing
+      // drawn until the user starts scrolling), leading ahead as they go.
+      const localTipY = window.scrollY * 1.5;
       const p = Math.min(1, Math.max(0, fracAtY(localTipY)));
       const off = String(1 - p);
       core.style.strokeDashoffset = off;
@@ -142,12 +156,26 @@ export default function HomeStreak() {
     const onLoad = () => build();
     window.addEventListener('load', onLoad);
 
+    // Rebuild when the page height changes without a window resize — e.g. the
+    // search panel expanding into results, or async event/club content loading.
+    // (streakWrap is absolutely positioned so re-sizing it can't feed back
+    // into the host's height — no observer loop.)
+    let lastH = root.scrollHeight;
+    const ro = new ResizeObserver(() => {
+      if (Math.abs(root.scrollHeight - lastH) < 4) return;
+      lastH = root.scrollHeight;
+      window.clearTimeout(rT);
+      rT = window.setTimeout(build, 150);
+    });
+    ro.observe(root);
+
     return () => {
       window.removeEventListener('scroll', onScroll);
       window.removeEventListener('resize', onResize);
       window.removeEventListener('load', onLoad);
       window.clearTimeout(rT);
       cancelAnimationFrame(raf);
+      ro.disconnect();
     };
   }, []);
 
