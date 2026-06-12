@@ -1,0 +1,104 @@
+/* ════════════════════════════════════════════════════════════
+   Homepage "two ways in" pillars — Running Events + Clubs.
+   Replaces the old 5-panel accordion (broke at 2 panels). Scoped
+   under .hp so it doesn't touch the rest of the homepage.
+   Matches the /for-clubs design language (chroma, color-blocked).
+   ════════════════════════════════════════════════════════════ */
+
+.hp {
+  --hp-chroma: linear-gradient(100deg, #E6232A 0%, #FF6B35 28%, #FF2E88 55%, #8B5CF6 85%);
+  --hp-fserif: var(--font-fraunces), Georgia, serif;
+  --hp-fui: var(--font-oswald), sans-serif;
+  --hp-fbody: var(--font-poppins), system-ui, sans-serif;
+  --hp-fmono: var(--font-jetbrains-mono), ui-monospace, monospace;
+  --hp-ease: cubic-bezier(.22, .8, .3, 1);
+  position: relative;
+  padding: 120px 0;
+  overflow: hidden;
+  background: #0A0A0A;
+  font-family: var(--hp-fbody);
+}
+@media (max-width: 720px) { .hp { padding: 76px 0; } }
+
+.hp-ghost {
+  position: absolute; top: 4%; left: 50%; transform: translateX(-50%);
+  font-family: var(--hp-fui); font-weight: 600; text-transform: uppercase;
+  font-size: clamp(120px, 22vw, 320px); line-height: 1; letter-spacing: .01em;
+  color: transparent; -webkit-text-stroke: 1px rgba(245, 240, 235, .06);
+  pointer-events: none; user-select: none; white-space: nowrap; z-index: 0;
+}
+
+.hp-head { position: relative; z-index: 1; text-align: center; max-width: 760px; margin: 0 auto; }
+.hp-eyebrow {
+  font-family: var(--hp-fmono); font-size: 11px; letter-spacing: .2em; text-transform: uppercase;
+  color: rgba(245, 240, 235, .55); display: inline-flex; gap: 12px; align-items: center;
+}
+.hp-eyebrow::before, .hp-eyebrow::after { content: ""; width: 26px; height: 2px; background: var(--hp-chroma); }
+.hp-title {
+  font-family: var(--hp-fserif); font-weight: 600; font-size: clamp(32px, 5vw, 60px);
+  line-height: 1.05; letter-spacing: -.015em; margin: 20px 0 0; color: #F5F0EB;
+}
+.hp-title em {
+  font-style: italic; background: var(--hp-chroma); background-size: 240% 100%;
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+  animation: hpGshift 8s ease-in-out infinite;
+}
+@keyframes hpGshift { 0%, 100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
+
+.hp-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; margin-top: 56px; position: relative; z-index: 1; }
+@media (max-width: 880px) { .hp-grid { grid-template-columns: 1fr; gap: 18px; } }
+
+.hp-tile {
+  position: relative; border-radius: 28px; padding: 40px; min-height: 440px;
+  display: flex; flex-direction: column; overflow: hidden; text-decoration: none;
+  transition: transform .4s var(--hp-ease), box-shadow .4s var(--hp-ease);
+}
+.hp-tile:hover { transform: translateY(-8px); }
+@media (max-width: 880px) { .hp-tile { min-height: 0; padding: 32px; } }
+
+.hp-tile .idx {
+  position: absolute; top: 18px; right: 26px; font-family: var(--hp-fserif);
+  font-style: italic; font-weight: 600; font-size: 96px; line-height: 1; opacity: .16; pointer-events: none;
+}
+.hp-tile h3 { font-family: var(--hp-fserif); font-weight: 600; font-size: clamp(28px, 3vw, 38px); line-height: 1.04; margin: 0; color: #fff; }
+.hp-tile > p { font-size: 15px; line-height: 1.6; margin: 16px 0 0; max-width: 42ch; }
+.hp-chips { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 20px; }
+.hp-chips span {
+  font-family: var(--hp-fmono); font-size: 10.5px; letter-spacing: .06em; border-radius: 999px;
+  padding: 5px 13px; background: rgba(255, 255, 255, .13); color: #fff; border: 1px solid rgba(255, 255, 255, .2);
+}
+.hp-cta {
+  margin-top: 28px; display: inline-flex; align-items: center; gap: 9px; font-family: var(--hp-fui);
+  font-weight: 600; font-size: 13px; letter-spacing: .14em; text-transform: uppercase; color: #fff;
+}
+.hp-cta svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; transition: transform .3s var(--hp-ease); }
+.hp-tile:hover .hp-cta svg { transform: translateX(5px); }
+
+/* preview card pinned to the bottom of each tile */
+.hp-prev { margin-top: auto; padding-top: 26px; }
+.hp-card { border-radius: 16px; padding: 16px; display: grid; gap: 11px; background: rgba(0, 0, 0, .34); border: 1px solid rgba(255, 255, 255, .15); }
+.hp-row { display: flex; align-items: center; gap: 12px; }
+.hp-av { width: 30px; height: 30px; border-radius: 99px; flex: 0 0 auto; display: flex; align-items: center; justify-content: center; font-family: var(--hp-fui); font-size: 11px; font-weight: 500; color: #fff; border: 1px solid rgba(255, 255, 255, .22); }
+.hp-date { width: 46px; height: 46px; border-radius: 11px; background: rgba(0, 0, 0, .3); border: 1px solid rgba(255, 255, 255, .2); flex: 0 0 auto; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.hp-date b { font-family: var(--hp-fui); font-size: 16px; line-height: 1; color: #fff; }
+.hp-date small { font-family: var(--hp-fmono); font-size: 8.5px; letter-spacing: .1em; text-transform: uppercase; color: rgba(255, 255, 255, .6); margin-top: 2px; }
+.hp-t { display: block; font-size: 12.5px; font-weight: 500; line-height: 1.35; color: #fff; }
+.hp-s { display: block; font-family: var(--hp-fmono); font-size: 9.5px; letter-spacing: .04em; color: rgba(255, 255, 255, .55); margin-top: 2px; }
+.hp-pill { font-family: var(--hp-fmono); font-size: 10px; letter-spacing: .08em; text-transform: uppercase; border-radius: 999px; padding: 4px 11px; white-space: nowrap; }
+.hp-pill-on { background: #B6FF3C; color: #0a0a0a; font-weight: 500; }
+.hp-pill-out { background: #fff; color: #0a0a0a; font-weight: 500; }
+
+/* tile A — Running Events (signal red) */
+.hp-events { background: linear-gradient(150deg, #E6232A 0%, #b51d24 55%, #9f1239 120%); box-shadow: 0 30px 80px -30px rgba(230, 35, 42, .5); }
+.hp-events .idx { color: #fff; }
+.hp-events > p { color: rgba(255, 255, 255, .82); }
+
+/* tile B — Clubs (violet → magenta) */
+.hp-clubs { background: linear-gradient(150deg, #1e1145 0%, #5b21b6 55%, #a21caf 120%); box-shadow: 0 30px 80px -30px rgba(139, 92, 246, .45); }
+.hp-clubs .idx { color: #fff; }
+.hp-clubs > p { color: rgba(255, 255, 255, .8); }
+
+@media (prefers-reduced-motion: reduce) {
+  .hp-title em { animation: none; }
+  .hp-tile, .hp-cta svg { transition: none; }
+}

@@ -1,6 +1,6 @@
 import Header from '@/components/Header';
 import HeroSearch from '@/components/HeroSearch';
-import PillarsAccordion from '@/components/PillarsAccordion';
+import HomePillars from '@/components/HomePillars';
 import ManageClubSection from '@/components/ManageClubSection';
 import CTASection from '@/components/CTASection';
 import Footer from '@/components/Footer';
@@ -115,7 +115,7 @@ export default async function Home() {
       )}
       <Header />
       <HeroSearch stats={HERO_STATS} />
-      <PillarsAccordion />
+      <HomePillars />
       <ManageClubSection />
       <CTASection />
       <Footer />
