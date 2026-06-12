@@ -73,6 +73,9 @@
 .hstreak { position: relative; }
 .hstreak .container { position: relative; z-index: 2; }
 .hstreak .v1-ribbon { position: relative; z-index: 2; }
+/* The hero search box is near-transparent glass; give it an opaque backdrop
+   on the homepage so the streak is genuinely occluded (reads as behind it). */
+.hstreak .v1-hero-search { background: #0c0c0c; }
 #homeStreakWrap { position: absolute; top: 0; left: 0; width: 100%; z-index: 1; pointer-events: none; overflow: hidden; }
 #homeStreakWrap svg { display: block; width: 100%; }
 #homeStreakWrap .streak-core { fill: none; stroke: url(#homeSgrad); stroke-width: 3.5; stroke-linecap: round; }

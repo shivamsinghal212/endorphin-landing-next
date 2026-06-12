@@ -22,6 +22,10 @@ export default function HomeStreak() {
     let glow: SVGPathElement | null = null;
     let built = false;
     let samples: Array<[number, number]> = [];
+    let hostTopDoc = 0;
+    let startY = 0;
+    let endY = 1;
+    let lastSecTop = 0;
 
     const build = () => {
       const rootRect = root.getBoundingClientRect();
@@ -62,7 +66,10 @@ export default function HomeStreak() {
         addPt(top + h * 0.45);
         if (h > vh * 1.0) addPt(top + h * 0.8);
       });
-      if (localH - 100 - pts[pts.length - 1][1] > 340) pts.push([w * 0.5, localH - 90]);
+      lastSecTop = anchors.length ? localTop(anchors[anchors.length - 1]) : localH - vh;
+      // Exit off the bottom edge (clipped by the wrap's overflow:hidden) so the
+      // streak ends with a clean exit instead of a glowing cap floating in space.
+      pts.push([w * 0.5, localH + 80]);
 
       let d = `M${pts[0][0]},${pts[0][1]}`;
       for (let i = 1; i < pts.length; i++) {
@@ -114,6 +121,9 @@ export default function HomeStreak() {
         const pt = core.getPointAtLength((total * k) / N);
         samples.push([pt.y, k / N]);
       }
+      startY = samples[0][0];
+      endY = samples[samples.length - 1][0];
+      hostTopDoc = rootRect.top + window.scrollY;
       built = true;
       draw();
     };
@@ -135,10 +145,14 @@ export default function HomeStreak() {
 
     const draw = () => {
       if (!built || reduce || !core || !glow) return;
-      // Tip is driven directly by scroll depth: 0 at the very top (nothing
-      // drawn until the user starts scrolling), leading ahead as they go.
-      const localTipY = window.scrollY * 1.5;
-      const p = Math.min(1, Math.max(0, fracAtY(localTipY)));
+      // Progress: 0 at the very top (nothing drawn until the user scrolls),
+      // reaching 1 as the last section (CTA) scrolls into view — so by the
+      // time the CTA is on screen the streak is fully drawn and exiting the
+      // bottom edge, never a tip floating mid-section.
+      const endScroll = Math.max(1, hostTopDoc + lastSecTop - window.innerHeight * 0.4);
+      const prog = Math.min(1, Math.max(0, window.scrollY / endScroll));
+      const targetY = startY + prog * (endY - startY);
+      const p = Math.min(1, Math.max(0, fracAtY(targetY)));
       const off = String(1 - p);
       core.style.strokeDashoffset = off;
       glow.style.strokeDashoffset = off;

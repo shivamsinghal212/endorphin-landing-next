@@ -90,10 +90,15 @@ export default function ForClubsView() {
       let glow: SVGPathElement | null = null;
       let built = false;
       let samples: Array<[number, number]> = [];
+      let hostTopDoc = 0;
+      let startY = 0;
+      let endY = 1;
+      let lastSecTop = 0;
 
       const build = () => {
         const localH = root.scrollHeight;
         const w = root.clientWidth;
+        const vh = window.innerHeight;
         streakWrap.style.height = `${localH}px`;
         streakWrap.innerHTML = '';
         const svg = document.createElementNS(NS, 'svg');
@@ -104,10 +109,10 @@ export default function ForClubsView() {
         // weave through the page — one bend per section band, with a minimum
         // vertical gap so the curve stays smooth (no hairpins).
         const anchors = Array.from(root.querySelectorAll<HTMLElement>('header.hero, section'));
-        const lo = w < 720 ? 0.2 : 0.12;
+        const lo = w < 720 ? 0.18 : 0.12;
         const hi = 1 - lo;
-        const MIN_GAP = Math.max(520, window.innerHeight * 0.7);
-        const pts: Array<[number, number]> = [[w * hi, 72]];
+        const MIN_GAP = Math.max(340, vh * 0.5);
+        const pts: Array<[number, number]> = [[w * hi, 60]];
         let flip = 0;
         const addPt = (y: number) => {
           if (y - pts[pts.length - 1][1] < MIN_GAP) return;
@@ -117,9 +122,11 @@ export default function ForClubsView() {
           const top = s.offsetTop;
           const h = s.offsetHeight;
           addPt(top + h * 0.45);
-          if (h > 1600) addPt(top + h * 0.85);
+          if (h > vh * 1.0) addPt(top + h * 0.8);
         });
-        if (localH - 120 - pts[pts.length - 1][1] > 420) pts.push([w * 0.5, localH - 120]);
+        lastSecTop = anchors.length ? anchors[anchors.length - 1].offsetTop : localH - vh;
+        // Exit off the bottom edge (clipped) — no glowing cap floating in space.
+        pts.push([w * 0.5, localH + 80]);
 
         let d = `M${pts[0][0]},${pts[0][1]}`;
         for (let i = 1; i < pts.length; i++) {
@@ -173,6 +180,9 @@ export default function ForClubsView() {
           const pt = core.getPointAtLength((total * k) / N);
           samples.push([pt.y, k / N]);
         }
+        startY = samples[0][0];
+        endY = samples[samples.length - 1][0];
+        hostTopDoc = root.getBoundingClientRect().top + window.scrollY;
         built = true;
         draw();
       };
@@ -194,9 +204,12 @@ export default function ForClubsView() {
 
       const draw = () => {
         if (!built || reduce || !core || !glow) return;
-        const mainTop = root.getBoundingClientRect().top + window.scrollY;
-        const localTipY = window.scrollY + window.innerHeight * 0.58 - mainTop;
-        const p = Math.min(1, Math.max(0, fracAtY(localTipY)));
+        // 0 at the very top (hidden until scroll), reaching 1 as the last
+        // section scrolls into view, then exiting off the bottom edge.
+        const endScroll = Math.max(1, hostTopDoc + lastSecTop - window.innerHeight * 0.4);
+        const prog = Math.min(1, Math.max(0, window.scrollY / endScroll));
+        const targetY = startY + prog * (endY - startY);
+        const p = Math.min(1, Math.max(0, fracAtY(targetY)));
         const off = String(1 - p);
         core.style.strokeDashoffset = off;
         glow.style.strokeDashoffset = off;
@@ -213,12 +226,23 @@ export default function ForClubsView() {
       const raf = requestAnimationFrame(build);
       const onLoad = () => build();
       window.addEventListener('load', onLoad);
+      // Rebuild when page height changes without a window resize (e.g. the FAQ
+      // accordion expanding). streakWrap is absolute, so it can't feed back.
+      let lastH = root.scrollHeight;
+      const ro = new ResizeObserver(() => {
+        if (Math.abs(root.scrollHeight - lastH) < 4) return;
+        lastH = root.scrollHeight;
+        window.clearTimeout(rT);
+        rT = window.setTimeout(build, 150);
+      });
+      ro.observe(root);
       cleanups.push(() => {
         window.removeEventListener('scroll', onScrollS);
         window.removeEventListener('resize', onResizeS);
         window.removeEventListener('load', onLoad);
         window.clearTimeout(rT);
         cancelAnimationFrame(raf);
+        ro.disconnect();
       });
     }
 
