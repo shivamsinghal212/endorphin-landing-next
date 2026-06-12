@@ -1,7 +1,8 @@
 import Header from '@/components/Header';
 import HeroSearch from '@/components/HeroSearch';
-import HomePillars from '@/components/HomePillars';
-import ManageClubSection from '@/components/ManageClubSection';
+import HomeStreak from '@/components/HomeStreak';
+import HomePillars, { type FeaturedEvent, type FeaturedClub } from '@/components/HomePillars';
+import ForClubsBand from '@/components/ForClubsBand';
 import CTASection from '@/components/CTASection';
 import Footer from '@/components/Footer';
 
@@ -29,6 +30,58 @@ async function getUpcomingEvents(): Promise<ApiEvent[]> {
   } catch {
     return [];
   }
+}
+
+interface ClubListItem {
+  name: string;
+  city?: string;
+  publishedAt?: string | null;
+  isFeatured?: boolean;
+  isVerified?: boolean;
+  stats?: { members?: number };
+}
+
+// One page of the public club directory is plenty to pick a featured club
+// for the homepage tile. Bare JSON array, same shape as fetchAllClubsList.
+async function getFeaturedClubs(): Promise<ClubListItem[]> {
+  try {
+    const res = await fetch('https://api.endorfin.run/api/v1/clubs?limit=20&page=1', {
+      next: { revalidate: 3600 },
+    });
+    if (!res.ok) return [];
+    const data = await res.json();
+    return Array.isArray(data) ? data : [];
+  } catch {
+    return [];
+  }
+}
+
+const IST = 'Asia/Kolkata';
+function deriveEvent(e: ApiEvent): FeaturedEvent {
+  const d = new Date(e.startTime);
+  const day = new Intl.DateTimeFormat('en-GB', { timeZone: IST, day: '2-digit' }).format(d);
+  const month = new Intl.DateTimeFormat('en-GB', { timeZone: IST, month: 'short' }).format(d);
+  const time = new Intl.DateTimeFormat('en-GB', { timeZone: IST, hour: 'numeric', minute: '2-digit', hour12: true })
+    .format(d).toUpperCase();
+  const loc = e.locationName || e.locationAddress || 'India';
+  const price = e.priceMin == null ? null : e.priceMin === 0 ? 'Free' : `from ₹${e.priceMin}`;
+  const meta = [loc, time, price].filter(Boolean).join(' · ');
+  return { title: e.title, day, month, meta };
+}
+
+function pickClub(clubs: ClubListItem[]): FeaturedClub | null {
+  const published = clubs.filter((c) => c.publishedAt);
+  const pool = published.length ? published : clubs;
+  if (!pool.length) return null;
+  const c = [...pool].sort(
+    (a, b) =>
+      Number(Boolean(b.isFeatured)) - Number(Boolean(a.isFeatured)) ||
+      (b.stats?.members ?? 0) - (a.stats?.members ?? 0),
+  )[0];
+  const initials = c.name.split(/\s+/).slice(0, 2).map((w) => w[0] ?? '').join('').toUpperCase() || 'EN';
+  const members = c.stats?.members;
+  const meta = [c.city, members ? `${members} members` : null].filter(Boolean).join(' · ');
+  return { name: c.name, initials, meta };
 }
 
 export interface HeroStats {
@@ -102,8 +155,10 @@ function buildEventsJsonLd(events: ApiEvent[]) {
 }
 
 export default async function Home() {
-  const events = await getUpcomingEvents();
+  const [events, clubs] = await Promise.all([getUpcomingEvents(), getFeaturedClubs()]);
   const eventsJsonLd = buildEventsJsonLd(events);
+  const featuredEvent = events[0] ? deriveEvent(events[0]) : null;
+  const featuredClub = pickClub(clubs);
 
   return (
     <main id="main-content" className="overflow-x-hidden">
@@ -114,10 +169,13 @@ export default async function Home() {
         />
       )}
       <Header />
-      <HeroSearch stats={HERO_STATS} />
-      <HomePillars />
-      <ManageClubSection />
-      <CTASection />
+      <div className="hstreak">
+        <HomeStreak />
+        <HeroSearch stats={HERO_STATS} />
+        <HomePillars event={featuredEvent} club={featuredClub} />
+        <ForClubsBand />
+        <CTASection />
+      </div>
       <Footer />
     </main>
   );

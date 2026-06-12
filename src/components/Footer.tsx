@@ -176,7 +176,7 @@ const Footer = () => (
       <div>
         <Logo variant="light" />
         <p className="v1-footer-brand-sub">
-          India&apos;s running community — running events, runners, clubs, and Kip, your AI run coach. Built for people who actually run.
+          India&apos;s running community — running events, clubs, and a free home for organisers. Built for people who actually run.
         </p>
       </div>
       <div>
