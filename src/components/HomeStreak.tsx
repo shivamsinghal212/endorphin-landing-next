@@ -22,6 +22,7 @@ export default function HomeStreak() {
     let glow: SVGPathElement | null = null;
     let tipGlow: SVGCircleElement | null = null;
     let tipCore: SVGCircleElement | null = null;
+    let tipTail: SVGCircleElement[] = [];
     let pathTotal = 0;
     let built = false;
     let samples: Array<[number, number]> = [];
@@ -116,6 +117,20 @@ export default function HomeStreak() {
         svg.appendChild(p);
       });
 
+      // Comet tail: a tapered run of blurred, gradient-filled blobs that trail
+      // behind the tip along the path, fading and shrinking with distance so
+      // the head reads as a comet with a long glowing wake. Appended first so
+      // the bright head sits on top.
+      tipTail = [];
+      const TAIL_N = 16;
+      for (let i = 0; i < TAIL_N; i++) {
+        const c = document.createElementNS(NS, 'circle');
+        c.setAttribute('class', 'streak-tip-tail');
+        c.style.opacity = '0';
+        svg.appendChild(c);
+        tipTail.push(c);
+      }
+
       // Glowing tip that rides the leading (drawn) end of the streak: a soft
       // colour halo (sampling the gradient so it matches the local hue) plus a
       // white-hot centre. Hidden until the streak starts drawing.
@@ -178,6 +193,7 @@ export default function HomeStreak() {
         if (p <= 0.003 || p >= 0.99) {
           tipGlow.style.opacity = '0';
           tipCore.style.opacity = '0';
+          tipTail.forEach((c) => { c.style.opacity = '0'; });
         } else {
           const pt = core.getPointAtLength(p * pathTotal);
           const cx = String(pt.x);
@@ -188,6 +204,19 @@ export default function HomeStreak() {
           tipCore.setAttribute('cy', cy);
           tipGlow.style.opacity = '0.9';
           tipCore.style.opacity = '1';
+          // Lay the comet tail back along the path behind the head.
+          const tailFrac = pathTotal ? 760 / pathTotal : 0.16;
+          for (let i = 0; i < tipTail.length; i++) {
+            const t = (i + 1) / tipTail.length; // 0→1, distance back from head
+            const f = p - t * tailFrac;
+            const c = tipTail[i];
+            if (f <= 0.003) { c.style.opacity = '0'; continue; }
+            const q = core.getPointAtLength(f * pathTotal);
+            c.setAttribute('cx', String(q.x));
+            c.setAttribute('cy', String(q.y));
+            c.setAttribute('r', String(12 * (1 - t) + 2));
+            c.style.opacity = String(0.5 * Math.pow(1 - t, 1.5));
+          }
         }
       }
     };
