@@ -447,8 +447,12 @@
 .fcx .wrap { z-index: 2; }
 .fcx #streakWrap { position: absolute; top: 0; left: 0; width: 100%; z-index: 1; pointer-events: none; overflow: hidden; }
 .fcx #streakWrap svg { display: block; width: 100%; }
-.fcx .streak-core { fill: none; stroke: url(#fcSgrad); stroke-width: 3.5; stroke-linecap: round; }
-.fcx .streak-glow { fill: none; stroke: url(#fcSgrad); stroke-width: 18; stroke-linecap: round; opacity: .55; filter: blur(17px); }
+.fcx .streak-core { fill: none; stroke: url(#fcSgrad); stroke-width: 2; stroke-linecap: round; opacity: .32; filter: blur(2px); }
+.fcx .streak-glow { fill: none; stroke: url(#fcSgrad); stroke-width: 46; stroke-linecap: round; opacity: .28; filter: blur(34px); }
+/* Glowing tip + comet tail riding the leading end of the streak */
+.fcx .streak-tip-tail { fill: none; stroke: url(#fcSgrad); stroke-width: 7; stroke-linecap: round; filter: blur(5px); }
+.fcx .streak-tip-glow { fill: url(#fcSgrad); filter: blur(9px); }
+.fcx .streak-tip-core { fill: #fff; filter: blur(1px); }
 
 @media (prefers-reduced-motion: reduce) {
   .fcx *, .fcx *::before, .fcx *::after { animation: none !important; transition: none !important; }
