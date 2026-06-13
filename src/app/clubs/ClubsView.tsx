@@ -882,8 +882,14 @@ export default function ClubsView({
           </div>
           <AdminPanel data={ADMIN_PANELS[activeTab]} />
           <div className="v1c-admin-foot">
-            <Link href="/admin/studio" className="v1c-btn v1c-btn-ghost">
-              Open Endorfin Studio →
+            {/* Auth-gated: signed-in users go straight to the studio; signed
+                -out visitors are routed through login first (which returns
+                them to the studio) rather than appearing to already be in. */}
+            <Link
+              href={isAuthed ? '/admin/studio' : '/?login=1&next=%2Fadmin%2Fstudio'}
+              className="v1c-btn v1c-btn-ghost"
+            >
+              Manage your club →
             </Link>
           </div>
         </div>

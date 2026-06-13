@@ -2,6 +2,7 @@
 
 import { authApi, ApiError, type AuthResponse, type OtpResponse, type User } from '@/lib/api';
 import { setSessionCookie, clearSessionCookie } from '@/lib/session';
+import { signOut } from '@/lib/auth';
 
 export type ActionState =
   | { ok: true; user?: User; message?: string }
@@ -97,5 +98,14 @@ export async function resetPasswordAction(
 
 export async function logoutAction(): Promise<{ ok: true }> {
   await clearSessionCookie();
+  // Also tear down the NextAuth (Google) session. Otherwise getStudioAuth()
+  // falls back to NextAuth's stored backendToken and the studio still treats
+  // the user as signed in ("Welcome <name>") after a marketing sign-out.
+  try {
+    await signOut({ redirect: false });
+  } catch {
+    // No active NextAuth session (or called outside its expected context) —
+    // the marketing cookie is already cleared, so logout still succeeds.
+  }
   return { ok: true };
 }
