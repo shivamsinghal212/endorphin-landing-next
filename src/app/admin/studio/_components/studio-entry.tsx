@@ -80,7 +80,9 @@ export function StudioEntry() {
 
             {isSuper && <SuperAdminTile />}
 
-            {!hasClubs && !isSuper && <EmptyStateTile />}
+            {/* Anyone without a club of their own gets the add-a-club option —
+                including super-admins, who otherwise had no way to register one. */}
+            {!hasClubs && <EmptyStateTile />}
           </div>
         )}
       </main>
