@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import posthog from 'posthog-js';
 import { useStudioAuth } from '@/lib/studio/auth-context';
 import { useMyClubs, describeError } from '@/lib/studio/hooks';
 import { ClubAvatar, ErrorState, Skeleton, StudioTopBar } from './ui';
@@ -191,28 +192,87 @@ function SuperAdminTile() {
 }
 
 function EmptyStateTile() {
-  const [browseHover, setBrowseHover] = useState(false);
+  const [handle, setHandle] = useState('');
+  const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+
+  const cleanHandle = (raw: string) =>
+    raw
+      .trim()
+      .replace(/^https?:\/\/(www\.)?instagram\.com\//i, '')
+      .replace(/\/+$/, '')
+      .replace(/^@/, '');
+
+  async function onSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    const cleaned = cleanHandle(handle);
+    if (!cleaned || submitting) return;
+    setSubmitting(true);
+    try {
+      posthog.capture('club_onboard_request', { instagram_handle: cleaned, source: 'studio_empty_state' });
+    } catch {
+      // PostHog optional — never block the request on analytics.
+    }
+    try {
+      await fetch('https://api.endorfin.run/api/v1/clubs/onboard-requests', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ instagramHandle: cleaned }),
+      });
+    } catch {
+      // Swallow — the team can still be reached via the mailto fallback below.
+    }
+    setSubmitted(true);
+    setSubmitting(false);
+  }
+
   return (
     <div className="sm:col-span-2 bg-white border border-jet/10 rounded-3xl p-8 text-center">
       <p className="font-display uppercase text-sm font-bold text-jet/50 mb-2">
-        No workspaces yet
+        No clubs on your account yet
       </p>
-      <p className="text-sm text-jet/60 max-w-md mx-auto mb-5">
-        You don&apos;t manage any clubs or events on this account. If you run a
-        club, head to its public page and tap <strong>Claim this club</strong>.
-      </p>
-      <Link
-        href="/clubs"
-        onMouseEnter={() => setBrowseHover(true)}
-        onMouseLeave={() => setBrowseHover(false)}
-        className={`inline-block px-4 py-2 rounded-lg text-sm font-medium border transition-colors ${
-          browseHover
-            ? 'bg-jet text-bone border-jet'
-            : 'border-jet/15 hover:bg-jet/5'
-        }`}
-      >
-        Browse clubs
-      </Link>
+      {submitted ? (
+        <p className="text-sm text-jet/70 max-w-md mx-auto" role="status" aria-live="polite">
+          <strong>Thanks — we&apos;ll be in touch.</strong> We&apos;ve logged your
+          club. If anything&apos;s urgent, reach us at{' '}
+          <a className="underline" href="mailto:hello@endorfin.run">hello@endorfin.run</a>.
+        </p>
+      ) : (
+        <>
+          <p className="text-sm text-jet/60 max-w-md mx-auto mb-5">
+            Run a club? Drop your club&apos;s Instagram and we&apos;ll get you set
+            up — or email{' '}
+            <a className="underline" href="mailto:hello@endorfin.run">hello@endorfin.run</a>{' '}
+            and we&apos;ll reach out.
+          </p>
+          <form onSubmit={onSubmit} className="flex flex-wrap items-stretch justify-center gap-2 max-w-md mx-auto">
+            <div className="flex items-center flex-1 min-w-[200px] border border-jet/15 rounded-lg px-3 focus-within:border-jet/40">
+              <span className="text-jet/40 text-sm" aria-hidden>@</span>
+              <input
+                type="text"
+                className="flex-1 bg-transparent px-2 py-2 text-sm text-jet outline-none"
+                placeholder="your_club_handle"
+                aria-label="Your club's Instagram handle"
+                value={handle}
+                onChange={(e) => setHandle(e.target.value)}
+                autoComplete="off"
+                spellCheck={false}
+                required
+              />
+            </div>
+            <button
+              type="submit"
+              disabled={!cleanHandle(handle) || submitting}
+              className="px-4 py-2 rounded-lg text-sm font-medium bg-jet text-bone hover:bg-jet/90 transition-colors disabled:opacity-40"
+            >
+              {submitting ? 'Adding…' : 'Add my club →'}
+            </button>
+          </form>
+          <Link href="/clubs" className="inline-block mt-4 text-xs text-jet/50 underline hover:text-jet">
+            Or browse clubs
+          </Link>
+        </>
+      )}
     </div>
   );
 }

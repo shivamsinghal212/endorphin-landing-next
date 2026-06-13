@@ -363,7 +363,7 @@ export default function ForClubsView() {
               List your club, host your runs, and get found by runners in your city. Free.
             </p>
             <div className="hero-ctas rv" style={{ transitionDelay: '.18s' }}>
-              <Link href="/clubs" className="btn btn-red">Add your club</Link>
+              <Link href="/admin/studio" className="btn btn-red">Manage your club</Link>
               <a href="#community" className="btn btn-ghost">See how it works</a>
             </div>
             <div className="hero-callouts rv" style={{ transitionDelay: '.24s' }}>
@@ -658,7 +658,7 @@ export default function ForClubsView() {
             <div><h3>How we earn</h3><p>Through event ticketing and brand partners — not by taxing communities.</p></div>
             <div><h3>What you commit</h3><p>Just keep the page alive and show up to the run. No contract, no exclusivity.</p></div>
           </div>
-          <Link href="/clubs" className="btn btn-ghost">Add your club</Link>
+          <Link href="/admin/studio" className="btn btn-ghost">Manage your club</Link>
         </div>
       </div></section>
 
@@ -700,7 +700,7 @@ export default function ForClubsView() {
           <h2 className="rv" style={{ transitionDelay: '.05s', marginTop: 18 }}>Put your club<br />on <span className="chroma-i">the map.</span></h2>
           <p className="lead rv" style={{ transitionDelay: '.1s' }}>Add it in a minute, or let us set it up for you.</p>
           <div className="hero-ctas rv" style={{ transitionDelay: '.15s' }}>
-            <Link href="/clubs" className="btn btn-red">Add your club</Link>
+            <Link href="/admin/studio" className="btn btn-red">Manage your club</Link>
             <a href="mailto:hello@endorfin.run" className="btn btn-ghost">Talk to us</a>
           </div>
         </div>
