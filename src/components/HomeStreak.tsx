@@ -20,6 +20,9 @@ export default function HomeStreak() {
     const NS = 'http://www.w3.org/2000/svg';
     let core: SVGPathElement | null = null;
     let glow: SVGPathElement | null = null;
+    let tipGlow: SVGCircleElement | null = null;
+    let tipCore: SVGCircleElement | null = null;
+    let pathTotal = 0;
     let built = false;
     let samples: Array<[number, number]> = [];
     let hostTopDoc = 0;
@@ -112,10 +115,23 @@ export default function HomeStreak() {
         p.style.strokeDashoffset = reduce ? '0' : '1';
         svg.appendChild(p);
       });
+
+      // Glowing tip that rides the leading (drawn) end of the streak: a soft
+      // colour halo (sampling the gradient so it matches the local hue) plus a
+      // white-hot centre. Hidden until the streak starts drawing.
+      tipGlow = document.createElementNS(NS, 'circle');
+      tipGlow.setAttribute('class', 'streak-tip-glow');
+      tipGlow.setAttribute('r', '15');
+      tipCore = document.createElementNS(NS, 'circle');
+      tipCore.setAttribute('class', 'streak-tip-core');
+      tipCore.setAttribute('r', '3.5');
+      [tipGlow, tipCore].forEach((c) => { c.style.opacity = '0'; svg.appendChild(c); });
+
       streakWrap.appendChild(svg);
 
       samples = [];
       const total = core.getTotalLength();
+      pathTotal = total;
       const N = 240;
       for (let k = 0; k <= N; k++) {
         const pt = core.getPointAtLength((total * k) / N);
@@ -156,6 +172,24 @@ export default function HomeStreak() {
       const off = String(1 - p);
       core.style.strokeDashoffset = off;
       glow.style.strokeDashoffset = off;
+      // Park the glowing tip on the leading end; fade it out before the very
+      // top (nothing drawn yet) and as the streak exits off the bottom edge.
+      if (tipGlow && tipCore) {
+        if (p <= 0.003 || p >= 0.99) {
+          tipGlow.style.opacity = '0';
+          tipCore.style.opacity = '0';
+        } else {
+          const pt = core.getPointAtLength(p * pathTotal);
+          const cx = String(pt.x);
+          const cy = String(pt.y);
+          tipGlow.setAttribute('cx', cx);
+          tipGlow.setAttribute('cy', cy);
+          tipCore.setAttribute('cx', cx);
+          tipCore.setAttribute('cy', cy);
+          tipGlow.style.opacity = '0.9';
+          tipCore.style.opacity = '1';
+        }
+      }
     };
 
     let sTick = false;
