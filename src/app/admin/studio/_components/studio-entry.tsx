@@ -72,17 +72,14 @@ export function StudioEntry() {
           </div>
         ) : (
           <div className="grid sm:grid-cols-2 gap-4">
-            {hasClubs && (
-              <ClubsTile clubs={clubs} />
-            )}
+            {/* Slot 01 / Run-club owner: manage existing clubs, or — for anyone
+                without a club of their own (super-admins included) — the
+                add-a-club option. Kept first so the tile numbers match order. */}
+            {hasClubs ? <ClubsTile clubs={clubs} /> : <EmptyStateTile />}
 
             <OrganiserTile />
 
             {isSuper && <SuperAdminTile />}
-
-            {/* Anyone without a club of their own gets the add-a-club option —
-                including super-admins, who otherwise had no way to register one. */}
-            {!hasClubs && <EmptyStateTile />}
           </div>
         )}
       </main>
