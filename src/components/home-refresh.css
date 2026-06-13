@@ -81,7 +81,7 @@
 #homeStreakWrap .streak-core { fill: none; stroke: url(#homeSgrad); stroke-width: 2; stroke-linecap: round; opacity: .32; filter: blur(2px); }
 #homeStreakWrap .streak-glow { fill: none; stroke: url(#homeSgrad); stroke-width: 46; stroke-linecap: round; opacity: .28; filter: blur(34px); }
 /* Glowing tip + comet tail riding the leading end of the streak */
-#homeStreakWrap .streak-tip-tail { fill: url(#homeSgrad); filter: blur(7px); }
+#homeStreakWrap .streak-tip-tail { fill: none; stroke: url(#homeSgrad); stroke-width: 7; stroke-linecap: round; filter: blur(5px); }
 #homeStreakWrap .streak-tip-glow { fill: url(#homeSgrad); filter: blur(9px); }
 #homeStreakWrap .streak-tip-core { fill: #fff; filter: blur(1px); }
 

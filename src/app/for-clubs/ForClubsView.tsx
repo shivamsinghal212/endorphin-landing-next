@@ -90,7 +90,8 @@ export default function ForClubsView() {
       let glow: SVGPathElement | null = null;
       let tipGlow: SVGCircleElement | null = null;
       let tipCore: SVGCircleElement | null = null;
-      let tipTail: SVGCircleElement[] = [];
+      let tail: SVGPathElement | null = null;
+      let tailFadeEl: SVGLinearGradientElement | null = null;
       let pathTotal = 0;
       let built = false;
       let samples: Array<[number, number]> = [];
@@ -159,6 +160,35 @@ export default function ForClubsView() {
           grad.appendChild(st);
         });
         defs.appendChild(grad);
+
+        // Fade mask for the comet tail: black (transparent) at the far end →
+        // white (solid) at the head. Its endpoints are re-pointed each frame so
+        // the fade always runs along the trailing segment.
+        const tailFade = document.createElementNS(NS, 'linearGradient');
+        tailFade.setAttribute('id', 'fcTailFade');
+        tailFade.setAttribute('gradientUnits', 'userSpaceOnUse');
+        const fadeStops: Array<[string, string]> = [['0', '#000'], ['.6', '#5a5a5a'], ['1', '#fff']];
+        fadeStops.forEach(([o, c]) => {
+          const st = document.createElementNS(NS, 'stop');
+          st.setAttribute('offset', o);
+          st.setAttribute('stop-color', c);
+          tailFade.appendChild(st);
+        });
+        defs.appendChild(tailFade);
+        tailFadeEl = tailFade;
+        const tailMask = document.createElementNS(NS, 'mask');
+        tailMask.setAttribute('id', 'fcTailMask');
+        tailMask.setAttribute('maskUnits', 'userSpaceOnUse');
+        tailMask.setAttribute('x', '0');
+        tailMask.setAttribute('y', '0');
+        tailMask.setAttribute('width', String(w));
+        tailMask.setAttribute('height', String(localH));
+        const tailMaskRect = document.createElementNS(NS, 'rect');
+        tailMaskRect.setAttribute('width', String(w));
+        tailMaskRect.setAttribute('height', String(localH));
+        tailMaskRect.setAttribute('fill', 'url(#fcTailFade)');
+        tailMask.appendChild(tailMaskRect);
+        defs.appendChild(tailMask);
         svg.appendChild(defs);
 
         glow = document.createElementNS(NS, 'path');
@@ -174,19 +204,14 @@ export default function ForClubsView() {
           svg.appendChild(p);
         });
 
-        // Comet tail: a tapered run of blurred, gradient-filled blobs that
-        // trail behind the tip along the path, fading and shrinking with
-        // distance so the head reads as a comet with a long glowing wake.
-        // Appended first so the bright head sits on top.
-        tipTail = [];
-        const TAIL_N = 16;
-        for (let i = 0; i < TAIL_N; i++) {
-          const c = document.createElementNS(NS, 'circle');
-          c.setAttribute('class', 'streak-tip-tail');
-          c.style.opacity = '0';
-          svg.appendChild(c);
-          tipTail.push(c);
-        }
+        // Comet tail: one continuous stroke of the trailing path segment, faded
+        // from transparent at the far end to solid at the head via the mask
+        // above. Appended first so the bright head sits on top.
+        tail = document.createElementNS(NS, 'path');
+        tail.setAttribute('class', 'streak-tip-tail');
+        tail.setAttribute('mask', 'url(#fcTailMask)');
+        tail.style.opacity = '0';
+        svg.appendChild(tail);
 
         // Glowing tip that rides the leading (drawn) end of the streak: a soft
         // colour halo (sampling the gradient so it matches the local hue) plus
@@ -250,7 +275,7 @@ export default function ForClubsView() {
           if (p <= 0.003 || p >= 0.99) {
             tipGlow.style.opacity = '0';
             tipCore.style.opacity = '0';
-            tipTail.forEach((c) => { c.style.opacity = '0'; });
+            if (tail) tail.style.opacity = '0';
           } else {
             const pt = core.getPointAtLength(p * pathTotal);
             const cx = String(pt.x);
@@ -261,18 +286,25 @@ export default function ForClubsView() {
             tipCore.setAttribute('cy', cy);
             tipGlow.style.opacity = '0.9';
             tipCore.style.opacity = '1';
-            // Lay the comet tail back along the path behind the head.
-            const tailFrac = pathTotal ? 760 / pathTotal : 0.16;
-            for (let i = 0; i < tipTail.length; i++) {
-              const t = (i + 1) / tipTail.length; // 0→1, distance back from head
-              const f = p - t * tailFrac;
-              const c = tipTail[i];
-              if (f <= 0.003) { c.style.opacity = '0'; continue; }
-              const q = core.getPointAtLength(f * pathTotal);
-              c.setAttribute('cx', String(q.x));
-              c.setAttribute('cy', String(q.y));
-              c.setAttribute('r', String(12 * (1 - t) + 2));
-              c.style.opacity = String(0.5 * Math.pow(1 - t, 1.5));
+            // Comet tail: trace the trailing path segment as one stroke and
+            // point its fade mask from the far (transparent) end up to the head.
+            if (tail && tailFadeEl) {
+              const tailFrac = pathTotal ? 820 / pathTotal : 0.16;
+              const f0 = Math.max(0.002, p - tailFrac);
+              const K = 28;
+              let d = '';
+              for (let i = 0; i <= K; i++) {
+                const f = f0 + (p - f0) * (i / K);
+                const q = core.getPointAtLength(f * pathTotal);
+                d += `${i === 0 ? 'M' : 'L'}${q.x.toFixed(1)},${q.y.toFixed(1)}`;
+              }
+              tail.setAttribute('d', d);
+              const a = core.getPointAtLength(f0 * pathTotal);
+              tailFadeEl.setAttribute('x1', String(a.x));
+              tailFadeEl.setAttribute('y1', String(a.y));
+              tailFadeEl.setAttribute('x2', cx);
+              tailFadeEl.setAttribute('y2', cy);
+              tail.style.opacity = '0.7';
             }
           }
         }

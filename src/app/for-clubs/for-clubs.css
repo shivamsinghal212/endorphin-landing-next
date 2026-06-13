@@ -450,7 +450,7 @@
 .fcx .streak-core { fill: none; stroke: url(#fcSgrad); stroke-width: 2; stroke-linecap: round; opacity: .32; filter: blur(2px); }
 .fcx .streak-glow { fill: none; stroke: url(#fcSgrad); stroke-width: 46; stroke-linecap: round; opacity: .28; filter: blur(34px); }
 /* Glowing tip + comet tail riding the leading end of the streak */
-.fcx .streak-tip-tail { fill: url(#fcSgrad); filter: blur(7px); }
+.fcx .streak-tip-tail { fill: none; stroke: url(#fcSgrad); stroke-width: 7; stroke-linecap: round; filter: blur(5px); }
 .fcx .streak-tip-glow { fill: url(#fcSgrad); filter: blur(9px); }
 .fcx .streak-tip-core { fill: #fff; filter: blur(1px); }
 
