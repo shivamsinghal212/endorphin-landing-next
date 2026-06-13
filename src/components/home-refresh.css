@@ -78,8 +78,8 @@
 .hstreak .v1-hero-search { background: #0c0c0c; }
 #homeStreakWrap { position: absolute; top: 0; left: 0; width: 100%; z-index: 1; pointer-events: none; overflow: hidden; }
 #homeStreakWrap svg { display: block; width: 100%; }
-#homeStreakWrap .streak-core { fill: none; stroke: url(#homeSgrad); stroke-width: 3.5; stroke-linecap: round; }
-#homeStreakWrap .streak-glow { fill: none; stroke: url(#homeSgrad); stroke-width: 18; stroke-linecap: round; opacity: .55; filter: blur(17px); }
+#homeStreakWrap .streak-core { fill: none; stroke: url(#homeSgrad); stroke-width: 2; stroke-linecap: round; opacity: .32; filter: blur(2px); }
+#homeStreakWrap .streak-glow { fill: none; stroke: url(#homeSgrad); stroke-width: 46; stroke-linecap: round; opacity: .28; filter: blur(34px); }
 
 @media (prefers-reduced-motion: reduce) {
   .fcb-title em, .hcta-title em { animation: none; }
