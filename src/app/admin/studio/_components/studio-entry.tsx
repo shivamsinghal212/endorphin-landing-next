@@ -229,30 +229,34 @@ function EmptyStateTile() {
   }
 
   return (
-    <div className="sm:col-span-2 bg-white border border-jet/10 rounded-3xl p-8 text-center">
-      <p className="font-display uppercase text-sm font-bold text-jet/50 mb-2">
-        No clubs on your account yet
+    <div className="bg-white border border-jet/10 rounded-3xl p-6 md:p-8 min-h-[200px] flex flex-col">
+      <p className="text-[10px] uppercase tracking-wider text-jet/40">
+        01 / Run-club owner
+      </p>
+      <p
+        className="italic text-3xl md:text-4xl leading-[0.95] mt-6 text-jet"
+        style={{ fontFamily: 'var(--font-fraunces), Georgia, serif' }}
+      >
+        Add your<br />club.
       </p>
       {submitted ? (
-        <p className="text-sm text-jet/70 max-w-md mx-auto" role="status" aria-live="polite">
-          <strong>Thanks — we&apos;ll be in touch.</strong> We&apos;ve logged your
-          club. If anything&apos;s urgent, reach us at{' '}
+        <p className="text-xs text-jet/60 mt-4" role="status" aria-live="polite">
+          <strong className="text-jet">Thanks — we&apos;ll be in touch.</strong> We&apos;ve
+          logged your club. Anything urgent? Email{' '}
           <a className="underline" href="mailto:hello@endorfin.run">hello@endorfin.run</a>.
         </p>
       ) : (
         <>
-          <p className="text-sm text-jet/60 max-w-md mx-auto mb-5">
-            Run a club? Drop your club&apos;s Instagram and we&apos;ll get you set
-            up — or email{' '}
-            <a className="underline" href="mailto:hello@endorfin.run">hello@endorfin.run</a>{' '}
-            and we&apos;ll reach out.
+          <p className="text-xs text-jet/60 mt-4">
+            Drop your club&apos;s Instagram and we&apos;ll get you set up — or email{' '}
+            <a className="underline" href="mailto:hello@endorfin.run">hello@endorfin.run</a>.
           </p>
-          <form onSubmit={onSubmit} className="flex flex-wrap items-stretch justify-center gap-2 max-w-md mx-auto">
-            <div className="flex items-center flex-1 min-w-[200px] border border-jet/15 rounded-lg px-3 focus-within:border-jet/40">
+          <form onSubmit={onSubmit} className="mt-6 flex flex-col gap-2">
+            <div className="flex items-center border border-jet/15 rounded-lg px-3 focus-within:border-jet/40 transition-colors">
               <span className="text-jet/40 text-sm" aria-hidden>@</span>
               <input
                 type="text"
-                className="flex-1 bg-transparent px-2 py-2 text-sm text-jet outline-none"
+                className="flex-1 min-w-0 bg-transparent px-2 py-2.5 text-sm text-jet outline-none"
                 placeholder="your_club_handle"
                 aria-label="Your club's Instagram handle"
                 value={handle}
@@ -265,12 +269,12 @@ function EmptyStateTile() {
             <button
               type="submit"
               disabled={!cleanHandle(handle) || submitting}
-              className="px-4 py-2 rounded-lg text-sm font-medium bg-jet text-bone hover:bg-jet/90 transition-colors disabled:opacity-40"
+              className="self-start px-4 py-2 rounded-lg text-sm font-medium bg-jet text-bone hover:bg-jet/90 transition-colors disabled:opacity-40 disabled:hover:bg-jet"
             >
               {submitting ? 'Adding…' : 'Add my club →'}
             </button>
           </form>
-          <Link href="/clubs" className="inline-block mt-4 text-xs text-jet/50 underline hover:text-jet">
+          <Link href="/clubs" className="mt-4 text-xs text-jet/50 underline hover:text-jet">
             Or browse clubs
           </Link>
         </>
