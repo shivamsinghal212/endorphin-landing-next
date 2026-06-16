@@ -162,7 +162,7 @@ export default function JoinClubFormModal({
                     : 'Add your Instagram if you like, then send your request.'}
               </p>
 
-              <div className="flex flex-col gap-3 mt-4">
+              <div className="flex flex-col gap-3">
                 {safeFields.map((f) => (
                   <FieldRow
                     key={f.id}
