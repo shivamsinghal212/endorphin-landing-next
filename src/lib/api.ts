@@ -306,10 +306,11 @@ export const clubsApi = {
     slug: string,
     formData: Record<string, unknown> | null,
     token: string,
+    instagramId?: string | null,
   ) =>
     api<JoinClubResponse>(`/clubs/${encodeURIComponent(slug)}/join`, {
       method: 'POST',
-      body: JSON.stringify({ formData }),
+      body: JSON.stringify({ formData, instagramId: instagramId || null }),
       token,
     }),
 

@@ -40,11 +40,12 @@ async function requireToken(): Promise<string | null> {
 export async function joinClubAction(
   slug: string,
   formData: Record<string, unknown> | null,
+  instagramId?: string | null,
 ): Promise<ClubActionState<JoinClubResponse>> {
   const token = await requireToken();
   if (!token) return { ok: false, error: 'Not signed in', status: 401 };
   try {
-    const data = await clubsApi.joinClub(slug, formData, token);
+    const data = await clubsApi.joinClub(slug, formData, token, instagramId);
     return { ok: true, data };
   } catch (e) {
     return toError(e);

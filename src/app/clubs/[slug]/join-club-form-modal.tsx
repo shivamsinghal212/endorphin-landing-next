@@ -43,6 +43,7 @@ export default function JoinClubFormModal({
   }, [fields]);
 
   const [values, setValues] = useState<Record<string, string>>({});
+  const [instagram, setInstagram] = useState('');
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
@@ -50,6 +51,7 @@ export default function JoinClubFormModal({
   useEffect(() => {
     if (open) {
       setValues({});
+      setInstagram('');
       setErrors({});
       setSubmitError(null);
     }
@@ -95,6 +97,7 @@ export default function JoinClubFormModal({
       const r = await joinClubAction(
         slug,
         safeFields.length === 0 ? null : payload,
+        instagram.trim() || null,
       );
       if (r.ok && r.data) {
         posthog.capture('club_joined', {
@@ -153,26 +156,50 @@ export default function JoinClubFormModal({
                 {autoJoin
                   ? hasFields
                     ? 'Tell us a bit about yourself and you’re in.'
-                    : 'No questions to answer — tap below to join.'
+                    : 'Add your Instagram if you like, then tap below to join.'
                   : hasFields
                     ? 'Answer a few quick questions and the club admins will review your request.'
-                    : 'No questions to answer — tap below to send a request.'}
+                    : 'Add your Instagram if you like, then send your request.'}
               </p>
 
-              {hasFields && (
-                <div className="flex flex-col gap-3 mt-4">
-                  {safeFields.map((f) => (
-                    <FieldRow
-                      key={f.id}
-                      field={f}
-                      value={values[f.id] ?? ''}
-                      onChange={(v) => set(f.id, v)}
-                      error={errors[f.id]}
-                      disabled={pending}
-                    />
-                  ))}
+              <div className="flex flex-col gap-3 mt-4">
+                {safeFields.map((f) => (
+                  <FieldRow
+                    key={f.id}
+                    field={f}
+                    value={values[f.id] ?? ''}
+                    onChange={(v) => set(f.id, v)}
+                    error={errors[f.id]}
+                    disabled={pending}
+                  />
+                ))}
+
+                {/* Always shown on every club — optional. The club reaches out
+                    to the requester here. */}
+                <div className="flex flex-col gap-1">
+                  <label
+                    htmlFor="jcfm-instagram"
+                    className="text-[11px] font-medium tracking-[0.12em] text-[#5C544A] uppercase"
+                  >
+                    What’s your Instagram ID?
+                  </label>
+                  <input
+                    id="jcfm-instagram"
+                    className="v1lm-input"
+                    type="text"
+                    inputMode="text"
+                    autoCapitalize="none"
+                    autoCorrect="off"
+                    value={instagram}
+                    onChange={(e) => setInstagram(e.target.value)}
+                    placeholder="@yourhandle"
+                    disabled={pending}
+                  />
+                  <span className="text-[12px] text-[#8A8278]">
+                    Optional — the run club will reach out to you here.
+                  </span>
                 </div>
-              )}
+              </div>
 
               {submitError && (
                 <div className="v1lm-feedback is-error mt-3" role="alert">
