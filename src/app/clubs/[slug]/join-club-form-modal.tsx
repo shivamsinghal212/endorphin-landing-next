@@ -209,7 +209,10 @@ export default function JoinClubFormModal({
 
               <button
                 type="submit"
-                className="v1lm-btn-primary mt-8"
+                className="v1lm-btn-primary"
+                // Inline margin beats .v1lm-btn-primary's own margin-top:4px,
+                // which otherwise overrides any mt-* utility class here.
+                style={{ marginTop: 28 }}
                 disabled={pending}
               >
                 {pending ? submittingLabel : submitLabel}
