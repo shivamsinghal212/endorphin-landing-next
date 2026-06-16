@@ -705,6 +705,7 @@ export interface ClubJoinRequestRow {
   id: string;
   user: ClubMemberUser;
   formData: Record<string, unknown> | null;
+  instagramId?: string | null;
   status: 'pending' | 'approved' | 'rejected';
   rejectionReason?: string | null;
   reviewedAt?: string | null;

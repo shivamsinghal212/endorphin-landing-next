@@ -173,6 +173,16 @@ export function MembersContent({
                   <p className="text-xs text-jet/50 truncate">
                     {r.user.email || '—'}
                   </p>
+                  {r.instagramId && (
+                    <a
+                      href={`https://instagram.com/${r.instagramId}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="block text-xs text-[#E4405F] font-medium truncate hover:underline mt-0.5"
+                    >
+                      @{r.instagramId}
+                    </a>
+                  )}
                   {r.formData && Object.keys(r.formData).length > 0 && (
                     <FormDataInline data={r.formData} />
                   )}
