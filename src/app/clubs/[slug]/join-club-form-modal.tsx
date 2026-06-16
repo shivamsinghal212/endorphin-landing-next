@@ -209,7 +209,7 @@ export default function JoinClubFormModal({
 
               <button
                 type="submit"
-                className="v1lm-btn-primary mt-5"
+                className="v1lm-btn-primary mt-8"
                 disabled={pending}
               >
                 {pending ? submittingLabel : submitLabel}
