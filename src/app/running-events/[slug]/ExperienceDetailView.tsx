@@ -158,9 +158,8 @@ export default function ExperienceDetailView({
   const registerNode = (className: string) => {
     if (isAlreadyRegistered) {
       return (
-        <Link href={eventPath(event, '/register')} className="exd-youre-in">
-          <span className="yi-tag">You&rsquo;re in</span>
-          <span className="yi-num">{myActiveRegistration!.bibNumber ?? 'Booked'} <span aria-hidden>→</span></span>
+        <Link href={`/me/registrations/${myActiveRegistration!.id}`} className="exd-btn exd-btn-booked">
+          ✓ Show ticket
         </Link>
       );
     }
@@ -400,7 +399,7 @@ export default function ExperienceDetailView({
               ) : null}
             </div>
             {isAlreadyRegistered ? (
-              <Link className="exd-sticky-cta" href={eventPath(event, '/register')}>✓ Booked</Link>
+              <Link className="exd-sticky-cta" href={`/me/registrations/${myActiveRegistration!.id}`}>✓ Show ticket</Link>
             ) : event.eventSourceType === 'organizer' ? (
               <Link
                 className="exd-sticky-cta"
