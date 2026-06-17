@@ -77,6 +77,15 @@
    on the homepage so the streak is genuinely occluded (reads as behind it). */
 .hstreak .v1-hero-search { background: #0c0c0c; }
 #homeStreakWrap { position: absolute; top: 0; left: 0; width: 100%; z-index: 1; pointer-events: none; overflow: hidden; }
+/* Hide the streak on Safari / iOS WebKit. Its glow relies on SVG blur
+   filters, which WebKit re-evaluates per scroll frame (open bug 283156) —
+   jagged + choppy there. `@supports (-webkit-hyphens: none)` matches only
+   Safari/WebKit (Chrome & Firefox return false); CSS-only so it applies
+   instantly regardless of JS timing. JS in HomeStreak.tsx also bails on the
+   same engines via navigator.vendor. */
+@supports (-webkit-hyphens: none) {
+  #homeStreakWrap { display: none !important; }
+}
 #homeStreakWrap svg { display: block; width: 100%; }
 #homeStreakWrap .streak-core { fill: none; stroke: url(#homeSgrad); stroke-width: 2; stroke-linecap: round; opacity: .32; filter: blur(2px); }
 #homeStreakWrap .streak-glow { fill: none; stroke: url(#homeSgrad); stroke-width: 46; stroke-linecap: round; opacity: .28; filter: blur(34px); }

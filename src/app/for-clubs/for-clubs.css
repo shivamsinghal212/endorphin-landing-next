@@ -447,6 +447,13 @@
 .fcx .wrap { z-index: 2; }
 .fcx #streakWrap { position: absolute; top: 0; left: 0; width: 100%; z-index: 1; pointer-events: none; overflow: hidden; }
 .fcx #streakWrap svg { display: block; width: 100%; }
+/* Hide the streak on Safari / iOS WebKit — its glow uses SVG blur filters
+   that WebKit re-evaluates per scroll frame (open bug 283156), so it's jagged
+   and choppy there. `@supports (-webkit-hyphens: none)` matches only WebKit
+   (Chrome & Firefox return false). Same guard as the homepage streak. */
+@supports (-webkit-hyphens: none) {
+  .fcx #streakWrap { display: none !important; }
+}
 .fcx .streak-core { fill: none; stroke: url(#fcSgrad); stroke-width: 2; stroke-linecap: round; opacity: .32; filter: blur(2px); }
 .fcx .streak-glow { fill: none; stroke: url(#fcSgrad); stroke-width: 46; stroke-linecap: round; opacity: .28; filter: blur(34px); }
 /* Glowing tip + comet tail riding the leading end of the streak */

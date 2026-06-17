@@ -84,7 +84,13 @@ export default function ForClubsView() {
 
     // ── glowing scroll streak (drawn by scroll, colour-ramps down the page) ──
     const streakWrap = root.querySelector<HTMLElement>('#streakWrap');
-    if (streakWrap) {
+    // Skip the streak on Safari / iOS WebKit — its SVG blur filters are
+    // re-evaluated per scroll frame (open bug 283156), so it's jagged and
+    // choppy there. Apple's WebKit is the only engine with this vendor
+    // (covers desktop Safari + every iOS browser). CSS hides it too.
+    const isWebkit = navigator.vendor === 'Apple Computer, Inc.';
+    if (streakWrap && isWebkit) streakWrap.style.display = 'none';
+    if (streakWrap && !isWebkit) {
       const NS = 'http://www.w3.org/2000/svg';
       let core: SVGPathElement | null = null;
       let glow: SVGPathElement | null = null;

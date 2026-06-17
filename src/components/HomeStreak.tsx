@@ -16,6 +16,16 @@ export default function HomeStreak() {
     const streakWrap = document.getElementById('homeStreakWrap');
     if (!root || !streakWrap) return;
 
+    // Skip the streak entirely on Safari / iOS WebKit. The glow relies on
+    // SVG blur filters, which WebKit re-evaluates per scroll frame (open
+    // bug 283156) — it looks jagged and scrolls choppily there. Apple's
+    // WebKit is the only engine whose navigator.vendor is "Apple Computer,
+    // Inc." (covers desktop Safari + every iOS browser, all WebKit).
+    if (navigator.vendor === 'Apple Computer, Inc.') {
+      streakWrap.style.display = 'none';
+      return;
+    }
+
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const NS = 'http://www.w3.org/2000/svg';
     let core: SVGPathElement | null = null;
