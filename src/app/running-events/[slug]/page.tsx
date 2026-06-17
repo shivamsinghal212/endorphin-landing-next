@@ -98,7 +98,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       // Social cards read cleaner without the "| Endorfin" suffix.
       title: event.title,
       description: metaDescription,
-      images: event.imageUrl ? [{ url: event.imageUrl }] : undefined,
+      images: (event.coverImageUrl || event.imageUrl) ? [{ url: (event.coverImageUrl || event.imageUrl)! }] : undefined,
       siteName: 'Endorfin',
     },
   };
@@ -135,7 +135,7 @@ function buildJsonLd(event: Event) {
         ? { '@type': 'PostalAddress', streetAddress: event.locationAddress, addressCountry: 'IN' }
         : { '@type': 'PostalAddress', addressLocality: event.locationName || undefined, addressCountry: 'IN' },
     },
-    image: event.imageUrl || undefined,
+    image: event.coverImageUrl || event.imageUrl || undefined,
     description,
     organizer: { '@type': 'Organization', name: organizerName },
     performer: { '@type': 'PerformingGroup', name: 'Event participants' },
