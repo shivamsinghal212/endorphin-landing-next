@@ -13,6 +13,7 @@ import { ReminderButton } from '@/components/ReminderButton';
 import DetailCrossNav from '@/components/DetailCrossNav';
 import ExploreMoreStrip from '@/components/ExploreMoreStrip';
 import { couponCta } from '@/lib/coupon-cta';
+import { eventPath } from '@/lib/event-path';
 import { buildEventNarrative } from '@/lib/event-seo';
 import type { Event, DistanceCategory } from '@/lib/api';
 import { useMyRegistrations } from '@/lib/runner-hooks';
@@ -374,7 +375,7 @@ export default function RaceDetailView({
               // bib number, wrapped by the same 2px jet border the full
               // bib carries. Click → opens the full bib + share view.
               <Link
-                href={`/running-events/${event.slug || event.id}/register`}
+                href={eventPath(event, '/register')}
                 className="group inline-flex items-stretch border-2 border-jet rounded-md overflow-hidden hover:shadow-[0_8px_24px_-12px_rgba(10,10,10,0.45)] transition-shadow no-underline"
                 style={{ textDecoration: 'none' }}
               >
@@ -399,7 +400,7 @@ export default function RaceDetailView({
               // get bounced to homepage by the server-side auth redirect.
               <Link
                 className="v1rd-btn v1rd-btn-primary"
-                href={`/running-events/${event.slug || event.id}/register`}
+                href={eventPath(event, '/register')}
                 onClick={(e) => {
                   posthog.capture('race_register_clicked', {
                     race_id: event.id,
@@ -409,7 +410,7 @@ export default function RaceDetailView({
                   });
                   if (!isAuthed) {
                     e.preventDefault();
-                    pendingInternalPathRef.current = `/running-events/${event.slug || event.id}/register`;
+                    pendingInternalPathRef.current = eventPath(event, '/register');
                     setLoginOpen(true);
                   }
                 }}
@@ -716,7 +717,7 @@ export default function RaceDetailView({
               {isAlreadyRegistered ? (
                 <Link
                   className="v1rd-sticky-cta"
-                  href={`/running-events/${event.slug || event.id}/register`}
+                  href={eventPath(event, '/register')}
                   style={{ background: '#0A0A0A', color: '#F5F0EB' }}
                 >
                   ✓ Bib {myActiveRegistration!.bibNumber ?? '—'}
@@ -724,11 +725,11 @@ export default function RaceDetailView({
               ) : event.eventSourceType === 'organizer' ? (
                 <Link
                   className="v1rd-sticky-cta"
-                  href={`/running-events/${event.slug || event.id}/register`}
+                  href={eventPath(event, '/register')}
                   onClick={(e) => {
                     if (!isAuthed) {
                       e.preventDefault();
-                      pendingInternalPathRef.current = `/running-events/${event.slug || event.id}/register`;
+                      pendingInternalPathRef.current = eventPath(event, '/register');
                       setLoginOpen(true);
                     }
                   }}

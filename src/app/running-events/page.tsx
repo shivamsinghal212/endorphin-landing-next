@@ -3,6 +3,7 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import RacesView from './RacesView';
 import { API_BASE } from '@/lib/api';
+import { eventPath } from '@/lib/event-path';
 import { getSessionToken } from '@/lib/session';
 
 export const metadata: Metadata = {
@@ -25,6 +26,7 @@ export interface ApiEvent {
   id: string;
   slug?: string;
   title: string;
+  category?: string;
   description?: string;
   imageUrl?: string;
   locationName?: string;
@@ -145,7 +147,7 @@ function buildJsonLd(races: ApiEvent[]) {
               availability: r.soldOut
                 ? 'https://schema.org/SoldOut'
                 : 'https://schema.org/InStock',
-              url: `https://www.endorfin.run/running-events/${r.slug || r.id}`,
+              url: `https://www.endorfin.run${eventPath(r)}`,
               validFrom,
               ...(r.registrationEndDate && { validThrough: r.registrationEndDate }),
             },

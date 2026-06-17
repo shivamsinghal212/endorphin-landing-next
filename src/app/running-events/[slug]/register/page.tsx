@@ -8,6 +8,7 @@ import { getSessionToken } from '@/lib/session';
 import { getStudioAuth } from '@/lib/studio/server-auth';
 import type { OrganiserEvent, RegistrationFormField } from '@/lib/organiser-api';
 import { RegistrationForm } from './_components/registration-form';
+import { BookingForm } from './_components/booking-form';
 import { RunnerProviders } from './_components/runner-providers';
 import '../race-detail.css';
 
@@ -136,7 +137,11 @@ export default async function RegisterPage({ params }: PageProps) {
               ← {event.title}
             </Link>
           </nav>
-          <RegistrationForm bundle={{ event, extras }} />
+          {event.allowGroupBooking ? (
+            <BookingForm bundle={{ event, extras }} />
+          ) : (
+            <RegistrationForm bundle={{ event, extras }} />
+          )}
         </div>
       </RunnerProviders>
       <Footer />

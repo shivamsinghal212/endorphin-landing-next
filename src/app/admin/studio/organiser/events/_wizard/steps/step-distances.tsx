@@ -12,6 +12,7 @@ export function StepDistances({
   onChange: (next: WizardDraft) => void;
 }) {
   const rows = draft.distanceCategories;
+  const isExperience = draft.category === 'experience';
 
   const setRows = (next: DistanceCategoryIn[]) =>
     onChange(patchDraft(draft, { distanceCategories: next }));
@@ -35,24 +36,26 @@ export function StepDistances({
       },
     ]);
 
+  const noun = isExperience ? 'ticket' : 'distance';
   const priceSummary = (() => {
     const prices = rows.map((r) => r.price).filter((p) => Number.isFinite(p));
     if (!prices.length) return '';
     const min = Math.min(...prices);
     const max = Math.max(...prices);
-    if (min === max) return `${rows.length} distance${rows.length === 1 ? '' : 's'} · ₹${min}`;
-    return `${rows.length} distances · ₹${min}–₹${max}`;
+    if (min === max) return `${rows.length} ${noun}${rows.length === 1 ? '' : 's'} · ₹${min}`;
+    return `${rows.length} ${noun}s · ₹${min}–₹${max}`;
   })();
 
   return (
     <div className="space-y-4">
       <div>
         <h1 className="font-display uppercase text-2xl font-bold">
-          Distances &amp; pricing
+          {isExperience ? 'Tickets & pricing' : 'Distances & pricing'}
         </h1>
         <p className="text-sm text-jet/60">
-          A virtual race usually sells 3–5 distances. Each one prices and caps
-          independently. At least one is required.
+          {isExperience
+            ? 'Add one or more ticket types (e.g. General, VIP). Each prices and caps independently. At least one is required.'
+            : 'A virtual race usually sells 3–5 distances. Each one prices and caps independently. At least one is required.'}
         </p>
       </div>
 
@@ -61,7 +64,9 @@ export function StepDistances({
           <thead className="bg-jet/[0.03] text-[10px] uppercase tracking-wider text-jet/50">
             <tr>
               <th className="text-left px-4 py-2.5 font-medium">Name</th>
-              <th className="text-left px-4 py-2.5 font-medium">Distance</th>
+              {!isExperience && (
+                <th className="text-left px-4 py-2.5 font-medium">Distance</th>
+              )}
               <th className="text-left px-4 py-2.5 font-medium">Price</th>
               <th className="text-left px-4 py-2.5 font-medium">Cap</th>
               <th className="text-left px-4 py-2.5 font-medium">Inclusions</th>
@@ -73,18 +78,19 @@ export function StepDistances({
               <DistanceRow
                 key={row.id ?? `new-${i}`}
                 row={row}
+                isExperience={isExperience}
                 onChange={(p) => update(i, p)}
                 onRemove={() => remove(i)}
               />
             ))}
             <tr className="bg-jet/[0.02]">
-              <td colSpan={6} className="px-4 py-3">
+              <td colSpan={isExperience ? 5 : 6} className="px-4 py-3">
                 <button
                   type="button"
                   onClick={add}
                   className="text-sm text-jet/60 hover:text-jet inline-flex items-center gap-2"
                 >
-                  ＋ Add distance
+                  ＋ Add {isExperience ? 'ticket type' : 'distance'}
                 </button>
               </td>
             </tr>
@@ -99,7 +105,7 @@ export function StepDistances({
 
       {rows.length === 0 && (
         <div className="rounded-xl bg-signal/5 border border-signal/30 px-3 py-2 text-[12px] text-signal">
-          ⚠ Add at least one distance before continuing.
+          ⚠ Add at least one {isExperience ? 'ticket type' : 'distance'} before continuing.
         </div>
       )}
     </div>
@@ -108,10 +114,12 @@ export function StepDistances({
 
 function DistanceRow({
   row,
+  isExperience,
   onChange,
   onRemove,
 }: {
   row: DistanceCategoryIn;
+  isExperience: boolean;
   onChange: (patch: Partial<DistanceCategoryIn>) => void;
   onRemove: () => void;
 }) {
@@ -148,22 +156,24 @@ function DistanceRow({
                 : row.fullTitle,
             })
           }
-          placeholder="10K"
+          placeholder={isExperience ? 'General' : '10K'}
           className="w-24 px-2 py-1.5 rounded-lg border border-jet/10 text-sm"
         />
       </td>
-      <td className="px-4 py-3">
-        <div className="flex items-center gap-1">
-          <input
-            value={distanceKm}
-            onChange={(e) => setDistanceKm(e.target.value)}
-            inputMode="decimal"
-            placeholder="10"
-            className="w-16 px-2 py-1.5 rounded-lg border border-jet/10 text-sm"
-          />
-          <span className="text-xs text-jet/50">km</span>
-        </div>
-      </td>
+      {!isExperience && (
+        <td className="px-4 py-3">
+          <div className="flex items-center gap-1">
+            <input
+              value={distanceKm}
+              onChange={(e) => setDistanceKm(e.target.value)}
+              inputMode="decimal"
+              placeholder="10"
+              className="w-16 px-2 py-1.5 rounded-lg border border-jet/10 text-sm"
+            />
+            <span className="text-xs text-jet/50">km</span>
+          </div>
+        </td>
+      )}
       <td className="px-4 py-3">
         <div className="flex items-center gap-1">
           <span className="text-xs text-jet/50">₹</span>
@@ -259,6 +269,7 @@ function InclusionsPicker({
   onPick: (opt: string) => void;
 }) {
   const [open, setOpen] = useState(false);
+  const [custom, setCustom] = useState('');
   const [coords, setCoords] = useState<{ top: number; left: number } | null>(null);
   const triggerRef = useRef<HTMLButtonElement | null>(null);
   const menuRef = useRef<HTMLDivElement | null>(null);
@@ -305,7 +316,14 @@ function InclusionsPicker({
   }, [open]);
 
   const available = INCLUSION_OPTIONS.filter((o) => !current.includes(o));
-  const exhausted = available.length === 0;
+
+  const addCustom = () => {
+    const v = custom.trim();
+    if (!v) return;
+    if (!current.includes(v)) onPick(v);
+    setCustom('');
+    setOpen(false);
+  };
 
   return (
     <>
@@ -313,10 +331,9 @@ function InclusionsPicker({
         ref={triggerRef}
         type="button"
         onClick={() => setOpen((o) => !o)}
-        disabled={exhausted}
-        className="text-[10px] px-2 py-0.5 rounded-full border border-dashed border-jet/30 text-jet/50 hover:border-jet hover:text-jet disabled:opacity-40 disabled:cursor-not-allowed"
+        className="text-[10px] px-2 py-0.5 rounded-full border border-dashed border-jet/30 text-jet/50 hover:border-jet hover:text-jet"
       >
-        {exhausted ? 'All added' : '+ Add'}
+        + Add
       </button>
       {open && coords && (
         <div
@@ -339,6 +356,31 @@ function InclusionsPicker({
               {opt}
             </button>
           ))}
+          {/* Free-text custom inclusion — inclusions are stored as a plain
+              string[], so anything the organiser types is valid. */}
+          <div className="w-full flex gap-1 mt-1 pt-2 border-t border-jet/10">
+            <input
+              value={custom}
+              onChange={(e) => setCustom(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  addCustom();
+                }
+              }}
+              placeholder="Add your own…"
+              autoFocus
+              className="flex-1 min-w-0 px-2 py-1 rounded-lg border border-jet/10 text-[11px]"
+            />
+            <button
+              type="button"
+              onClick={addCustom}
+              disabled={!custom.trim()}
+              className="text-[11px] px-2 py-1 rounded-lg bg-jet text-bone disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              Add
+            </button>
+          </div>
         </div>
       )}
     </>

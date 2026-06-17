@@ -3,6 +3,8 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { useMyRegistration } from '@/lib/runner-hooks';
+import { eventPath } from '@/lib/event-path';
+import { EventTicket } from '@/app/running-events/[slug]/register/success/_event-ticket';
 import type { MyRegistrationItem } from '@/lib/runner-api';
 
 const IST = 'Asia/Kolkata';
@@ -80,26 +82,26 @@ function buildTimeline(r: MyRegistrationItem): StepDef[] {
     });
   }
 
-  steps.push({
-    key: 'medal',
-    label: 'Medal',
-    state:
-      r.medalStatus === 'delivered'
-        ? 'done'
-        : r.medalStatus === 'dispatched'
-          ? 'current'
-          : r.medalStatus === 'not_applicable'
-            ? 'skipped'
+  // Medal only applies to events that ship one (running). Omit the row
+  // entirely otherwise so experiences don't show a "No medal" line.
+  if (r.medalStatus !== 'not_applicable') {
+    steps.push({
+      key: 'medal',
+      label: 'Medal',
+      state:
+        r.medalStatus === 'delivered'
+          ? 'done'
+          : r.medalStatus === 'dispatched'
+            ? 'current'
             : 'todo',
-    detail:
-      r.medalStatus === 'not_applicable'
-        ? 'No medal for this event.'
-        : r.medalStatus === 'dispatched'
+      detail:
+        r.medalStatus === 'dispatched'
           ? 'On its way.'
           : r.medalStatus === 'delivered'
             ? 'Delivered.'
             : undefined,
-  });
+    });
+  }
   return steps;
 }
 
@@ -135,7 +137,9 @@ export function RegistrationDetailView({
 
   const r = q.data;
   const timeline = buildTimeline(r);
-  const eventHref = `/running-events/${r.event.slug || r.event.id}`;
+  const eventHref = eventPath(r.event);
+  const isRunning = r.event.category === 'running';
+  const isPaid = r.paymentStatus === 'paid' || r.paymentStatus === 'free';
 
   return (
     <div className="max-w-3xl mx-auto px-4 md:px-6 py-8 md:py-12">
@@ -173,6 +177,20 @@ export function RegistrationDetailView({
           </Link>
         </div>
       </div>
+
+      {isPaid && (
+        <div className="mb-6">
+          <EventTicket
+            className="w-full"
+            eventTitle={r.event.title}
+            code={r.bibNumber || r.bookingCode || '—'}
+            codeLabel={isRunning ? 'Bib no.' : 'Entry code'}
+            startTime={r.event.startTime}
+            venue={r.event.venueName || r.event.locationName || null}
+            qrValue={typeof window !== 'undefined' ? window.location.href : ''}
+          />
+        </div>
+      )}
 
       <section className="bg-white border border-jet/10 rounded-2xl p-5 md:p-6 mb-4">
         <p className="font-display uppercase text-sm font-bold text-jet mb-4">

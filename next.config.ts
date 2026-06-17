@@ -7,6 +7,8 @@ const nextConfig: NextConfig = {
       { protocol: 'https', hostname: 's3.ap-south-1.amazonaws.com' },
       { protocol: 'https', hostname: 'images.unsplash.com' },
       { protocol: 'https', hostname: '*.supabase.co' },
+      // Cloudflare R2/Workers media bucket (studio event covers, gallery).
+      { protocol: 'https', hostname: '**.workers.dev' },
     ],
   },
   async headers() {
@@ -38,6 +40,14 @@ const nextConfig: NextConfig = {
   },
   async rewrites() {
     return [
+      {
+        // Experience events share the running-events route tree — only the
+        // public URL prefix differs. eventPath() renders /experiences/...
+        // links; this rewrite makes them resolve. Canonical tags (set
+        // per-event from event.category) disambiguate for SEO.
+        source: '/experiences/:path*',
+        destination: '/running-events/:path*',
+      },
       {
         source: '/ingest/static/:path*',
         destination: 'https://us-assets.i.posthog.com/static/:path*',

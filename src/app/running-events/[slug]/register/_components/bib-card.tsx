@@ -160,7 +160,7 @@ export function ShareRow({
 }) {
   const buildShareText = () => {
     const distancePart = distance ? ` (${distance})` : '';
-    return `Just registered for ${eventTitle}${distancePart} on @Endorfin 🏃 My bib is ${bibNumber}.`;
+    return `I'm going to ${eventTitle}${distancePart} — booked on @Endorfin 🎟️`;
   };
   const buildShareUrl = () => {
     if (typeof window === 'undefined') return '';
@@ -212,7 +212,7 @@ export function ShareRow({
   return (
     <div className="mt-6">
       <p className="text-[10px] uppercase tracking-widest text-jet/45 mb-2">
-        Share your bib
+        Share
       </p>
       <div className="flex flex-wrap justify-center gap-2">
         <button

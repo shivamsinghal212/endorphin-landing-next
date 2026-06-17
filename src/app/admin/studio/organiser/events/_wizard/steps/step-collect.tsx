@@ -12,6 +12,8 @@ export function StepCollect({
 }) {
   const set = (patch: Partial<WizardDraft>) => onChange(patchDraft(draft, patch));
   const isPhysical = draft.eventFormat === 'in_person';
+  // Run proof + finisher medals are running-only concepts.
+  const isExperience = draft.category === 'experience';
 
   const sizes = draft.tshirtSizes ?? [];
 
@@ -111,36 +113,47 @@ export function StepCollect({
         disabled={!!draft.shipsMedal}
       />
 
-      <CollectCard
-        title="Ship a finisher's medal"
-        body="Dispatched after the run is verified."
-        checked={!!draft.shipsMedal}
-        onChange={(v) =>
-          set({
-            shipsMedal: v,
-            // Turning medal on flips address on too. Turning it off doesn't
-            // forcibly turn address off — the organiser may still want it.
-            collectAddress: v ? true : draft.collectAddress,
-          })
-        }
-      />
+      {!isExperience && (
+        <CollectCard
+          title="Ship a finisher's medal"
+          body="Dispatched after the run is verified."
+          checked={!!draft.shipsMedal}
+          onChange={(v) =>
+            set({
+              shipsMedal: v,
+              // Turning medal on flips address on too. Turning it off doesn't
+              // forcibly turn address off — the organiser may still want it.
+              collectAddress: v ? true : draft.collectAddress,
+            })
+          }
+        />
+      )}
 
       <CollectCard
-        title="Require run proof"
-        body={
-          isPhysical
-            ? 'Disabled for physical events — runners check in on race day.'
-            : 'Screenshot of Strava/Garmin/phone app. We verify before medal dispatch.'
-        }
-        chip={
-          isPhysical ? (
-            <RequiredChip label="Virtual only" tone="jet" />
-          ) : null
-        }
-        checked={!!draft.requiresRunProof}
-        onChange={(v) => set({ requiresRunProof: v })}
-        disabled={isPhysical}
+        title="Allow group booking (multi-ticket)"
+        body="Let one person buy several tickets in a single checkout — across ticket types — and enter each guest's name and email. Best for parties, workshops and socials."
+        checked={!!draft.allowGroupBooking}
+        onChange={(v) => set({ allowGroupBooking: v })}
       />
+
+      {!isExperience && (
+        <CollectCard
+          title="Require run proof"
+          body={
+            isPhysical
+              ? 'Disabled for physical events — runners check in on race day.'
+              : 'Screenshot of Strava/Garmin/phone app. We verify before medal dispatch.'
+          }
+          chip={
+            isPhysical ? (
+              <RequiredChip label="Virtual only" tone="jet" />
+            ) : null
+          }
+          checked={!!draft.requiresRunProof}
+          onChange={(v) => set({ requiresRunProof: v })}
+          disabled={isPhysical}
+        />
+      )}
     </div>
   );
 }

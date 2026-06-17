@@ -146,10 +146,16 @@ export function StepCoupons({ draft }: { draft: WizardDraft }) {
           existingCodes={coupons
             .filter((c) => c.id !== editing?.id)
             .map((c) => c.code.toUpperCase())}
-          distances={draft.distanceCategories.map((d, i) => ({
-            id: d.id ?? `tmp-${i}`,
-            name: d.categoryName || `Distance ${i + 1}`,
-          }))}
+          // Only persisted tickets (with a real UUID) can be scoped — the
+          // backend's appliesToDistanceIds must be UUIDs. Unsaved rows get a
+          // real id once the event autosaves (see wizard hydrateServerIds);
+          // until then they're simply not offered here.
+          distances={draft.distanceCategories
+            .filter((d): d is typeof d & { id: string } => !!d.id)
+            .map((d) => ({
+              id: d.id,
+              name: d.categoryName || 'Ticket',
+            }))}
           onCancel={() => {
             setEditorOpen(false);
             setEditing(null);

@@ -110,6 +110,9 @@ export interface OrganiserEvent {
   id: string;
   slug: string | null;
   title: string;
+  // 'running' (default) or 'experience' (non-running activities). Drives
+  // the public URL prefix and the wizard's wording.
+  category: string;
   organiserId: string | null;
   eventFormat: EventFormat;
   eventStatus: EventStatus;
@@ -127,9 +130,12 @@ export interface OrganiserEvent {
   collectAddress: boolean;
   requiresRunProof: boolean;
   shipsMedal: boolean;
+  locationName: string | null;
+  locationAddress: string | null;
   registrationOpenAt: string | null;
   registrationCloseAt: string | null;
   acceptingRegistrations: boolean;
+  allowGroupBooking: boolean;
   resultWindowStart: string | null;
   resultWindowEnd: string | null;
   bibPrefix: string | null;
@@ -177,6 +183,7 @@ export interface DistanceCategoryIn {
 export interface OrganiserEventCreate {
   title: string;
   slug: string;
+  category?: 'running' | 'experience';
   eventFormat: EventFormat;
   coverImageUrl?: string | null;
   galleryImages?: string[] | null;
@@ -190,9 +197,12 @@ export interface OrganiserEventCreate {
   collectAddress?: boolean;
   requiresRunProof?: boolean;
   shipsMedal?: boolean;
+  locationName?: string | null;
+  locationAddress?: string | null;
   registrationOpenAt?: string | null;
   registrationCloseAt?: string | null;
   acceptingRegistrations?: boolean;
+  allowGroupBooking?: boolean;
   resultWindowStart?: string | null;
   resultWindowEnd?: string | null;
   bibPrefix?: string | null;
@@ -266,6 +276,13 @@ export interface RegistrationRow {
   resultStatus: 'not_submitted' | 'submitted' | 'verified' | 'rejected';
   medalStatus: 'not_applicable' | 'pending' | 'dispatched' | 'delivered';
   bibNumber: string | null;
+  // Group-booking line items carry the attendee's own identity (distinct
+  // from the buyer in `user`) plus the shared booking code. Null/absent for
+  // single registrations.
+  bookingId?: string | null;
+  bookingCode?: string | null;
+  attendeeName?: string | null;
+  attendeeEmail?: string | null;
   createdAt: string;
   updatedAt: string;
   // backend merges these in for the dashboard rendering

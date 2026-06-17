@@ -6,10 +6,11 @@ import { getSessionToken } from '@/lib/session';
 import { getStudioAuth } from '@/lib/studio/server-auth';
 import { RunnerProviders } from '../_components/runner-providers';
 import { SuccessView } from './_success-view';
+import { BookingSuccessView } from './_booking-success-view';
 
 interface PageProps {
   params: Promise<{ slug: string }>;
-  searchParams: Promise<{ id?: string }>;
+  searchParams: Promise<{ id?: string; booking?: string }>;
 }
 
 export const metadata: Metadata = {
@@ -19,20 +20,24 @@ export const metadata: Metadata = {
 
 export default async function SuccessPage({ params, searchParams }: PageProps) {
   const { slug } = await params;
-  const { id } = await searchParams;
+  const { id, booking } = await searchParams;
 
-  if (!id) {
+  if (!id && !booking) {
     redirect(`/running-events/${encodeURIComponent(slug)}`);
   }
 
+  const query = booking
+    ? `booking=${encodeURIComponent(booking)}`
+    : `id=${encodeURIComponent(id!)}`;
+
   const token = await getSessionToken();
   if (!token) {
-    const next = encodeURIComponent(`/running-events/${slug}/register/success?id=${id}`);
+    const next = encodeURIComponent(`/running-events/${slug}/register/success?${query}`);
     redirect(`/?login=1&next=${next}`);
   }
   const studio = await getStudioAuth();
   if (!studio) {
-    const next = encodeURIComponent(`/running-events/${slug}/register/success?id=${id}`);
+    const next = encodeURIComponent(`/running-events/${slug}/register/success?${query}`);
     redirect(`/?login=1&next=${next}`);
   }
 
@@ -40,7 +45,11 @@ export default async function SuccessPage({ params, searchParams }: PageProps) {
     <main id="main-content" className="overflow-x-hidden bg-bone min-h-screen text-jet">
       <Header />
       <RunnerProviders studio={studio}>
-        <SuccessView registrationId={id} slug={slug} />
+        {booking ? (
+          <BookingSuccessView bookingId={booking} slug={slug} />
+        ) : (
+          <SuccessView registrationId={id!} slug={slug} />
+        )}
       </RunnerProviders>
       <Footer />
     </main>

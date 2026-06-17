@@ -37,10 +37,10 @@ export default function RaceDetailError({
             marginBottom: 12,
           }}
         >
-          Couldn’t load this race.
+          Couldn’t load this event.
         </h1>
         <p style={{ color: '#8A8278', marginBottom: 24, lineHeight: 1.6 }}>
-          The race data didn’t load. This is usually a brief network blip — try again.
+          The event data didn’t load. This is usually a brief network blip — try again.
         </p>
         <button
           type="button"

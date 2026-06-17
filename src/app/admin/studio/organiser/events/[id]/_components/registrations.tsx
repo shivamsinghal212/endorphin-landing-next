@@ -119,7 +119,7 @@ export function Registrations({
   const [cancellingIds, setCancellingIds] = useState<Set<string>>(() => new Set());
   const handleCancel = async (row: RegistrationRow) => {
     const ok = window.confirm(
-      `Mark ${row.user?.name || 'this registration'} as failed? They'll be removed from the event roster. This can't be undone here.`,
+      `Mark ${row.attendeeName || row.user?.name || 'this registration'} as failed? They'll be removed from the event roster. This can't be undone here.`,
     );
     if (!ok) return;
     setCancellingIds((prev) => new Set(prev).add(row.id));
@@ -145,7 +145,7 @@ export function Registrations({
             <TextInput
               value={searchInput}
               onChange={setSearchInput}
-              placeholder="Search runner, email, bib…"
+              placeholder="Search name, email, attendee…"
             />
           </div>
           <Select
@@ -323,15 +323,29 @@ function Row({
       <td className="px-5 py-2.5">
         <div className="flex items-center gap-2">
           <div className="w-7 h-7 rounded-full bg-jet text-bone grid place-items-center text-[10px] font-semibold flex-shrink-0">
-            {runnerInitials(row.user?.name)}
+            {runnerInitials(row.attendeeName || row.user?.name)}
           </div>
           <div className="min-w-0">
             <p className="text-[12px] font-medium leading-tight truncate">
-              {row.user?.name || 'Anonymous'}
+              {row.attendeeName || row.user?.name || 'Anonymous'}
             </p>
             <p className="text-[10px] text-jet/50 truncate">
-              {describeRunner(row.user) || row.user?.email || '—'}
+              {/* For a group-booking line item show the attendee's own email
+                  plus who paid; otherwise the usual runner descriptor. */}
+              {row.attendeeName
+                ? row.attendeeEmail || row.user?.email || '—'
+                : describeRunner(row.user) || row.user?.email || '—'}
             </p>
+            {row.bookingCode && (
+              <p className="text-[10px] text-jet/45 truncate">
+                <span className="inline-block px-1 py-0.5 rounded bg-jet/[0.06] font-mono tracking-tight mr-1">
+                  {row.bookingCode}
+                </span>
+                {row.attendeeName && row.user?.name
+                  ? `booked by ${row.user.name}`
+                  : 'group booking'}
+              </p>
+            )}
           </div>
         </div>
       </td>

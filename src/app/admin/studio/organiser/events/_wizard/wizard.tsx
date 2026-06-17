@@ -5,7 +5,10 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { toast } from 'sonner';
 import { WizardShell, type WizardStep } from '@/components/studio/WizardShell';
 import { NOT_READY_MARKER, useAutosave } from '@/components/studio/useAutosave';
-import { ORGANISER_EVENT_DRAFT_KEY as DRAFT_LOCAL_KEY } from '@/lib/organiser-api';
+import {
+  ORGANISER_EVENT_DRAFT_KEY as DRAFT_LOCAL_KEY,
+  type OrganiserEvent,
+} from '@/lib/organiser-api';
 import {
   describeOrganiserError,
   useCreateOrganiserEvent,
@@ -21,10 +24,12 @@ import {
   prevStep,
   STEP_IDS,
   STEP_LABELS,
+  stepLabelFor,
   toBackendBody,
   type StepId,
   type WizardDraft,
 } from './wizard-state';
+import { eventPath } from '@/lib/event-path';
 import { StepBasics } from './steps/step-basics';
 import { StepDistances } from './steps/step-distances';
 import { StepCollect } from './steps/step-collect';
@@ -120,18 +125,47 @@ export function EventWizard({
         throw new Error(NOT_READY_MARKER);
       }
       if (value._eventId) {
-        await updateMut.mutateAsync(toBackendBody(value));
+        const updated = await updateMut.mutateAsync(toBackendBody(value));
+        hydrateServerIds(updated);
       } else {
         const created = await createMut.mutateAsync(toBackendBody(value));
-        // Stash the new id back into the draft so future saves go through
-        // the update path. We avoid passing through setDraft to dodge a
-        // re-render cycle inside useAutosave's value subscription — the next
-        // edit will pick it up cleanly.
-        setDraft((d) => ({ ...d, _eventId: created.id }));
+        hydrateServerIds(created);
       }
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [createMut, updateMut],
   );
+
+  /**
+   * Merge the server-assigned ids back into the draft after a save:
+   * `_eventId`, plus the real UUID for each distance/ticket that doesn't
+   * have one yet (matched by name). Without this the coupon step's
+   * "Applies to" sent a temporary id (`tmp-0`) and the backend rejected it
+   * as a non-UUID. We only write when something actually changed (returning
+   * the same draft reference otherwise) so the merge doesn't retrigger the
+   * autosave debounce into a loop, and we only fill *missing* ids so a
+   * user's in-flight edits to a row aren't clobbered.
+   */
+  const hydrateServerIds = useCallback((serverEvent: OrganiserEvent) => {
+    setDraft((d) => {
+      const idByName = new Map<string, string>();
+      for (const sd of serverEvent.distanceCategories ?? []) {
+        if (sd.categoryName && sd.id) idByName.set(sd.categoryName, sd.id);
+      }
+      let changed = d._eventId !== serverEvent.id;
+      const distanceCategories = d.distanceCategories.map((dc) => {
+        if (dc.id) return dc; // already has a real UUID
+        const sid = idByName.get(dc.categoryName);
+        if (sid) {
+          changed = true;
+          return { ...dc, id: sid };
+        }
+        return dc;
+      });
+      if (!changed) return d;
+      return { ...d, _eventId: serverEvent.id, distanceCategories };
+    });
+  }, []);
 
   const { status, lastSavedAt, forceSave, clearLocal } = useAutosave(
     draft,
@@ -147,7 +181,7 @@ export function EventWizard({
     () =>
       STEP_IDS.map((id) => ({
         id,
-        label: STEP_LABELS[id],
+        label: stepLabelFor(id, draft.category),
         href: hrefFor(id, searchParams),
         isComplete: isStepComplete(id, draft),
       })),
@@ -225,7 +259,9 @@ export function EventWizard({
   );
 
   const previewHref =
-    draft.slug && draft._eventId ? `/running-events/${draft.slug}?preview=1` : undefined;
+    draft.slug && draft._eventId
+      ? `${eventPath({ category: draft.category, slug: draft.slug, id: draft._eventId })}?preview=1`
+      : undefined;
 
   // ── Render ──────────────────────────────────────────────────────────────
   if (mode === 'edit' && !hydrated) {

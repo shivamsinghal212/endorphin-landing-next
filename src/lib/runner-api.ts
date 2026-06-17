@@ -97,6 +97,23 @@ export const previewCoupon = (token: string | null, body: CouponPreviewRequest) 
     body: JSON.stringify(body),
   });
 
+// Whole-order coupon preview for the group-booking cart (discount applies
+// to the order subtotal across tiers, not a single distance).
+export interface CouponAmountPreviewRequest {
+  eventId: string;
+  code: string;
+  amountPaise: number;
+}
+
+export const previewCouponAmount = (
+  token: string | null,
+  body: CouponAmountPreviewRequest,
+) =>
+  runnerFetch<CouponPreviewResponse>('/coupons/preview-amount', token, {
+    method: 'POST',
+    body: JSON.stringify(body),
+  });
+
 // ── Registrations ─────────────────────────────────────────────────────────
 
 export interface ShippingAddress {
@@ -120,11 +137,14 @@ export interface RegistrationCreate {
 
 export interface RegistrationCreateResponse {
   registrationId: string;
-  orderId: string; // Razorpay order id
-  amount: number; // paise
+  orderId: string; // Razorpay order id ('' when free)
+  amount: number; // paise (0 when free)
   currency: string; // 'INR'
-  keyId: string; // Razorpay public key
+  keyId: string; // Razorpay public key ('' when free)
   prefill: { name: string; email: string; contact: string };
+  // True when the registration was free (₹0 via 100%-off coupon) and is
+  // already confirmed server-side — the client skips Razorpay checkout.
+  free?: boolean;
 }
 
 export interface RegistrationConfirmRequest {
@@ -172,12 +192,19 @@ export interface RegistrationOut {
 }
 
 export interface MyRegistrationItem extends RegistrationOut {
+  // Set when this registration is a group-booking line item — the entry
+  // code lives on the booking, not a per-row bib.
+  bookingCode?: string | null;
   event: {
     id: string;
     slug: string | null;
     title: string;
+    category: string | null;
     coverImageUrl: string | null;
     eventFormat: 'virtual' | 'in_person';
+    startTime: string | null;
+    locationName: string | null;
+    venueName: string | null;
     resultWindowStart: string | null;
     resultWindowEnd: string | null;
   };
@@ -219,5 +246,106 @@ export const getMyRegistrations = (token: string) =>
 export const getMyRegistration = (token: string, registrationId: string) =>
   runnerFetch<MyRegistrationItem>(
     `/registrations/${encodeURIComponent(registrationId)}`,
+    token,
+  );
+
+// ── Group bookings (multi-ticket checkout) ────────────────────────────────
+
+export interface BookingAttendeeInput {
+  name: string;
+  email: string;
+  tshirtSize?: string | null;
+  shippingAddress?: ShippingAddress | null;
+  formData?: Record<string, unknown> | null;
+}
+
+export interface BookingItemInput {
+  distanceCategoryId: string;
+  attendees: BookingAttendeeInput[];
+}
+
+export interface BookingCreate {
+  eventId: string;
+  items: BookingItemInput[];
+  couponCode?: string | null;
+}
+
+export interface BookingCreateResponse {
+  bookingId: string;
+  orderId: string; // Razorpay order id ('' when free)
+  amount: number; // paise (order total; 0 when free)
+  currency: string; // 'INR'
+  keyId: string; // Razorpay public key ('' when free)
+  prefill: { name: string; email: string; contact: string };
+  // True when the booking was free (₹0 via 100%-off coupon) and is already
+  // confirmed server-side — the client skips Razorpay checkout.
+  free?: boolean;
+}
+
+export interface BookingConfirmRequest {
+  razorpayPaymentId: string;
+  razorpayOrderId: string;
+  razorpaySignature: string;
+}
+
+export interface MyBookingAttendee {
+  id: string;
+  distanceCategoryId: string | null;
+  attendeeName: string | null;
+  attendeeEmail: string | null;
+  tshirtSize: string | null;
+  amountPaid: number | null;
+  paymentStatus: PaymentStatus;
+  distance: { id: string; categoryName: string; fullTitle: string | null } | null;
+}
+
+export interface MyBookingItem {
+  id: string;
+  userId: string;
+  eventId: string;
+  couponId: string | null;
+  subtotalPaise: number;
+  discountAmount: number;
+  totalPaise: number;
+  currency: string;
+  paymentStatus: PaymentStatus;
+  bookingCode: string | null;
+  ticketCount: number;
+  createdAt: string;
+  updatedAt: string;
+  event: {
+    id: string;
+    slug: string | null;
+    title: string;
+    category: string | null;
+    coverImageUrl: string | null;
+    eventFormat: 'virtual' | 'in_person';
+    startTime: string | null;
+    locationName: string | null;
+    venueName: string | null;
+  } | null;
+  attendees: MyBookingAttendee[];
+}
+
+export const createBooking = (token: string, body: BookingCreate) =>
+  runnerFetch<BookingCreateResponse>('/bookings', token, {
+    method: 'POST',
+    body: JSON.stringify(body),
+  });
+
+export const confirmBooking = (
+  token: string,
+  bookingId: string,
+  body: BookingConfirmRequest,
+) =>
+  runnerFetch<unknown>(
+    `/bookings/${encodeURIComponent(bookingId)}/confirm`,
+    token,
+    { method: 'POST', body: JSON.stringify(body) },
+  );
+
+export const getMyBooking = (token: string, bookingId: string) =>
+  runnerFetch<MyBookingItem>(
+    `/bookings/${encodeURIComponent(bookingId)}`,
     token,
   );

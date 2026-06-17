@@ -3,11 +3,10 @@
 import { useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useMyRegistration } from '@/lib/runner-hooks';
+import { useMyBooking } from '@/lib/runner-hooks';
 import { AppStoreButtons } from '@/components/AppStoreButtons';
-import { ShareRow } from '../_components/bib-card';
 import { EventTicket } from './_event-ticket';
-import type { MyRegistrationItem } from '@/lib/runner-api';
+import type { MyBookingItem } from '@/lib/runner-api';
 
 function fmtRupees(paise: number | null, currency: string | null) {
   if (paise == null) return '—';
@@ -18,24 +17,26 @@ function fmtRupees(paise: number | null, currency: string | null) {
   return `${cur} ${(paise / 100).toLocaleString('en')}`;
 }
 
-export function SuccessView({
-  registrationId,
+export function BookingSuccessView({
+  bookingId,
   slug,
 }: {
-  registrationId: string;
+  bookingId: string;
   slug: string;
 }) {
-  // While the row is `pending` (race between confirm POST + payment.captured
-  // webhook), poll every 5s. After 120s of being stuck pending we stop the
-  // auto-poll and let the runner trigger refresh manually — Razorpay test
-  // payments sometimes take longer than this; that's not an error.
+  // Poll while pending (race between the confirm POST and the
+  // payment.captured webhook). Stop auto-polling after 120s — Razorpay test
+  // payments occasionally settle slowly; that's not an error.
+  // We're already on the event's correct prefix (the booking form pushed us
+  // here via eventPath). Mirror it on the back/try-again links so an
+  // experience stays under /experiences.
   const eventBase = (usePathname() || '').startsWith('/experiences')
     ? '/experiences'
     : '/running-events';
   const pollStart = useRef<number | null>(null);
   const POLL_BUDGET_MS = 120_000;
-  const reg = useMyRegistration(registrationId, { refetchIntervalMs: 5_000 });
-  const data = reg.data;
+  const q = useMyBooking(bookingId, { refetchIntervalMs: 5_000 });
+  const data = q.data;
 
   useEffect(() => {
     if (!data) return;
@@ -48,18 +49,18 @@ export function SuccessView({
     (pollStart.current == null ||
       Date.now() - (pollStart.current ?? 0) < POLL_BUDGET_MS);
 
-  if (reg.isLoading) {
-    return <Wrap>Loading your registration…</Wrap>;
+  if (q.isLoading) {
+    return <Wrap>Loading your booking…</Wrap>;
   }
-  if (reg.error || !data) {
+  if (q.error || !data) {
     return (
       <Wrap>
         <h1 className="font-display uppercase text-2xl md:text-3xl font-bold mb-3">
-          Couldn&rsquo;t find that registration
+          Couldn&rsquo;t find that booking
         </h1>
         <p className="text-sm text-jet/70 mb-6">
-          The link may have expired or the registration belongs to a different
-          account. Try opening it from My Events.
+          The link may have expired or the booking belongs to a different
+          account.
         </p>
         <Link
           href="/me/registrations"
@@ -71,7 +72,7 @@ export function SuccessView({
     );
   }
 
-  if (data.paymentStatus === 'paid' || data.paymentStatus === 'free') {
+  if (data.paymentStatus === 'paid') {
     return <PaidView data={data} />;
   }
 
@@ -83,7 +84,7 @@ export function SuccessView({
         </h1>
         <p className="text-sm text-jet/70 mb-6">
           We received a failure signal from the payment provider. No charge was
-          made — try the registration again to grab a fresh order.
+          made — try booking again to grab a fresh order.
         </p>
         <div className="flex flex-wrap gap-3">
           <Link
@@ -120,11 +121,11 @@ export function SuccessView({
       <div className="flex flex-wrap gap-3">
         <button
           type="button"
-          onClick={() => reg.refetch()}
-          disabled={reg.isFetching}
+          onClick={() => q.refetch()}
+          disabled={q.isFetching}
           className="inline-flex items-center px-4 py-2 rounded-lg bg-jet text-bone text-sm hover:bg-jet/90 disabled:opacity-50"
         >
-          {reg.isFetching ? 'Checking…' : 'Refresh status'}
+          {q.isFetching ? 'Checking…' : 'Refresh status'}
         </button>
         <Link
           href="/me/registrations"
@@ -137,63 +138,51 @@ export function SuccessView({
   );
 }
 
-function PaidView({ data }: { data: MyRegistrationItem }) {
-  const eventTitle = data.event.title;
-  const bibNumber = data.bibNumber ?? '—';
-  const distance = data.distance?.fullTitle ?? data.distance?.categoryName ?? '';
-  const eventSlug = data.event.slug ?? data.event.id;
-  const isRunning = data.event.category === 'running';
+function PaidView({ data }: { data: MyBookingItem }) {
+  const eventTitle = data.event?.title ?? 'this event';
+  const isVirtual = data.event?.eventFormat === 'virtual';
 
   return (
     <Wrap centered>
       <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-medium uppercase tracking-wider mb-3">
-        <span aria-hidden>✓</span> Registration confirmed
+        <span aria-hidden>✓</span> Booking confirmed
       </div>
       <h1 className="font-display uppercase text-3xl md:text-4xl font-bold leading-tight mb-3">
-        {isRunning ? 'See you at the start line' : 'You’re all set'}
+        You&rsquo;re all set
       </h1>
       <p className="text-sm text-jet/65 mb-7 mx-auto max-w-md">
         We&rsquo;ve emailed your confirmation
-        {data.amountPaid != null
-          ? ` along with a receipt for ${fmtRupees(data.amountPaid, data.currency)}`
+        {data.totalPaise != null
+          ? ` along with a receipt for ${fmtRupees(data.totalPaise, data.currency)}`
           : ''}
-        . Here&rsquo;s your ticket — show the QR at entry.
+        . Show this booking code at entry — it admits your whole group.
       </p>
 
       <EventTicket
         className="max-w-md mx-auto"
         eventTitle={eventTitle}
-        code={bibNumber}
-        codeLabel={isRunning ? 'Bib no.' : 'Entry code'}
-        startTime={data.event.startTime}
-        venue={data.event.venueName || data.event.locationName || null}
+        code={data.bookingCode ?? '—'}
+        codeLabel="Booking code"
+        admitsCount={data.ticketCount}
+        startTime={data.event?.startTime ?? null}
+        venue={data.event?.venueName || data.event?.locationName || null}
+        attendees={data.attendees.map((a) => a.attendeeName || 'Guest')}
         qrValue={typeof window !== 'undefined' ? window.location.href : ''}
       />
 
-      <div className="mt-6">
-        <ShareRow
-          eventTitle={eventTitle}
-          bibNumber={bibNumber}
-          distance={distance}
-          eventSlug={eventSlug}
-        />
-      </div>
-
-      {/* Install-the-app nudge. Uses the site-wide AppStoreButtons so it
-       *  matches the homepage CTA, footer, and other install touchpoints. */}
       <div className="bg-jet text-bone rounded-2xl px-5 md:px-6 py-7 mb-6 mt-8 text-center">
         <p className="font-display uppercase text-base md:text-lg font-bold mb-2">
           Get the Endorfin app
         </p>
         <p className="text-sm text-bone/70 mb-5 leading-relaxed max-w-md mx-auto">
-          {isRunning
-            ? 'Event-day reminders, your ticket on your lock screen, and a record of every event you’ve done.'
-            : 'Event-day reminders, your ticket on your lock screen, and every event you’ve booked in one place.'}
+          {isVirtual
+            ? 'Manage your booking and event details from the app.'
+            : 'Event-day reminders, your booking on your lock screen, and a record of every event you’ve booked.'}
         </p>
         <AppStoreButtons variant="dark" />
       </div>
 
-      <div className="flex flex-wrap gap-3">
+      <div className="flex flex-wrap gap-3 justify-center">
         <Link
           href="/me/registrations"
           className="inline-flex items-center px-4 py-2 rounded-lg bg-jet text-bone text-sm hover:bg-jet/90"
@@ -216,8 +205,6 @@ function Wrap({
   centered = false,
 }: {
   children: React.ReactNode;
-  /** Center the content horizontally — used by the PaidView so the bib
-   *  card and supporting copy line up symmetrically on desktop. */
   centered?: boolean;
 }) {
   return (

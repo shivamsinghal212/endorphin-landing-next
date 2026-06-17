@@ -42,6 +42,13 @@ export function isStepId(s: string | null | undefined): s is StepId {
   return !!s && (STEP_IDS as readonly string[]).includes(s);
 }
 
+/** Step label, adapted for non-running events. Experiences sell "tickets",
+ *  not "distances". Everything else reads fine generically. */
+export function stepLabelFor(s: StepId, category: string | undefined): string {
+  if (s === 'distances' && category === 'experience') return 'Tickets & pricing';
+  return STEP_LABELS[s];
+}
+
 export function nextStep(s: StepId): StepId | null {
   const i = STEP_IDS.indexOf(s);
   if (i < 0 || i >= STEP_IDS.length - 1) return null;
@@ -74,6 +81,26 @@ By registering you agree to:
 3. We may **reject** submissions that look edited, look like indoor treadmill runs, or that don't match your registered distance within ±2%.
 4. Medals are shipped only to verified finishers, to the address you entered at checkout.`;
 
+/** Experience variants — no run window, no medals, plain ticketed-event language. */
+export const DEFAULT_REFUND_TEMPLATE_EXPERIENCE = `## Refunds
+
+- **Full refund** if you cancel up to {7 days before the event}.
+- **50% refund** until {2 days before the event}.
+- **No refund** after that.
+
+If we cancel the event for any reason, we refund **100%** automatically within 7 working days.
+
+Contact us to request a cancellation.`;
+
+export const DEFAULT_TERMS_TEMPLATE_EXPERIENCE = `## Terms
+
+By booking you agree to:
+
+1. Arrive at the venue on time with a valid ticket (digital is fine).
+2. Each ticket admits one guest unless stated otherwise.
+3. Follow the organiser's and venue's instructions on the day.
+4. Tickets are non-transferable unless the organiser allows it.`;
+
 /** Fixed inclusion vocabulary surfaced by the Step 2 chip picker. */
 export const INCLUSION_OPTIONS = [
   'T-shirt',
@@ -101,6 +128,7 @@ export function makeEmptyDraft(): WizardDraft {
   return {
     title: '',
     slug: '',
+    category: 'running',
     eventFormat: 'virtual',
     coverImageUrl: null,
     galleryImages: null,
@@ -114,9 +142,12 @@ export function makeEmptyDraft(): WizardDraft {
     collectAddress: false,
     requiresRunProof: false,
     shipsMedal: false,
+    locationName: null,
+    locationAddress: null,
     registrationOpenAt: null,
     registrationCloseAt: null,
     acceptingRegistrations: true,
+    allowGroupBooking: false,
     resultWindowStart: null,
     resultWindowEnd: null,
     bibPrefix: null,
@@ -151,6 +182,7 @@ export function fromServerEvent(
     id: string;
     title: string;
     slug: string | null;
+    category: string;
     eventFormat: EventFormat;
     coverImageUrl: string | null;
     galleryImages: string[] | null;
@@ -164,9 +196,12 @@ export function fromServerEvent(
     collectAddress: boolean;
     requiresRunProof: boolean;
     shipsMedal: boolean;
+    locationName: string | null;
+    locationAddress: string | null;
     registrationOpenAt: string | null;
     registrationCloseAt: string | null;
     acceptingRegistrations: boolean;
+    allowGroupBooking: boolean;
     resultWindowStart: string | null;
     resultWindowEnd: string | null;
     bibPrefix: string | null;
@@ -201,6 +236,7 @@ export function fromServerEvent(
   return {
     title: e.title,
     slug: e.slug ?? '',
+    category: e.category === 'experience' ? 'experience' : 'running',
     eventFormat: e.eventFormat,
     coverImageUrl: e.coverImageUrl,
     galleryImages: e.galleryImages,
@@ -214,9 +250,12 @@ export function fromServerEvent(
     collectAddress: e.collectAddress,
     requiresRunProof: e.requiresRunProof,
     shipsMedal: e.shipsMedal,
+    locationName: e.locationName ?? null,
+    locationAddress: e.locationAddress ?? null,
     registrationOpenAt: e.registrationOpenAt,
     registrationCloseAt: e.registrationCloseAt,
     acceptingRegistrations: e.acceptingRegistrations,
+    allowGroupBooking: e.allowGroupBooking,
     resultWindowStart: e.resultWindowStart,
     resultWindowEnd: e.resultWindowEnd,
     bibPrefix: e.bibPrefix,

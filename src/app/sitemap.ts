@@ -1,5 +1,6 @@
 import type { MetadataRoute } from 'next';
 import type { ApiEvent } from '@/app/running-events/page';
+import { eventPath } from '@/lib/event-path';
 import {
   CLUB_CITY_PAGES,
   MIN_CLUBS_PER_CITY,
@@ -183,7 +184,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       const slug = race.slug || race.id;
       if (!slug) continue;
       staticRoutes.push({
-        url: `${SITE}/running-events/${slug}`,
+        url: `${SITE}${eventPath(race)}`,
         lastModified: new Date(race.startTime),
         changeFrequency: 'weekly',
         priority: 0.7,

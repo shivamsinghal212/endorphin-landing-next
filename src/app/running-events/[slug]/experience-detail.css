@@ -1,0 +1,222 @@
+/* ════════════════════════════════════════════════════════════════
+   Experience event detail page — dark, vivid "for-clubs" treatment.
+   All rules scoped under .exd so nothing leaks into the global
+   Header/Footer (CSS imports are global in the App Router). Tokens +
+   primitives mirror /for-clubs (for-clubs.css) but live independently.
+   Fonts come from the next/font CSS variables defined on <html>.
+   ════════════════════════════════════════════════════════════════ */
+
+.exd {
+  --coal: #101010;
+  --slate: #161616;
+  --bone: #f5f0eb;
+  --bone-72: rgba(245, 240, 235, 0.72);
+  --bone-55: rgba(245, 240, 235, 0.55);
+  --bone-38: rgba(245, 240, 235, 0.38);
+  --hair: rgba(245, 240, 235, 0.1);
+  --hair-2: rgba(245, 240, 235, 0.17);
+  --red-fc: #e6232a;
+  --orange: #ff6b35;
+  --magenta: #ff2e88;
+  --purple: #8b5cf6;
+  --lime: #b6ff3c;
+  --chroma: linear-gradient(100deg, var(--red-fc) 0%, var(--orange) 28%, var(--magenta) 55%, var(--purple) 85%);
+  --f-serif: var(--font-fraunces), Georgia, serif;
+  --f-ui: var(--font-oswald), sans-serif;
+  --f-body: var(--font-poppins), system-ui, sans-serif;
+  --f-mono: var(--font-jetbrains-mono), ui-monospace, monospace;
+  --ease: cubic-bezier(0.22, 0.8, 0.3, 1);
+
+  position: relative;
+  overflow-x: clip;
+  background: #0a0a0a;
+  color: var(--bone);
+  font-family: var(--f-body);
+  font-weight: 300;
+  line-height: 1.65;
+}
+.exd *, .exd *::before, .exd *::after { box-sizing: border-box; }
+
+.exd .exd-wrap { max-width: 980px; margin: 0 auto; padding: 0 24px; position: relative; z-index: 1; }
+.exd .exd-section { position: relative; padding: 64px 0; }
+@media (max-width: 720px) { .exd .exd-section { padding: 44px 0; } }
+
+/* aurora blobs */
+.exd .exd-blob { position: absolute; border-radius: 50%; filter: blur(95px); pointer-events: none; opacity: 0.6; z-index: 0; }
+.exd .exd-blob-red { background: radial-gradient(circle, rgba(230, 35, 42, 0.42), transparent 65%); }
+.exd .exd-blob-orange { background: radial-gradient(circle, rgba(255, 107, 53, 0.3), transparent 65%); }
+.exd .exd-blob-magenta { background: radial-gradient(circle, rgba(255, 46, 136, 0.28), transparent 65%); }
+.exd .exd-blob-purple { background: radial-gradient(circle, rgba(124, 58, 237, 0.34), transparent 65%); }
+
+/* type */
+.exd .exd-eyebrow {
+  font-family: var(--f-mono); font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--bone-55); display: inline-flex; align-items: center; gap: 10px;
+}
+.exd .exd-eyebrow::before { content: ""; width: 26px; height: 2px; background: var(--chroma); }
+.exd h1, .exd h2, .exd h3, .exd h4 { font-family: var(--f-serif); font-weight: 600; letter-spacing: -0.015em; margin: 0; }
+.exd .exd-title { font-size: clamp(40px, 7vw, 78px); line-height: 1.14; margin-top: 16px; }
+.exd .exd-h2 { font-size: clamp(26px, 4vw, 40px); line-height: 1.08; }
+.exd .chroma-i {
+  font-style: italic; background: var(--chroma); background-size: 240% 100%;
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+  animation: exdGshift 8s ease-in-out infinite;
+  /* inline-block + padding stops italic descenders (y/g/P) being clipped by
+     background-clip:text on a tight line box */
+  display: inline-block; padding-bottom: 0.12em;
+}
+@keyframes exdGshift { 0%, 100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
+.exd .exd-byline { color: var(--bone-72); font-size: 15px; margin-top: 14px; }
+.exd .exd-byline strong { color: var(--bone); font-weight: 600; }
+.exd .exd-lead { font-size: clamp(15px, 1.6vw, 17px); color: var(--bone-72); max-width: 60ch; }
+
+/* buttons */
+.exd .exd-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 10px; height: 52px; padding: 0 28px;
+  font-family: var(--f-ui); font-weight: 600; font-size: 13.5px; letter-spacing: 0.14em; text-transform: uppercase;
+  border-radius: 12px; border: 0; cursor: pointer; text-decoration: none; position: relative; overflow: hidden;
+  transition: transform 0.2s var(--ease), box-shadow 0.25s, background-position 0.4s var(--ease); will-change: transform;
+}
+.exd .exd-btn:active { transform: scale(0.97); }
+.exd .exd-btn-red {
+  background: linear-gradient(115deg, var(--red-fc), #ff3d44 50%, var(--red-fc)); background-size: 200% 100%; color: #fff;
+  box-shadow: 0 10px 34px -10px rgba(230, 35, 42, 0.6);
+}
+.exd .exd-btn-red:hover { transform: translateY(-2px); background-position: 100% 0; box-shadow: 0 16px 44px -10px rgba(230, 35, 42, 0.75); }
+.exd .exd-btn-ghost { background: transparent; color: var(--bone); border: 1px solid rgba(245, 240, 235, 0.35); }
+.exd .exd-btn-ghost:hover { background: var(--bone); color: #0a0a0a; transform: translateY(-2px); }
+.exd .exd-btn-disabled { background: rgba(245, 240, 235, 0.1); color: var(--bone-38); cursor: not-allowed; box-shadow: none; }
+
+/* pills */
+.exd .exd-pill {
+  display: inline-flex; align-items: center; gap: 7px; font-family: var(--f-mono); font-size: 11px; letter-spacing: 0.06em;
+  border-radius: 999px; padding: 7px 14px; border: 1px solid var(--hair-2); color: var(--bone-72); background: rgba(245, 240, 235, 0.03);
+}
+.exd .exd-pill b { font-family: var(--f-ui); font-weight: 600; color: var(--bone); letter-spacing: 0.02em; }
+.exd .exd-pill svg { width: 13px; height: 13px; opacity: 0.7; }
+
+/* reveal */
+.exd .rv { opacity: 0; transform: translateY(22px); transition: opacity 0.7s var(--ease), transform 0.7s var(--ease); }
+.exd .rv.in { opacity: 1; transform: none; }
+@media (prefers-reduced-motion: reduce) {
+  .exd .rv { opacity: 1; transform: none; transition: none; }
+  .exd .chroma-i { animation: none; }
+}
+
+/* ═══ HERO ═══ */
+.exd .exd-hero { position: relative; padding: 88px 0 56px; overflow: hidden; }
+.exd .exd-hero .exd-blob-1 { width: 460px; height: 460px; top: -120px; left: -140px; }
+.exd .exd-hero .exd-blob-2 { width: 420px; height: 420px; top: -60px; right: -160px; }
+.exd .exd-meta { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
+.exd .exd-cta-row { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-top: 26px; }
+.exd .exd-cta-meta { font-family: var(--f-mono); font-size: 11px; letter-spacing: 0.04em; color: var(--bone-55); }
+
+/* cover image — show the full poster (no crop) on a neutral backdrop;
+   organiser art is often portrait, so forcing 16:9 + cover cropped it. */
+.exd .exd-cover {
+  margin-top: 34px; border-radius: 24px; overflow: hidden; border: 1px solid var(--hair-2);
+  box-shadow: 0 30px 80px -50px rgba(0, 0, 0, 0.8); background: #0d0d0d;
+  max-width: 720px; margin-left: auto; margin-right: auto;
+}
+.exd .exd-cover img { width: 100%; height: auto; display: block; }
+.exd .exd-gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 10px; margin-top: 12px; }
+.exd .exd-gallery img { width: 100%; aspect-ratio: 1 / 1; object-fit: cover; border-radius: 12px; border: 1px solid var(--hair); }
+
+/* "you're in" chip */
+.exd .exd-youre-in {
+  display: inline-flex; align-items: stretch; border: 2px solid var(--bone); border-radius: 10px; overflow: hidden;
+  text-decoration: none; transition: box-shadow 0.2s;
+}
+.exd .exd-youre-in:hover { box-shadow: 0 12px 30px -12px rgba(255, 46, 136, 0.5); }
+.exd .exd-youre-in .yi-tag { background: var(--red-fc); color: #fff; padding: 8px 12px; font-family: var(--f-ui); font-weight: 700; font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; display: flex; align-items: center; }
+.exd .exd-youre-in .yi-num { background: var(--bone); color: #0a0a0a; padding: 8px 16px; font-family: var(--f-ui); font-weight: 700; font-size: 15px; letter-spacing: 0.02em; display: flex; align-items: center; gap: 8px; }
+
+/* section heading */
+.exd .exd-section-h { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; margin-bottom: 22px; flex-wrap: wrap; }
+.exd .exd-section-meta { font-family: var(--f-mono); font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--bone-38); }
+
+/* content card */
+.exd .exd-card { background: var(--slate); border: 1px solid var(--hair); border-radius: 22px; padding: 28px; }
+@media (max-width: 720px) { .exd .exd-card { padding: 20px; } }
+
+/* tickets */
+.exd .exd-tickets { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 16px; }
+.exd .exd-ticket {
+  background: var(--slate); border: 1px solid var(--hair-2); border-radius: 18px; padding: 22px;
+  transition: transform 0.22s var(--ease), box-shadow 0.25s var(--ease), border-color 0.25s;
+}
+.exd .exd-ticket:hover { transform: translateY(-6px); border-color: rgba(255, 46, 136, 0.4); box-shadow: 0 26px 60px -30px rgba(255, 46, 136, 0.5); }
+.exd .exd-ticket-name { font-family: var(--f-ui); font-weight: 600; font-size: 17px; letter-spacing: 0.02em; text-transform: uppercase; color: var(--bone); }
+.exd .exd-ticket-price { font-family: var(--f-serif); font-weight: 600; font-size: 26px; margin-top: 8px; color: #fff; }
+.exd .exd-ticket-was { font-size: 14px; color: var(--bone-38); text-decoration: line-through; margin-left: 8px; font-family: var(--f-body); }
+.exd .exd-ticket-incl { margin-top: 14px; display: flex; flex-wrap: wrap; gap: 6px; }
+.exd .exd-incl-pill { font-family: var(--f-mono); font-size: 10px; letter-spacing: 0.04em; padding: 4px 9px; border-radius: 999px; background: rgba(182, 255, 60, 0.1); border: 1px solid rgba(182, 255, 60, 0.32); color: var(--lime); }
+
+/* prose (dark markdown) */
+.exd .exd-prose { color: var(--bone-72); font-size: 15.5px; line-height: 1.7; }
+.exd .exd-prose > * + * { margin-top: 14px; }
+.exd .exd-prose h1, .exd .exd-prose h2, .exd .exd-prose h3 { color: var(--bone); font-size: 20px; margin-top: 26px; }
+.exd .exd-prose a { color: var(--orange); text-decoration: underline; text-underline-offset: 2px; }
+.exd .exd-prose strong { color: var(--bone); font-weight: 600; }
+.exd .exd-prose ul, .exd .exd-prose ol { padding-left: 20px; }
+.exd .exd-prose li { margin-top: 6px; }
+.exd .exd-prose code { font-family: var(--f-mono); font-size: 0.88em; background: rgba(245, 240, 235, 0.08); padding: 2px 6px; border-radius: 6px; }
+.exd .exd-prose hr { border: 0; border-top: 1px solid var(--hair); margin: 22px 0; }
+.exd .exd-prose blockquote { border-left: 2px solid var(--red-fc); padding-left: 14px; color: var(--bone-55); }
+
+/* organiser */
+.exd .exd-org { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+.exd .exd-org-av { width: 52px; height: 52px; border-radius: 999px; flex: 0 0 auto; display: flex; align-items: center; justify-content: center; font-family: var(--f-serif); font-weight: 600; font-size: 22px; color: #fff; background: linear-gradient(140deg, var(--magenta), var(--purple)); }
+.exd .exd-org-name { font-family: var(--f-ui); font-weight: 600; font-size: 16px; letter-spacing: 0.02em; color: var(--bone); }
+.exd .exd-org-meta { font-size: 13px; color: var(--bone-55); margin-top: 3px; }
+.exd .exd-org-meta a { color: var(--bone-72); }
+.exd .exd-org-meta a:hover { color: var(--bone); }
+
+/* location */
+.exd .exd-venue-name { font-family: var(--f-serif); font-weight: 600; font-size: 20px; color: var(--bone); }
+.exd .exd-venue-addr { color: var(--bone-55); font-size: 14px; margin-top: 6px; }
+
+/* disclosures */
+.exd .exd-disclosure { border-top: 1px solid var(--hair); }
+.exd .exd-disclosure:first-of-type { border-top: 0; }
+.exd .exd-disclosure summary { display: flex; align-items: center; justify-content: space-between; gap: 12px; cursor: pointer; padding: 16px 0; list-style: none; font-family: var(--f-ui); font-weight: 500; letter-spacing: 0.04em; text-transform: uppercase; font-size: 13px; color: var(--bone); }
+.exd .exd-disclosure summary::-webkit-details-marker { display: none; }
+.exd .exd-disclosure .exd-disclosure-icon { font-family: var(--f-ui); color: var(--bone-38); transition: transform 0.2s; }
+.exd .exd-disclosure[open] .exd-disclosure-icon { transform: rotate(45deg); }
+.exd .exd-disclosure-body { padding-bottom: 18px; }
+
+/* end CTA */
+.exd .exd-end { position: relative; overflow: hidden; text-align: center; padding: 80px 0; }
+.exd .exd-end .exd-blob-3 { width: 520px; height: 360px; left: 50%; transform: translateX(-50%); top: 10px; }
+.exd .exd-end h2 { font-size: clamp(30px, 5vw, 54px); line-height: 1.05; }
+.exd .exd-end p { color: var(--bone-72); margin-top: 14px; }
+.exd .exd-end .exd-cta-row { justify-content: center; }
+
+/* mobile sticky bar (portaled to body) */
+.exd-sticky-bar {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 60; display: none;
+  align-items: center; justify-content: space-between; gap: 14px;
+  padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
+  background: rgba(10, 10, 10, 0.92); backdrop-filter: blur(12px); border-top: 1px solid rgba(245, 240, 235, 0.12);
+  font-family: var(--font-poppins), system-ui, sans-serif;
+}
+@media (max-width: 980px) { .exd-sticky-bar { display: flex; } }
+.exd-sticky-bar .exd-sticky-price { color: #f5f0eb; font-family: var(--font-oswald), sans-serif; font-weight: 600; font-size: 17px; }
+.exd-sticky-bar .exd-sticky-price small { color: rgba(245, 240, 235, 0.55); font-weight: 400; font-size: 11px; }
+.exd-sticky-bar .exd-sticky-deadline { color: rgba(245, 240, 235, 0.55); font-size: 11px; margin-top: 2px; }
+.exd-sticky-bar .exd-sticky-cta {
+  flex: 0 0 auto; display: inline-flex; align-items: center; gap: 8px; height: 46px; padding: 0 22px; border-radius: 11px;
+  background: linear-gradient(115deg, #e6232a, #ff3d44 50%, #e6232a); color: #fff; text-decoration: none;
+  font-family: var(--font-oswald), sans-serif; font-weight: 600; font-size: 13px; letter-spacing: 0.12em; text-transform: uppercase;
+  box-shadow: 0 10px 30px -10px rgba(230, 35, 42, 0.7);
+}
+.exd-sticky-bar .exd-sticky-cta-disabled { background: rgba(245, 240, 235, 0.12); color: rgba(245, 240, 235, 0.4); box-shadow: none; }
+
+/* ReminderButton (.v1-remind-btn) override — match the Register button's
+   size/shape so the hero CTA row is consistent, and read on the dark hero. */
+.exd .v1-remind-btn {
+  height: 52px !important; padding: 0 26px !important; border-radius: 12px !important;
+  border: 1px solid rgba(245, 240, 235, 0.35) !important; color: var(--bone) !important;
+  background: transparent !important; box-shadow: none !important;
+}
+.exd .v1-remind-btn:hover { background: rgba(245, 240, 235, 0.08) !important; transform: translateY(-2px); }

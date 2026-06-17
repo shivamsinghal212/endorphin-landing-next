@@ -77,6 +77,10 @@ export interface DistanceCategory {
   categoryStartTime: string | null;
   registrationStartDate: string | null;
   registrationEndDate: string | null;
+  // Per-tier capacity cap (paid/organiser events). Used as a soft cap on
+  // the group-booking quantity stepper; the backend is authoritative on
+  // sold-out.
+  maxParticipants?: number | null;
 }
 
 export interface Event {
@@ -139,6 +143,9 @@ export interface Event {
   registrationCloseAt?: string | null;
   resultWindowStart?: string | null;
   resultWindowEnd?: string | null;
+  // When true, the registration page renders the multi-ticket (group)
+  // booking cart instead of the single-registration flow.
+  allowGroupBooking?: boolean;
   bibPrefix?: string | null;
   accentColor?: string | null;
   // Built-in collection toggles + custom-form config from the wizard.

@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Theme options · neon green + purple on the Endorfin brand</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,600&family=Oswald:wght@500;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --jet:#0A0A0A; --slate:#161616; --bone:#F5F0EB; --bone-dim:rgba(245,240,235,.62);
+    --red:#E6232A; --red-hover:#c41e24;
+    --purple:#8B5CF6; --purple-deep:#7C3AED;
+    --lime:#B6FF3C; --lime-on:#0A0A0A;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:#050505;color:var(--bone);font-family:'Oswald',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+  .serif{font-family:'Fraunces',Georgia,serif}
+  .mono{font-family:'JetBrains Mono',monospace}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 22px}
+  .page-head{padding:46px 0 14px}
+  .page-head h1{font-family:'Fraunces',serif;font-weight:600;font-size:34px;margin:0}
+  .page-head p{color:var(--bone-dim);max-width:64ch;font-family:system-ui;font-size:15px;line-height:1.6}
+  /* option block */
+  .opt{border-top:1px solid rgba(245,240,235,.12);padding:40px 0}
+  .opt-tag{display:inline-flex;gap:8px;align-items:center;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.14em;
+    text-transform:uppercase;color:var(--bone-dim);border:1px solid rgba(245,240,235,.18);border-radius:99px;padding:4px 12px;margin-bottom:8px}
+  .opt h2{font-family:'Fraunces',serif;font-weight:600;font-size:24px;margin:8px 0 4px}
+  .opt .why{color:var(--bone-dim);font-family:system-ui;font-size:14px;max-width:70ch;margin:0 0 22px;line-height:1.6}
+  /* swatches */
+  .sw{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:22px}
+  .sw span{font-family:'JetBrains Mono',monospace;font-size:10px;color:#000;border-radius:7px;padding:8px 10px;min-width:78px;display:flex;align-items:flex-end;height:46px}
+  /* demo card (the mini hero) */
+  .demo{border-radius:18px;overflow:hidden;border:1px solid rgba(245,240,235,.1);background:var(--jet);position:relative}
+  .demo-in{padding:34px 30px;position:relative;z-index:1}
+  .eyebrow{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--bone-dim)}
+  .demo h3{font-family:'Fraunces',serif;font-weight:600;font-size:clamp(28px,4vw,42px);line-height:1.05;margin:12px 0 0;letter-spacing:-.01em}
+  .demo p{font-family:system-ui;color:var(--bone-dim);font-size:15px;max-width:48ch;margin:14px 0 0}
+  .btns{display:flex;gap:12px;flex-wrap:wrap;margin-top:24px}
+  .btn{font-family:'Oswald',sans-serif;font-weight:600;font-size:14px;letter-spacing:.02em;border-radius:9px;padding:12px 20px;border:0;cursor:pointer;text-transform:uppercase}
+  .btn-ghost{background:transparent;border:1px solid rgba(245,240,235,.5);color:var(--bone)}
+  .pillrow{display:flex;gap:10px;flex-wrap:wrap;margin-top:22px}
+  .pill{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;border-radius:99px;padding:5px 12px;border:1px solid rgba(245,240,235,.22);color:var(--bone-dim)}
+  .pill.live{background:var(--lime);color:var(--lime-on);border-color:var(--lime);font-weight:600}
+  .pill.free{background:rgba(182,255,60,.14);color:var(--lime);border-color:rgba(182,255,60,.4)}
+  .tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:24px}
+  .tile{background:var(--slate);border:1px solid rgba(245,240,235,.08);border-radius:12px;padding:16px;min-height:92px}
+  .tile .k{font-family:'Fraunces',serif;font-size:22px}
+  .tile .l{font-family:system-ui;font-size:12px;color:var(--bone-dim);margin-top:4px}
+  .check{color:var(--lime);font-weight:700}
+  @media(max-width:680px){.tiles{grid-template-columns:1fr}}
+
+  /* ─────────── OPTION A: red stays king, neon as accents on dark ─────────── */
+  .A .btn-primary{background:var(--red);color:#fff}
+  .A .btn-primary:hover{background:var(--red-hover)}
+  .A .demo h3 .accent{color:var(--red)}
+  .A .demo::before{content:"";position:absolute;inset:0;z-index:0;
+    background:radial-gradient(120% 90% at 0% 0%, rgba(230,35,42,.20), transparent 55%),
+               radial-gradient(90% 80% at 100% 100%, rgba(139,92,246,.18), transparent 55%);}
+  .A .tile .k{color:var(--bone)}
+  .A .demo h3 .accent2{color:var(--purple)}
+
+  /* ─────────── OPTION B: red→purple duotone gradient brand + lime pop ─────────── */
+  .B .btn-primary{background:linear-gradient(110deg,var(--red),var(--purple-deep));color:#fff}
+  .B .btn-primary:hover{filter:brightness(1.08)}
+  .B .demo::before{content:"";position:absolute;inset:0;z-index:0;
+    background:linear-gradient(125deg, rgba(230,35,42,.28) 0%, rgba(176,38,255,.22) 60%, transparent 90%);}
+  .B .demo h3 .accent{background:linear-gradient(110deg,var(--red),var(--purple));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .B .tile .k{color:var(--bone)}
+  .B .ring{box-shadow:0 0 0 1px rgba(176,38,255,.5), 0 0 24px rgba(176,38,255,.18)}
+
+  /* ─────────── OPTION C: purple primary (full pivot, red demoted) ─────────── */
+  .C .btn-primary{background:var(--purple-deep);color:#fff}
+  .C .btn-primary:hover{background:var(--purple)}
+  .C .demo::before{content:"";position:absolute;inset:0;z-index:0;
+    background:radial-gradient(110% 90% at 100% 0%, rgba(124,58,237,.30), transparent 55%);}
+  .C .demo h3 .accent{color:var(--purple)}
+  .C .pill.brand{background:var(--purple-deep);color:#fff;border-color:var(--purple-deep)}
+  .C .tile .k{color:var(--bone)}
+</style>
+</head>
+<body>
+
+<div class="wrap page-head">
+  <h1 class="serif">Three ways to add neon green + purple</h1>
+  <p>Same content, same fonts (Fraunces / Oswald / JetBrains Mono), same jet canvas — only the <b>colour roles</b> change. Neon is kept on dark surfaces only. Pick a direction.</p>
+</div>
+
+<!-- OPTION A -->
+<section class="opt A"><div class="wrap">
+  <span class="opt-tag">Option A · recommended</span>
+  <h2 class="serif">Red stays king — neon as supporting energy</h2>
+  <p class="why">Your brand doesn't change. Red is still the only CTA colour. Purple appears only as a soft background bloom + selected-state accent; lime green is reserved for <b>Free / Live / ✓</b>. Lowest risk, most cohesive with everything you already ship.</p>
+  <div class="sw">
+    <span style="background:#0A0A0A;color:#888">#0A0A0A jet</span>
+    <span style="background:#E6232A">#E6232A red</span>
+    <span style="background:#8B5CF6">#8B5CF6 purple</span>
+    <span style="background:#B6FF3C">#B6FF3C lime</span>
+    <span style="background:#F5F0EB;color:#000">#F5F0EB bone</span>
+  </div>
+  <div class="demo"><div class="demo-in">
+    <span class="eyebrow">For run club organisers</span>
+    <h3 class="serif">A home for your <span class="accent">run club.</span></h3>
+    <p>List your club, host your runs, and get found by runners in your city.</p>
+    <div class="btns">
+      <button class="btn btn-primary">Add your club</button>
+      <button class="btn btn-ghost">See how it works</button>
+    </div>
+    <div class="pillrow"><span class="pill free">Free to host</span><span class="pill live">● Live now</span><span class="pill">Verified</span></div>
+    <div class="tiles">
+      <div class="tile"><div class="k">110<span class="check"> ✓</span></div><div class="l">clubs onboarded</div></div>
+      <div class="tile"><div class="k">500+</div><div class="l">events</div></div>
+      <div class="tile"><div class="k">30</div><div class="l">cities</div></div>
+    </div>
+  </div></div>
+</div></section>
+
+<!-- OPTION B -->
+<section class="opt B"><div class="wrap">
+  <span class="opt-tag">Option B · boldest</span>
+  <h2 class="serif">Red→purple gradient as the signature</h2>
+  <p class="why">Purple gets promoted to co-star via a red→purple gradient (they blend through magenta, so purple feels born from your red). The gradient becomes the brand signature on CTAs + headlines. Lime stays the single semantic pop. More distinctive, slightly more of a visual evolution.</p>
+  <div class="sw">
+    <span style="background:#0A0A0A;color:#888">#0A0A0A jet</span>
+    <span style="background:linear-gradient(110deg,#E6232A,#7C3AED)">red→purple</span>
+    <span style="background:#B6FF3C">#B6FF3C lime</span>
+    <span style="background:#F5F0EB;color:#000">#F5F0EB bone</span>
+  </div>
+  <div class="demo"><div class="demo-in">
+    <span class="eyebrow">For run club organisers</span>
+    <h3 class="serif">A home for your <span class="accent">run club.</span></h3>
+    <p>List your club, host your runs, and get found by runners in your city.</p>
+    <div class="btns">
+      <button class="btn btn-primary">Add your club</button>
+      <button class="btn btn-ghost">See how it works</button>
+    </div>
+    <div class="pillrow"><span class="pill free">Free to host</span><span class="pill live">● Live now</span><span class="pill">Verified</span></div>
+    <div class="tiles">
+      <div class="tile ring"><div class="k">110<span class="check"> ✓</span></div><div class="l">clubs onboarded</div></div>
+      <div class="tile"><div class="k">500+</div><div class="l">events</div></div>
+      <div class="tile"><div class="k">30</div><div class="l">cities</div></div>
+    </div>
+  </div></div>
+</div></section>
+
+<!-- OPTION C -->
+<section class="opt C"><div class="wrap">
+  <span class="opt-tag">Option C · biggest change</span>
+  <h2 class="serif">Purple primary, red demoted to alert/error</h2>
+  <p class="why">A real pivot: purple becomes the brand/CTA colour (community-app convention), green the action pop, and red retires to its semantic job (errors, destructive). Most "neon community" but it walks away from your current red identity — shown for contrast.</p>
+  <div class="sw">
+    <span style="background:#0A0A0A;color:#888">#0A0A0A jet</span>
+    <span style="background:#7C3AED">#7C3AED purple</span>
+    <span style="background:#B6FF3C">#B6FF3C lime</span>
+    <span style="background:#E6232A">#E6232A red→error</span>
+    <span style="background:#F5F0EB;color:#000">#F5F0EB bone</span>
+  </div>
+  <div class="demo"><div class="demo-in">
+    <span class="eyebrow">For run club organisers</span>
+    <h3 class="serif">A home for your <span class="accent">run club.</span></h3>
+    <p>List your club, host your runs, and get found by runners in your city.</p>
+    <div class="btns">
+      <button class="btn btn-primary">Add your club</button>
+      <button class="btn btn-ghost">See how it works</button>
+    </div>
+    <div class="pillrow"><span class="pill brand">Community</span><span class="pill free">Free to host</span><span class="pill live">● Live now</span></div>
+    <div class="tiles">
+      <div class="tile"><div class="k">110<span class="check"> ✓</span></div><div class="l">clubs onboarded</div></div>
+      <div class="tile"><div class="k">500+</div><div class="l">events</div></div>
+      <div class="tile"><div class="k">30</div><div class="l">cities</div></div>
+    </div>
+  </div></div>
+</div></section>
+
+</body>
+</html>

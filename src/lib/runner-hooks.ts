@@ -19,19 +19,26 @@ function useRunnerToken(): string | null {
 }
 import {
   RunnerApiError,
+  type BookingConfirmRequest,
+  type BookingCreate,
+  type CouponAmountPreviewRequest,
   type CouponPreviewRequest,
   type MeProfile,
   type MeUpdate,
   type MyRegistrationItem,
   type RegistrationConfirmRequest,
   type RegistrationCreate,
+  confirmBooking,
   confirmRegistration,
+  createBooking,
   createRegistration,
   getMe,
+  getMyBooking,
   getMyRegistration,
   getMyRegistrations,
   patchMe,
   previewCoupon,
+  previewCouponAmount,
 } from '@/lib/runner-api';
 import { runnerKeys } from '@/lib/studio/runner-keys';
 
@@ -83,6 +90,15 @@ export function usePreviewCoupon() {
   const token = useRunnerToken();
   return useMutation({
     mutationFn: (body: CouponPreviewRequest) => previewCoupon(token, body),
+  });
+}
+
+/** Whole-order coupon preview for the group-booking cart. */
+export function usePreviewCouponAmount() {
+  const token = useRunnerToken();
+  return useMutation({
+    mutationFn: (body: CouponAmountPreviewRequest) =>
+      previewCouponAmount(token, body),
   });
 }
 
@@ -147,6 +163,48 @@ export function useMyRegistration(
     queryKey: runnerKeys.registration(registrationId ?? ''),
     queryFn: () => getMyRegistration(token!, registrationId!),
     enabled: !!token && !!registrationId,
+    staleTime: 5_000,
+    refetchInterval: options.refetchIntervalMs ?? false,
+  });
+}
+
+// ── Group bookings ───────────────────────────────────────────────────────
+
+export function useCreateBooking() {
+  const token = useRunnerToken();
+  return useMutation({
+    mutationFn: (body: BookingCreate) => createBooking(token!, body),
+  });
+}
+
+/** Confirm a booking's payment. The bookingId is supplied at mutate time
+ *  (from the createBooking response), mirroring useConfirmRegistration. */
+export function useConfirmBooking() {
+  const token = useRunnerToken();
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({
+      bookingId,
+      body,
+    }: {
+      bookingId: string;
+      body: BookingConfirmRequest;
+    }) => confirmBooking(token!, bookingId, body),
+    onSuccess: (_res, { bookingId }) => {
+      qc.invalidateQueries({ queryKey: runnerKeys.booking(bookingId) });
+    },
+  });
+}
+
+export function useMyBooking(
+  bookingId: string | null,
+  options: { refetchIntervalMs?: number } = {},
+) {
+  const token = useRunnerToken();
+  return useQuery({
+    queryKey: runnerKeys.booking(bookingId ?? ''),
+    queryFn: () => getMyBooking(token!, bookingId!),
+    enabled: !!token && !!bookingId,
     staleTime: 5_000,
     refetchInterval: options.refetchIntervalMs ?? false,
   });

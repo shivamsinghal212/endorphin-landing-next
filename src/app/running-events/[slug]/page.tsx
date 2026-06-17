@@ -5,8 +5,11 @@ import Footer from '@/components/Footer';
 import { eventsApi, remindersApi, ApiError, type Event, type Reminder } from '@/lib/api';
 import { getSessionToken } from '@/lib/session';
 import { getStudioAuth } from '@/lib/studio/server-auth';
+import { eventPath } from '@/lib/event-path';
 import { RunnerProviders } from './register/_components/runner-providers';
 import RaceDetailView from './RaceDetailView';
+import ExperienceDetailView from './ExperienceDetailView';
+import './experience-detail.css';
 import {
   buildEventTitle,
   buildEventMetaDescription,
@@ -83,7 +86,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const event = await loadEvent(slug, null).catch(() => null);
   if (!event) return { title: 'Event not found' };
 
-  const url = `https://www.endorfin.run/running-events/${event.slug || event.id}`;
+  const url = `https://www.endorfin.run${eventPath(event)}`;
   const metaDescription = buildEventMetaDescription(event);
   return {
     title: buildEventTitle(event),
@@ -145,12 +148,12 @@ function buildJsonLd(event: Event) {
             availability: event.soldOut
               ? 'https://schema.org/SoldOut'
               : 'https://schema.org/InStock',
-            url: event.registrationUrl || `https://www.endorfin.run/running-events/${event.slug || event.id}`,
+            url: event.registrationUrl || `https://www.endorfin.run${eventPath(event)}`,
             validFrom: offerValidFrom,
             ...(event.registrationEndDate && { validThrough: event.registrationEndDate }),
           }
         : undefined,
-    url: `https://www.endorfin.run/running-events/${event.slug || event.id}`,
+    url: `https://www.endorfin.run${eventPath(event)}`,
   };
 }
 
@@ -186,7 +189,7 @@ export default async function RaceDetailPage({ params }: PageProps) {
         '@type': 'ListItem',
         position: 3,
         name: event.title,
-        item: `https://www.endorfin.run/running-events/${event.slug || event.id}`,
+        item: `https://www.endorfin.run${eventPath(event)}`,
       },
     ],
   };
@@ -237,11 +240,19 @@ async function RaceDetailWithRunnerContext({
   const studio = await getStudioAuth();
   return (
     <RunnerProviders studio={studio}>
-      <RaceDetailView
-        event={event}
-        isAuthed={isAuthed}
-        reminderIsSet={reminderIsSet}
-      />
+      {event.category === 'experience' ? (
+        <ExperienceDetailView
+          event={event}
+          isAuthed={isAuthed}
+          reminderIsSet={reminderIsSet}
+        />
+      ) : (
+        <RaceDetailView
+          event={event}
+          isAuthed={isAuthed}
+          reminderIsSet={reminderIsSet}
+        />
+      )}
     </RunnerProviders>
   );
 }

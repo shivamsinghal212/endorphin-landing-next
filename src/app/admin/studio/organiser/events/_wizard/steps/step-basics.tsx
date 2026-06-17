@@ -31,6 +31,8 @@ export function StepBasics({
   const slugCheck = useMemo(() => validateSlug(draft.slug || ''), [draft.slug]);
 
   const isPhysical = draft.eventFormat === 'in_person';
+  const isExperience = draft.category === 'experience';
+  const urlPrefix = isExperience ? 'experiences' : 'running-events';
 
   const windowCheck = useMemo(
     () =>
@@ -88,13 +90,45 @@ export function StepBasics({
         </p>
       </div>
 
+      <SectionCard title="Event kind">
+        <div className="grid grid-cols-2 gap-3">
+          <FormatCard
+            name="event-kind"
+            checked={!isExperience}
+            onSelect={() => set({ category: 'running' })}
+            title="Running"
+            body="Races, runs and timed challenges — distances, bibs, finisher medals."
+          />
+          <FormatCard
+            name="event-kind"
+            checked={isExperience}
+            onSelect={() =>
+              set({
+                category: 'experience',
+                // Experiences are venue events by default; run-proof/medals
+                // don't apply, so clear them.
+                eventFormat: 'in_person',
+                requiresRunProof: false,
+                shipsMedal: false,
+              })
+            }
+            title="Experience"
+            body="Yoga, workshops, socials and other ticketed activities — guests book a spot."
+          />
+        </div>
+      </SectionCard>
+
       <SectionCard title="Event format">
         <div className="grid grid-cols-2 gap-3">
           <FormatCard
             checked={draft.eventFormat === 'virtual'}
             onSelect={() => set({ eventFormat: 'virtual' })}
             title="Virtual"
-            body="Runners complete on their own and submit a screenshot. We verify and ship medals."
+            body={
+              isExperience
+                ? 'Guests join online from anywhere.'
+                : 'Runners complete on their own and submit a screenshot. We verify and ship medals.'
+            }
           />
           <FormatCard
             checked={draft.eventFormat === 'in_person'}
@@ -105,7 +139,11 @@ export function StepBasics({
               })
             }
             title="Physical"
-            body="Single venue, single date. Runners check in on race day."
+            body={
+              isExperience
+                ? 'Single venue, single date. Guests check in on the day.'
+                : 'Single venue, single date. Runners check in on race day.'
+            }
           />
         </div>
       </SectionCard>
@@ -138,10 +176,10 @@ export function StepBasics({
               }`}
             >
               <span className="px-3 py-2.5 bg-jet/[0.04] text-jet/50 hidden sm:inline">
-                endorfin.app/running-events/
+                endorfin.app/{urlPrefix}/
               </span>
               <span className="px-3 py-2.5 bg-jet/[0.04] text-jet/50 sm:hidden">
-                /running-events/
+                /{urlPrefix}/
               </span>
               <input
                 value={draft.slug}
@@ -163,7 +201,11 @@ export function StepBasics({
               onChange={(v) => set({ descriptionMd: v })}
               maxLength={DESCRIPTION_MAX}
               rows={6}
-              placeholder="Tell runners what this race is about, why it's special, how the day will run."
+              placeholder={
+                isExperience
+                  ? "Tell guests what this experience is about, why it's special, and what to expect on the day."
+                  : "Tell runners what this race is about, why it's special, how the day will run."
+              }
             />
           </div>
         </div>
@@ -171,7 +213,7 @@ export function StepBasics({
 
       <SectionCard
         title="Media"
-        description="Hero is what runners see on the race page and cards. JPG/PNG/WebP · max 5 MB · we crop to 16:9."
+        description={`Hero is what ${isExperience ? 'guests' : 'runners'} see on the event page and cards. JPG/PNG/WebP · max 5 MB · we crop to 16:9.`}
       >
         <ImageUploader
           label="Hero image"
@@ -192,6 +234,32 @@ export function StepBasics({
             }
             folder="studio/events"
           />
+        </div>
+      </SectionCard>
+
+      <SectionCard title="Where">
+        <div className="space-y-3">
+          <div>
+            <FieldLabel>{isExperience ? 'Venue / location' : 'Location'}</FieldLabel>
+            <input
+              value={draft.locationName ?? ''}
+              onChange={(e) => set({ locationName: e.target.value || null })}
+              placeholder="e.g. Play Haus, Adventure Island, Rohini"
+              className="w-full px-3 py-2.5 rounded-xl border border-jet/10 text-sm bg-white outline-none focus:border-jet"
+            />
+          </div>
+          <div>
+            <FieldLabel>
+              Full address <span className="text-jet/30">· optional</span>
+            </FieldLabel>
+            <textarea
+              value={draft.locationAddress ?? ''}
+              onChange={(e) => set({ locationAddress: e.target.value || null })}
+              rows={2}
+              placeholder="Street, area, city, pincode"
+              className="w-full px-3 py-2.5 rounded-xl border border-jet/10 text-sm bg-white outline-none focus:border-jet"
+            />
+          </div>
         </div>
       </SectionCard>
 
@@ -305,11 +373,13 @@ function FormatCard({
   onSelect,
   title,
   body,
+  name = 'event-format',
 }: {
   checked: boolean;
   onSelect: () => void;
   title: string;
   body: string;
+  name?: string;
 }) {
   return (
     <label
@@ -321,7 +391,7 @@ function FormatCard({
     >
       <input
         type="radio"
-        name="event-format"
+        name={name}
         checked={checked}
         onChange={onSelect}
         className="mt-1 accent-jet"

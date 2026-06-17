@@ -19,6 +19,7 @@ import {
   usePatchMe,
 } from '@/lib/runner-hooks';
 import { AppStoreButtons } from '@/components/AppStoreButtons';
+import { eventPath } from '@/lib/event-path';
 import type { ShippingAddress } from '@/lib/runner-api';
 import {
   missingProfileFields,
@@ -42,7 +43,8 @@ import {
 } from './shipping-address';
 import { CouponInput, type AppliedCoupon } from './coupon-input';
 import { OrderSummary, deriveTotals } from './order-summary';
-import { BibCard, ShareRow } from './bib-card';
+import { ShareRow } from './bib-card';
+import { EventTicket } from '../success/_event-ticket';
 import {
   isRazorpayLoaded,
   openRazorpayCheckout,
@@ -284,6 +286,17 @@ export function RegistrationForm({ bundle }: { bundle: RegistrationEventBundle }
         couponCode: coupon?.code ?? null,
       });
 
+      // Free registration (₹0 — 100%-off coupon): already confirmed
+      // server-side, no Razorpay order. Skip checkout → success.
+      if (created.free) {
+        try { window.localStorage.removeItem(draftKey); } catch {}
+        toast.success('You’re in — it’s on the house!');
+        router.push(
+          `${eventPath(event, '/register/success')}?id=${encodeURIComponent(created.registrationId)}`,
+        );
+        return;
+      }
+
       if (!isRazorpayLoaded()) {
         fail('Payment SDK is still loading. Give it a few seconds and try again.');
         return;
@@ -342,9 +355,8 @@ export function RegistrationForm({ bundle }: { bundle: RegistrationEventBundle }
         });
 
       toast.success('Payment received — confirming…');
-      const slug = event.slug || event.id;
       router.push(
-        `/running-events/${encodeURIComponent(slug)}/register/success?id=${encodeURIComponent(created.registrationId)}`,
+        `${eventPath(event, '/register/success')}?id=${encodeURIComponent(created.registrationId)}`,
       );
     } catch (e) {
       fail(friendlyError(describeRunnerError(e)));
@@ -384,7 +396,7 @@ export function RegistrationForm({ bundle }: { bundle: RegistrationEventBundle }
           contact the organiser.
         </p>
         <Link
-          href={`/running-events/${event.slug || event.id}`}
+          href={eventPath(event)}
           className="mt-4 inline-block text-sm text-signal hover:underline"
         >
           ← Back to event
@@ -586,7 +598,7 @@ export function RegistrationForm({ bundle }: { bundle: RegistrationEventBundle }
           />
           <p className="mt-3 text-xs text-jet/50 text-center">
             <Link
-              href={`/running-events/${event.slug || event.id}`}
+              href={eventPath(event)}
               className="hover:underline"
             >
               ← Back to event details
@@ -652,9 +664,8 @@ function AlreadyRegisteredView({
   // The runner viewing this is the one who registered (the parent query
   // already filtered to my-registrations), so `useMe()` is the right
   // source for their name.
-  const meQ = useMe();
-  const participantName = meQ.data?.name ?? '';
   const isVirtual = reg.event?.eventFormat === 'virtual';
+  const isRunning = reg.event?.category === 'running';
   const eventTitle = reg.event?.title ?? 'this event';
   const bibNumber = reg.bibNumber ?? '—';
   const distance = reg.distance?.fullTitle ?? reg.distance?.categoryName ?? '';
@@ -665,26 +676,31 @@ function AlreadyRegisteredView({
         <span aria-hidden>✓</span> You’re in
       </div>
       <h1 className="font-display uppercase text-3xl md:text-4xl font-bold leading-tight mb-3">
-        See you at the start line
+        {isRunning ? 'See you at the start line' : 'You’re all set'}
       </h1>
       <p className="text-sm text-jet/65 mb-7 mx-auto max-w-md">
-        Here’s your race bib for <strong>{eventTitle}</strong>. Screenshot it,
-        share it, and use the Endorfin app to track your run.
+        Here’s your ticket for <strong>{eventTitle}</strong>. Screenshot it,
+        share it, or show the QR at entry.
       </p>
 
-      <BibCard
+      <EventTicket
+        className="max-w-md mx-auto"
         eventTitle={eventTitle}
-        bibNumber={bibNumber}
-        participantName={participantName}
-        distance={distance}
+        code={bibNumber}
+        codeLabel={isRunning ? 'Bib no.' : 'Entry code'}
+        startTime={reg.event?.startTime ?? null}
+        venue={reg.event?.venueName || reg.event?.locationName || null}
+        qrValue={typeof window !== 'undefined' ? window.location.origin + `/me/registrations/${reg.id}` : ''}
       />
 
-      <ShareRow
-        eventTitle={eventTitle}
-        bibNumber={bibNumber}
-        distance={distance}
-        eventSlug={eventSlug}
-      />
+      <div className="mt-6">
+        <ShareRow
+          eventTitle={eventTitle}
+          bibNumber={bibNumber}
+          distance={distance}
+          eventSlug={eventSlug}
+        />
+      </div>
 
       {/* App install nudge — primary path for "manage my registration"
        *  lives in the app. Uses the site-wide AppStoreButtons so it

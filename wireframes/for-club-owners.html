@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Lo-fi · For Club Owners</title>
+<style>
+  /* ───────── Lo-fi wireframe styling: greyscale, boxes, no brand ───────── */
+  :root{
+    --ink:#3a3a3a; --line:#b9b9b9; --line-2:#d8d8d8;
+    --fill:#efefef; --fill-2:#e3e3e3; --paper:#f7f7f5;
+    --muted:#8a8a8a; --note:#9a6b2f; --note-bg:#fbf2e2;
+    --r:8px;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0; background:var(--paper); color:var(--ink);
+    font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+    line-height:1.5; -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1080px;margin:0 auto;padding:0 20px}
+  section{padding:48px 0;border-bottom:1px dashed var(--line-2)}
+  /* section tag */
+  .stag{
+    display:inline-block;font-size:11px;letter-spacing:.12em;text-transform:uppercase;
+    color:var(--muted);border:1px solid var(--line);border-radius:99px;
+    padding:3px 10px;margin-bottom:18px;background:#fff;
+  }
+  h1,h2,h3,h4{font-family:Georgia,"Times New Roman",serif;font-weight:600;color:#2a2a2a;margin:0}
+  h1{font-size:clamp(30px,5vw,46px);line-height:1.08;letter-spacing:-.01em}
+  h2{font-size:clamp(22px,3.4vw,30px);line-height:1.12}
+  h3{font-size:16px}
+  h4{font-size:14px}
+  p{margin:10px 0;color:#555;font-size:14px;max-width:60ch}
+  .sub{color:#6a6a6a;font-size:15px;max-width:56ch}
+  /* generic boxes */
+  .box{border:1px solid var(--line);border-radius:var(--r);background:#fff}
+  .box.fill{background:var(--fill)}
+  .ph{ /* image placeholder with diagonal cross */
+    border:1px solid var(--line);border-radius:var(--r);background:
+      linear-gradient(135deg,transparent 49.4%,var(--line) 49.5%,var(--line) 50.5%,transparent 50.6%),
+      linear-gradient(45deg, transparent 49.4%,var(--line) 49.5%,var(--line) 50.5%,transparent 50.6%),
+      var(--fill);
+    display:flex;align-items:center;justify-content:center;
+    color:var(--muted);font-size:11px;letter-spacing:.1em;text-transform:uppercase;
+  }
+  .btn{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--ink);border-radius:6px;
+    padding:11px 18px;font-size:13px;background:var(--ink);color:#fff;font-weight:600}
+  .btn.ghost{background:#fff;color:var(--ink)}
+  .row{display:flex;gap:14px;flex-wrap:wrap;align-items:center}
+  .muted{color:var(--muted);font-size:12px}
+  .pill{display:inline-block;font-size:10px;letter-spacing:.08em;text-transform:uppercase;
+    border:1px solid var(--line);border-radius:99px;padding:2px 8px;color:var(--muted);background:#fff}
+  .pill.solid{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .icon{width:28px;height:28px;border:1px solid var(--line);border-radius:6px;background:var(--fill);
+    display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:12px;flex:0 0 auto}
+  /* annotation note */
+  .note{font-family:ui-monospace,monospace;font-size:12px;color:var(--note);background:var(--note-bg);
+    border:1px dashed #e0c596;border-radius:6px;padding:8px 12px;margin:14px 0}
+  .note b{color:var(--note)}
+  /* grids */
+  .g2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  .g3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  .g4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+  .card{border:1px solid var(--line);border-radius:var(--r);background:#fff;padding:18px;min-height:120px}
+  .card .icon{margin-bottom:12px}
+  /* ── bento (section ② redesign) ── */
+  .bento{display:grid;grid-template-columns:repeat(12,1fr);gap:16px;margin-top:26px}
+  .tile{grid-column:span 6;border:1px solid var(--line);border-radius:14px;background:#fff;
+    padding:22px;display:flex;flex-direction:column;min-height:230px;
+    font-family:system-ui,-apple-system,"Segoe UI",sans-serif}
+  .tile.w7{grid-column:span 7}
+  .tile.w5{grid-column:span 5}
+  .tile-head{display:flex;align-items:center;gap:12px}
+  .tile-head .icon{width:38px;height:38px;border-radius:10px}
+  .tile h3{font-family:system-ui,sans-serif;font-size:18px;font-weight:700;letter-spacing:-.01em}
+  .tile p{font-family:system-ui,sans-serif;font-size:14px;color:#5a5a5a;margin:10px 0 0;max-width:46ch}
+  .chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+  .chips span{font-family:system-ui,sans-serif;font-size:12px;color:#444;background:var(--fill);
+    border:1px solid var(--line-2);border-radius:99px;padding:4px 11px}
+  /* faux UI preview that fills the tile so it doesn't read as an empty box */
+  .prev{margin-top:auto;padding-top:18px}
+  .prev-card{border:1px solid var(--line-2);border-radius:10px;background:var(--paper);padding:12px;display:grid;gap:9px}
+  .frow{display:flex;align-items:center;gap:10px}
+  .av{width:26px;height:26px;border-radius:99px;background:var(--fill-2);border:1px solid var(--line-2);flex:0 0 auto}
+  .ln{height:8px;border-radius:5px;background:var(--fill-2)}
+  .ln.s{width:40%}.ln.m{width:65%}.ln.l{width:85%}
+  .mini-pill{font-family:system-ui,sans-serif;font-size:11px;border:1px solid var(--line);border-radius:99px;
+    padding:3px 10px;color:#444;background:#fff;margin-left:auto}
+  .mini-pill.solid{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .date-blk{width:42px;height:42px;border-radius:8px;border:1px solid var(--line-2);background:#fff;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;flex:0 0 auto;font-family:system-ui,sans-serif}
+  .date-blk b{font-size:14px;line-height:1}.date-blk small{font-size:9px;color:var(--muted);text-transform:uppercase}
+  .bar{height:8px;border-radius:5px;background:var(--fill-2);overflow:hidden}
+  .bar i{display:block;height:100%;width:62%;background:#9b9b9b}
+  .badges{display:flex;gap:6px}
+  .badge{width:24px;height:24px;border-radius:8px;border:1px solid var(--line-2);background:var(--fill);
+    display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--muted)}
+  @media(max-width:820px){.tile,.tile.w7,.tile.w5{grid-column:span 12}}
+  /* index bar */
+  .index{position:sticky;top:0;z-index:50;background:#fff;border-bottom:1px solid var(--line);
+    font-size:11px;color:var(--muted);padding:8px 0}
+  .index .wrap{display:flex;gap:14px;flex-wrap:wrap;align-items:center}
+  .index a{color:var(--muted);text-decoration:none}
+  .index a:hover{color:var(--ink)}
+  /* nav mock */
+  .nav{display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid var(--line)}
+  .nav .links{display:flex;gap:18px;font-size:13px;color:#555}
+  .nav .links .cur{color:var(--ink);font-weight:700;border-bottom:2px solid var(--ink);padding-bottom:2px}
+  /* table */
+  .tbl-wrap{overflow-x:auto;margin-top:18px;border-radius:var(--r)}
+  table{width:100%;min-width:760px;border-collapse:collapse;font-size:13px;background:#fff;border:1px solid var(--line);border-radius:var(--r);overflow:hidden;
+    font-family:system-ui,-apple-system,"Segoe UI",sans-serif}
+  th,td{padding:13px 14px;text-align:center;border-bottom:1px solid var(--line-2)}
+  th:first-child,td:first-child{text-align:left;color:#333;font-weight:500;min-width:230px;position:sticky;left:0;background:#fff;z-index:1}
+  thead th{background:var(--fill);font-family:Georgia,serif;font-weight:600;font-size:13.5px;color:#555}
+  thead th:first-child{background:var(--fill)}
+  thead th.us{background:#2a2a2a;color:#fff;border-radius:8px 8px 0 0}
+  tbody td.us{background:#fafafa;border-left:1px solid var(--line-2);border-right:1px solid var(--line-2)}
+  tbody tr:last-child td.us{border-bottom:1px solid var(--line-2);border-radius:0 0 8px 8px}
+  .yes{color:#1f7a3d;font-weight:800;font-size:15px}
+  td.us .yes{color:#0f5f2c}
+  .no{color:#cdcdcd;font-size:15px}
+  .mid{color:#c79a3a;font-weight:700}
+  .na{color:#d5d5d5;font-size:12px}
+  .legend{display:flex;gap:18px;flex-wrap:wrap;margin-top:12px;font-family:system-ui,sans-serif;font-size:12px;color:var(--muted)}
+  .legend b{color:#444;font-weight:700}
+  /* steps */
+  .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:0;margin-top:22px}
+  .step{padding:18px;border:1px solid var(--line);border-right:none;background:#fff;position:relative}
+  .step:last-child{border-right:1px solid var(--line)}
+  .step .n{width:26px;height:26px;border-radius:99px;border:1px solid var(--ink);display:flex;
+    align-items:center;justify-content:center;font-weight:700;font-size:13px;margin-bottom:10px}
+  /* faq */
+  details{border:1px solid var(--line);border-radius:var(--r);background:#fff;margin-bottom:10px}
+  summary{cursor:pointer;padding:14px 16px;font-family:Georgia,serif;font-size:15px;color:#2a2a2a;
+    list-style:none;display:flex;justify-content:space-between;align-items:center}
+  summary::-webkit-details-marker{display:none}
+  summary::after{content:"+";color:var(--muted);font-family:monospace}
+  details[open] summary::after{content:"\2212"}
+  details .ans{padding:0 16px 16px;color:#555;font-size:13px}
+  /* platform features — CSS-only interactive tabs */
+  .pf2{display:grid;grid-template-columns:300px 1fr;gap:18px;margin-top:22px;
+    font-family:system-ui,-apple-system,"Segoe UI",sans-serif}
+  .pf2 > input{position:absolute;opacity:0;pointer-events:none}
+  .pf2-rail{display:flex;flex-direction:column;gap:8px}
+  .pf2-rail label{padding:13px 15px;border:1px solid var(--line);border-radius:9px;background:#fff;
+    display:flex;justify-content:space-between;align-items:center;font-size:14px;cursor:pointer;transition:.15s}
+  .pf2-rail label:hover{border-color:#9a9a9a}
+  .pf2-panel{display:none;border:1px solid var(--line);border-radius:14px;background:#fff;padding:24px;
+    min-height:320px;flex-direction:column}
+  .pf2-panel h4{font-family:system-ui,sans-serif;font-size:17px;font-weight:700}
+  .pf2-panel p{font-family:system-ui,sans-serif;font-size:13.5px;color:#5a5a5a;margin:8px 0 0;max-width:44ch}
+  .pf2-stage{margin-top:auto;padding-top:20px;display:flex;justify-content:center}
+  .pf2-stage .prev-card{width:100%;max-width:420px}
+  /* active tab + matching panel (6 features) */
+  #f1:checked ~ .pf2-rail label[for=f1],#f2:checked ~ .pf2-rail label[for=f2],
+  #f3:checked ~ .pf2-rail label[for=f3],#f4:checked ~ .pf2-rail label[for=f4],
+  #f5:checked ~ .pf2-rail label[for=f5],#f6:checked ~ .pf2-rail label[for=f6],
+  #f7:checked ~ .pf2-rail label[for=f7]{
+    background:var(--ink);color:#fff;border-color:var(--ink)}
+  #f1:checked ~ .pf2-rail label[for=f1] .pill,#f2:checked ~ .pf2-rail label[for=f2] .pill,
+  #f7:checked ~ .pf2-rail label[for=f7] .pill{border-color:#fff;color:#fff}
+  #f1:checked ~ .pf2-panels .p1,#f2:checked ~ .pf2-panels .p2,#f3:checked ~ .pf2-panels .p3,
+  #f4:checked ~ .pf2-panels .p4,#f5:checked ~ .pf2-panels .p5,#f6:checked ~ .pf2-panels .p6,
+  #f7:checked ~ .pf2-panels .p7{display:flex}
+  /* chat + qr + notif previews */
+  .bub{max-width:78%;padding:9px 12px;border-radius:12px;font-size:12.5px;font-family:system-ui,sans-serif;background:var(--fill);color:#333}
+  .bub.me{margin-left:auto;background:var(--ink);color:#fff}
+  .qr{width:84px;height:84px;border-radius:10px;flex:0 0 auto;background:
+    repeating-linear-gradient(0deg,#cfcfcf 0 6px,#fff 6px 12px),
+    repeating-linear-gradient(90deg,#cfcfcf 0 6px,transparent 6px 12px);border:1px solid var(--line-2)}
+  .notif{display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--line-2);border-radius:10px;background:#fff;font-family:system-ui,sans-serif;font-size:12.5px}
+  .notif .src{font-size:10px;font-weight:700;color:#fff;background:#444;border-radius:5px;padding:2px 6px;flex:0 0 auto}
+  .notif .src.wa{background:#2a8c4a}
+  @media(max-width:820px){.pf2{grid-template-columns:1fr}}
+  /* ── ③ Discovery: scroll-driven feature change ── */
+  .scroller{display:grid;grid-template-columns:1fr 1fr;gap:56px;margin-top:30px;
+    font-family:system-ui,-apple-system,"Segoe UI",sans-serif}
+  .scroller-sticky{position:sticky;top:96px;align-self:start}
+  .dstage{position:relative;min-height:360px;border:1px solid var(--line);border-radius:16px;background:#fff;
+    box-shadow:0 1px 0 rgba(0,0,0,.02)}
+  .dpv{position:absolute;inset:22px;opacity:0;transform:translateY(10px);transition:opacity .35s ease,transform .35s ease;
+    pointer-events:none;display:flex;flex-direction:column;justify-content:center;gap:10px}
+  .dpv.active{opacity:1;transform:none}
+  .dprog{display:flex;gap:7px;justify-content:center;margin-top:16px}
+  .dprog i{width:7px;height:7px;border-radius:99px;background:var(--line);transition:.25s}
+  .dprog i.on{background:var(--ink);width:20px}
+  .scroller-steps{display:flex;flex-direction:column}
+  .dstep{min-height:58vh;display:flex;flex-direction:column;justify-content:center;
+    border-left:2px solid var(--line-2);padding-left:22px;opacity:.3;transition:opacity .3s,border-color .3s}
+  .dstep.active{opacity:1;border-color:var(--ink)}
+  .dstep .dnum{font-family:system-ui,sans-serif;font-size:12px;letter-spacing:.14em;color:var(--muted);font-weight:700}
+  .dstep h3{font-family:Georgia,serif;font-size:24px;margin:8px 0 0}
+  .dstep p{font-size:15px;color:#555;margin:10px 0 0;max-width:42ch}
+  .dstep .pill{margin-top:12px}
+  /* mini SERP + city + ad previews */
+  .serp{border:1px solid var(--line-2);border-radius:10px;overflow:hidden}
+  .serp-bar{background:var(--fill);padding:7px 12px;font-size:11px;color:var(--muted);border-bottom:1px solid var(--line-2)}
+  .serp-hit{padding:12px}.serp-hit .u{font-size:11px;color:#5a8a5a}.serp-hit .t{font-size:14px;color:#26509e;margin:3px 0}
+  .city-row{display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--line-2);border-radius:9px}
+  .ad{border:1px solid var(--line-2);border-radius:12px;overflow:hidden}
+  .ad .ad-top{display:flex;align-items:center;gap:8px;padding:9px 11px;font-size:12px;color:#444}
+  .ad .ad-img{height:120px;background:var(--fill);border-top:1px solid var(--line-2);border-bottom:1px solid var(--line-2);
+    display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:11px;letter-spacing:.1em}
+  .ad .ad-cta{display:flex;justify-content:space-between;align-items:center;padding:10px 11px;font-size:12px}
+  @media(max-width:820px){
+    .scroller{grid-template-columns:1fr;gap:18px}
+    .scroller-sticky{top:60px}
+    .dstage{min-height:240px}
+    .dstep{min-height:auto;padding:26px 0 26px 18px}
+  }
+  @media(prefers-reduced-motion:reduce){
+    .dpv,.dstep,.dprog i{transition:none}
+    .dpv{transform:none}
+  }
+  /* integrations strip */
+  .intg{display:flex;gap:12px;flex-wrap:wrap;margin-top:14px}
+  .intg .chip{display:flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:8px;
+    padding:10px 14px;background:#fff;font-size:13px;color:#444}
+  /* footer */
+  footer{background:#2a2a2a;color:#cfcfcf;padding:40px 0}
+  footer h4{color:#fff;font-family:Georgia,serif;margin-bottom:10px;font-size:13px}
+  footer .fg{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:24px}
+  footer a,footer li{color:#bcbcbc;font-size:13px;text-decoration:none;line-height:1.9;list-style:none}
+  footer ul{padding:0;margin:0}
+  @media(max-width:820px){
+    .g3,.g4,.pf,.steps,footer .fg{grid-template-columns:1fr 1fr}
+    .g2{grid-template-columns:1fr}
+  }
+  @media(max-width:560px){
+    .g3,.g4,.steps,.nav .links,footer .fg{grid-template-columns:1fr}
+    .nav .links{display:none}
+  }
+</style>
+</head>
+<body>
+
+<!-- jump index -->
+<div class="index"><div class="wrap">
+  <b style="color:#2a2a2a">LO-FI · For Club Owners</b>
+  <a href="#hero">1 Hero</a><a href="#community">2 Community</a><a href="#discovery">3 Discovery</a>
+  <a href="#platform">4 Platform</a><a href="#compare">5 Compare</a><a href="#migrate">6 Migration</a>
+  <a href="#pricing">7 Pricing</a><a href="#faq">8 FAQ</a><a href="#cta">9 CTA</a><a href="#footer">10 Footer</a>
+</div></div>
+
+<div class="wrap">
+  <!-- nav mock -->
+  <div class="nav">
+    <div style="font-family:Georgia,serif;font-weight:700;font-size:18px">◎ endorfin</div>
+    <div class="links">
+      <span>Running Events</span><span>Clubs</span>
+      <span class="cur">For club owners</span>
+    </div>
+    <span class="btn ghost">Sign in</span>
+  </div>
+</div>
+
+<!-- ① HERO -->
+<section id="hero"><div class="wrap">
+  <span class="stag">① Hero</span>
+  <div class="g2" style="align-items:center">
+    <div>
+      <span class="pill">For run club organisers</span>
+      <h1 style="margin-top:14px">A home for your run club.</h1>
+      <p class="sub" style="margin-top:14px">List your club, host your runs, and get found by runners in your city. Free.</p>
+      <div class="row" style="margin-top:22px">
+        <span class="btn">Add your club</span>
+        <span class="btn ghost">See how it works</span>
+      </div>
+      <div class="row" style="margin-top:26px;gap:22px">
+        <span class="muted">◦ Get discovered</span>
+        <span class="muted">◦ Host runs free</span>
+        <span class="muted">◦ One place to manage</span>
+      </div>
+    </div>
+    <div class="ph" style="aspect-ratio:4/3">Club page / app mockup</div>
+  </div>
+  <div class="note"><b>Tone:</b> quiet headline, no exclamation. Loud version ("We'll run the internet") retired.</div>
+</div></section>
+
+<!-- ② BUILD COMMUNITY -->
+<section id="community"><div class="wrap">
+  <span class="stag">② Build community that sticks</span>
+  <h2>Everything your club needs to keep members coming back.</h2>
+  <p class="sub">A real home for your community — not a chat thread and a spreadsheet.</p>
+
+  <div class="bento">
+    <!-- Social Connection (wide hero tile) -->
+    <div class="tile w7">
+      <div class="tile-head"><span class="icon">◍</span><h3>Social Connection</h3></div>
+      <p>Give members a reason to stay. A shared feed, group chat, and profiles that make the club feel like an actual club.</p>
+      <div class="chips"><span>Member feed</span><span>Group chat</span><span>Profiles</span></div>
+      <div class="prev"><div class="prev-card">
+        <div class="frow"><span class="av"></span><div style="flex:1"><div class="ln s" style="margin-bottom:6px"></div><div class="ln l"></div></div></div>
+        <div class="frow"><span class="av"></span><div style="flex:1"><div class="ln s" style="margin-bottom:6px"></div><div class="ln m"></div></div></div>
+      </div></div>
+    </div>
+
+    <!-- Members & Approval -->
+    <div class="tile w5">
+      <div class="tile-head"><span class="icon">▤</span><h3>Members &amp; Approval</h3></div>
+      <p>Requests, member details, and approvals all in one place. No more Google Forms, no more spreadsheets.</p>
+      <div class="prev"><div class="prev-card">
+        <div class="frow"><span class="av"></span><div class="ln m"></div><span class="mini-pill solid">Approve</span></div>
+        <div class="frow"><span class="av"></span><div class="ln s"></div><span class="mini-pill">Pending</span></div>
+      </div></div>
+    </div>
+
+    <!-- Events & Classes -->
+    <div class="tile w5">
+      <div class="tile-head"><span class="icon">◷</span><h3>Events &amp; Classes</h3></div>
+      <p>Host paid events and recurring classes. Give members something to commit to, week after week.</p>
+      <div class="prev"><div class="prev-card">
+        <div class="frow"><span class="date-blk"><b>14</b><small>Jun</small></span><div style="flex:1"><div class="ln m" style="margin-bottom:6px"></div><div class="ln s"></div></div><span class="mini-pill solid">RSVP</span></div>
+      </div></div>
+    </div>
+
+    <!-- Gamification -->
+    <div class="tile w7">
+      <div class="tile-head"><span class="icon">✦</span><h3>Gamification</h3></div>
+      <p>Run weekly and daily challenges that keep members motivated — streaks, leaderboards, and badges that turn up the consistency.</p>
+      <div class="chips"><span>Weekly challenges</span><span>Streaks</span><span>Leaderboard</span></div>
+      <div class="prev"><div class="prev-card">
+        <div class="frow"><div style="flex:1"><div class="ln s" style="margin-bottom:8px"></div><div class="bar"><i></i></div></div><div class="badges"><span class="badge">①</span><span class="badge">②</span><span class="badge">③</span></div></div>
+      </div></div>
+    </div>
+  </div>
+</div></section>
+
+<!-- ③ DISCOVERY — scroll-driven feature change -->
+<section id="discovery"><div class="wrap">
+  <span class="stag">③ Discovery</span>
+  <h2>Runners are already looking. We help them find you.</h2>
+  <p class="sub">We don't just host your club — we put it in front of people. Scroll to see how.</p>
+
+  <div class="scroller" id="discScroller">
+    <!-- sticky preview -->
+    <div class="scroller-sticky">
+      <div class="dstage">
+        <!-- 1 feed -->
+        <div class="dpv active" data-pv="1">
+          <div class="prev-card">
+            <div class="frow"><span class="av"></span><div style="flex:1"><div class="ln s" style="margin-bottom:6px"></div><div class="ln l"></div></div><span class="mini-pill">Run club</span></div>
+            <div class="frow"><span class="av"></span><div style="flex:1"><div class="ln s" style="margin-bottom:6px"></div><div class="ln m"></div></div><span class="mini-pill">Event</span></div>
+            <div class="frow"><span class="av"></span><div style="flex:1"><div class="ln s" style="margin-bottom:6px"></div><div class="ln m"></div></div><span class="mini-pill">Run club</span></div>
+          </div>
+        </div>
+        <!-- 2 google -->
+        <div class="dpv" data-pv="2">
+          <div class="serp">
+            <div class="serp-bar">google.com › search?q=run clubs in noida</div>
+            <div class="serp-hit"><div class="u">endorfin.run › clubs › uprun</div><div class="t">UpRun Club — Noida · 42 members · Endorfin</div><div class="ln l" style="margin-top:6px"></div><div class="ln m" style="margin-top:6px"></div></div>
+          </div>
+          <div class="mini-pill solid" style="align-self:flex-start">Ranks #1</div>
+        </div>
+        <!-- 3 city pages -->
+        <div class="dpv" data-pv="3">
+          <div class="city-row"><span class="icon" style="width:24px;height:24px">◷</span><div class="ln m"></div><span class="mini-pill" style="margin-left:auto">Delhi</span></div>
+          <div class="city-row"><span class="icon" style="width:24px;height:24px">◷</span><div class="ln s"></div><span class="mini-pill" style="margin-left:auto">Mumbai</span></div>
+          <div class="city-row"><span class="icon" style="width:24px;height:24px">◷</span><div class="ln m"></div><span class="mini-pill" style="margin-left:auto">Pune</span></div>
+        </div>
+        <!-- 4 push -->
+        <div class="dpv" data-pv="4">
+          <div class="notif"><span class="src wa">WA</span><div style="flex:1">Sunrise loop tomorrow, 6:00am ☀️</div></div>
+          <div class="notif"><span class="src" style="background:#444">PUSH</span><div style="flex:1">3 spots left for Saturday's 10K</div></div>
+        </div>
+        <!-- 5 ads -->
+        <div class="dpv" data-pv="5">
+          <div class="ad">
+            <div class="ad-top"><span class="av" style="width:22px;height:22px"></span><div class="ln s"></div><span class="mini-pill" style="margin-left:auto">Sponsored</span></div>
+            <div class="ad-img">EVENT CREATIVE</div>
+            <div class="ad-cta"><div class="ln m"></div><span class="mini-pill solid">Get tickets</span></div>
+          </div>
+        </div>
+        <div class="dprog" aria-hidden="true"><i class="on"></i><i></i><i></i><i></i><i></i></div>
+      </div>
+    </div>
+
+    <!-- scrolling steps -->
+    <div class="scroller-steps">
+      <div class="dstep active" data-step="1"><span class="dnum">01</span><h3>Discovery feed</h3><p>Your club and its runs surface in the in-app discover search, in front of runners browsing for a crew.</p></div>
+      <div class="dstep" data-step="2"><span class="dnum">02</span><h3>Found on Google</h3><p>An SEO-ready club page that ranks for "run clubs in [city]" — working for you 24/7.</p></div>
+      <div class="dstep" data-step="3"><span class="dnum">03</span><h3>Curated city pages</h3><p>We feature your club in the city and event roundups we maintain and promote.</p></div>
+      <div class="dstep" data-step="4"><span class="dnum">04</span><h3>Push &amp; reminders</h3><p>Members get a nudge on WhatsApp and push before every run, so more of them actually show up.</p></div>
+      <div class="dstep" data-step="5"><span class="dnum">05</span><h3>Free ads for paid events</h3><p>Hosting a ticketed run? We run Instagram &amp; Google ads to fill it — on us, no ad spend from you.</p><span class="pill solid">Paid events</span></div>
+    </div>
+  </div>
+  <div class="note"><b>Interaction:</b> sticky preview on the left swaps as each feature scrolls through the viewport centre (IntersectionObserver; falls back to static + respects reduced-motion).</div>
+</div></section>
+
+<!-- ④ PLATFORM FEATURES + INTEGRATIONS -->
+<section id="platform"><div class="wrap">
+  <span class="stag">④ Platform features</span>
+  <h2>The tools to run it day to day.</h2>
+  <p class="sub">Click a tool to preview it.</p>
+  <div class="pf2">
+    <input type="radio" name="pf" id="f1" checked>
+    <input type="radio" name="pf" id="f7">
+    <input type="radio" name="pf" id="f2">
+    <input type="radio" name="pf" id="f3">
+    <input type="radio" name="pf" id="f4">
+    <input type="radio" name="pf" id="f5">
+    <input type="radio" name="pf" id="f6">
+
+    <div class="pf2-rail">
+      <label for="f1">Your club page <span class="pill">Live</span></label>
+      <label for="f7">Auto-import from Instagram <span class="pill">Auto</span></label>
+      <label for="f2">Event hosting &amp; RSVPs <span class="pill">Free</span></label>
+      <label for="f3">QR check-in</label>
+      <label for="f4">In-app chat</label>
+      <label for="f5">SMS / WhatsApp notifications</label>
+      <label for="f6">Member directory &amp; roles</label>
+    </div>
+
+    <div class="pf2-panels">
+      <!-- 1 club page -->
+      <div class="pf2-panel p1">
+        <h4>Your club page</h4>
+        <p>A public, SEO-ready home for your club — stats, next run, and a clear join button.</p>
+        <div class="pf2-stage"><div class="prev-card">
+          <div class="frow"><span class="av"></span><div style="flex:1"><div class="ln m" style="margin-bottom:6px"></div><div class="ln s"></div></div><span class="mini-pill solid">Join</span></div>
+          <div class="frow" style="gap:14px"><div style="flex:1"><b style="font-family:system-ui;font-size:15px">42</b><div class="ln s" style="margin-top:4px"></div></div><div style="flex:1"><b style="font-family:system-ui;font-size:15px">312km</b><div class="ln s" style="margin-top:4px"></div></div><div style="flex:1"><b style="font-family:system-ui;font-size:15px">8</b><div class="ln s" style="margin-top:4px"></div></div></div>
+        </div></div>
+      </div>
+      <!-- 7 auto-import from instagram -->
+      <div class="pf2-panel p7">
+        <h4>Auto-import from Instagram</h4>
+        <p>Connect your handle and we read your next event right off your latest post — date, time, place — and build the event card for you. No re-typing what you already posted.</p>
+        <div class="pf2-stage"><div class="prev-card" style="gap:12px">
+          <div class="frow"><span class="av"></span><div style="flex:1"><b style="font-family:system-ui;font-size:13px">@uprun.club</b><div class="ln l" style="margin-top:6px"></div></div><span class="mini-pill">IG post</span></div>
+          <div style="text-align:center;font-family:system-ui;font-size:11px;color:var(--muted);letter-spacing:.08em">↓ auto-detected</div>
+          <div class="frow" style="border:1px solid var(--line-2);border-radius:9px;padding:10px"><span class="date-blk"><b>14</b><small>Jun</small></span><div style="flex:1"><div class="ln m" style="margin-bottom:6px"></div><div class="ln s"></div></div><span class="mini-pill solid">Event ✓</span></div>
+        </div></div>
+      </div>
+      <!-- 2 events -->
+      <div class="pf2-panel p2">
+        <h4>Event hosting &amp; RSVPs</h4>
+        <p>Free to host. Set a run or a ticketed event, members RSVP, headcount tracks itself.</p>
+        <div class="pf2-stage"><div class="prev-card">
+          <div class="frow"><span class="date-blk"><b>14</b><small>Jun</small></span><div style="flex:1"><div class="ln m" style="margin-bottom:6px"></div><div class="ln s"></div></div><span class="mini-pill solid">RSVP</span></div>
+          <div class="frow"><span class="av"></span><span class="av" style="margin-left:-14px"></span><span class="av" style="margin-left:-14px"></span><div class="ln s" style="margin-left:6px"></div></div>
+        </div></div>
+      </div>
+      <!-- 3 check-in -->
+      <div class="pf2-panel p3">
+        <h4>QR check-in</h4>
+        <p>Scan members in at the start line. Live attendance, no clipboard.</p>
+        <div class="pf2-stage"><div class="prev-card" style="flex-direction:row;align-items:center;gap:16px">
+          <div class="qr"></div>
+          <div style="flex:1;display:grid;gap:9px">
+            <div class="frow"><span class="av"></span><div class="ln m"></div><span class="mini-pill solid">In</span></div>
+            <div class="frow"><span class="av"></span><div class="ln s"></div><span class="mini-pill solid">In</span></div>
+          </div>
+        </div></div>
+      </div>
+      <!-- 4 chat -->
+      <div class="pf2-panel p4">
+        <h4>In-app chat</h4>
+        <p>Talk to your club without handing out your number. Members-only threads.</p>
+        <div class="pf2-stage"><div class="prev-card" style="background:#fff">
+          <div class="bub">Sunday's run moves to 6:30am ☀️</div>
+          <div class="bub me">Counted in! 5K or 10K?</div>
+          <div class="bub">Both — RSVP in the event card 👇</div>
+        </div></div>
+      </div>
+      <!-- 5 notifications -->
+      <div class="pf2-panel p5">
+        <h4>SMS / WhatsApp notifications</h4>
+        <p>Reach members where they actually read — automated reminders before every run and event.</p>
+        <div class="pf2-stage"><div class="prev-card" style="background:#fff">
+          <div class="notif"><span class="src wa">WA</span><div style="flex:1">Reminder: Sunrise loop tomorrow, 6:00am</div></div>
+          <div class="notif"><span class="src">SMS</span><div style="flex:1">Your spot for Sat 10K is confirmed ✓</div></div>
+        </div></div>
+      </div>
+      <!-- 6 members -->
+      <div class="pf2-panel p6">
+        <h4>Member directory &amp; roles</h4>
+        <p>See every member, promote co-admins, manage who can post and approve.</p>
+        <div class="pf2-stage"><div class="prev-card">
+          <div class="frow"><span class="av"></span><div class="ln m"></div><span class="mini-pill">Admin</span></div>
+          <div class="frow"><span class="av"></span><div class="ln s"></div><span class="mini-pill">Member</span></div>
+          <div class="frow"><span class="av"></span><div class="ln m"></div><span class="mini-pill">Member</span></div>
+        </div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- integrations -->
+  <h3 style="margin-top:34px">Works with the tools you already use</h3>
+  <p class="sub">Bring your existing flow — no need to rebuild from scratch.</p>
+  <div class="intg">
+    <div class="chip"><span class="icon">▦</span> Google Forms <span class="muted">— import existing responses</span></div>
+    <div class="chip"><span class="icon">▢</span> WhatsApp <span class="muted">— invite your group, share your page</span></div>
+    <div class="chip"><span class="icon">◎</span> Instagram <span class="muted">— link from bio</span></div>
+    <div class="chip"><span class="icon">⌚</span> Strava <span class="muted">— sync runs</span></div>
+  </div>
+  <div class="note"><b>Integrations:</b> Google Forms stays here for <i>importing</i> your old responses. The "no more Google Forms" line in §2 is the forward pitch — collect everything in Endorfin going forward.</div>
+</div></section>
+
+<!-- ⑤ COMPARISON -->
+<section id="compare"><div class="wrap">
+  <span class="stag">⑤ Comparison</span>
+  <h2>Why clubs move to Endorfin.</h2>
+  <p class="sub">Built for run clubs in India — not a generic ticketing marketplace or a chat thread.</p>
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr>
+      <th>&nbsp;</th>
+      <th class="us">Endorfin</th>
+      <th>District</th>
+      <th>Luma</th>
+      <th>AroundU</th>
+      <th>WhatsApp&nbsp;+&nbsp;Instagram</th>
+    </tr></thead>
+    <tbody>
+      <tr>
+        <td>Membership &amp; member management</td>
+        <td class="us"><span class="yes">✓</span></td>
+        <td><span class="no">✗</span></td>
+        <td><span class="yes">✓</span></td>
+        <td><span class="mid">~</span></td>
+        <td><span class="no">✗</span></td>
+      </tr>
+      <tr>
+        <td>Events &amp; ticketing</td>
+        <td class="us"><span class="yes">✓</span></td>
+        <td><span class="yes">✓</span></td>
+        <td><span class="yes">✓</span></td>
+        <td><span class="yes">✓</span></td>
+        <td><span class="no">✗</span></td>
+      </tr>
+      <tr>
+        <td>QR code check-in</td>
+        <td class="us"><span class="yes">✓</span></td>
+        <td><span class="yes">✓</span></td>
+        <td><span class="yes">✓</span></td>
+        <td><span class="yes">✓</span></td>
+        <td><span class="no">✗</span></td>
+      </tr>
+      <tr>
+        <td>Chat, SMS &amp; email built-in</td>
+        <td class="us"><span class="yes">✓</span></td>
+        <td><span class="no">✗</span></td>
+        <td><span class="mid">~</span></td>
+        <td><span class="mid">~</span></td>
+        <td><span class="mid">~</span></td>
+      </tr>
+      <tr>
+        <td>Social features (feed, profiles)</td>
+        <td class="us"><span class="yes">✓</span></td>
+        <td><span class="no">✗</span></td>
+        <td><span class="no">✗</span></td>
+        <td><span class="mid">~</span></td>
+        <td><span class="yes">✓</span></td>
+      </tr>
+      <tr>
+        <td>Free paid advertising (IG / Google)</td>
+        <td class="us"><span class="yes">✓</span></td>
+        <td><span class="mid">~</span></td>
+        <td><span class="no">✗</span></td>
+        <td><span class="no">✗</span></td>
+        <td><span class="no">✗</span></td>
+      </tr>
+      <tr>
+        <td>WhatsApp / Google Forms integration</td>
+        <td class="us"><span class="yes">✓</span></td>
+        <td><span class="no">✗</span></td>
+        <td><span class="no">✗</span></td>
+        <td><span class="no">✗</span></td>
+        <td><span class="na">native</span></td>
+      </tr>
+      <tr>
+        <td>Auto-imports events from Instagram</td>
+        <td class="us"><span class="yes">✓</span></td>
+        <td><span class="no">✗</span></td>
+        <td><span class="no">✗</span></td>
+        <td><span class="no">✗</span></td>
+        <td><span class="no">✗</span></td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+  <div class="legend"><span><b>✓</b> full</span><span><b style="color:#c79a3a">~</b> partial / limited</span><span><b>✗</b> none</span></div>
+  <div class="note"><b>Verified from each product's site (Jun 2026):</b> District = Zomato's ticketing/discovery marketplace (reach, no club tools). Luma = ticketing + QR + free/paid memberships + recurring, but no member chat/social. AroundU = India community/clubs app (QR join, threaded posts, UPI). Flag any cell you'd grade differently.</div>
+</div></section>
+
+<!-- ⑥ MIGRATION -->
+<section id="migrate"><div class="wrap">
+  <span class="stag">⑥ Migration</span>
+  <h2>Already running a club? Moving in takes minutes.</h2>
+  <div class="steps">
+    <div class="step"><div class="n">1</div><h3>Send your details</h3><p>Club name, city, schedule — we may already have them.</p></div>
+    <div class="step"><div class="n">2</div><h3>We set up your page</h3><p>Page built and your next event auto-pulled from your Instagram — no re-typing.</p></div>
+    <div class="step"><div class="n">3</div><h3>Invite your members</h3><p>Share the link on WhatsApp / Instagram — done.</p></div>
+  </div>
+  <p style="margin-top:16px">Or hand it to us — we'll run the page for you, free. <span class="pill">Concierge</span></p>
+</div></section>
+
+<!-- ⑦ PRICING -->
+<section id="pricing"><div class="wrap" style="text-align:center">
+  <span class="stag">⑦ Pricing</span>
+  <h2>It's free for clubs.</h2>
+  <p class="sub" style="margin:8px auto 0">No monthly fee. No per-run fee. No fee to host events.</p>
+  <div class="g3" style="margin-top:26px;text-align:left">
+    <div class="card"><h3>Why free</h3><p>Clubs are the heartbeat of running. Charging founders would be backwards.</p></div>
+    <div class="card"><h3>How we earn</h3><p>Through event ticketing and brand partners — not by taxing communities.</p></div>
+    <div class="card"><h3>What you commit</h3><p>Just keep the page alive and show up to the run.</p></div>
+  </div>
+  <div class="row" style="justify-content:center;margin-top:24px"><span class="btn">Add your club</span></div>
+</div></section>
+
+<!-- ⑧ FAQ -->
+<section id="faq"><div class="wrap">
+  <span class="stag">⑧ FAQ</span>
+  <h2>Questions, answered.</h2>
+  <div style="margin-top:20px;max-width:760px">
+    <details open><summary>Is it really free?</summary><div class="ans">Yes. There's no fee for clubs to list, host runs, or manage members. We earn from event ticketing and partners.</div></details>
+    <details><summary>What does hosting an event cost?</summary><div class="ans">Hosting is free. For ticketed events, standard payment processing applies — and we run free Instagram/Google ads to help fill it.</div></details>
+    <details><summary>Do I have to share my phone number?</summary><div class="ans">No. Members reach you through in-app chat. Your number stays private.</div></details>
+    <details><summary>How do members find my club?</summary><div class="ans">Your page ranks on Google, shows in the in-app discover feed, and gets featured in city roundups.</div></details>
+    <details><summary>Can you set the page up for me?</summary><div class="ans">Yes — our concierge option imports your last runs, writes the first recap, and hands you the keys. Free, limited slots.</div></details>
+    <details><summary>What kinds of clubs is this for?</summary><div class="ans">Any run club in India — training groups, weekend crews, beginner pods, women-only clubs.</div></details>
+  </div>
+</div></section>
+
+<!-- ⑨ FINAL CTA -->
+<section id="cta"><div class="wrap" style="text-align:center;padding:20px 0">
+  <span class="stag">⑨ Final CTA</span>
+  <h2 style="font-size:clamp(26px,4vw,38px)">Put your club on the map.</h2>
+  <p class="sub" style="margin:10px auto 0">Add it in a minute, or let us set it up for you.</p>
+  <div class="row" style="justify-content:center;margin-top:22px">
+    <span class="btn">Add your club</span>
+    <span class="btn ghost">Talk to us</span>
+  </div>
+</div></section>
+
+<!-- ⑩ FOOTER -->
+<footer id="footer"><div class="wrap">
+  <div style="margin-bottom:6px"><span class="pill" style="color:#bbb;border-color:#555;background:transparent">⑩ Footer — reuse existing &lt;Footer/&gt;</span></div>
+  <div class="fg" style="margin-top:16px">
+    <div>
+      <div style="font-family:Georgia,serif;color:#fff;font-weight:700;font-size:18px">◎ endorfin</div>
+      <p style="color:#9a9a9a;max-width:34ch">India's running community — events, clubs, and a free home for organisers.</p>
+    </div>
+    <div><h4>Explore</h4><ul><li>Running Events</li><li>Clubs</li><li>For club owners</li></ul></div>
+    <div><h4>Company</h4><ul><li>Support</li><li>Contact</li></ul></div>
+    <div><h4>Legal</h4><ul><li>Privacy</li><li>Terms</li><li>App Store</li><li>Google Play</li></ul></div>
+  </div>
+</div></footer>
+
+<script>
+  // ③ Discovery: activate the feature whose step is crossing the viewport centre.
+  (function(){
+    var root = document.getElementById('discScroller');
+    if(!root) return;
+    var steps = root.querySelectorAll('.dstep');
+    var pvs   = root.querySelectorAll('.dpv');
+    var dots  = root.querySelectorAll('.dprog i');
+    function activate(i){
+      steps.forEach(function(s){ s.classList.toggle('active', s.dataset.step === i); });
+      pvs.forEach(function(p){ p.classList.toggle('active', p.dataset.pv === i); });
+      dots.forEach(function(d, idx){ d.classList.toggle('on', String(idx+1) === i); });
+    }
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(e){ if(e.isIntersecting) activate(e.target.dataset.step); });
+    }, { rootMargin: '-45% 0px -45% 0px', threshold: 0 });
+    steps.forEach(function(s){ io.observe(s); });
+  })();
+</script>
+</body>
+</html>

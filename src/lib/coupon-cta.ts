@@ -11,6 +11,8 @@
  *   else window.open(cta.href, '_blank');
  */
 
+import { eventPath } from '@/lib/event-path';
+
 interface CouponishRace {
   registrationUrl?: string | null;
   hasCoupon?: boolean;
@@ -18,6 +20,7 @@ interface CouponishRace {
   couponDiscountPercent?: number | null;
   slug?: string | null;
   id: string;
+  category?: string | null;
 }
 
 export type CouponIntent = 'register' | 'login' | 'detail' | 'tbd';
@@ -40,7 +43,7 @@ export interface CouponCta {
 export function couponCta(race: CouponishRace): CouponCta {
   const hasDiscount = !!race.hasCoupon && race.couponDiscountPercent != null;
   const isAuthed = !!race.couponCode; // authed users see the code server-side
-  const detailHref = `/running-events/${race.slug || race.id}`;
+  const detailHref = eventPath(race);
 
   // Has coupon + authed → green "Coupon unlocked", goes to detail page
   if (hasDiscount && isAuthed) {
