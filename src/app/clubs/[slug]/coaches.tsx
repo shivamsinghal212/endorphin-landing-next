@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import type { ClubCoach } from '@/lib/admin-api';
 
 // "Coaches" section for the public club page. Renders a grid of coach
@@ -123,7 +124,12 @@ function CoachModal({
   const photos = coach.photos ?? [];
   const paragraphs = toParagraphs(coach.experience);
   const [slide, setSlide] = useState(0);
+  const [mounted, setMounted] = useState(false);
   const touchX = useRef<number | null>(null);
+
+  // Portal target is the document body — render only after mount so SSR and
+  // the first client paint agree (the modal only ever opens on a click anyway).
+  useEffect(() => setMounted(true), []);
 
   const step = useCallback(
     (delta: number) => {
@@ -149,7 +155,15 @@ function CoachModal({
     };
   }, [onClose, step]);
 
-  return (
+  if (!mounted) return null;
+
+  // The modal portals to <body> to escape transformed ancestors, so it lands
+  // OUTSIDE the `.club-page` container. All coach-modal CSS (and the design
+  // tokens) are scoped under `.club-page`, so re-establish that scope with a
+  // wrapping element — it must be an ancestor (not the overlay itself) because
+  // the rules use a descendant combinator (`.club-page .coach-modal-overlay`).
+  return createPortal(
+    <div className="club-page">
     <div
       className="coach-modal-overlay"
       role="dialog"
@@ -249,5 +263,7 @@ function CoachModal({
         </div>
       </div>
     </div>
+    </div>,
+    document.body,
   );
 }
