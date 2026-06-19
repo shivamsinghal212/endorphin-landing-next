@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Club Detail · Coaches Section · Mockup</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@1,9..144,400;1,9..144,500;1,9..144,700&family=Oswald:wght@400;500;600;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --bone:#F5F0EB;
+    --cream:#EDE7E0;
+    --paper:#FBF8F2;
+    --jet:#0A0A0A;
+    --red:#E6232A;
+    --red-dim:#c41e24;
+    --green:#07A039;
+    --text-secondary:#8A8278;
+    --text-muted:#B0A89E;
+    --hairline:rgba(10,10,10,0.12);
+    --hairline-strong:rgba(10,10,10,0.24);
+    --gutter:clamp(20px,4vw,40px);
+    --container:1120px;
+  }
+  *,*::before,*::after{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    font-family:'Poppins',sans-serif;
+    background:var(--bone);color:var(--jet);
+    -webkit-font-smoothing:antialiased;
+    font-size:15px;line-height:1.6;
+    font-feature-settings:"kern";
+  }
+  a{color:inherit;text-decoration:none}
+  img{display:block;max-width:100%}
+  .wrap{max-width:var(--container);margin:0 auto;padding:0 var(--gutter)}
+
+  .variant-banner{
+    background:var(--jet);color:var(--bone);
+    padding:11px var(--gutter);display:flex;justify-content:space-between;align-items:center;gap:16px;
+    font-family:'Oswald',sans-serif;font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+  }
+  .variant-banner b{font-weight:600;letter-spacing:.06em;font-size:13px}
+  .variant-banner span{color:rgba(245,240,235,.55)}
+
+  /* Type tokens */
+  .kicker{
+    font-family:'Oswald',sans-serif;font-weight:500;
+    text-transform:uppercase;letter-spacing:.16em;font-size:11px;color:var(--text-secondary);
+  }
+
+  /* ─────────── SECTION shell ─────────── */
+  .section{padding:52px 0}
+  .section + .section{border-top:1px solid var(--jet)}
+  .section-head{
+    display:flex;align-items:baseline;justify-content:space-between;gap:16px;
+    margin-bottom:28px;padding-bottom:14px;border-bottom:0.5px solid var(--hairline);
+  }
+  .section-head h2{
+    margin:0;
+    font-family:'Oswald',sans-serif;font-weight:600;font-size:24px;letter-spacing:-.005em;text-transform:uppercase;line-height:1;
+  }
+  .section-head h2 .accent{
+    font-family:'Fraunces',serif;font-style:italic;font-weight:700;text-transform:none;color:var(--red);
+  }
+  .section-head .count{
+    font-family:'Oswald',sans-serif;font-weight:500;font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--text-secondary);
+    white-space:nowrap;
+  }
+
+  /* ─────────── COACHES GRID ─────────── */
+  .coaches-grid{
+    display:grid;grid-template-columns:repeat(3,1fr);gap:20px;
+  }
+  .coach-card{
+    position:relative;display:flex;flex-direction:column;
+    background:var(--paper);
+    border:0.5px solid var(--hairline);
+    border-radius:18px;overflow:hidden;
+    cursor:pointer;text-align:left;width:100%;padding:0;
+    font-family:inherit;color:inherit;
+    transition:transform 220ms cubic-bezier(.2,.7,.2,1), box-shadow 220ms ease-out, border-color 220ms ease-out;
+  }
+  .coach-card:hover{
+    transform:translateY(-4px);
+    border-color:var(--hairline-strong);
+    box-shadow:0 18px 40px -22px rgba(10,10,10,0.45);
+  }
+  .coach-card:focus-visible{outline:2px solid var(--red);outline-offset:3px}
+
+  .coach-photo{
+    position:relative;aspect-ratio:4/5;overflow:hidden;background:var(--cream);
+  }
+  .coach-photo img{
+    width:100%;height:100%;object-fit:cover;
+    transition:transform 600ms cubic-bezier(.2,.7,.2,1);
+  }
+  .coach-card:hover .coach-photo img{transform:scale(1.045)}
+  /* gradient + name overlay on the image */
+  .coach-photo::after{
+    content:"";position:absolute;inset:0;
+    background:linear-gradient(to top,rgba(10,10,10,.78) 0%,rgba(10,10,10,.30) 32%,rgba(10,10,10,0) 58%);
+  }
+  .photo-overlay{
+    position:absolute;left:16px;right:16px;bottom:14px;z-index:2;
+  }
+  .photo-overlay .name{
+    font-family:'Oswald',sans-serif;font-weight:600;font-size:21px;line-height:1.05;
+    letter-spacing:-.005em;text-transform:uppercase;color:var(--bone);
+  }
+  .photo-overlay .role{
+    margin-top:5px;display:flex;flex-wrap:wrap;gap:0 6px;
+    font-family:'Oswald',sans-serif;font-weight:500;font-size:11px;letter-spacing:.12em;text-transform:uppercase;
+    color:rgba(245,240,235,.82);
+  }
+  /* photo count chip */
+  .photo-count{
+    position:absolute;top:12px;right:12px;z-index:2;
+    display:inline-flex;align-items:center;gap:5px;
+    padding:5px 9px;border-radius:999px;
+    background:rgba(10,10,10,.55);backdrop-filter:blur(6px);
+    font-family:'Oswald',sans-serif;font-weight:500;font-size:10px;letter-spacing:.1em;color:var(--bone);
+  }
+  .photo-count svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:1.8}
+
+  .coach-body{
+    padding:15px 16px 16px;display:flex;flex-direction:column;gap:12px;flex:1;
+  }
+  .coach-teaser{
+    margin:0;font-size:13.5px;line-height:1.55;color:var(--jet);opacity:.72;
+    display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;
+  }
+  .coach-foot{
+    margin-top:auto;display:flex;align-items:center;justify-content:space-between;gap:10px;
+    padding-top:12px;border-top:0.5px solid var(--hairline);
+  }
+  .coach-view{
+    display:inline-flex;align-items:center;gap:7px;
+    font-family:'Oswald',sans-serif;font-weight:600;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--jet);
+  }
+  .coach-view svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;transition:transform 200ms ease-out}
+  .coach-card:hover .coach-view svg{transform:translateX(3px)}
+  .coach-view .accent-dot{color:var(--red)}
+
+  /* social icon button (matches icon-btn pattern) */
+  .icon-btn{
+    display:inline-grid;place-items:center;width:34px;height:34px;border-radius:999px;
+    border:0.5px solid var(--hairline-strong);background:transparent;color:var(--jet);
+    cursor:pointer;transition:background-color 160ms ease-out,color 160ms ease-out,border-color 160ms ease-out;
+  }
+  .icon-btn svg{width:16px;height:16px}
+  .icon-btn[data-brand="instagram"]:hover{background:#E1306C;border-color:#E1306C;color:#fff}
+
+  /* ─────────── LED BY (context, below coaches) ─────────── */
+  .led-by-kicker{margin-bottom:24px}
+  .admins-grid{display:grid;grid-template-columns:1fr 1fr;gap:28px 40px}
+  .admin-card{
+    display:grid;grid-template-columns:64px 1fr auto;align-items:center;gap:18px;
+    padding:14px;margin:-14px;border-radius:14px;transition:background-color 180ms ease-out;
+  }
+  .admin-card:hover{background:var(--cream)}
+  .admin-avatar{
+    width:64px;height:64px;border-radius:50%;background-size:cover;background-position:center;
+    display:grid;place-items:center;font-family:'Oswald',sans-serif;font-weight:600;font-size:28px;
+    color:var(--bone);text-transform:uppercase;
+  }
+  .admin-avatar.initial-jet{background:var(--jet)}
+  .admin-avatar.initial-red{background:var(--red)}
+  .admin-name{
+    font-family:'Oswald',sans-serif;font-weight:600;font-size:24px;line-height:1;
+    text-transform:uppercase;color:var(--jet);letter-spacing:-.005em;
+  }
+  .admin-role{margin-top:10px}
+  .admin-socials{display:flex;gap:6px}
+
+  /* ─────────── MODAL ─────────── */
+  .modal-overlay{
+    position:fixed;inset:0;z-index:100;
+    background:rgba(10,10,10,.55);backdrop-filter:blur(4px);
+    display:flex;align-items:center;justify-content:center;padding:24px;
+    opacity:0;visibility:hidden;transition:opacity 240ms ease-out,visibility 240ms;
+  }
+  .modal-overlay.open{opacity:1;visibility:visible}
+  .modal{
+    position:relative;width:min(880px,100%);max-height:90vh;overflow:hidden;
+    background:var(--paper);border-radius:22px;border:0.5px solid var(--hairline);
+    display:grid;grid-template-columns:minmax(0,46%) minmax(0,54%);
+    box-shadow:0 40px 90px -30px rgba(10,10,10,.6);
+    transform:translateY(16px) scale(.98);transition:transform 280ms cubic-bezier(.2,.7,.2,1);
+  }
+  .modal-overlay.open .modal{transform:translateY(0) scale(1)}
+
+  /* close */
+  .modal-close{
+    position:absolute;top:14px;right:14px;z-index:10;
+    width:38px;height:38px;border-radius:999px;border:0;cursor:pointer;
+    background:rgba(10,10,10,.5);backdrop-filter:blur(6px);color:var(--bone);
+    display:grid;place-items:center;transition:background-color 160ms ease-out;
+  }
+  .modal-close:hover{background:var(--red)}
+  .modal-close svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2}
+
+  /* slider */
+  .slider{position:relative;height:100%;min-height:420px;background:var(--cream);overflow:hidden}
+  .slides{display:flex;height:100%;transition:transform 420ms cubic-bezier(.2,.7,.2,1)}
+  .slide{flex:0 0 100%;height:100%}
+  .slide img{width:100%;height:100%;object-fit:cover;min-height:420px}
+  .slider-btn{
+    position:absolute;top:50%;transform:translateY(-50%);z-index:5;
+    width:40px;height:40px;border-radius:999px;border:0;cursor:pointer;
+    background:rgba(251,248,242,.85);backdrop-filter:blur(6px);color:var(--jet);
+    display:grid;place-items:center;transition:background-color 160ms ease-out,transform 120ms ease-out;
+  }
+  .slider-btn:hover{background:var(--bone)}
+  .slider-btn:active{transform:translateY(-50%) scale(.92)}
+  .slider-btn.prev{left:12px}
+  .slider-btn.next{right:12px}
+  .slider-btn svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2}
+  .dots{
+    position:absolute;left:0;right:0;bottom:14px;z-index:5;
+    display:flex;justify-content:center;gap:7px;
+  }
+  .dot{width:7px;height:7px;border-radius:999px;background:rgba(245,240,235,.55);border:0;padding:0;cursor:pointer;transition:width 200ms ease-out,background-color 200ms ease-out}
+  .dot.active{width:22px;background:var(--bone)}
+
+  /* modal content */
+  .modal-content{padding:34px 34px 30px;overflow-y:auto;display:flex;flex-direction:column}
+  .modal-kicker{
+    display:inline-flex;align-items:center;gap:7px;margin-bottom:12px;
+    font-family:'Oswald',sans-serif;font-weight:600;font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--red);
+  }
+  .modal-kicker .dot-fixed{width:5px;height:5px;border-radius:50%;background:var(--red)}
+  .modal-name{
+    margin:0;font-family:'Oswald',sans-serif;font-weight:600;font-size:30px;line-height:1.04;
+    letter-spacing:-.01em;text-transform:uppercase;color:var(--jet);
+  }
+  .modal-role{
+    margin:8px 0 0;font-family:'Fraunces',serif;font-style:italic;font-weight:400;
+    font-size:17px;line-height:1.4;color:var(--jet);opacity:.8;
+  }
+  .modal-divider{height:0.5px;background:var(--hairline);margin:22px 0}
+  .modal-bio{margin:0;font-size:14.5px;line-height:1.72;color:var(--jet);opacity:.82}
+  .modal-bio p{margin:0 0 14px}
+  .modal-bio p:last-child{margin-bottom:0}
+  .modal-actions{
+    margin-top:24px;padding-top:20px;border-top:0.5px solid var(--hairline);
+    display:flex;align-items:center;gap:12px;
+  }
+  .btn-ig{
+    display:inline-flex;align-items:center;gap:9px;
+    padding:0 18px;height:46px;border-radius:999px;border:0;cursor:pointer;
+    font-family:'Oswald',sans-serif;font-weight:600;font-size:12px;letter-spacing:.14em;text-transform:uppercase;
+    color:#fff;background:linear-gradient(45deg,#F58529,#DD2A7B 52%,#8134AF);
+    transition:transform 120ms ease-out,filter 160ms ease-out;
+  }
+  .btn-ig:hover{filter:brightness(1.06)}
+  .btn-ig:active{transform:translateY(1px)}
+  .btn-ig svg{width:18px;height:18px}
+  .modal-handle{display:none}
+
+  /* ─────────── RESPONSIVE ─────────── */
+  @media (max-width:980px){
+    .coaches-grid{grid-template-columns:repeat(2,1fr);gap:16px}
+  }
+  @media (max-width:760px){
+    .section{padding:40px 0}
+
+    /* coaches become a horizontal, edge-to-edge swipe carousel */
+    .coaches-grid{
+      display:flex;grid-template-columns:none;gap:14px;
+      overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;
+      scrollbar-width:none;
+      margin:0 calc(-1 * var(--gutter));
+      padding:2px var(--gutter) 8px;
+    }
+    .coaches-grid::-webkit-scrollbar{display:none}
+    .coach-card{flex:0 0 76%;scroll-snap-align:start}
+    .coach-card:hover{transform:none}
+
+    .modal{
+      grid-template-columns:1fr;grid-template-rows:auto auto;
+      width:100%;max-height:92vh;
+      border-radius:22px 22px 0 0;align-self:end;
+      transform:translateY(100%);
+    }
+    .modal-overlay{padding:0;align-items:flex-end}
+    .modal-overlay.open .modal{transform:translateY(0)}
+    /* portrait media on mobile (images are mostly 9:16 / 4:5) */
+    .slider{height:auto;aspect-ratio:4/5;max-height:56vh;min-height:0}
+    .slide img{min-height:0}
+    .modal-handle{
+      display:block;width:42px;height:5px;border-radius:999px;background:rgba(245,240,235,.7);
+      margin:10px auto 0;position:absolute;left:0;right:0;top:0;z-index:6;
+    }
+    .modal-content{padding:22px 22px 28px}
+    .modal-name{font-size:26px}
+    .admins-grid{grid-template-columns:1fr;gap:8px}
+    .admin-card{grid-template-columns:56px 1fr auto;gap:14px}
+    .admin-avatar{width:56px;height:56px;font-size:22px}
+  }
+</style>
+</head>
+<body>
+
+<div class="variant-banner">
+  <b>Coaches · Section Mockup</b>
+  <span>Sits above “Led by” · click a coach → profile modal · photo slider + Instagram · mobile-first</span>
+</div>
+
+<main class="wrap">
+
+  <!-- ══════════════════ COACHES ══════════════════ -->
+  <section class="section" aria-labelledby="coaches-title">
+    <div class="section-head">
+      <h2 id="coaches-title">Coaches <span class="accent">&amp; trainers</span></h2>
+      <span class="count">3 coaches</span>
+    </div>
+
+    <div class="coaches-grid" id="coachesGrid"><!-- cards injected by JS --></div>
+  </section>
+
+  <!-- ══════════════════ LED BY (context) ══════════════════ -->
+  <section class="section">
+    <div class="kicker led-by-kicker">Led by</div>
+    <div class="admins-grid">
+      <div class="admin-card">
+        <div class="admin-avatar initial-jet">R</div>
+        <div>
+          <div class="admin-name">Rahul Verma</div>
+          <div class="kicker admin-role">Founder · Run Lead</div>
+        </div>
+        <div class="admin-socials">
+          <a class="icon-btn" data-brand="instagram" href="#" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg></a>
+        </div>
+      </div>
+      <div class="admin-card">
+        <div class="admin-avatar initial-red">P</div>
+        <div>
+          <div class="admin-name">Priya Nair</div>
+          <div class="kicker admin-role">Pace Lead</div>
+        </div>
+        <div class="admin-socials">
+          <a class="icon-btn" data-brand="instagram" href="#" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg></a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- ══════════════════ MODAL ══════════════════ -->
+<div class="modal-overlay" id="modal" role="dialog" aria-modal="true" aria-labelledby="modalName">
+  <div class="modal">
+    <button class="modal-close" id="modalClose" aria-label="Close">
+      <svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </button>
+
+    <div class="slider" id="slider">
+      <div class="modal-handle" aria-hidden="true"></div>
+      <div class="slides" id="slides"><!-- slides injected --></div>
+      <button class="slider-btn prev" id="prevBtn" aria-label="Previous photo"><svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg></button>
+      <button class="slider-btn next" id="nextBtn" aria-label="Next photo"><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></button>
+      <div class="dots" id="dots"></div>
+    </div>
+
+    <div class="modal-content">
+      <span class="modal-kicker"><span class="dot-fixed"></span> Coach</span>
+      <h3 class="modal-name" id="modalName"></h3>
+      <p class="modal-role" id="modalRole"></p>
+      <div class="modal-divider"></div>
+      <div class="modal-bio" id="modalBio"></div>
+      <div class="modal-actions" id="modalActions"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ── Sample data (this is the shape the backend will eventually return) ──
+  const COACHES = [
+    {
+      name: "Aashna Kathpalia",
+      role: "Dance Choreographer · Zumba Instructor",
+      teaser: "Passionate about creating high-energy, engaging fitness experiences for communities, clubs, and events.",
+      instagram: "https://instagram.com/",
+      photos: [
+        "https://images.unsplash.com/photo-1518611012118-696072aa579a?q=80&w=900&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?q=80&w=900&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=900&auto=format&fit=crop"
+      ],
+      bio: [
+        "I’m Aashna Kathpalia, a Dance Choreographer and Zumba Instructor passionate about creating high-energy, engaging fitness experiences for communities, clubs, and events.",
+        "I have had the opportunity to lead Zumba sessions for renowned fitness and running communities, such as Run and Rally Club, D3X Running Club, Fitistan, Ride Tea Gupshup, Rewari Runners Fleet, and The Fly Young Club.",
+        "My sessions are designed to energize participants, boost engagement, and create a fun, inclusive atmosphere suitable for all fitness levels. Whether it’s a marathon warm-up, fitness event, corporate wellness program, community gathering, or club meet-up, I bring enthusiasm, professional choreography, and crowd engagement to every session."
+      ]
+    },
+    {
+      name: "Karan Mehta",
+      role: "Head Run Coach · Marathon Pacer",
+      teaser: "Building structured training plans that take first-timers to the finish line and seasoned runners to new PBs.",
+      instagram: "https://instagram.com/",
+      photos: [
+        "https://images.unsplash.com/photo-1486218119243-13883505764c?q=80&w=900&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1552674605-db6ffd4facb5?q=80&w=900&auto=format&fit=crop"
+      ],
+      bio: [
+        "I’m Karan, a certified run coach and official marathon pacer with over eight years on the road and the track.",
+        "I’ve paced sub-4 and sub-5 bus groups at Tata Mumbai Marathon and Delhi Half, and coached more than 200 runners through their first 10K, half, and full marathons.",
+        "My coaching is built on consistency, smart progression, and injury prevention — every plan is tailored to your current fitness, your goal race, and the life you’re fitting it around."
+      ]
+    },
+    {
+      name: "Sara D’Souza",
+      role: "Strength & Mobility Coach",
+      teaser: "Helping runners move better, stay injury-free, and build the strength that holds up over long distances.",
+      instagram: "https://instagram.com/",
+      photos: [
+        "https://images.unsplash.com/photo-1599058917212-d750089bc07e?q=80&w=900&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?q=80&w=900&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1434682881908-b43d0467b798?q=80&w=900&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1540497077202-7c8a3999166f?q=80&w=900&auto=format&fit=crop"
+      ],
+      bio: [
+        "I’m Sara, a strength and mobility coach focused on the specific demands of endurance athletes.",
+        "I run our weekly strength &amp; mobility clinic, working with runners on hip stability, ankle mobility, and the posterior-chain strength that keeps you durable through high-mileage weeks.",
+        "Whether you’re rehabbing from a niggle or just want to feel stronger at the back end of a long run, my sessions meet you where you are and progress at a pace your body can absorb."
+      ]
+    }
+  ];
+
+  // ── Card rendering ──
+  const igSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>';
+  const grid = document.getElementById('coachesGrid');
+
+  COACHES.forEach((c, i) => {
+    const card = document.createElement('button');
+    card.className = 'coach-card';
+    card.type = 'button';
+    card.setAttribute('aria-label', `View ${c.name}'s profile`);
+    const countChip = c.photos.length > 1
+      ? `<span class="photo-count"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M3 15l5-5 4 4 3-3 6 6"/></svg>${c.photos.length}</span>`
+      : '';
+    card.innerHTML = `
+      <div class="coach-photo">
+        ${countChip}
+        <img src="${c.photos[0]}" alt="${c.name}" loading="lazy" />
+        <div class="photo-overlay">
+          <div class="name">${c.name}</div>
+          <div class="role">${c.role}</div>
+        </div>
+      </div>
+      <div class="coach-body">
+        <p class="coach-teaser">${c.teaser}</p>
+        <div class="coach-foot">
+          <span class="coach-view">View profile <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+          ${c.instagram ? `<span class="icon-btn" data-brand="instagram" aria-hidden="true">${igSvg}</span>` : ''}
+        </div>
+      </div>`;
+    card.addEventListener('click', () => openModal(i));
+    grid.appendChild(card);
+  });
+
+  // ── Modal + slider ──
+  const overlay = document.getElementById('modal');
+  const slidesEl = document.getElementById('slides');
+  const dotsEl = document.getElementById('dots');
+  const prevBtn = document.getElementById('prevBtn');
+  const nextBtn = document.getElementById('nextBtn');
+  let current = 0, idx = 0;
+
+  function renderSlider(c){
+    slidesEl.innerHTML = c.photos.map(src =>
+      `<div class="slide"><img src="${src}" alt="${c.name}" /></div>`).join('');
+    dotsEl.innerHTML = c.photos.map((_, i) =>
+      `<button class="dot ${i===0?'active':''}" data-i="${i}" aria-label="Photo ${i+1}"></button>`).join('');
+    const single = c.photos.length <= 1;
+    prevBtn.style.display = nextBtn.style.display = dotsEl.style.display = single ? 'none' : '';
+    idx = 0; updateSlide();
+    dotsEl.querySelectorAll('.dot').forEach(d =>
+      d.addEventListener('click', () => { idx = +d.dataset.i; updateSlide(); }));
+  }
+  function updateSlide(){
+    slidesEl.style.transform = `translateX(-${idx*100}%)`;
+    dotsEl.querySelectorAll('.dot').forEach((d,i)=>d.classList.toggle('active', i===idx));
+  }
+  function step(n){
+    const len = COACHES[current].photos.length;
+    idx = (idx + n + len) % len; updateSlide();
+  }
+  prevBtn.addEventListener('click', () => step(-1));
+  nextBtn.addEventListener('click', () => step(1));
+
+  function openModal(i){
+    current = i;
+    const c = COACHES[i];
+    document.getElementById('modalName').textContent = c.name;
+    document.getElementById('modalRole').textContent = c.role;
+    document.getElementById('modalBio').innerHTML = c.bio.map(p => `<p>${p}</p>`).join('');
+    document.getElementById('modalActions').innerHTML = c.instagram
+      ? `<a class="btn-ig" href="${c.instagram}" target="_blank" rel="noopener noreferrer">${igSvg} Instagram</a>`
+      : '';
+    renderSlider(c);
+    overlay.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeModal(){
+    overlay.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+  document.getElementById('modalClose').addEventListener('click', closeModal);
+  overlay.addEventListener('click', e => { if (e.target === overlay) closeModal(); });
+  document.addEventListener('keydown', e => {
+    if (!overlay.classList.contains('open')) return;
+    if (e.key === 'Escape') closeModal();
+    if (e.key === 'ArrowLeft') step(-1);
+    if (e.key === 'ArrowRight') step(1);
+  });
+
+  // basic swipe on mobile
+  let touchX = null;
+  slidesEl.addEventListener('touchstart', e => touchX = e.touches[0].clientX, {passive:true});
+  slidesEl.addEventListener('touchend', e => {
+    if (touchX === null) return;
+    const dx = e.changedTouches[0].clientX - touchX;
+    if (Math.abs(dx) > 45) step(dx < 0 ? 1 : -1);
+    touchX = null;
+  }, {passive:true});
+</script>
+</body>
+</html>

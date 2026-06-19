@@ -307,6 +307,46 @@ export interface ClubAdminPerson {
   derived?: boolean;
 }
 
+// A curated coach/trainer profile shown in the "Coaches" section of the
+// public club page. Distinct from ClubAdminPerson (the run-lead roster):
+// coaches are richer cards with a photo gallery and a long-form bio that
+// opens in a modal. Stored as a JSON array on the club row (clubs.coaches),
+// edited in Studio. Always present in the GET /clubs/{slug} response —
+// empty array when none are configured.
+export interface ClubCoach {
+  // Stable id for React keys + per-coach admin CRUD.
+  id: string;
+  name: string;
+  // Title line, e.g. "Dance Choreographer · Zumba Instructor".
+  designation?: string | null;
+  // Short skill tags, e.g. ["Strength & conditioning", "Marathon"].
+  specialisations: string[];
+  // Long-form bio. Plain text; paragraph breaks are blank lines ("\n\n").
+  // The card teaser is derived client-side from the first paragraph.
+  experience?: string | null;
+  instagramUrl?: string | null;
+  // Ordered gallery URLs (Supabase storage). First entry is the card cover.
+  // Mostly portrait (4:5 / 9:16). May be empty.
+  photos: string[];
+  // Ascending display order within the section.
+  sortOrder: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+// Create/patch payloads for the coach CRUD endpoints. PATCH is
+// exclude_unset on the backend — only send fields you intend to change.
+// `photos` is replaced wholesale (add/remove/reorder), never merged.
+export interface ClubCoachInput {
+  name: string;
+  designation?: string | null;
+  specialisations?: string[];
+  experience?: string | null;
+  instagramUrl?: string | null;
+  photos?: string[];
+  sortOrder?: number;
+}
+
 export type JoinFormFieldType = 'text' | 'textarea' | 'select' | 'number';
 
 export interface JoinFormField {
@@ -353,6 +393,8 @@ export interface Club {
   isClaimed: boolean;
   stats: ClubStats;
   admins: ClubAdminPerson[];
+  // Curated coach/trainer profiles. Always an array (empty when none).
+  coaches: ClubCoach[];
   // Populated by the Instagram scrape pipeline. Editable by admins; if the
   // form omits them on save they're preserved (the backend's POST /clubs
   // uses exclude_unset semantics on update).
@@ -664,6 +706,44 @@ export const deleteClubCollaboration = (
 ) =>
   clubFetch<void>(
     `/clubs/${encodeURIComponent(slug)}/collaborations/${encodeURIComponent(collabId)}`,
+    token,
+    { method: 'DELETE' },
+  );
+
+// ── Coaches (Studio / super-admin CRUD) ─────────────────────────────────────
+// Reads arrive on the club detail (club.coaches); these mutate. Authorised by
+// club membership (owner/admin) or platform admin — the super-admin manages
+// any club's coaches via the platform-admin bypass. Photos are uploaded
+// client-side to Supabase Storage; their public URLs are sent in the body.
+
+export const listClubCoaches = (token: string, slug: string) =>
+  clubFetch<ClubCoach[]>(`/clubs/${encodeURIComponent(slug)}/coaches`, token);
+
+export const createClubCoach = (
+  token: string,
+  slug: string,
+  body: ClubCoachInput,
+) =>
+  clubFetch<ClubCoach>(`/clubs/${encodeURIComponent(slug)}/coaches`, token, {
+    method: 'POST',
+    body: JSON.stringify(body),
+  });
+
+export const updateClubCoach = (
+  token: string,
+  slug: string,
+  coachId: string,
+  body: Partial<ClubCoachInput>,
+) =>
+  clubFetch<ClubCoach>(
+    `/clubs/${encodeURIComponent(slug)}/coaches/${encodeURIComponent(coachId)}`,
+    token,
+    { method: 'PATCH', body: JSON.stringify(body) },
+  );
+
+export const deleteClubCoach = (token: string, slug: string, coachId: string) =>
+  clubFetch<void>(
+    `/clubs/${encodeURIComponent(slug)}/coaches/${encodeURIComponent(coachId)}`,
     token,
     { method: 'DELETE' },
   );

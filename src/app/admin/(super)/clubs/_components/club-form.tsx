@@ -19,6 +19,7 @@ import { CheckboxField, Field } from './field';
 import { ImageUploadField } from './image-upload';
 import { TagsField } from './tags-field';
 import { AdminsEditor } from './admins-editor';
+import { CoachesEditor } from './coaches-editor';
 import { CollaborationsEditor } from './collaborations-editor';
 import { JoinFormEditor } from './join-form-editor';
 
@@ -474,6 +475,13 @@ export function ClubFormContent({
 
           {!isNew && initialClub && (
             <>
+              <Card title="Coaches">
+                <CoachesEditor
+                  slug={initialClub.slug}
+                  initial={initialClub.coaches ?? []}
+                />
+              </Card>
+
               <Card title="Instagram scrape">
                 <p className="font-body text-xs text-jet/50">
                   {initialClub.lastScrapedAt

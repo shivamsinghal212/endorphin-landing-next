@@ -9,6 +9,7 @@ import { clubsApi, remindersApi, type MyMembership, type Reminder } from '@/lib/
 import { getSessionEmail, getSessionToken } from '@/lib/session';
 import type { ClubEvent } from '../page';
 import { ClaimClubLink } from './claim-club-link';
+import { Coaches } from './coaches';
 import { ClubIcons } from './club-icons';
 import { JoinClubButton } from './join-club-button';
 import { RunGallery } from './run-gallery';
@@ -291,6 +292,7 @@ export default async function ClubPage({ params }: PageProps) {
         {pastEvents.length > 0 && <PreviousRuns events={pastEvents} />}
         <CommentsSay events={pastEvents} />
         <BrandsStrip collaborations={club.collaborations} />
+        <Coaches coaches={club.coaches ?? []} />
         {club.admins.length > 0 && <LedBy admins={club.admins} />}
         {/* <ExploreMoreStrip from="from-club" /> */}
         <CtaFooter club={club} />
@@ -368,25 +370,32 @@ function ClubJsonLd({
   if (club.tags && club.tags.length > 0) {
     data.keywords = club.tags.join(', ');
   }
+  // `member` aggregates the run-lead roster (admins) and the curated
+  // coach/trainer profiles into Person entities — both are people the
+  // Knowledge Graph can associate with this club.
+  const members: Record<string, unknown>[] = [];
   if (club.admins && club.admins.length > 0) {
-    const members = club.admins
-      .filter((a) => a.name)
-      .map((a) => {
-        const member: Record<string, unknown> = {
-          '@type': 'Person',
-          name: a.name,
-        };
-        const memberSameAs = [
-          a.instagramUrl,
-          a.stravaUrl,
-          a.whatsappUrl,
-        ].filter(Boolean);
-        if (memberSameAs.length > 0) member.sameAs = memberSameAs;
-        if (a.role) member.jobTitle = a.role;
-        return member;
-      });
-    if (members.length > 0) data.member = members;
+    for (const a of club.admins) {
+      if (!a.name) continue;
+      const member: Record<string, unknown> = { '@type': 'Person', name: a.name };
+      const memberSameAs = [a.instagramUrl, a.stravaUrl, a.whatsappUrl].filter(Boolean);
+      if (memberSameAs.length > 0) member.sameAs = memberSameAs;
+      if (a.role) member.jobTitle = a.role;
+      members.push(member);
+    }
   }
+  if (club.coaches && club.coaches.length > 0) {
+    for (const c of club.coaches) {
+      if (!c.name) continue;
+      const member: Record<string, unknown> = { '@type': 'Person', name: c.name };
+      if (c.instagramUrl) member.sameAs = [c.instagramUrl];
+      if (c.designation) member.jobTitle = c.designation;
+      if (c.experience) member.description = c.experience;
+      if (c.photos && c.photos.length > 0) member.image = c.photos[0];
+      members.push(member);
+    }
+  }
+  if (members.length > 0) data.member = members;
   // Locality coverage — surface the distinct neighborhoods this club
   // operates in via `areaServed` so map-aware AI assistants and
   // Google's Knowledge Graph see the club as locally relevant without

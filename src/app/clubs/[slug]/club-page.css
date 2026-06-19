@@ -1405,6 +1405,325 @@
   .club-page .prev-row { transition: none; }
 }
 
+/* ─── Coaches ──────────────────────────────────── */
+.club-page .coaches { padding: 52px 0; border-top: 1px solid var(--jet); }
+.club-page .coaches-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 28px;
+  padding-bottom: 14px;
+  border-bottom: 0.5px solid var(--hairline);
+}
+.club-page .coaches-title {
+  margin: 0;
+  font-family: var(--font-oswald), sans-serif;
+  font-weight: 600;
+  font-size: 24px;
+  line-height: 1;
+  letter-spacing: -0.005em;
+  text-transform: uppercase;
+  color: var(--jet);
+}
+.club-page .coaches-count { color: var(--text-secondary); white-space: nowrap; }
+
+.club-page .coaches-grid {
+  display: grid;
+  /* Fixed-width tracks (not 1fr) keep cards compact and left-aligned: a lone
+     coach stays a tidy ~220px card instead of stretching across a third of
+     the viewport. Extra tracks just sit empty on the right. */
+  grid-template-columns: repeat(auto-fill, minmax(190px, 220px));
+  justify-content: start;
+  gap: 20px;
+}
+
+.club-page .coach-card {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  padding: 0;
+  text-align: left;
+  font-family: inherit;
+  color: inherit;
+  background: #FBF8F2;
+  border: 0.5px solid var(--hairline);
+  border-radius: 18px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 220ms cubic-bezier(.2,.7,.2,1), box-shadow 220ms ease-out, border-color 220ms ease-out;
+}
+.club-page .coach-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--hairline-strong);
+  box-shadow: 0 18px 40px -22px rgba(10, 10, 10, 0.45);
+}
+.club-page .coach-card:focus-visible { outline: 2px solid var(--red); outline-offset: 3px; }
+
+.club-page .coach-photo {
+  position: relative;
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  background: var(--cream);
+}
+.club-page .coach-photo img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  transition: transform 600ms cubic-bezier(.2,.7,.2,1);
+}
+.club-page .coach-card:hover .coach-photo img { transform: scale(1.045); }
+.club-page .coach-photo::after {
+  content: "";
+  position: absolute; inset: 0;
+  background: linear-gradient(to top, rgba(10,10,10,.80) 0%, rgba(10,10,10,.30) 34%, rgba(10,10,10,0) 60%);
+}
+.club-page .coach-photo-empty {
+  width: 100%; height: 100%;
+  display: grid; place-items: center;
+  font-family: var(--font-oswald), sans-serif;
+  font-weight: 600; font-size: 64px;
+  color: var(--bone); background: var(--jet);
+  text-transform: uppercase;
+}
+.club-page .coach-photo-count {
+  position: absolute; top: 12px; right: 12px; z-index: 2;
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 5px 9px; border-radius: 999px;
+  background: rgba(10, 10, 10, .55);
+  backdrop-filter: blur(6px);
+  font-family: var(--font-oswald), sans-serif;
+  font-weight: 500; font-size: 10px; letter-spacing: .1em;
+  color: var(--bone);
+}
+.club-page .coach-photo-count svg { width: 12px; height: 12px; }
+.club-page .coach-photo-overlay {
+  position: absolute; left: 16px; right: 16px; bottom: 14px; z-index: 2;
+}
+.club-page .coach-card-name {
+  font-family: var(--font-oswald), sans-serif;
+  font-weight: 600; font-size: 21px; line-height: 1.05;
+  letter-spacing: -0.005em; text-transform: uppercase;
+  color: var(--bone);
+}
+.club-page .coach-card-role {
+  margin-top: 5px;
+  font-family: var(--font-oswald), sans-serif;
+  font-weight: 500; font-size: 11px; letter-spacing: .12em;
+  text-transform: uppercase; color: rgba(245, 240, 235, .82);
+}
+
+.club-page .coach-card-body {
+  padding: 15px 16px 16px;
+  display: flex; flex-direction: column; gap: 12px; flex: 1;
+}
+.club-page .coach-card-teaser {
+  margin: 0; font-size: 13.5px; line-height: 1.55;
+  color: var(--jet); opacity: .72;
+  display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.club-page .coach-card-foot {
+  margin-top: auto;
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  padding-top: 12px; border-top: 0.5px solid var(--hairline);
+}
+.club-page .coach-card-view {
+  display: inline-flex; align-items: center; gap: 7px;
+  font-family: var(--font-oswald), sans-serif;
+  font-weight: 600; font-size: 11px; letter-spacing: .14em;
+  text-transform: uppercase; color: var(--jet);
+}
+.club-page .coach-card-view svg {
+  width: 14px; height: 14px;
+  transition: transform 200ms ease-out;
+}
+.club-page .coach-card:hover .coach-card-view svg { transform: translateX(3px); }
+.club-page .coach-card-foot .icon-btn.sm { border-color: var(--hairline); pointer-events: none; }
+
+/* Coach modal */
+.club-page .coach-modal-overlay {
+  position: fixed; inset: 0; z-index: 100;
+  background: rgba(10, 10, 10, .55);
+  backdrop-filter: blur(4px);
+  display: flex; align-items: center; justify-content: center;
+  padding: 24px;
+  animation: coach-fade 200ms ease-out;
+}
+@keyframes coach-fade { from { opacity: 0; } to { opacity: 1; } }
+.club-page .coach-modal {
+  position: relative;
+  width: min(880px, 100%);
+  max-height: 90vh;
+  overflow: hidden;
+  background: #FBF8F2;
+  border-radius: 22px;
+  border: 0.5px solid var(--hairline);
+  display: grid;
+  grid-template-columns: minmax(0, 46%) minmax(0, 54%);
+  box-shadow: 0 40px 90px -30px rgba(10, 10, 10, .6);
+  animation: coach-rise 280ms cubic-bezier(.2,.7,.2,1);
+}
+@keyframes coach-rise {
+  from { transform: translateY(16px) scale(.98); opacity: 0; }
+  to { transform: translateY(0) scale(1); opacity: 1; }
+}
+.club-page .coach-modal-close {
+  position: absolute; top: 14px; right: 14px; z-index: 10;
+  width: 38px; height: 38px; border-radius: 999px; border: 0; cursor: pointer;
+  background: rgba(10, 10, 10, .5);
+  backdrop-filter: blur(6px);
+  color: var(--bone);
+  display: grid; place-items: center;
+  transition: background-color 160ms ease-out;
+}
+.club-page .coach-modal-close:hover { background: var(--red); }
+.club-page .coach-modal-close svg { width: 18px; height: 18px; }
+
+.club-page .coach-slider {
+  position: relative; height: 100%; min-height: 420px;
+  background: var(--cream); overflow: hidden;
+}
+.club-page .coach-slides { display: flex; height: 100%; transition: transform 420ms cubic-bezier(.2,.7,.2,1); }
+.club-page .coach-slide { flex: 0 0 100%; height: 100%; }
+.club-page .coach-slide img { width: 100%; height: 100%; object-fit: cover; min-height: 420px; }
+.club-page .coach-slider-empty {
+  width: 100%; height: 100%; min-height: 420px;
+  display: grid; place-items: center;
+  font-family: var(--font-oswald), sans-serif;
+  font-weight: 600; font-size: 96px; color: var(--bone); background: var(--jet);
+  text-transform: uppercase;
+}
+.club-page .coach-slider-btn {
+  position: absolute; top: 50%; transform: translateY(-50%); z-index: 5;
+  width: 40px; height: 40px; border-radius: 999px; border: 0; cursor: pointer;
+  background: rgba(251, 248, 242, .85);
+  backdrop-filter: blur(6px);
+  color: var(--jet);
+  display: grid; place-items: center;
+  transition: background-color 160ms ease-out;
+}
+.club-page .coach-slider-btn:hover { background: var(--bone); }
+.club-page .coach-slider-btn svg { width: 18px; height: 18px; }
+.club-page .coach-slider-btn.prev { left: 12px; }
+.club-page .coach-slider-btn.next { right: 12px; }
+.club-page .coach-dots {
+  position: absolute; left: 0; right: 0; bottom: 14px; z-index: 5;
+  display: flex; justify-content: center; gap: 7px;
+}
+.club-page .coach-dot {
+  width: 7px; height: 7px; border-radius: 999px;
+  background: rgba(245, 240, 235, .55); border: 0; padding: 0; cursor: pointer;
+  transition: width 200ms ease-out, background-color 200ms ease-out;
+}
+.club-page .coach-dot.active { width: 22px; background: var(--bone); }
+
+.club-page .coach-modal-content {
+  padding: 34px 34px 30px;
+  overflow-y: auto;
+  display: flex; flex-direction: column;
+}
+.club-page .coach-modal-kicker {
+  display: inline-flex; align-items: center; margin-bottom: 12px;
+  font-family: var(--font-oswald), sans-serif;
+  font-weight: 600; font-size: 11px; letter-spacing: .22em;
+  text-transform: uppercase; color: var(--red);
+}
+.club-page .coach-modal-name {
+  margin: 0;
+  font-family: var(--font-oswald), sans-serif;
+  font-weight: 600; font-size: 30px; line-height: 1.04;
+  letter-spacing: -0.01em; text-transform: uppercase; color: var(--jet);
+}
+.club-page .coach-modal-role {
+  margin: 8px 0 0;
+  font-family: var(--font-fraunces), serif;
+  font-style: italic; font-weight: 400;
+  font-size: 17px; line-height: 1.4; color: var(--jet); opacity: .8;
+}
+.club-page .coach-modal-tags {
+  display: flex; flex-wrap: wrap; gap: 8px;
+  margin-top: 16px;
+}
+.club-page .coach-tag {
+  display: inline-flex; align-items: center;
+  padding: 6px 12px; border-radius: 999px;
+  border: 0.5px solid var(--hairline-strong);
+  font-family: var(--font-oswald), sans-serif;
+  font-weight: 500; font-size: 10px; letter-spacing: .1em;
+  text-transform: uppercase; color: var(--jet);
+}
+.club-page .coach-modal-bio {
+  margin-top: 22px; padding-top: 22px;
+  border-top: 0.5px solid var(--hairline);
+  font-size: 14.5px; line-height: 1.72; color: var(--jet); opacity: .85;
+}
+.club-page .coach-modal-bio p { margin: 0 0 14px; }
+.club-page .coach-modal-bio p:last-child { margin-bottom: 0; }
+.club-page .coach-modal-actions {
+  margin-top: 24px; padding-top: 20px;
+  border-top: 0.5px solid var(--hairline);
+  display: flex; align-items: center; gap: 12px;
+}
+.club-page .coach-ig-btn {
+  display: inline-flex; align-items: center; gap: 9px;
+  padding: 0 18px; height: 46px; border-radius: 999px; border: 0; cursor: pointer;
+  font-family: var(--font-oswald), sans-serif;
+  font-weight: 600; font-size: 12px; letter-spacing: .14em; text-transform: uppercase;
+  color: #fff;
+  background: linear-gradient(45deg, #F58529, #DD2A7B 52%, #8134AF);
+  transition: filter 160ms ease-out;
+}
+.club-page .coach-ig-btn:hover { filter: brightness(1.06); }
+.club-page .coach-ig-btn svg { width: 18px; height: 18px; }
+.club-page .coach-modal-handle { display: none; }
+
+@media (max-width: 760px) {
+  .club-page .coaches { padding: 40px 0; }
+  /* Coaches become an edge-to-edge horizontal swipe carousel. The
+     negative margin + matching padding let cards bleed to the screen
+     edge while the first card still aligns to the section gutter. */
+  .club-page .coaches-grid {
+    display: flex;
+    grid-template-columns: none;
+    gap: 14px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    margin-left: calc(-1 * max(20px, (100% - var(--container-max)) / 2));
+    margin-right: calc(-1 * max(20px, (100% - var(--container-max)) / 2));
+    padding: 2px max(20px, calc((100% - var(--container-max)) / 2)) 8px;
+  }
+  .club-page .coaches-grid::-webkit-scrollbar { display: none; }
+  .club-page .coach-card { flex: 0 0 76%; scroll-snap-align: start; }
+  .club-page .coach-card:hover { transform: none; }
+
+  .club-page .coach-modal-overlay { padding: 0; align-items: flex-end; }
+  .club-page .coach-modal {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto;
+    width: 100%;
+    max-height: 92vh;
+    border-radius: 22px 22px 0 0;
+    animation: coach-sheet 300ms cubic-bezier(.2,.7,.2,1);
+  }
+  @keyframes coach-sheet {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
+  }
+  /* Portrait media on mobile (coach photos are mostly 9:16 / 4:5). */
+  .club-page .coach-slider { height: auto; aspect-ratio: 4 / 5; max-height: 56vh; min-height: 0; }
+  .club-page .coach-slide img, .club-page .coach-slider-empty { min-height: 0; }
+  .club-page .coach-modal-handle {
+    display: block;
+    position: absolute; left: 0; right: 0; top: 10px; z-index: 6;
+    width: 42px; height: 5px; margin: 0 auto;
+    border-radius: 999px; background: rgba(245, 240, 235, .7);
+  }
+  .club-page .coach-modal-content { padding: 22px 22px 28px; }
+  .club-page .coach-modal-name { font-size: 26px; }
+}
+
 /* ─── Led by ───────────────────────────────────── */
 .club-page .led-by { padding: 44px 0; border-top: 1px solid var(--jet); }
 .club-page .led-by-kicker { margin-bottom: 24px; }
@@ -1516,6 +1835,7 @@
 .club-page .previous-runs,
 .club-page .say,
 .club-page .brands,
+.club-page .coaches,
 .club-page .led-by,
 .club-page .cta-footer {
   padding-left: max(28px, calc((100% - var(--container-max)) / 2));
@@ -1541,6 +1861,7 @@
   .club-page .previous-runs,
   .club-page .say,
   .club-page .brands,
+  .club-page .coaches,
   .club-page .led-by,
   .club-page .cta-footer {
     padding-left: max(20px, calc((100% - var(--container-max)) / 2));
