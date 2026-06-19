@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>/clubs redesign — clean rails, Endorfin skin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;1,9..144,500;1,9..144,600;1,9..144,700&family=Oswald:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  /* ── Endorfin v1 tokens (jet / bone / red, SHARP corners) ── */
+  :root {
+    --jet: #0A0A0A;
+    --coal: #0F0F0F;
+    --surf: #141312;
+    --bone: #F5F0EB;
+    --bone-70: rgba(245,240,235,.70);
+    --bone-55: rgba(245,240,235,.55);
+    --bone-38: rgba(245,240,235,.38);
+    --hair: rgba(245,240,235,.12);
+    --hair-2: rgba(245,240,235,.22);
+    --red: #E6232A;
+    --serif: 'Fraunces', Georgia, serif;
+    --ui: 'Oswald', sans-serif;
+    --body: ui-sans-serif, system-ui, -apple-system, 'Helvetica Neue', sans-serif;
+    --maxw: 1240px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body { background: var(--jet); color: var(--bone); font-family: var(--body); -webkit-font-smoothing: antialiased; line-height: 1.5; }
+  a { color: inherit; text-decoration: none; }
+  img { display: block; }
+
+  /* Oswald uppercase label helper */
+  .ui { font-family: var(--ui); text-transform: uppercase; letter-spacing: .14em; font-weight: 500; }
+
+  /* ── Top bar ── */
+  .nav { position: sticky; top: 0; z-index: 50; background: rgba(10,10,10,.86); backdrop-filter: blur(14px); border-bottom: 1px solid var(--hair); height: 76px; display: flex; align-items: center; }
+  .nav-inner { display: flex; align-items: center; gap: 22px; width: 100%; max-width: var(--maxw); margin: 0 auto; padding: 0 28px; }
+  .brand { font-family: var(--serif); font-style: italic; font-weight: 600; font-size: 23px; letter-spacing: -.01em; flex-shrink: 0; }
+  .brand b { color: var(--red); font-style: normal; }
+
+  .search { flex: 1; max-width: 580px; margin: 0 auto; display: flex; align-items: center; height: 50px; background: var(--surf); border: 1px solid var(--hair); padding: 0 8px 0 18px; transition: border-color .16s, background .16s; }
+  .search:hover, .search:focus-within { border-color: var(--hair-2); }
+  .search svg.ic { width: 18px; height: 18px; color: var(--bone-55); flex-shrink: 0; }
+  .search input { flex: 1; background: none; border: none; outline: none; color: var(--bone); font-family: var(--serif); font-style: italic; font-size: 17px; padding: 0 12px; }
+  .search input::placeholder { color: var(--bone-55); }
+  .search .loc { display: flex; align-items: center; gap: 6px; padding: 0 14px; border-left: 1px solid var(--hair); font-family: var(--ui); text-transform: uppercase; letter-spacing: .1em; font-size: 12px; font-weight: 500; white-space: nowrap; }
+  .search .loc svg { width: 14px; height: 14px; color: var(--red); }
+  .search .mapbtn { width: 38px; height: 38px; background: var(--bone); display: grid; place-items: center; flex-shrink: 0; cursor: pointer; }
+  .search .mapbtn svg { width: 17px; height: 17px; color: var(--jet); }
+  .nav-end a { font-family: var(--ui); text-transform: uppercase; letter-spacing: .14em; font-size: 12px; font-weight: 600; color: var(--bone); padding: 11px 18px; border: 1px solid var(--hair-2); transition: background .15s, color .15s; }
+  .nav-end a:hover { background: var(--red); border-color: var(--red); color: #fff; }
+  @media (max-width: 880px) { .search .loc span { display: none; } .nav-end { display: none; } }
+
+  /* faint Endorfin red glow behind the header zone */
+  .glow { position: relative; }
+  .glow::before { content: ""; position: absolute; inset: 0 0 auto 0; height: 360px; pointer-events: none; z-index: 0;
+    background: radial-gradient(ellipse 70% 60% at 12% -10%, rgba(230,35,42,.16), transparent 60%); }
+
+  /* ── Date filter chips (sharp) ── */
+  .filters { position: sticky; top: 76px; z-index: 40; background: rgba(10,10,10,.86); backdrop-filter: blur(14px); padding: 15px 0; border-bottom: 1px solid var(--hair); }
+  .chips { display: flex; gap: 8px; overflow-x: auto; padding: 0 28px; max-width: var(--maxw); margin: 0 auto; scrollbar-width: none; }
+  .chips::-webkit-scrollbar { display: none; }
+  .chip { flex-shrink: 0; font-family: var(--ui); text-transform: uppercase; letter-spacing: .1em; font-size: 12px; font-weight: 500; color: var(--bone-70); background: transparent; border: 1px solid var(--hair); padding: 9px 16px; cursor: pointer; transition: all .14s; white-space: nowrap; }
+  .chip:hover { color: var(--bone); border-color: var(--hair-2); }
+  .chip.is-active { background: var(--bone); color: var(--jet); border-color: var(--bone); }
+  .chip.filter-chip { display: inline-flex; align-items: center; gap: 7px; }
+  .chip.filter-chip svg { width: 13px; height: 13px; }
+
+  /* ── Rails ── */
+  .rail-sec { padding: 38px 0 6px; position: relative; z-index: 1; }
+  .rail-head { display: flex; align-items: flex-end; justify-content: space-between; max-width: var(--maxw); margin: 0 auto; padding: 0 28px 18px; gap: 14px; }
+  .rail-head h2 { font-family: var(--serif); font-style: italic; font-weight: 600; font-size: 28px; letter-spacing: -.01em; display: inline-flex; align-items: center; gap: 10px; cursor: pointer; }
+  .rail-head h2 .arr { font-style: normal; color: var(--red); transition: transform .18s; }
+  .rail-head h2:hover .arr { transform: translateX(4px); }
+  .rail-head .seeall { font-family: var(--ui); text-transform: uppercase; letter-spacing: .14em; font-size: 12px; font-weight: 500; color: var(--bone-55); white-space: nowrap; }
+  .rail-head .seeall:hover { color: var(--bone); }
+
+  .rail { display: flex; gap: 18px; overflow-x: auto; padding: 0 28px 8px; scroll-snap-type: x proximity; scrollbar-width: none; }
+  .rail::-webkit-scrollbar { display: none; }
+  .rail::after { content: ""; flex: 0 0 10px; }
+
+  /* ── Card: image-led, text below, SHARP corners ── */
+  .card { flex: 0 0 290px; width: 290px; scroll-snap-align: start; cursor: pointer; }
+  @media (max-width: 600px) { .card { flex-basis: 78vw; width: 78vw; } }
+  .card-media { position: relative; overflow: hidden; background: var(--surf); border: 1px solid var(--hair); transition: border-color .18s; }
+  /* Instagram posters shown COMPLETE (1:1 or 4:5), never cropped */
+  .card-media img { width: 100%; height: auto; }
+  .card:hover .card-media { border-color: var(--hair-2); }
+  .badge { position: absolute; top: 12px; left: 12px; display: inline-flex; align-items: center; gap: 6px; background: rgba(10,10,10,.6); backdrop-filter: blur(6px); border: 1px solid rgba(245,240,235,.18); color: var(--bone); font-family: var(--ui); text-transform: uppercase; letter-spacing: .1em; font-size: 10.5px; font-weight: 600; padding: 6px 10px; }
+  .badge svg { width: 12px; height: 12px; }
+
+  .card-body { padding: 14px 2px 0; }
+  .byline { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+  .byline .av { width: 20px; height: 20px; border-radius: 50%; background: var(--surf); border: 1px solid var(--hair-2); display: grid; place-items: center; font-family: var(--ui); font-size: 8.5px; font-weight: 600; color: var(--bone-55); flex-shrink: 0; }
+  .byline .nm { font-family: var(--ui); text-transform: uppercase; letter-spacing: .1em; font-size: 11px; font-weight: 500; color: var(--bone-55); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .byline .nm svg { width: 11px; height: 11px; color: var(--red); vertical-align: -1px; margin-left: 3px; }
+  .card-title { font-family: var(--serif); font-style: italic; font-weight: 600; font-size: 19px; line-height: 1.2; letter-spacing: -.01em; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .card-meta { font-family: var(--ui); text-transform: uppercase; letter-spacing: .08em; font-size: 11.5px; color: var(--bone-70); margin-top: 7px; }
+  .card-meta .sep { color: var(--bone-38); margin: 0 6px; }
+
+  /* Club card variant — square cover, equal billing */
+  .club-card .card-media { aspect-ratio: 1/1; }
+  .club-card .card-media img { height: 100%; object-fit: cover; }
+  .club-card .card-title { -webkit-line-clamp: 1; }
+
+  footer { border-top: 1px solid var(--hair); margin-top: 50px; padding: 30px 0 64px; }
+  footer .wrap { max-width: var(--maxw); margin: 0 auto; padding: 0 28px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+  footer .brand { font-size: 18px; }
+  footer .fnote { font-family: var(--ui); text-transform: uppercase; letter-spacing: .14em; font-size: 11px; color: var(--bone-38); }
+
+  .note { position: fixed; bottom: 16px; right: 16px; z-index: 100; background: var(--red); color: #fff; font-family: var(--ui); text-transform: uppercase; letter-spacing: .1em; font-size: 10px; font-weight: 600; padding: 8px 13px; }
+</style>
+</head>
+<body>
+
+<div class="glow">
+
+<!-- TOP BAR -->
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="#" class="brand">endorfin<b>.</b></a>
+    <div class="search">
+      <svg class="ic" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/><path d="m20 20-3-3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      <input type="text" placeholder="Search runs &amp; clubs in New Delhi…" />
+      <span class="loc"><svg viewBox="0 0 24 24" fill="none"><path d="M12 21s-7-5.6-7-11a7 7 0 0114 0c0 5.4-7 11-7 11z" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="10" r="2.4" stroke="currentColor" stroke-width="2"/></svg><span>New Delhi</span></span>
+      <span class="mapbtn" title="Map view"><svg viewBox="0 0 24 24" fill="none"><path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M9 4v14M15 6v14" stroke="currentColor" stroke-width="2"/></svg></span>
+    </div>
+    <div class="nav-end"><a href="#">List your club</a></div>
+  </div>
+</nav>
+
+<!-- DATE FILTER CHIPS -->
+<div class="filters">
+  <div class="chips">
+    <button class="chip is-active">This weekend</button>
+    <button class="chip">Today</button>
+    <button class="chip">Tomorrow</button>
+    <button class="chip">Thu 18</button>
+    <button class="chip">Fri 19</button>
+    <button class="chip">Sat 20</button>
+    <button class="chip">Sun 21</button>
+    <button class="chip">Mon 22</button>
+    <button class="chip">Choose date</button>
+    <button class="chip filter-chip"><svg viewBox="0 0 24 24" fill="none"><path d="M3 5h18M6 12h12M10 19h4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Filters</button>
+  </div>
+</div>
+
+</div><!-- /glow -->
+
+<!-- RAIL 1 · This weekend -->
+<section class="rail-sec">
+  <div class="rail-head">
+    <h2>This weekend <span class="arr">→</span></h2>
+    <a href="#" class="seeall">See all 18</a>
+  </div>
+  <div class="rail">
+
+    <article class="card">
+      <div class="card-media">
+        <span class="badge"><svg viewBox="0 0 24 24" fill="none"><path d="M3 18l5-7 4 5 3-4 6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Trail</span>
+        <img src="https://endorfin-media.shivam-8a5.workers.dev/storage/v1/object/public/media/clubs/runwithme-club/events/DZo7obtTGtT/cover.jpg" alt="" loading="lazy" />
+      </div>
+      <div class="card-body">
+        <div class="byline"><span class="av">RW</span><span class="nm">Run With Me Club</span></div>
+        <div class="card-title">Gairatpur Bass → Raiseena Trail Run</div>
+        <div class="card-meta">Sat Jun 20<span class="sep">·</span>5:30 AM<span class="sep">·</span>12K</div>
+      </div>
+    </article>
+
+    <article class="card">
+      <div class="card-media">
+        <span class="badge"><svg viewBox="0 0 24 24" fill="none"><path d="M12 3v18M5 8l7-5 7 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Yoga + Run</span>
+        <img src="https://endorfin-media.shivam-8a5.workers.dev/storage/v1/object/public/media/clubs/d3xrunningclub/events/DZpKwH-SFZt/cover.jpg" alt="" loading="lazy" />
+      </div>
+      <div class="card-body">
+        <div class="byline"><span class="av">D3</span><span class="nm">D3X Running Club</span></div>
+        <div class="card-title">Move. Breathe. Achieve — Community Run</div>
+        <div class="card-meta">Sat Jun 20<span class="sep">·</span>5:45 AM<span class="sep">·</span>Lodhi Garden</div>
+      </div>
+    </article>
+
+    <article class="card">
+      <div class="card-media">
+        <span class="badge"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/><path d="M12 7v5l3 2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>HYROX</span>
+        <img src="https://endorfin-media.shivam-8a5.workers.dev/storage/v1/object/public/media/clubs/bombayonfoot/events/DZnS0pPDDO7/cover.jpg" alt="" loading="lazy" />
+      </div>
+      <div class="card-body">
+        <div class="byline"><span class="av">BF</span><span class="nm">Bombay On Foot</span></div>
+        <div class="card-title">HYROX Simulation + Ice Bath</div>
+        <div class="card-meta">Sun Jun 21<span class="sep">·</span>6:30 AM<span class="sep">·</span>Lower Parel</div>
+      </div>
+    </article>
+
+    <article class="card">
+      <div class="card-media">
+        <span class="badge"><svg viewBox="0 0 24 24" fill="none"><path d="M13 4l-7 9h5l-1 7 7-9h-5l1-7z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>Social 5K</span>
+        <img src="https://endorfin-media.shivam-8a5.workers.dev/storage/v1/object/public/media/clubs/kochirunclub/events/DZruvaZSsNY/cover.jpg" alt="" loading="lazy" />
+      </div>
+      <div class="card-body">
+        <div class="byline"><span class="av">KR</span><span class="nm">Kochi Run Club</span></div>
+        <div class="card-title">Saturday Run with Xude</div>
+        <div class="card-meta">Sat Jun 20<span class="sep">·</span>6:15 AM<span class="sep">·</span>Panampilly</div>
+      </div>
+    </article>
+
+    <article class="card">
+      <div class="card-media">
+        <span class="badge"><svg viewBox="0 0 24 24" fill="none"><path d="M3 18l5-7 4 5 3-4 6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Expedition</span>
+        <img src="https://endorfin-media.shivam-8a5.workers.dev/storage/v1/object/public/media/clubs/runrallyclub/events/DZUpr8HShWg/cover.jpg" alt="" loading="lazy" />
+      </div>
+      <div class="card-body">
+        <div class="byline"><span class="av">RR</span><span class="nm">Run&amp;Rally Club <svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 2a10 10 0 100 20 10 10 0 000-20zm4.7 7.3l-5.8 5.8a1 1 0 01-1.4 0L7 12.6a1 1 0 011.4-1.4l1.8 1.8 5.1-5.1a1 1 0 011.4 1.4z"/></svg></span></div>
+        <div class="card-title">Manali–Leh–Khardungla Cycling Expedition</div>
+        <div class="card-meta">Fri Jun 19<span class="sep">·</span>6:00 PM<span class="sep">·</span>Manali</div>
+      </div>
+    </article>
+
+  </div>
+</section>
+
+<!-- RAIL 2 · Trail & long runs -->
+<section class="rail-sec">
+  <div class="rail-head">
+    <h2>Trail &amp; long runs <span class="arr">→</span></h2>
+    <a href="#" class="seeall">See all</a>
+  </div>
+  <div class="rail">
+
+    <article class="card">
+      <div class="card-media">
+        <span class="badge"><svg viewBox="0 0 24 24" fill="none"><path d="M3 18l5-7 4 5 3-4 6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Trail</span>
+        <img src="https://endorfin-media.shivam-8a5.workers.dev/storage/v1/object/public/media/clubs/runwithme-club/events/DZo7obtTGtT/cover.jpg" alt="" loading="lazy" />
+      </div>
+      <div class="card-body">
+        <div class="byline"><span class="av">RW</span><span class="nm">Run With Me Club</span></div>
+        <div class="card-title">Gairatpur Bass → Raiseena Trail Run</div>
+        <div class="card-meta">Sat Jun 20<span class="sep">·</span>5:30 AM<span class="sep">·</span>12K</div>
+      </div>
+    </article>
+
+    <article class="card">
+      <div class="card-media">
+        <span class="badge"><svg viewBox="0 0 24 24" fill="none"><path d="M3 18l5-7 4 5 3-4 6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Expedition</span>
+        <img src="https://endorfin-media.shivam-8a5.workers.dev/storage/v1/object/public/media/clubs/runrallyclub/events/DZUpr8HShWg/cover.jpg" alt="" loading="lazy" />
+      </div>
+      <div class="card-body">
+        <div class="byline"><span class="av">RR</span><span class="nm">Run&amp;Rally Club</span></div>
+        <div class="card-title">Manali–Leh–Khardungla Cycling Expedition</div>
+        <div class="card-meta">Fri Jun 19<span class="sep">·</span>6:00 PM<span class="sep">·</span>Manali</div>
+      </div>
+    </article>
+
+    <article class="card">
+      <div class="card-media">
+        <span class="badge"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/><path d="M12 7v5l3 2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Night run</span>
+        <img src="https://endorfin-media.shivam-8a5.workers.dev/storage/v1/object/public/media/clubs/runclubharidwar/events/DZpDh0HOGGX/cover.jpg" alt="" loading="lazy" />
+      </div>
+      <div class="card-body">
+        <div class="byline"><span class="av">RH</span><span class="nm">Run Club Haridwar</span></div>
+        <div class="card-title">Summer Night Run</div>
+        <div class="card-meta">Thu Jun 18<span class="sep">·</span>7:30 PM<span class="sep">·</span>Om Setu</div>
+      </div>
+    </article>
+
+    <article class="card">
+      <div class="card-media">
+        <span class="badge"><svg viewBox="0 0 24 24" fill="none"><path d="M13 4l-7 9h5l-1 7 7-9h-5l1-7z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>Social 5K</span>
+        <img src="https://endorfin-media.shivam-8a5.workers.dev/storage/v1/object/public/media/clubs/kochirunclub/events/DZruvaZSsNY/cover.jpg" alt="" loading="lazy" />
+      </div>
+      <div class="card-body">
+        <div class="byline"><span class="av">KR</span><span class="nm">Kochi Run Club</span></div>
+        <div class="card-title">Saturday Run with Xude</div>
+        <div class="card-meta">Sat Jun 20<span class="sep">·</span>6:15 AM<span class="sep">·</span>Panampilly</div>
+      </div>
+    </article>
+
+  </div>
+</section>
+
+<!-- RAIL 3 · Clubs to join -->
+<section class="rail-sec">
+  <div class="rail-head">
+    <h2>Run clubs to join <span class="arr">→</span></h2>
+    <a href="#" class="seeall">All 49 clubs</a>
+  </div>
+  <div class="rail">
+
+    <article class="card club-card">
+      <div class="card-media">
+        <img src="https://endorfin-media.shivam-8a5.workers.dev/storage/v1/object/public/media/clubs/bombayonfoot/events/DZnS0pPDDO7/cover.jpg" alt="" loading="lazy" />
+      </div>
+      <div class="card-body">
+        <div class="card-title">Bombay On Foot <svg viewBox="0 0 24 24" style="width:13px;height:13px;vertical-align:-1px"><path fill="#E6232A" d="M12 2a10 10 0 100 20 10 10 0 000-20zm4.7 7.3l-5.8 5.8a1 1 0 01-1.4 0L7 12.6a1 1 0 011.4-1.4l1.8 1.8 5.1-5.1a1 1 0 011.4 1.4z"/></svg></div>
+        <div class="card-meta">Mumbai<span class="sep">·</span>1.2K members</div>
+      </div>
+    </article>
+
+    <article class="card club-card">
+      <div class="card-media">
+        <img src="https://endorfin-media.shivam-8a5.workers.dev/storage/v1/object/public/media/clubs/d3xrunningclub/events/DZpKwH-SFZt/cover.jpg" alt="" loading="lazy" />
+      </div>
+      <div class="card-body">
+        <div class="card-title">D3X Running Club</div>
+        <div class="card-meta">Delhi<span class="sep">·</span>540 members</div>
+      </div>
+    </article>
+
+    <article class="card club-card">
+      <div class="card-media">
+        <img src="https://endorfin-media.shivam-8a5.workers.dev/storage/v1/object/public/media/clubs/runrallyclub/events/DZUpr8HShWg/cover.jpg" alt="" loading="lazy" />
+      </div>
+      <div class="card-body">
+        <div class="card-title">Run&amp;Rally Club <svg viewBox="0 0 24 24" style="width:13px;height:13px;vertical-align:-1px"><path fill="#E6232A" d="M12 2a10 10 0 100 20 10 10 0 000-20zm4.7 7.3l-5.8 5.8a1 1 0 01-1.4 0L7 12.6a1 1 0 011.4-1.4l1.8 1.8 5.1-5.1a1 1 0 011.4 1.4z"/></svg></div>
+        <div class="card-meta">Delhi<span class="sep">·</span>2.1K members</div>
+      </div>
+    </article>
+
+    <article class="card club-card">
+      <div class="card-media">
+        <img src="https://endorfin-media.shivam-8a5.workers.dev/storage/v1/object/public/media/clubs/kochirunclub/events/DZruvaZSsNY/cover.jpg" alt="" loading="lazy" />
+      </div>
+      <div class="card-body">
+        <div class="card-title">Kochi Run Club</div>
+        <div class="card-meta">Kochi<span class="sep">·</span>320 members</div>
+      </div>
+    </article>
+
+    <article class="card club-card">
+      <div class="card-media">
+        <img src="https://endorfin-media.shivam-8a5.workers.dev/storage/v1/object/public/media/clubs/runwithme-club/events/DZo7obtTGtT/cover.jpg" alt="" loading="lazy" />
+      </div>
+      <div class="card-body">
+        <div class="card-title">Run With Me Club</div>
+        <div class="card-meta">Gurgaon<span class="sep">·</span>410 members</div>
+      </div>
+    </article>
+
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <span class="brand">endorfin<b>.</b></span>
+    <span class="fnote">Clean rails · Endorfin skin — jet / bone / red, Fraunces + Oswald, sharp corners</span>
+  </div>
+</footer>
+
+<div class="note">Mock · scroll rails sideways</div>
+
+<script>
+  document.querySelectorAll('.chip').forEach(c => {
+    if (c.classList.contains('filter-chip')) return;
+    c.addEventListener('click', () => {
+      document.querySelectorAll('.chip').forEach(x => x.classList.remove('is-active'));
+      c.classList.add('is-active');
+    });
+  });
+</script>
+</body>
+</html>

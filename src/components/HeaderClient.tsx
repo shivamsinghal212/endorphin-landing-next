@@ -7,10 +7,17 @@ import LoginModal from '@/components/LoginModal';
 import { logoutAction } from '@/app/actions/auth';
 import { useStoreLink } from '@/lib/use-store-link';
 
+// Top-level links rendered as-is. "Clubs" is special — it's a hover/tap
+// dropdown (see CLUBS_SUBLINKS) rather than a direct link.
 const NAV_LINKS = [
   { label: 'Running Events', href: '/running-events', soon: false, primary: true },
-  { label: 'Clubs', href: '/clubs', soon: false, primary: true },
-  { label: 'For club owners', href: '/for-clubs', soon: false, primary: false },
+  { label: 'Experiences', href: '/experiences', soon: false, primary: true },
+];
+
+// The "Clubs" dropdown. Both club surfaces live here now.
+const CLUBS_SUBLINKS = [
+  { label: 'Find your run club', href: '/clubs' },
+  { label: 'For club owners', href: '/for-clubs' },
 ];
 
 function isLinkActive(pathname: string | null, href: string) {
@@ -18,6 +25,19 @@ function isLinkActive(pathname: string | null, href: string) {
   if (href === '/') return pathname === '/';
   return pathname === href || pathname.startsWith(`${href}/`);
 }
+
+const ChevronIcon = () => (
+  <svg
+    className="v1-nav-sub-chevron"
+    viewBox="0 0 12 12"
+    width="10"
+    height="10"
+    fill="none"
+    aria-hidden="true"
+  >
+    <path d="M2.5 4.5L6 8l3.5-3.5" stroke="currentColor" strokeWidth="1.1" strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+);
 
 const LogoMark = () => (
   <svg viewBox="0 0 16 16" fill="none" aria-hidden="true" className="w-7 h-7">
@@ -36,7 +56,11 @@ const HeaderClient = ({
   canAccessStudio?: boolean;
 }) => {
   const navRef = useRef<HTMLElement | null>(null);
+  const subRef = useRef<HTMLLIElement | null>(null);
   const [open, setOpen] = useState(false);
+  // Controls the "Clubs" dropdown. Desktop also opens it on hover via CSS;
+  // this state drives tap-to-open on touch and click-to-pin on desktop.
+  const [subOpen, setSubOpen] = useState(false);
   const [loginOpen, setLoginOpen] = useState(false);
   const [isLoggingOut, startTransition] = useTransition();
   // Tracks the post-login server refresh so the modal can show a loader
@@ -74,15 +98,32 @@ const HeaderClient = ({
     return () => window.removeEventListener('resize', setH);
   }, []);
 
-  // Body scroll lock + Escape close
+  // Body scroll lock + Escape close (closes both the mobile menu and the
+  // Clubs dropdown).
   useEffect(() => {
     document.body.classList.toggle('nav-open', open);
-    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setOpen(false); };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') { setOpen(false); setSubOpen(false); }
+    };
     document.addEventListener('keydown', onKey);
     return () => document.removeEventListener('keydown', onKey);
   }, [open]);
 
-  const closeMenu = () => setOpen(false);
+  // Click-outside closes the (click-pinned) Clubs dropdown on desktop.
+  useEffect(() => {
+    if (!subOpen) return;
+    const onDown = (e: PointerEvent) => {
+      if (subRef.current && !subRef.current.contains(e.target as Node)) {
+        setSubOpen(false);
+      }
+    };
+    document.addEventListener('pointerdown', onDown);
+    return () => document.removeEventListener('pointerdown', onDown);
+  }, [subOpen]);
+
+  const closeMenu = () => { setOpen(false); setSubOpen(false); };
+
+  const clubsActive = ['/clubs', '/for-clubs', '/run-clubs'].some((h) => isLinkActive(pathname, h));
 
   const handleSignIn = () => {
     setOpen(false);
@@ -164,11 +205,36 @@ const HeaderClient = ({
               </li>
             );
           })}
+
+          {/* Clubs — hover dropdown on desktop, tap-to-expand on mobile. */}
+          <li ref={subRef} className={`v1-nav-sub-wrap ${subOpen ? 'is-sub-open' : ''}`}>
+            <button
+              type="button"
+              className={`v1-nav-sub-trigger is-primary ${clubsActive ? 'is-current' : ''}`}
+              aria-haspopup="true"
+              aria-expanded={subOpen}
+              aria-current={clubsActive ? 'page' : undefined}
+              onClick={() => setSubOpen((v) => !v)}
+            >
+              Clubs
+              <ChevronIcon />
+            </button>
+            <ul className="v1-nav-sub" role="menu">
+              {CLUBS_SUBLINKS.map((s) => (
+                <li key={s.href} role="none">
+                  <Link href={s.href} role="menuitem" onClick={closeMenu}>
+                    {s.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </li>
+
           <li className="v1-nav-auth-mobile-li">{authButton}</li>
           <li>
             {canAccessStudio ? (
               <Link href="/admin/studio" className="v1-nav-cta" onClick={closeMenu}>
-                Studio
+                Create Experience
               </Link>
             ) : (
               <a href={downloadHref} className="v1-nav-cta" onClick={closeMenu}>
@@ -182,7 +248,7 @@ const HeaderClient = ({
           {authButton}
           {canAccessStudio ? (
             <Link href="/admin/studio" className="v1-nav-cta">
-              Studio
+              Create Experience
             </Link>
           ) : (
             <a href={downloadHref} className="v1-nav-cta">
