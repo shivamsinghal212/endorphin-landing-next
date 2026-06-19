@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>endorfin · experiences — V1D Category Explorer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500;1,9..144,600;1,9..144,700&family=Oswald:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --jet:#0A0A0A; --coal:#101010; --surf:#141312; --slate:#161616;
+    --bone:#F5F0EB; --bone-72:rgba(245,240,235,.72); --bone-55:rgba(245,240,235,.55); --bone-38:rgba(245,240,235,.38);
+    --hair:rgba(245,240,235,.10); --hair-2:rgba(245,240,235,.18);
+    --red:#E6232A; --orange:#FF6B35; --magenta:#FF2E88; --purple:#8B5CF6; --lime:#B6FF3C;
+    --chroma:linear-gradient(100deg,var(--red) 0%,var(--orange) 28%,var(--magenta) 55%,var(--purple) 85%);
+    --ease:cubic-bezier(.22,.8,.3,1);
+    --nav-h:76px; --chip-h:56px; --cat-h:56px;
+    --maxw:1240px;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0; background:var(--jet); color:var(--bone);
+    font-family:ui-sans-serif,system-ui,-apple-system,sans-serif; line-height:1.5;
+    -webkit-font-smoothing:antialiased; position:relative; min-height:100vh;
+  }
+  body::before{
+    content:""; position:fixed; inset:0; pointer-events:none; z-index:0;
+    background:radial-gradient(ellipse 70% 60% at 12% -10%, rgba(230,35,42,.16), transparent 60%);
+  }
+  body::after{
+    content:""; position:fixed; inset:0; pointer-events:none; z-index:1; opacity:.035;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+  }
+  .wrap{position:relative; z-index:2;}
+
+  .container{max-width:var(--maxw); margin:0 auto; padding:0 32px;}
+  @media(max-width:768px){ .container{padding:0 18px;} }
+
+  .wordmark{font-family:"Fraunces",serif; font-style:italic; font-weight:600; font-size:24px; letter-spacing:-.01em; color:var(--bone); text-decoration:none; white-space:nowrap;}
+  .wordmark .dot{font-style:normal; color:var(--red);}
+
+  a{color:inherit;}
+  button{font-family:inherit; cursor:pointer; border:none; background:none; color:inherit;}
+
+  /* ───────── NAV ───────── */
+  .nav{
+    position:sticky; top:0; z-index:40; height:var(--nav-h);
+    background:rgba(10,10,10,.86); backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
+    border-bottom:1px solid var(--hair);
+  }
+  .nav-inner{height:var(--nav-h); display:flex; align-items:center; gap:22px;}
+  .nav-search{flex:1; display:flex; align-items:center; justify-content:center; gap:14px;}
+
+  .loc{
+    display:inline-flex; align-items:center; gap:7px; flex-shrink:0;
+    padding:9px 12px; border:1px solid var(--hair); background:transparent; border-radius:999px;
+    color:var(--bone-72); transition:border-color .18s var(--ease), color .18s var(--ease);
+  }
+  .loc:hover{border-color:var(--hair-2); color:var(--bone);}
+  .loc .city{font-family:"Oswald",sans-serif; text-transform:uppercase; letter-spacing:.12em; font-size:11.5px; font-weight:500;}
+  .loc svg{flex-shrink:0;}
+
+  .field{
+    display:flex; align-items:center; gap:11px; flex:1; max-width:500px;
+    padding:11px 16px; border:1px solid var(--hair); background:rgba(245,240,235,.02); border-radius:12px;
+    transition:border-color .18s var(--ease), background .18s var(--ease);
+  }
+  .field:focus-within{border-color:var(--hair-2); background:rgba(245,240,235,.04);}
+  .field svg{flex-shrink:0; color:var(--bone-55);}
+  .field input{
+    flex:1; border:none; outline:none; background:transparent; color:var(--bone);
+    font-family:"Fraunces",serif; font-style:italic; font-weight:500; font-size:15.5px; letter-spacing:-.01em;
+  }
+  .field input::placeholder{color:var(--bone-38); font-style:italic;}
+
+  .icon-btn{
+    flex-shrink:0; width:42px; height:42px; display:inline-flex; align-items:center; justify-content:center;
+    border:1px solid var(--hair); color:var(--bone-72); border-radius:10px;
+    transition:border-color .18s var(--ease), color .18s var(--ease), background .18s var(--ease);
+  }
+  .icon-btn:hover{border-color:var(--hair-2); color:var(--bone); background:rgba(245,240,235,.03);}
+
+  .nav-actions{flex-shrink:0; display:flex; align-items:center; gap:12px;}
+
+  /* SECONDARY ghost: List your club */
+  .btn-ghost{
+    padding:11px 18px; border:1px solid var(--hair-2); background:transparent; color:var(--bone); border-radius:10px;
+    font-family:"Oswald",sans-serif; text-transform:uppercase; letter-spacing:.12em; font-size:11.5px; font-weight:500;
+    transition:background .2s var(--ease), color .2s var(--ease), border-color .2s var(--ease);
+  }
+  .btn-ghost:hover{border-color:var(--bone-55); background:rgba(245,240,235,.04);}
+
+  /* PRIMARY red: Create experience */
+  .btn-primary{
+    display:inline-flex; align-items:center; gap:8px; padding:11px 20px; border-radius:10px; color:#fff;
+    background:linear-gradient(115deg,#E6232A,#ff3d44 50%,#E6232A); background-size:160% 100%;
+    box-shadow:0 6px 22px rgba(230,35,42,.34), inset 0 1px 0 rgba(255,255,255,.18);
+    font-family:"Oswald",sans-serif; text-transform:uppercase; letter-spacing:.12em; font-size:11.5px; font-weight:600;
+    transition:transform .2s var(--ease), box-shadow .2s var(--ease), background-position .35s var(--ease);
+  }
+  .btn-primary:hover{transform:translateY(-2px); box-shadow:0 10px 30px rgba(230,35,42,.46), inset 0 1px 0 rgba(255,255,255,.22); background-position:100% 0;}
+  .btn-primary svg{flex-shrink:0;}
+
+  @media(max-width:1024px){
+    .nav-search{display:none;}
+    .btn-ghost{display:none;}
+  }
+  @media(max-width:768px){
+    .nav-inner{gap:12px;}
+    .btn-primary .label{display:none;}
+    .btn-primary{padding:11px 13px;}
+  }
+
+  /* mobile search row */
+  .mobile-search{display:none;}
+  @media(max-width:1024px){
+    .mobile-search{
+      display:flex; align-items:center; gap:10px; padding:12px 32px;
+      background:rgba(10,10,10,.86); backdrop-filter:blur(14px); border-bottom:1px solid var(--hair);
+      position:sticky; top:var(--nav-h); z-index:39;
+    }
+    .mobile-search .field{max-width:none;}
+  }
+  @media(max-width:768px){ .mobile-search{padding:12px 18px;} }
+
+  /* ───────── FILTER ZONE (TWO ROWS) ───────── */
+  .filterzone{
+    position:sticky; top:var(--nav-h); z-index:38;
+    background:rgba(10,10,10,.82); backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
+    border-bottom:1px solid var(--hair);
+  }
+  @media(max-width:1024px){ .filterzone{top:calc(var(--nav-h) + 67px);} }
+
+  .chips{
+    height:var(--chip-h); display:flex; align-items:center; gap:9px;
+    overflow-x:auto; scrollbar-width:none;
+  }
+  .chips::-webkit-scrollbar{display:none;}
+  /* second row gets a faint top hairline to separate */
+  .catrow .chips{border-top:1px solid var(--hair); height:var(--cat-h);}
+
+  .chip{
+    flex-shrink:0; display:inline-flex; align-items:center; gap:7px; padding:8px 15px; border-radius:999px;
+    border:1px solid var(--hair); background:transparent; color:var(--bone-72);
+    font-family:"Oswald",sans-serif; text-transform:uppercase; letter-spacing:.1em; font-size:11px; font-weight:500;
+    transition:border-color .15s var(--ease), color .15s var(--ease), background .15s var(--ease);
+    white-space:nowrap;
+  }
+  .chip svg{flex-shrink:0;}
+  .chip:hover{border-color:var(--hair-2); color:var(--bone);}
+  .chip.active{background:var(--bone); color:var(--jet); border-color:var(--bone);}
+  .chip.trailing{margin-left:auto;}
+  @media(max-width:768px){ .chip.trailing{margin-left:0;} }
+
+  /* ───────── RAILS ───────── */
+  main{padding:42px 0 30px;}
+  .rail{margin-bottom:50px;}
+  .rail-head{display:flex; align-items:baseline; gap:14px; margin-bottom:18px;}
+  .rail-title{
+    font-family:"Fraunces",serif; font-style:italic; font-weight:600; font-size:25px; letter-spacing:-.01em;
+    color:var(--bone); margin:0; display:inline-flex; align-items:baseline; gap:10px;
+  }
+  .rail-title .arrow{
+    font-style:normal; color:var(--red); display:inline-block; transition:transform .2s var(--ease); font-weight:500;
+  }
+  .rail-head:hover .arrow{transform:translateX(6px);}
+  .see-all{
+    margin-left:auto; flex-shrink:0; text-decoration:none; color:var(--bone-55);
+    font-family:"Oswald",sans-serif; text-transform:uppercase; letter-spacing:.12em; font-size:11px; font-weight:500;
+    transition:color .15s var(--ease);
+  }
+  .see-all:hover{color:var(--bone);}
+  @media(max-width:768px){ .rail-title{font-size:21px;} }
+
+  .scroller{
+    display:flex; gap:16px; overflow-x:auto; scroll-snap-type:x mandatory;
+    scrollbar-width:none; padding-bottom:4px;
+    margin:0 -32px; padding-left:32px; padding-right:32px;
+  }
+  @media(max-width:768px){ .scroller{margin:0 -18px; padding-left:18px; padding-right:18px;} }
+  .scroller::-webkit-scrollbar{display:none;}
+
+  /* ───────── EVENT CARD (COMPACT) ───────── */
+  .card{
+    flex-shrink:0; width:228px; scroll-snap-align:start; text-decoration:none; color:inherit;
+    display:flex; flex-direction:column;
+  }
+  @media(max-width:768px){ .card{width:64vw; max-width:300px;} }
+
+  /* FIXED 4:5 MEDIA — full image always visible, blurred backdrop */
+  .card-media{
+    position:relative; aspect-ratio:4/5; border-radius:14px; overflow:hidden;
+    background:var(--surf); border:1px solid var(--hair);
+    transition:border-color .18s, transform .25s var(--ease);
+  }
+  .card:hover .card-media{border-color:var(--hair-2); transform:translateY(-4px);}
+  .card-media .bg{
+    position:absolute; inset:0; background-size:cover; background-position:center;
+    filter:blur(34px) saturate(1.15); transform:scale(1.2); opacity:.5;
+  }
+  .card-media img{position:absolute; inset:0; width:100%; height:100%; object-fit:contain;}
+
+  /* ONLY the category chip overlays the image */
+  .cat-chip{
+    position:absolute; top:10px; left:10px; z-index:2; display:inline-flex; align-items:center; gap:6px;
+    padding:5px 10px; border-radius:999px; background:rgba(10,10,10,.55);
+    backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px);
+    border:1px solid var(--hair-2); color:var(--bone);
+    font-family:"Oswald",sans-serif; text-transform:uppercase; letter-spacing:.1em; font-size:10px; font-weight:500;
+  }
+  .cat-chip svg{flex-shrink:0;}
+
+  .card-body{padding:13px 2px 0;}
+  .byline{display:flex; align-items:center; gap:8px; margin-bottom:8px;}
+  .avatar{
+    flex-shrink:0; width:22px; height:22px; border-radius:50%; border:1px solid var(--hair-2); background:var(--surf);
+    background-size:cover; background-position:center;
+    display:inline-flex; align-items:center; justify-content:center;
+    font-family:"Oswald",sans-serif; font-size:9px; letter-spacing:.04em; color:var(--bone-72); font-weight:500; overflow:hidden;
+  }
+  .club-name{
+    font-family:"Oswald",sans-serif; text-transform:uppercase; letter-spacing:.1em; font-size:10px; font-weight:500;
+    color:var(--bone-55); display:inline-flex; align-items:center; gap:5px; min-width:0;
+  }
+  .club-name span{overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .verified{flex-shrink:0;}
+  .event-title{
+    font-family:"Fraunces",serif; font-style:italic; font-weight:600; font-size:18px; letter-spacing:-.01em;
+    color:var(--bone); margin:0 0 9px; line-height:1.2; min-height:2.4em;
+    display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;
+  }
+  .meta{
+    font-family:"Oswald",sans-serif; text-transform:uppercase; letter-spacing:.08em; font-size:11px; font-weight:400;
+    color:var(--bone-72);
+  }
+  .meta .sep{color:var(--bone-38); margin:0 3px;}
+
+  /* ───────── CLUB RAIL (secondary) ───────── */
+  .club-card{
+    flex-shrink:0; width:196px; scroll-snap-align:start; text-decoration:none; color:inherit;
+  }
+  @media(max-width:768px){ .club-card{width:56vw; max-width:230px;} }
+  .club-cover{
+    position:relative; width:100%; aspect-ratio:1/1; border:1px solid var(--hair); background:var(--surf);
+    overflow:hidden; border-radius:12px; transition:border-color .2s var(--ease), transform .25s var(--ease);
+  }
+  .club-card:hover .club-cover{border-color:var(--hair-2); transform:translateY(-4px);}
+  .club-cover img{display:block; width:100%; height:100%; object-fit:cover;}
+  .club-card .name{
+    font-family:"Fraunces",serif; font-style:italic; font-weight:600; font-size:16px; letter-spacing:-.01em;
+    color:var(--bone); margin:12px 0 5px; display:flex; align-items:center; gap:6px; line-height:1.2;
+  }
+  .club-card .name span{overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .club-card .cmeta{
+    font-family:"Oswald",sans-serif; text-transform:uppercase; letter-spacing:.1em; font-size:10.5px; font-weight:400; color:var(--bone-55);
+  }
+  .club-card .cmeta .sep{color:var(--bone-38); margin:0 3px;}
+
+  /* ───────── FOOTER ───────── */
+  footer{border-top:1px solid var(--hair); margin-top:30px; padding:38px 0 56px;}
+  .foot-inner{display:flex; align-items:center; justify-content:space-between; gap:20px; flex-wrap:wrap;}
+  .foot-note{
+    font-family:"Oswald",sans-serif; text-transform:uppercase; letter-spacing:.12em; font-size:10.5px; font-weight:400; color:var(--bone-38);
+  }
+
+  a:focus-visible, button:focus-visible, input:focus-visible{outline:2px solid var(--red); outline-offset:2px;}
+
+  @media(prefers-reduced-motion:reduce){
+    *{transition:none !important; scroll-behavior:auto !important;}
+    .rail-head:hover .arrow{transform:none;}
+    .card:hover .card-media,.club-card:hover .club-cover{transform:none;}
+    .btn-primary:hover{transform:none;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- ───────── NAV ───────── -->
+  <nav class="nav">
+    <div class="container nav-inner">
+      <a href="#" class="wordmark">endorfin<span class="dot">.</span></a>
+
+      <div class="nav-search">
+        <button class="loc" aria-label="Change location">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+          <span class="city">New Delhi</span>
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+        </button>
+
+        <div class="field">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+          <input type="text" placeholder="Search experiences &amp; clubs…" aria-label="Search experiences and clubs" />
+        </div>
+
+        <button class="icon-btn" aria-label="Map view">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m9 4-6 2v14l6-2 6 2 6-2V4l-6 2-6-2Z"/><path d="M9 4v14M15 6v14"/></svg>
+        </button>
+      </div>
+
+      <div class="nav-actions">
+        <button class="btn-ghost">List your club</button>
+        <button class="btn-primary">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+          <span class="label">Create experience</span>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- mobile search row -->
+  <div class="mobile-search">
+    <button class="loc" aria-label="Change location">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+    </button>
+    <div class="field">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+      <input type="text" placeholder="Search experiences &amp; clubs…" aria-label="Search experiences and clubs" />
+    </div>
+    <button class="icon-btn" aria-label="Map view">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m9 4-6 2v14l6-2 6 2 6-2V4l-6 2-6-2Z"/><path d="M9 4v14M15 6v14"/></svg>
+    </button>
+  </div>
+
+  <!-- ───────── FILTER ZONE: TWO PILL ROWS ───────── -->
+  <div class="filterzone">
+    <!-- ROW 1: DATE -->
+    <div class="container chips" id="dateRow">
+      <button class="chip active">This weekend</button>
+      <button class="chip">Today</button>
+      <button class="chip">Tomorrow</button>
+      <button class="chip">Sat 20</button>
+      <button class="chip">Sun 21</button>
+      <button class="chip">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+        Choose date
+      </button>
+    </div>
+
+    <!-- ROW 2: CATEGORY -->
+    <div class="catrow">
+      <div class="container chips" id="catRow">
+        <button class="chip active">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 3v18M3 12h18"/></svg>
+          All
+        </button>
+        <button class="chip">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 19 5-8 4 5 3-4 6 7Z"/></svg>
+          Trail
+        </button>
+        <button class="chip">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 17h4l3-10 3 14 2.5-8H21"/></svg>
+          Road 5K/10K
+        </button>
+        <button class="chip">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 6.5h11v11h-11Z"/><path d="M3 9v6M21 9v6"/></svg>
+          HYROX
+        </button>
+        <button class="chip">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 4 6 7H6Z"/><path d="M6 14h12M6 19h12"/></svg>
+          Yoga + Run
+        </button>
+        <button class="chip">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 20 6-12 4 6 2-3 6 9Z"/><path d="m9 8 1.5 3"/></svg>
+          Expedition
+        </button>
+        <button class="chip">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5Z"/></svg>
+          Night Run
+        </button>
+        <button class="chip">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v3M12 18v3M5 12H2M22 12h-3"/><circle cx="12" cy="12" r="4"/></svg>
+          Beginner
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ───────── MAIN: RAILS GROUPED BY EXPERIENCE TYPE ───────── -->
+  <main>
+    <div class="container">
+
+      <!-- ─── RAIL A: Trail & off-road (events 1,5,6) ─── -->
+      <section class="rail">
+        <div class="rail-head">
+          <h2 class="rail-title">Trail &amp; off-road <span class="arrow">&rarr;</span></h2>
+          <a href="#" class="see-all">See all</a>
+        </div>
+        <div class="scroller">
+          <!-- 1 Run With Me -->
+          <a href="#" class="card">
+            <div class="card-media">
+              <div class="bg" style="background-image:url('https://endorfin-media.shivam-8a5.workers.dev/storage/v1/object/public/media/clubs/runwithme-club/events/DZo7obtTGtT/cover.jpg')"></div>
+              <span class="cat-chip"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 19 5-8 4 5 3-4 6 7Z"/></svg>Trail</span>
+              <img src="https://endorfin-media.shivam-8a5.workers.dev/storage/v1/object/public/media/clubs/runwithme-club/events/DZo7obtTGtT/cover.jpg" alt="Gairatpur Bass to Raiseena Trail Run" loading="lazy" />
+            </div>
+            <div class="card-body">
+              <div class="byline"><span class="avatar">RW</span><span class="club-name"><span>Run With Me Club</span></span></div>
+              <h3 class="event-title">Gairatpur Bass &rarr; Raiseena Trail Run</h3>
+              <div class="meta">Sat Jun 20 <span class="sep">·</span> 5:30 AM <span class="sep">·</span> 12K</div>
+            </div>
+          </a>
+          <!-- 5 Run&Rally -->
+          <a href="#" class="card">
+            <div class="card-media">
+              <div class="bg" style="background-image:url('https://endorfin-media.shivam-8a5.workers.dev/storage/v1/object/public/media/clubs/runrallyclub/events/DZUpr8HShWg/cover.jpg')"></div>
+              <span class="cat-chip"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 20 6-12 4 6 2-3 6 9Z"/><path d="m9 8 1.5 3"/></svg>Expedition</span>
+              <img src="https://endorfin-media.shivam-8a5.workers.dev/storage/v1/object/public/media/clubs/runrallyclub/events/DZUpr8HShWg/cover.jpg" alt="Manali Leh Khardungla Cycling Expedition" loading="lazy" />
+            </div>
+            <div class="card-body">
+              <div class="byline"><span class="avatar">RR</span><span class="club-name"><span>Run&amp;Rally Club</span><svg class="verified" width="13" height="13" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" fill="#E6232A"/><path d="m8 12 2.5 2.5L16 9" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
+              <h3 class="event-title">Manali–Leh–Khardungla Cycling Expedition</h3>
+              <div class="meta">Fri Jun 19 <span class="sep">·</span> 6:00 PM <span class="sep">·</span> Manali</div>
+            </div>
+          </a>
+          <!-- 6 Run Club Haridwar -->
+          <a href="#" class="card">
+            <div class="card-media">
+              <div class="bg" style="background-image:url('https://endorfin-media.shivam-8a5.workers.dev/storage/v1/object/public/media/clubs/runclubharidwar/events/DZpDh0HOGGX/cover.jpg')"></div>
+              <span class="cat-chip"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5Z"/></svg>Night Run</span>
+              <img src="https://endorfin-media.shivam-8a5.workers.dev/storage/v1/object/public/media/clubs/runclubharidwar/events/DZpDh0HOGGX/cover.jpg" alt="Summer Night Run" loading="lazy" />
+            </div>
+            <div class="card-body">
+              <div class="byline"><span class="avatar">RH</span><span class="club-name"><span>Run Club Haridwar</span></span></div>
+              <h3 class="event-title">Summer Night Run</h3>
+              <div class="meta">Thu Jun 18 <span class="sep">·</span> 7:30 PM <span class="sep">·</span> Om Setu</div>
+            </div>
+          </a>
+        </div>
+      </section>
+
+      <!-- ─── RAIL B: HYROX & strength (events 3,1) ─── -->
+      <section class="rail">
+        <div class="rail-head">
+          <h2 class="rail-title">HYROX &amp; strength <span class="arrow">&rarr;</span></h2>
+          <a href="#" class="see-all">See all</a>
+        </div>
+        <div class="scroller">
+          <!-- 3 Bombay On Foot -->
+          <a href="#" class="card">
+            <div class="card-media">
+              <div class="bg" style="background-image:url('https://endorfin-media.shivam-8a5.workers.dev/storage/v1/object/public/media/clubs/bombayonfoot/events/DZnS0pPDDO7/cover.jpg')"></div>
+              <span class="cat-chip"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 6.5h11v11h-11Z"/><path d="M3 9v6M21 9v6"/></svg>HYROX</span>
+              <img src="https://endorfin-media.shivam-8a5.workers.dev/storage/v1/object/public/media/clubs/bombayonfoot/events/DZnS0pPDDO7/cover.jpg" alt="HYROX Simulation and Ice Bath" loading="lazy" />
+            </div>
+            <div class="card-body">
+              <div class="byline"><span class="avatar">BF</span><span class="club-name"><span>Bombay On Foot</span><svg class="verified" width="13" height="13" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" fill="#E6232A"/><path d="m8 12 2.5 2.5L16 9" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
+              <h3 class="event-title">HYROX Simulation + Ice Bath</h3>
+              <div class="meta">Sun Jun 21 <span class="sep">·</span> 6:30 AM <span class="sep">·</span> Lower Parel</div>
+            </div>
+          </a>
+          <!-- 1 Run With Me -->
+          <a href="#" class="card">
+            <div class="card-media">
+              <div class="bg" style="background-image:url('https://endorfin-media.shivam-8a5.workers.dev/storage/v1/object/public/media/clubs/runwithme-club/events/DZo7obtTGtT/cover.jpg')"></div>
+              <span class="cat-chip"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 19 5-8 4 5 3-4 6 7Z"/></svg>Trail</span>
+              <img src="https://endorfin-media.shivam-8a5.workers.dev/storage/v1/object/public/media/clubs/runwithme-club/events/DZo7obtTGtT/cover.jpg" alt="Gairatpur Bass to Raiseena Trail Run" loading="lazy" />
+            </div>
+            <div class="card-body">
+              <div class="byline"><span class="avatar">RW</span><span class="club-name"><span>Run With Me Club</span></span></div>
+              <h3 class="event-title">Gairatpur Bass &rarr; Raiseena Trail Run</h3>
+              <div class="meta">Sat Jun 20 <span class="sep">·</span> 5:30 AM <span class="sep">·</span> 12K</div>
+            </div>
+          </a>
+        </div>
+      </section>
+
+      <!-- ─── RAIL C: Social & easy runs (events 4,2,6) ─── -->
+      <section class="rail">
+        <div class="rail-head">
+          <h2 class="rail-title">Social &amp; easy runs <span class="arrow">&rarr;</span></h2>
+          <a href="#" class="see-all">See all</a>
+        </div>
+        <div class="scroller">
+          <!-- 4 Kochi -->
+          <a href="#" class="card">
+            <div class="card-media">
+              <div class="bg" style="background-image:url('https://endorfin-media.shivam-8a5.workers.dev/storage/v1/object/public/media/clubs/kochirunclub/events/DZruvaZSsNY/cover.jpg')"></div>
+              <span class="cat-chip"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m13 2-9 12h7l-1 8 9-12h-7Z"/></svg>Social 5K</span>
+              <img src="https://endorfin-media.shivam-8a5.workers.dev/storage/v1/object/public/media/clubs/kochirunclub/events/DZruvaZSsNY/cover.jpg" alt="Saturday Run with Xude" loading="lazy" />
+            </div>
+            <div class="card-body">
+              <div class="byline"><span class="avatar">KR</span><span class="club-name"><span>Kochi Run Club</span></span></div>
+              <h3 class="event-title">Saturday Run with Xude</h3>
+              <div class="meta">Sat Jun 20 <span class="sep">·</span> 6:15 AM <span class="sep">·</span> Panampilly</div>
+            </div>
+          </a>
+          <!-- 2 D3X -->
+          <a href="#" class="card">
+            <div class="card-media">
+              <div class="bg" style="background-image:url('https://endorfin-media.shivam-8a5.workers.dev/storage/v1/object/public/media/clubs/d3xrunningclub/events/DZpKwH-SFZt/cover.jpg')"></div>
+              <span class="cat-chip"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 4 6 7H6Z"/><path d="M6 14h12M6 19h12"/></svg>Yoga + Run</span>
+              <img src="https://endorfin-media.shivam-8a5.workers.dev/storage/v1/object/public/media/clubs/d3xrunningclub/events/DZpKwH-SFZt/cover.jpg" alt="Move Breathe Achieve Community Run" loading="lazy" />
+            </div>
+            <div class="card-body">
+              <div class="byline"><span class="avatar">D3</span><span class="club-name"><span>D3X Running Club</span></span></div>
+              <h3 class="event-title">Move. Breathe. Achieve — Community Run</h3>
+              <div class="meta">Sat Jun 20 <span class="sep">·</span> 5:45 AM <span class="sep">·</span> Lodhi Garden</div>
+            </div>
+          </a>
+          <!-- 6 Run Club Haridwar -->
+          <a href="#" class="card">
+            <div class="card-media">
+              <div class="bg" style="background-image:url('https://endorfin-media.shivam-8a5.workers.dev/storage/v1/object/public/media/clubs/runclubharidwar/events/DZpDh0HOGGX/cover.jpg')"></div>
+              <span class="cat-chip"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5Z"/></svg>Night Run</span>
+              <img src="https://endorfin-media.shivam-8a5.workers.dev/storage/v1/object/public/media/clubs/runclubharidwar/events/DZpDh0HOGGX/cover.jpg" alt="Summer Night Run" loading="lazy" />
+            </div>
+            <div class="card-body">
+              <div class="byline"><span class="avatar">RH</span><span class="club-name"><span>Run Club Haridwar</span></span></div>
+              <h3 class="event-title">Summer Night Run</h3>
+              <div class="meta">Thu Jun 18 <span class="sep">·</span> 7:30 PM <span class="sep">·</span> Om Setu</div>
+            </div>
+          </a>
+        </div>
+      </section>
+
+      <!-- ─── RAIL D: Expeditions & getaways (events 5,1) ─── -->
+      <section class="rail">
+        <div class="rail-head">
+          <h2 class="rail-title">Expeditions &amp; getaways <span class="arrow">&rarr;</span></h2>
+          <a href="#" class="see-all">See all</a>
+        </div>
+        <div class="scroller">
+          <!-- 5 Run&Rally -->
+          <a href="#" class="card">
+            <div class="card-media">
+              <div class="bg" style="background-image:url('https://endorfin-media.shivam-8a5.workers.dev/storage/v1/object/public/media/clubs/runrallyclub/events/DZUpr8HShWg/cover.jpg')"></div>
+              <span class="cat-chip"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 20 6-12 4 6 2-3 6 9Z"/><path d="m9 8 1.5 3"/></svg>Expedition</span>
+              <img src="https://endorfin-media.shivam-8a5.workers.dev/storage/v1/object/public/media/clubs/runrallyclub/events/DZUpr8HShWg/cover.jpg" alt="Manali Leh Khardungla Cycling Expedition" loading="lazy" />
+            </div>
+            <div class="card-body">
+              <div class="byline"><span class="avatar">RR</span><span class="club-name"><span>Run&amp;Rally Club</span><svg class="verified" width="13" height="13" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" fill="#E6232A"/><path d="m8 12 2.5 2.5L16 9" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
+              <h3 class="event-title">Manali–Leh–Khardungla Cycling Expedition</h3>
+              <div class="meta">Fri Jun 19 <span class="sep">·</span> 6:00 PM <span class="sep">·</span> Manali</div>
+            </div>
+          </a>
+          <!-- 1 Run With Me -->
+          <a href="#" class="card">
+            <div class="card-media">
+              <div class="bg" style="background-image:url('https://endorfin-media.shivam-8a5.workers.dev/storage/v1/object/public/media/clubs/runwithme-club/events/DZo7obtTGtT/cover.jpg')"></div>
+              <span class="cat-chip"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 19 5-8 4 5 3-4 6 7Z"/></svg>Trail</span>
+              <img src="https://endorfin-media.shivam-8a5.workers.dev/storage/v1/object/public/media/clubs/runwithme-club/events/DZo7obtTGtT/cover.jpg" alt="Gairatpur Bass to Raiseena Trail Run" loading="lazy" />
+            </div>
+            <div class="card-body">
+              <div class="byline"><span class="avatar">RW</span><span class="club-name"><span>Run With Me Club</span></span></div>
+              <h3 class="event-title">Gairatpur Bass &rarr; Raiseena Trail Run</h3>
+              <div class="meta">Sat Jun 20 <span class="sep">·</span> 5:30 AM <span class="sep">·</span> 12K</div>
+            </div>
+          </a>
+        </div>
+      </section>
+
+      <!-- ─── SECONDARY: Clubs in New Delhi ─── -->
+      <section class="rail">
+        <div class="rail-head">
+          <h2 class="rail-title">Clubs in New Delhi <span class="arrow">&rarr;</span></h2>
+          <a href="#" class="see-all">See all</a>
+        </div>
+        <div class="scroller">
+          <a href="#" class="club-card">
+            <div class="club-cover"><img src="https://endorfin-media.shivam-8a5.workers.dev/storage/v1/object/public/media/clubs/bombayonfoot/events/DZnS0pPDDO7/cover.jpg" alt="Bombay On Foot" loading="lazy" /></div>
+            <div class="name"><span>Bombay On Foot</span><svg class="verified" width="13" height="13" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" fill="#E6232A"/><path d="m8 12 2.5 2.5L16 9" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+            <div class="cmeta">Mumbai <span class="sep">·</span> 1.2K members</div>
+          </a>
+          <a href="#" class="club-card">
+            <div class="club-cover"><img src="https://endorfin-media.shivam-8a5.workers.dev/storage/v1/object/public/media/clubs/runrallyclub/events/DZUpr8HShWg/cover.jpg" alt="Run and Rally Club" loading="lazy" /></div>
+            <div class="name"><span>Run&amp;Rally Club</span><svg class="verified" width="13" height="13" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" fill="#E6232A"/><path d="m8 12 2.5 2.5L16 9" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+            <div class="cmeta">Delhi <span class="sep">·</span> 2.1K members</div>
+          </a>
+          <a href="#" class="club-card">
+            <div class="club-cover"><img src="https://endorfin-media.shivam-8a5.workers.dev/storage/v1/object/public/media/clubs/d3xrunningclub/events/DZpKwH-SFZt/cover.jpg" alt="D3X Running Club" loading="lazy" /></div>
+            <div class="name"><span>D3X Running Club</span></div>
+            <div class="cmeta">Delhi <span class="sep">·</span> 540 members</div>
+          </a>
+          <a href="#" class="club-card">
+            <div class="club-cover"><img src="https://endorfin-media.shivam-8a5.workers.dev/storage/v1/object/public/media/clubs/runwithme-club/events/DZo7obtTGtT/cover.jpg" alt="Run With Me Club" loading="lazy" /></div>
+            <div class="name"><span>Run With Me Club</span></div>
+            <div class="cmeta">Gurgaon <span class="sep">·</span> 410 members</div>
+          </a>
+          <a href="#" class="club-card">
+            <div class="club-cover"><img src="https://endorfin-media.shivam-8a5.workers.dev/storage/v1/object/public/media/clubs/kochirunclub/events/DZruvaZSsNY/cover.jpg" alt="Kochi Run Club" loading="lazy" /></div>
+            <div class="name"><span>Kochi Run Club</span></div>
+            <div class="cmeta">Kochi <span class="sep">·</span> 320 members</div>
+          </a>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- ───────── FOOTER ───────── -->
+  <footer>
+    <div class="container foot-inner">
+      <a href="#" class="wordmark">endorfin<span class="dot">.</span></a>
+      <span class="foot-note">Find your people · Run together · India</span>
+    </div>
+  </footer>
+
+</div>
+
+<script>
+  // Independent active-state toggle for each pill row (exclude any trailing/Filters chip).
+  function wireRow(id){
+    var row = document.getElementById(id);
+    if(!row) return;
+    row.addEventListener('click', function(e){
+      var chip = e.target.closest('.chip');
+      if(!chip || chip.classList.contains('trailing')) return;
+      row.querySelectorAll('.chip.active').forEach(function(c){ c.classList.remove('active'); });
+      chip.classList.add('active');
+    });
+  }
+  wireRow('dateRow');
+  wireRow('catRow');
+</script>
+</body>
+</html>

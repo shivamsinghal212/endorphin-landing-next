@@ -1,7 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import { useCallback, useMemo, useState } from 'react';
+import * as Dialog from '@radix-ui/react-dialog';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import posthog from 'posthog-js';
 import HeroSearchPanel, {
   cityChip,
@@ -621,25 +622,682 @@ function PaginationBar({
   );
 }
 
+// ─── Experiences rails (events-first, national /clubs only) ──
+// Ported from design-mockups/clubs-v1a-rails-classic.html. Three rails —
+// "Events around you", "Events this weekend" (both DiscoverHit events) and
+// "Run Clubs By City" (clubs we already fetched, grouped by city). Event
+// cards link to the real /clubs/{slug}/events/{eventSlug} pages; the city
+// rail's "See all" links to the real /run-clubs/[city] landing pages.
+
+const CITY_GROUPS = ['Delhi NCR', 'Mumbai', 'Bangalore', 'Pune', 'Hyderabad', 'Chennai', 'Others'] as const;
+type CityGroup = (typeof CITY_GROUPS)[number];
+
+// Map a club's free-text city onto one of the rail's city groups.
+function cityGroupOf(city: string | null): CityGroup {
+  const c = (city || '').toLowerCase();
+  if (/delhi|ncr|noida|gurgaon|gurugram|faridabad|ghaziabad/.test(c)) return 'Delhi NCR';
+  if (/mumbai|bombay|thane/.test(c)) return 'Mumbai';
+  if (/bengaluru|bangalore/.test(c)) return 'Bangalore';
+  if (/pune/.test(c)) return 'Pune';
+  if (/hyderabad|secunderabad/.test(c)) return 'Hyderabad';
+  if (/chennai|madras/.test(c)) return 'Chennai';
+  return 'Others';
+}
+
+// "See all" target for a city group → its /run-clubs/[city] landing.
+// "Others" has no single city page, so it gets no link.
+const CITY_GROUP_HREF: Record<CityGroup, string | null> = {
+  'Delhi NCR': '/run-clubs/delhi',
+  Mumbai: '/run-clubs/mumbai',
+  Bangalore: '/run-clubs/bengaluru',
+  Pune: '/run-clubs/pune',
+  Hyderabad: '/run-clubs/hyderabad',
+  Chennai: '/run-clubs/chennai',
+  Others: null,
+};
+
+// Stable, ASCII id slug for a city group — used to wire tab/tabpanel aria
+// (e.g. "Delhi NCR" → "delhi-ncr").
+function cityGroupId(g: CityGroup): string {
+  return g.toLowerCase().replace(/\s+/g, '-');
+}
+
+// Event link mirrors page.tsx's eventHref: /clubs/{clubSlug}/events/{slug||id}.
+function eventHref(hit: DiscoverHit): string | null {
+  if (!hit.clubSlug) return null;
+  return `/clubs/${hit.clubSlug}/events/${hit.slug || hit.id}`;
+}
+
+// Short experience-type label for the card chip — the ONLY element over
+// the image. Prefer a tag, else derive from event type / distance.
+function eventTypeLabel(hit: DiscoverHit): string {
+  if (hit.tags && hit.tags.length) return hit.tags[0];
+  if (hit.eventType === 'race_event') return 'Race';
+  if (hit.distanceKm != null) return `${hit.distanceKm}K run`;
+  return 'Club run';
+}
+
+const RunIcon = () => (
+  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <circle cx="13" cy="4" r="1.6" />
+    <path d="M5 20l3-5 3 2 1-4-3-3 4-1 2 3 3 1" />
+  </svg>
+);
+
+function EventCard({ hit, clubLogo }: { hit: DiscoverHit; clubLogo?: string | null }) {
+  const href = eventHref(hit);
+  const img = hit.imageUrl;
+  const day = fmtDayShort(hit.startTime);
+  const time = fmtTimeShort(hit.startTime);
+  const dist = hit.distanceKm != null ? `${hit.distanceKm}K` : null;
+  const club = hit.clubName || '';
+
+  const inner = (
+    <>
+      <div className="v1c-exp-media">
+        {img ? (
+          <>
+            <div className="v1c-exp-bg" style={{ backgroundImage: `url(${img})` }} aria-hidden />
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={img} alt={hit.title} loading="lazy" />
+          </>
+        ) : (
+          <div className="v1c-exp-media-fallback" aria-hidden>{initials(hit.title)}</div>
+        )}
+        <span className="v1c-exp-badge"><RunIcon />{eventTypeLabel(hit)}</span>
+      </div>
+      <div className="v1c-exp-body">
+        {club && (
+          <div className="v1c-exp-byline">
+            <span className="v1c-exp-mono">
+              {clubLogo ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={clubLogo} alt="" loading="lazy" />
+              ) : (
+                initials(club)
+              )}
+            </span>
+            <span className="v1c-exp-club">
+              <span>{club}</span>
+              {hit.isVerified && <VerifiedTick className="v1c-exp-verified" />}
+            </span>
+          </div>
+        )}
+        <h3 className="v1c-exp-title">{hit.title}</h3>
+        <div className="v1c-exp-evtmeta">
+          {day}
+          {time && (<><span className="v1c-exp-sep">·</span>{time}</>)}
+          {dist && (<><span className="v1c-exp-sep">·</span>{dist}</>)}
+        </div>
+      </div>
+    </>
+  );
+
+  return href ? (
+    <Link href={href} className="v1c-exp-card" aria-label={hit.title}>{inner}</Link>
+  ) : (
+    <div className="v1c-exp-card">{inner}</div>
+  );
+}
+
+function ExpClubCard({ c }: { c: DiscoverHit }) {
+  if (!c.slug) return null;
+  const img = c.imageUrl;
+  const members = formatMembers(c.members);
+  return (
+    <Link href={`/clubs/${c.slug}`} className="v1c-exp-club-card" aria-label={c.title}>
+      <div className="v1c-exp-club-cover">
+        {img ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={img} alt={c.title} loading="lazy" />
+        ) : (
+          <div className="v1c-exp-media-fallback" aria-hidden>{initials(c.title)}</div>
+        )}
+      </div>
+      <div className="v1c-exp-club-name">
+        <span>{c.title}</span>
+        {c.isVerified && <VerifiedTick className="v1c-exp-verified" />}
+      </div>
+      <div className="v1c-exp-club-meta">
+        {c.city}
+        {members && (<><span className="v1c-exp-sep">·</span>{members} members</>)}
+      </div>
+    </Link>
+  );
+}
+
+function EventRail({
+  title,
+  hits,
+  isOpen,
+  onToggle,
+  clubLogos = {},
+}: {
+  title: string;
+  hits: DiscoverHit[];
+  isOpen: boolean;
+  onToggle: () => void;
+  // clubSlug → logo URL, built from the already-fetched clubs list (the
+  // club_event payload itself carries no club logo, only the event cover).
+  clubLogos?: Record<string, string>;
+}) {
+  if (!hits.length) return null;
+  return (
+    <section className="v1c-exp-rail">
+      <div className="v1c-exp-rail-head">
+        <h2 className="v1c-exp-rail-title">{title}</h2>
+        {hits.length > 4 && (
+          <button type="button" className="v1c-exp-seeall" onClick={onToggle} aria-expanded={isOpen}>
+            {isOpen ? 'Show less' : 'See all'}
+          </button>
+        )}
+      </div>
+      <div className={isOpen ? 'v1c-exp-grid' : 'v1c-exp-scroller v1c-exp-evlist'}>
+        {hits.map((h) => (
+          <EventCard key={h.id} hit={h} clubLogo={h.clubSlug ? clubLogos[h.clubSlug] : null} />
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function ClubsByCityRail({ clubs }: { clubs: DiscoverHit[] }) {
+  const [active, setActive] = useState<CityGroup>('Delhi NCR');
+
+  const byGroup = useMemo(() => {
+    const m: Record<CityGroup, DiscoverHit[]> = {
+      'Delhi NCR': [], Mumbai: [], Bangalore: [], Pune: [], Hyderabad: [], Chennai: [], Others: [],
+    };
+    for (const c of clubs) m[cityGroupOf(c.city)].push(c);
+    return m;
+  }, [clubs]);
+
+  const seeAll = CITY_GROUP_HREF[active];
+  const activeList = byGroup[active];
+
+  return (
+    <section className="v1c-exp-rail">
+      <div className="v1c-exp-rail-head">
+        <h2 className="v1c-exp-rail-title">Run Clubs By City</h2>
+        {seeAll && activeList.length > 0 && (
+          <Link href={seeAll} className="v1c-exp-seeall">See all</Link>
+        )}
+      </div>
+      <div className="v1c-exp-citychips" role="tablist" aria-label="Run clubs by city">
+        {CITY_GROUPS.map((g) => (
+          <button
+            key={g}
+            type="button"
+            role="tab"
+            id={`v1c-citytab-${cityGroupId(g)}`}
+            aria-selected={active === g}
+            aria-controls={`v1c-citypanel-${cityGroupId(g)}`}
+            className={`v1c-exp-citychip ${active === g ? 'is-active' : ''}`}
+            onClick={() => setActive(g)}
+          >
+            {g}
+          </button>
+        ))}
+      </div>
+      {/* Render every city group's clubs into the DOM (only the active tab is
+          visible — inactive panels carry the `hidden` attribute). This keeps
+          every /clubs/{slug} anchor crawlable from the hub, so the national
+          page flows link equity to all club profiles, not just the active
+          tab's. `hidden` + loading="lazy" means off-screen logos don't fetch. */}
+      {CITY_GROUPS.map((g) => {
+        const list = byGroup[g];
+        return (
+          <div
+            key={g}
+            role="tabpanel"
+            id={`v1c-citypanel-${cityGroupId(g)}`}
+            aria-labelledby={`v1c-citytab-${cityGroupId(g)}`}
+            hidden={active !== g}
+          >
+            {list.length ? (
+              <div className="v1c-exp-scroller">
+                {list.map((c) => <ExpClubCard key={c.id} c={c} />)}
+              </div>
+            ) : (
+              <div className="v1c-exp-empty">No clubs listed in {g} yet.</div>
+            )}
+          </div>
+        );
+      })}
+    </section>
+  );
+}
+
+// ─── Compact search (national /clubs only) ──
+// Replaces the tall hero (big headline + stats + HeroSearchPanel) with a
+// SweatPals-style compact bar: one search field with an inline city picker,
+// a row of date-window chips, and a Filters reveal for club tags. Submitting
+// fans out TWO /discover/smart queries (kind=club_event + kind=club) and
+// renders the hits as two lists — Events and Clubs — in place of the three
+// default rails. Empty on both → fall back to Mumbai. The shared
+// HeroSearchPanel is left untouched; it still powers the homepage,
+// /running-events, and the /run-clubs/[city] city pages.
+
+const DISCOVER = 'https://api.endorfin.run/api/v1/discover/smart';
+
+type SearchWindow = 'today' | 'tomorrow' | 'this_weekend' | 'this_month';
+// The discover event-type values, exposed as the "Type" filter. Verified
+// against the API: the working param is `eventType` (singular, repeatable) —
+// the plural `eventTypes` is silently ignored. `club_social` is omitted
+// (only a handful of upcoming events ever carry it).
+type EventTypeKey = 'club_run' | 'club_race' | 'club_cross_train';
+// Distance buckets for events, mapped to the API's distanceMin/distanceMax
+// (both verified working). Single-select — picking a bucket sets the range.
+type DistanceKey = '5k' | '10k' | 'half' | 'full';
+
+interface ClubSearchFilters {
+  q: string;
+  city: string; // '' = All India; otherwise an API-canonical city name
+  window: SearchWindow | '';
+  // Event-side filters — applied to the kind=club_event query only.
+  types: EventTypeKey[];
+  distance: DistanceKey | '';
+  // Club-side filters — applied to the kind=club query only.
+  tags: string[];
+  verified: boolean;
+}
+
+const WINDOW_CHIPS: { key: SearchWindow; label: string }[] = [
+  { key: 'today', label: 'Today' },
+  { key: 'tomorrow', label: 'Tomorrow' },
+  { key: 'this_weekend', label: 'This weekend' },
+  { key: 'this_month', label: 'This month' },
+];
+
+// Event "Type" chips → `eventType` param (multi). Labels are runner-facing;
+// cross-training is where yoga/HYROX/pickleball sessions live, so it's the
+// closest event-side proxy for activity filtering (events have no filterable
+// activity/tags field — verified against the API).
+const TYPE_CHIPS: { key: EventTypeKey; label: string }[] = [
+  { key: 'club_run', label: 'Runs' },
+  { key: 'club_race', label: 'Races' },
+  { key: 'club_cross_train', label: 'Cross-training' },
+];
+
+// Distance buckets → distanceMin/distanceMax (km). null bound = open-ended.
+// NOTE: ~half of upcoming events have no distance set (cross-train/social/
+// some races), so this is opt-in and never a default.
+const DISTANCE_CHIPS: { key: DistanceKey; label: string; min: number | null; max: number | null }[] = [
+  { key: '5k', label: '5K & under', min: null, max: 5 },
+  { key: '10k', label: '5–10K', min: 5, max: 10 },
+  { key: 'half', label: 'Half (10–21K)', min: 10, max: 21.1 },
+  { key: 'full', label: 'Full+ (21K+)', min: 21.1, max: null },
+];
+
+// Club tag filters revealed behind the "Filters" control. Tags are matched
+// against clubs.tags by the API (strict, multi). Picked by real club counts
+// (e.g. social-run 29, pickleball 22, marathon-training 13) — the old `trail`
+// and `beginner-friendly` chips matched ~0 real tags and were dropped.
+const SEARCH_TAGS: { tag: string; label: string }[] = [
+  { tag: 'social-run', label: 'Social' },
+  { tag: 'marathon-training', label: 'Marathon' },
+  { tag: 'pickleball', label: 'Pickleball' },
+  { tag: 'women-only', label: 'Women only' },
+  { tag: 'hyrox', label: 'HYROX' },
+  { tag: 'trail-running', label: 'Trail' },
+  { tag: 'yoga', label: 'Yoga' },
+];
+
+// City picker options. Values are the API-canonical city names the discover
+// endpoint understands (it normalizes aliases like New Delhi→Delhi); "Delhi
+// NCR" maps to "Delhi", which covers the bulk of NCR listings.
+const SEARCH_CITIES: { value: string; label: string }[] = [
+  { value: '', label: 'All India' },
+  { value: 'Delhi', label: 'Delhi NCR' },
+  { value: 'Mumbai', label: 'Mumbai' },
+  { value: 'Bengaluru', label: 'Bengaluru' },
+  { value: 'Pune', label: 'Pune' },
+  { value: 'Hyderabad', label: 'Hyderabad' },
+  { value: 'Chennai', label: 'Chennai' },
+];
+
+// "Delhi NCR" (picker value "Delhi") spans multiple municipalities, but the
+// discover `city=` filter is single-value (no comma/repeat support — verified
+// against the API). So an NCR search fans out one request per city and merges,
+// mirroring NCR_CITIES in page.tsx (the at-rest rails). Without this, searching
+// from "Delhi NCR" only matches Delhi proper and silently drops events in
+// Ghaziabad/Faridabad/etc. — e.g. "yoga" returned 1 of 3 NCR events.
+const NCR_SEARCH_CITIES = ['Delhi', 'Gurgaon', 'Noida', 'Faridabad', 'Ghaziabad'] as const;
+
+// The cities a search should actually query for a given picker value: NCR fans
+// out, everything else (including "" = All India) is a single query.
+function searchCitiesFor(city: string): string[] {
+  return city === 'Delhi' ? [...NCR_SEARCH_CITIES] : [city];
+}
+
+// Map the visitor's IP-resolved city onto one of the picker values so the
+// bar opens pre-scoped to where they are. Unknown city → All India.
+function canonicalCity(geo: string | null | undefined): string {
+  if (!geo) return '';
+  const c = geo.toLowerCase();
+  if (/delhi|ncr|noida|gurgaon|gurugram|faridabad|ghaziabad/.test(c)) return 'Delhi';
+  if (/mumbai|bombay|thane|navi mumbai/.test(c)) return 'Mumbai';
+  if (/bengaluru|bangalore/.test(c)) return 'Bengaluru';
+  if (/pune/.test(c)) return 'Pune';
+  if (/hyderabad|secunderabad/.test(c)) return 'Hyderabad';
+  if (/chennai|madras/.test(c)) return 'Chennai';
+  return '';
+}
+
+function cityLabelOf(value: string): string {
+  return SEARCH_CITIES.find((c) => c.value === value)?.label ?? value;
+}
+
+// Today (IST calendar day, YYYY-MM-DD) as the lower bound for "upcoming"
+// event queries — sort=upcoming sorts but doesn't filter past events.
+function istTodayFloor(): string {
+  const ist = new Date(Date.now() + 5.5 * 60 * 60 * 1000);
+  return ist.toISOString().slice(0, 10);
+}
+
+// Merge a multi-city event fan-out: dedupe by id, soonest-first (events with no
+// startTime sort last), cap. Matches mergeUpcoming() in page.tsx.
+function mergeSearchEvents(hits: DiscoverHit[], limit: number): DiscoverHit[] {
+  const seen = new Set<string>();
+  const at = (h: DiscoverHit) => (h.startTime ? new Date(h.startTime).getTime() : Infinity);
+  return hits
+    .filter((h) => (seen.has(h.id) ? false : (seen.add(h.id), true)))
+    .sort((a, b) => at(a) - at(b))
+    .slice(0, limit);
+}
+
+// Merge a multi-city club fan-out: dedupe by id, strongest relevance first
+// (members as tiebreaker), cap. Single-city queries already arrive score-sorted,
+// so this is a no-op reorder for them.
+function mergeSearchClubs(hits: DiscoverHit[], limit: number): DiscoverHit[] {
+  const seen = new Set<string>();
+  return hits
+    .filter((h) => (seen.has(h.id) ? false : (seen.add(h.id), true)))
+    .sort((a, b) => (b.score ?? 0) - (a.score ?? 0) || (b.members ?? 0) - (a.members ?? 0))
+    .slice(0, limit);
+}
+
+// A search is "empty" — and therefore returns the page to its default rails
+// rather than entering results mode — when it carries no query, no window,
+// no tags, and the city is still the visitor's own (the idle baseline).
+function isEmptySearch(f: ClubSearchFilters, baseCity: string): boolean {
+  return (
+    !f.q.trim() &&
+    !f.window &&
+    f.types.length === 0 &&
+    !f.distance &&
+    f.tags.length === 0 &&
+    !f.verified &&
+    f.city === baseCity
+  );
+}
+
+const SearchGlyph = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <circle cx="11" cy="11" r="7" />
+    <path d="m20 20-3.5-3.5" />
+  </svg>
+);
+
+const CaretGlyph = () => (
+  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <path d="m6 9 6 6 6-6" />
+  </svg>
+);
+
+const FilterGlyph = () => (
+  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <path d="M3 5h18M6 12h12M10 19h4" />
+  </svg>
+);
+
+function ClubsSearchBar({
+  filters,
+  showFilters,
+  onQChange,
+  onSubmit,
+  onCityChange,
+  onWindowToggle,
+  onTypeToggle,
+  onDistanceToggle,
+  onTagToggle,
+  onVerifiedToggle,
+  onToggleFilters,
+  onCloseFilters,
+  onClearFilters,
+}: {
+  filters: ClubSearchFilters;
+  showFilters: boolean;
+  onQChange: (q: string) => void;
+  onSubmit: () => void;
+  onCityChange: (city: string) => void;
+  onWindowToggle: (w: SearchWindow) => void;
+  onTypeToggle: (t: EventTypeKey) => void;
+  onDistanceToggle: (d: DistanceKey) => void;
+  onTagToggle: (tag: string) => void;
+  onVerifiedToggle: () => void;
+  onToggleFilters: () => void;
+  onCloseFilters: () => void;
+  onClearFilters: () => void;
+}) {
+  const cityLbl = cityLabelOf(filters.city);
+  const activeFilterCount =
+    filters.types.length +
+    (filters.distance ? 1 : 0) +
+    filters.tags.length +
+    (filters.verified ? 1 : 0);
+  return (
+    <div className="v1c-search">
+      <form
+        className="v1c-search-bar"
+        role="search"
+        onSubmit={(e) => {
+          e.preventDefault();
+          onSubmit();
+        }}
+      >
+        <div className="v1c-search-field">
+          <span className="v1c-search-ic" aria-hidden><SearchGlyph /></span>
+          <input
+            className="v1c-search-input"
+            type="text"
+            value={filters.q}
+            placeholder="Search clubs & events"
+            onChange={(e) => onQChange(e.target.value)}
+            aria-label="Search run clubs and events"
+            autoComplete="off"
+            spellCheck={false}
+            enterKeyHint="search"
+          />
+        </div>
+        <label className="v1c-search-city">
+          <span className="v1c-search-city-val">
+            {cityLbl}
+            <CaretGlyph />
+          </span>
+          <select
+            value={filters.city}
+            onChange={(e) => onCityChange(e.target.value)}
+            aria-label="Choose city"
+          >
+            {SEARCH_CITIES.map((c) => (
+              <option key={c.value || 'all'} value={c.value}>{c.label}</option>
+            ))}
+          </select>
+        </label>
+        <button type="submit" className="v1c-search-submit" aria-label="Search">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <path d="M5 12h14" />
+            <path d="m13 6 6 6-6 6" />
+          </svg>
+        </button>
+      </form>
+
+      <div className="v1c-search-chips" role="group" aria-label="Date filters">
+        {WINDOW_CHIPS.map((w) => {
+          const active = filters.window === w.key;
+          return (
+            <button
+              key={w.key}
+              type="button"
+              className={`v1c-search-chip ${active ? 'is-active' : ''}`}
+              aria-pressed={active}
+              onClick={() => onWindowToggle(w.key)}
+            >
+              {w.label}
+            </button>
+          );
+        })}
+        <button
+          type="button"
+          className={`v1c-search-chip v1c-search-filters-btn ${showFilters || activeFilterCount ? 'is-active' : ''}`}
+          aria-expanded={showFilters}
+          onClick={onToggleFilters}
+        >
+          <FilterGlyph />
+          Filters{activeFilterCount ? ` · ${activeFilterCount}` : ''}
+        </button>
+      </div>
+
+      <Dialog.Root open={showFilters} onOpenChange={(o) => (o ? onToggleFilters() : onCloseFilters())}>
+        <Dialog.Portal>
+          <Dialog.Overlay className="v1c-fmodal-overlay" />
+          <Dialog.Content className="v1c-fmodal" aria-describedby={undefined}>
+            <header className="v1c-fmodal-head">
+              <Dialog.Title className="v1c-fmodal-title">
+                Filters{activeFilterCount ? <span className="v1c-fmodal-count">{activeFilterCount}</span> : null}
+              </Dialog.Title>
+              <Dialog.Close className="v1c-fmodal-close" aria-label="Close filters">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
+                  <path d="M18 6L6 18M6 6l12 12" />
+                </svg>
+              </Dialog.Close>
+            </header>
+
+            <div className="v1c-fmodal-body">
+              <div className="v1c-search-fgroup" role="group" aria-label="Event type">
+                <span className="v1c-search-flabel">Type</span>
+                <div className="v1c-search-tags">
+                  {TYPE_CHIPS.map((t) => {
+                    const active = filters.types.includes(t.key);
+                    return (
+                      <button
+                        key={t.key}
+                        type="button"
+                        className={`v1c-search-tag ${active ? 'is-active' : ''}`}
+                        aria-pressed={active}
+                        onClick={() => onTypeToggle(t.key)}
+                      >
+                        {t.label}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div className="v1c-search-fgroup" role="group" aria-label="Event distance">
+                <span className="v1c-search-flabel">Distance</span>
+                <div className="v1c-search-tags">
+                  {DISTANCE_CHIPS.map((d) => {
+                    const active = filters.distance === d.key;
+                    return (
+                      <button
+                        key={d.key}
+                        type="button"
+                        className={`v1c-search-tag ${active ? 'is-active' : ''}`}
+                        aria-pressed={active}
+                        onClick={() => onDistanceToggle(d.key)}
+                      >
+                        {d.label}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div className="v1c-search-fgroup" role="group" aria-label="Club filters">
+                <span className="v1c-search-flabel">Clubs</span>
+                <div className="v1c-search-tags">
+                  {SEARCH_TAGS.map((t) => {
+                    const active = filters.tags.includes(t.tag);
+                    return (
+                      <button
+                        key={t.tag}
+                        type="button"
+                        className={`v1c-search-tag ${active ? 'is-active' : ''}`}
+                        aria-pressed={active}
+                        onClick={() => onTagToggle(t.tag)}
+                      >
+                        {t.label}
+                      </button>
+                    );
+                  })}
+                  <button
+                    type="button"
+                    className={`v1c-search-tag ${filters.verified ? 'is-active' : ''}`}
+                    aria-pressed={filters.verified}
+                    onClick={onVerifiedToggle}
+                  >
+                    Verified
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <footer className="v1c-fmodal-foot">
+              <button
+                type="button"
+                className="v1c-fmodal-clear"
+                onClick={onClearFilters}
+                disabled={!activeFilterCount}
+              >
+                Clear all
+              </button>
+              <Dialog.Close className="v1c-fmodal-apply">
+                Show results
+              </Dialog.Close>
+            </footer>
+          </Dialog.Content>
+        </Dialog.Portal>
+      </Dialog.Root>
+    </div>
+  );
+}
+
 // ─── Main view ──────────────────────────────
 
 export default function ClubsView({
   clubs,
   featuredFull,
   cityFacets,
+  eventsAround = [],
+  aroundCity = null,
+  eventsWeekend = [],
   membershipBySlug = {},
   claimBySlug = {},
   isAuthed = false,
   userEmail = null,
   cityName,
+  geoCity = null,
+  variant = 'clubs',
 }: {
   // Lean shape powering the all-clubs grid (SSR'd ~112 anchors for SEO).
   clubs: DiscoverHit[];
   // Rich shape powering the featured-5 strip — stats, tags, events.
   // Fetched separately in page.tsx because /discover/smart doesn't
   // surface runs_this_month / km_this_month / years_running / events[].
+  // On the national /clubs page the events rails replace this strip; it
+  // still renders on /run-clubs/[city] city pages.
   featuredFull: ApiClub[];
   cityFacets: { value: string; count: number }[];
+  // Events-first rails (national /clubs only) — soonest-upcoming and
+  // this-weekend club events from /discover/smart?kind=club_event.
+  eventsAround?: DiscoverHit[];
+  // Visitor's IP-resolved city when the upcoming-events rail is scoped to it
+  // (the rail then titles itself "Upcoming Events in {aroundCity}"). null =
+  // the national soonest-upcoming list, titled just "Upcoming Events".
+  aroundCity?: string | null;
+  eventsWeekend?: DiscoverHit[];
   membershipBySlug?: Record<string, Membership>;
   claimBySlug?: Record<string, Claim>;
   isAuthed?: boolean;
@@ -649,6 +1307,14 @@ export default function ClubsView({
   // second stat becomes "Verified", and the city quick-chips are dropped.
   // Undefined = the national /clubs experience (unchanged).
   cityName?: string;
+  // Visitor's IP-resolved city (Vercel edge geo). Seeds the compact search
+  // bar's city picker so it opens scoped to where they are. National only.
+  geoCity?: string | null;
+  // National page identity. /clubs ('clubs') leads with the run-club
+  // directory rail; /experiences ('experiences') leads with the club-events
+  // rails. Same data + layout — only the rail order differs. Ignored on city
+  // pages (cityName set), which don't render these rails.
+  variant?: 'clubs' | 'experiences';
 }) {
   const [isSearching, setIsSearching] = useState(false);
   // Page index instead of "visible count" — we paginate now (Prev/Next at
@@ -657,10 +1323,235 @@ export default function ClubsView({
   // visible via .is-hidden.
   const [pageIndex, setPageIndex] = useState(0);
   const [activeTab, setActiveTab] = useState<AdminTab>('members');
+  // Which event rail is expanded into a full grid ("See all"). null = both
+  // collapsed to horizontal scrollers.
+  const [openRail, setOpenRail] = useState<'around' | 'weekend' | 'search-ev' | 'search-cl' | null>(null);
   const [modal, setModal] = useState<{ kind: 'join' | 'claim'; club: { name: string; slug: string } } | null>(null);
+
+  // ── National compact search (only used when !cityName) ──
+  // baseCity = the visitor's own city; it's the picker's opening value and
+  // the "idle" baseline. A search returns to the default rails when it
+  // collapses back to (no query, no window, no tags, city === baseCity).
+  const baseCity = useMemo(() => canonicalCity(geoCity), [geoCity]);
+  const [searchFilters, setSearchFilters] = useState<ClubSearchFilters>(() => ({
+    q: '',
+    city: baseCity,
+    window: '',
+    types: [],
+    distance: '',
+    tags: [],
+    verified: false,
+  }));
+  const [committedSearch, setCommittedSearch] = useState<ClubSearchFilters | null>(null);
+  const [showFilters, setShowFilters] = useState(false);
+  const [searchEvents, setSearchEvents] = useState<DiscoverHit[]>([]);
+  const [searchClubs, setSearchClubs] = useState<DiscoverHit[]>([]);
+  const [searchStatus, setSearchStatus] = useState<'idle' | 'loading' | 'ok' | 'fallback' | 'error'>('idle');
+  const searchAbort = useRef<AbortController | null>(null);
+  const searchResultsRef = useRef<HTMLElement | null>(null);
+  // Sticky search dock — `dockStuck` toggles a frosted background + hairline
+  // once the dock pins under the fixed nav (the sentinel scrolls out of view).
+  const [dockStuck, setDockStuck] = useState(false);
+  const dockSentinelRef = useRef<HTMLSpanElement | null>(null);
+
+  // Apply a filter change and decide whether it enters results mode. Reads
+  // the latest filters via the functional updater so rapid clicks don't race.
+  const applySearch = useCallback(
+    (patch: Partial<ClubSearchFilters>) => {
+      setSearchFilters((prev) => {
+        const next = { ...prev, ...patch };
+        setCommittedSearch(isEmptySearch(next, baseCity) ? null : next);
+        return next;
+      });
+    },
+    [baseCity],
+  );
+
+  const onQChange = useCallback((q: string) => setSearchFilters((f) => ({ ...f, q })), []);
+  // Enter / → button — commit whatever's typed (functional read for latest q).
+  const submitSearch = useCallback(() => {
+    setSearchFilters((f) => {
+      setCommittedSearch(isEmptySearch(f, baseCity) ? null : f);
+      return f;
+    });
+  }, [baseCity]);
+  const onCityChange = useCallback((city: string) => applySearch({ city }), [applySearch]);
+  const onWindowToggle = useCallback(
+    (w: SearchWindow) => applySearch({ window: searchFilters.window === w ? '' : w }),
+    [applySearch, searchFilters.window],
+  );
+  const onTypeToggle = useCallback(
+    (t: EventTypeKey) =>
+      applySearch({
+        types: searchFilters.types.includes(t)
+          ? searchFilters.types.filter((x) => x !== t)
+          : [...searchFilters.types, t],
+      }),
+    [applySearch, searchFilters.types],
+  );
+  const onDistanceToggle = useCallback(
+    (d: DistanceKey) => applySearch({ distance: searchFilters.distance === d ? '' : d }),
+    [applySearch, searchFilters.distance],
+  );
+  const onTagToggle = useCallback(
+    (tag: string) =>
+      applySearch({
+        tags: searchFilters.tags.includes(tag)
+          ? searchFilters.tags.filter((t) => t !== tag)
+          : [...searchFilters.tags, tag],
+      }),
+    [applySearch, searchFilters.tags],
+  );
+  const onVerifiedToggle = useCallback(
+    () => applySearch({ verified: !searchFilters.verified }),
+    [applySearch, searchFilters.verified],
+  );
+  // Reset only the modal's facets (type/distance/club tags/verified); the
+  // free-text query, city, and date window live outside the modal and stay.
+  const clearFilters = useCallback(
+    () => applySearch({ types: [], distance: '', tags: [], verified: false }),
+    [applySearch],
+  );
+  const clearSearch = useCallback(() => {
+    setSearchFilters({ q: '', city: baseCity, window: '', types: [], distance: '', tags: [], verified: false });
+    setCommittedSearch(null);
+    setShowFilters(false);
+  }, [baseCity]);
+
+  // Dual fetch: one query for club events, one for clubs. Both empty →
+  // fall back to a generic Mumbai listing (events + clubs), dropping the
+  // failed query entirely. National page only.
+  useEffect(() => {
+    if (cityName) return;
+    if (!committedSearch) {
+      setSearchStatus('idle');
+      setSearchEvents([]);
+      setSearchClubs([]);
+      return;
+    }
+    const c = committedSearch;
+    const ctrl = new AbortController();
+    searchAbort.current?.abort();
+    searchAbort.current = ctrl;
+    setSearchStatus('loading');
+
+    // "Delhi NCR" fans out to every NCR city (the discover city= filter is
+    // single-value); every other selection is a single query.
+    const queryCities = searchCitiesFor(c.city);
+    // Events query: q + city + the event-side filters (type, distance, window).
+    // `eventType` is singular+repeatable; `tags`/`eventTypes` are no-ops here
+    // (verified against the API), so club tags are deliberately NOT sent.
+    const eventsUrl = (city: string) => {
+      const p = new URLSearchParams();
+      p.set('kind', 'club_event');
+      if (c.q.trim()) p.set('q', c.q.trim());
+      if (city) p.set('city', city);
+      for (const t of c.types) p.append('eventType', t);
+      const d = DISTANCE_CHIPS.find((x) => x.key === c.distance);
+      if (d?.min != null) p.set('distanceMin', String(d.min));
+      if (d?.max != null) p.set('distanceMax', String(d.max));
+      if (c.window) p.set('eventsWindow', c.window);
+      else p.set('dateFrom', istTodayFloor());
+      p.set('sort', 'upcoming');
+      p.set('limit', '24');
+      return `${DISCOVER}?${p.toString()}`;
+    };
+    // Clubs query: q + city + the club-side filters (tags, verified). Event
+    // type/distance don't apply to clubs.
+    const clubsUrl = (city: string) => {
+      const p = new URLSearchParams();
+      p.set('kind', 'club');
+      if (c.q.trim()) p.set('q', c.q.trim());
+      if (city) p.set('city', city);
+      for (const t of c.tags) p.append('tags', t);
+      if (c.verified) p.set('verified', 'true');
+      p.set('limit', '24');
+      return `${DISCOVER}?${p.toString()}`;
+    };
+    // Mumbai fallback ignores the user's query — the point is to show
+    // *something* lively when their search came up dry.
+    const fallbackEventsUrl = `${DISCOVER}?kind=club_event&city=Mumbai&dateFrom=${istTodayFloor()}&sort=upcoming&limit=24`;
+    const fallbackClubsUrl = `${DISCOVER}?kind=club&city=Mumbai&limit=24`;
+
+    const getItems = (url: string): Promise<DiscoverHit[]> =>
+      fetch(url, { signal: ctrl.signal })
+        .then((r) => (r.ok ? r.json() : { items: [] }))
+        .then((j) => (j.items ?? []) as DiscoverHit[])
+        .catch(() => [] as DiscoverHit[]);
+
+    // Fan out one request per city, merge + dedupe. Single-city selections
+    // collapse to a single request, so this is a no-op for them.
+    const fetchEvents = () =>
+      Promise.all(queryCities.map((city) => getItems(eventsUrl(city)))).then((lists) =>
+        mergeSearchEvents(lists.flat(), 24),
+      );
+    const fetchClubs = () =>
+      Promise.all(queryCities.map((city) => getItems(clubsUrl(city)))).then((lists) =>
+        mergeSearchClubs(lists.flat(), 24),
+      );
+
+    (async () => {
+      try {
+        const [ev, cl] = await Promise.all([fetchEvents(), fetchClubs()]);
+        if (ctrl.signal.aborted) return;
+        if (ev.length === 0 && cl.length === 0) {
+          const [fev, fcl] = await Promise.all([getItems(fallbackEventsUrl), getItems(fallbackClubsUrl)]);
+          if (ctrl.signal.aborted) return;
+          setSearchEvents(fev);
+          setSearchClubs(fcl);
+          setSearchStatus('fallback');
+          posthog.capture('clubs_search', {
+            q: c.q || null, city: c.city || null, window: c.window || null,
+            types: c.types, distance: c.distance || null, tags: c.tags, verified: c.verified,
+            events: 0, clubs: 0, fallback: true,
+          });
+        } else {
+          setSearchEvents(ev);
+          setSearchClubs(cl);
+          setSearchStatus('ok');
+          posthog.capture('clubs_search', {
+            q: c.q || null, city: c.city || null, window: c.window || null,
+            types: c.types, distance: c.distance || null, tags: c.tags, verified: c.verified,
+            events: ev.length, clubs: cl.length, fallback: false,
+          });
+        }
+      } catch {
+        if (!ctrl.signal.aborted) setSearchStatus('error');
+      }
+    })();
+
+    return () => ctrl.abort();
+  }, [committedSearch, cityName]);
+
+  // Frost the sticky search dock once it pins under the nav. A zero-height
+  // sentinel sits at the dock's resting position; when it scrolls above the
+  // nav line (rootMargin offsets by --nav-h) the dock is stuck. National page
+  // only — the sentinel isn't rendered on city pages.
+  useEffect(() => {
+    if (cityName) return;
+    const el = dockSentinelRef.current;
+    if (!el || typeof IntersectionObserver === 'undefined') return;
+    const obs = new IntersectionObserver(
+      ([entry]) => setDockStuck(!entry.isIntersecting),
+      { rootMargin: '-68px 0px 0px 0px', threshold: 0 },
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, [cityName]);
 
   const openJoin = useCallback((club: { name: string; slug: string }) => setModal({ kind: 'join', club }), []);
   const closeModal = useCallback(() => setModal(null), []);
+
+  // clubSlug → logo URL, from the clubs we already fetched (kind=club hits
+  // carry the logo as imageUrl). Lets event cards show the real club logo —
+  // the club_event payload only has the event cover, not the club logo.
+  const clubLogoBySlug = useMemo(() => {
+    const m: Record<string, string> = {};
+    for (const c of clubs) {
+      if (c.slug && c.imageUrl) m[c.slug] = c.imageUrl;
+    }
+    return m;
+  }, [clubs]);
 
   // featuredFull is already top-5-by-members from page.tsx — no further
   // slicing needed here.
@@ -668,7 +1559,6 @@ export default function ClubsView({
   const totalPages = Math.max(1, Math.ceil(totalClubs / PAGE_SIZE));
   const visibleStart = pageIndex * PAGE_SIZE;
   const visibleEnd = Math.min(visibleStart + PAGE_SIZE, totalClubs);
-  const cityCount = useMemo(() => cityFacets.length, [cityFacets]);
   // City pages show "Verified" as the second stat instead of "Cities"
   // (a single-city page counting "1 city" reads oddly).
   const verifiedCount = useMemo(
@@ -718,66 +1608,239 @@ export default function ClubsView({
           bg, search bar inside the hero). HeroSearchPanel renders its
           own .v1-hero-search wrapper inline; the page-scoped CSS in
           .v1-clubs-page lets us tweak just the bits that differ. */}
-      <section className="v1-hero">
+      <section className={`v1-hero${cityName ? '' : ' v1c-hero-natl'}`}>
         <div className="v1-hero-bg" aria-hidden="true" />
         <div className="container">
-          <div className="v1-hero-topline">
+          <div className={`v1-hero-topline${cityName ? '' : ' is-compact'}`}>
             <span className="v1-hero-kicker">
-              {cityName ? `Run clubs · ${cityName}` : "Run clubs · India's verified directory"}
+              {cityName ? `Run clubs · ${cityName}` : 'Run clubs & events · India'}
             </span>
-            <span className="v1-hero-meta">{totalClubs} listed</span>
+            <span className="v1-hero-meta">{totalClubs} clubs listed</span>
           </div>
 
-          <h1 className="v1-hero-title">
-            {cityName ? (
-              <>
+          {cityName ? (
+            // ── City landing pages (/run-clubs/[city]) — unchanged: big
+            //    SEO headline, the shared HeroSearchPanel, and the 2-stat bar.
+            <>
+              <h1 className="v1-hero-title">
                 Run clubs in <span className="accent">{cityName}</span><span className="accent">.</span>
-              </>
-            ) : (
-              <>
-                Find India&apos;s most <span className="accent">happening</span> run clubs<span className="accent">.</span>
-              </>
-            )}
-          </h1>
+              </h1>
 
-          <HeroSearchPanel
-            kindLock="club"
-            placeholderExamples={CLUB_SEARCH_EXAMPLES}
-            onSearchActiveChange={setIsSearching}
-            quickChips={clubChips}
-            // Render search results with the SAME ClubCard the static
-            // listing uses — same Join CTA, same members, tags, next-
-            // event line — so the UI doesn't visually change when the
-            // user submits a search.
-            renderCard={(hit) => (
-              <ClubCard
-                key={hit.id}
-                c={hit}
-                membership={hit.slug ? membershipFor(hit.slug) : null}
-                onJoin={openJoin}
-                hidden={false}
+              <HeroSearchPanel
+                kindLock="club"
+                placeholderExamples={CLUB_SEARCH_EXAMPLES}
+                onSearchActiveChange={setIsSearching}
+                quickChips={clubChips}
+                // Render search results with the SAME ClubCard the static
+                // listing uses — same Join CTA, members, tags, next-event
+                // line — so the UI doesn't jump when a search is submitted.
+                renderCard={(hit) => (
+                  <ClubCard
+                    key={hit.id}
+                    c={hit}
+                    membership={hit.slug ? membershipFor(hit.slug) : null}
+                    onJoin={openJoin}
+                    hidden={false}
+                  />
+                )}
               />
-            )}
-          />
 
-          <div className="v1-hero-stats-bar">
-            <span className="v1-hero-stat">
-              <span className="v1-hero-stat-n">{totalClubs}</span>
-              <span className="v1-hero-stat-l">Clubs</span>
-            </span>
-            <span className="v1-hero-stat">
-              <span className="v1-hero-stat-n">{cityName ? verifiedCount : cityCount}</span>
-              <span className="v1-hero-stat-l">{cityName ? 'Verified' : 'Cities'}</span>
-            </span>
-          </div>
+              <div className="v1-hero-stats-bar">
+                <span className="v1-hero-stat">
+                  <span className="v1-hero-stat-n">{totalClubs}</span>
+                  <span className="v1-hero-stat-l">Clubs</span>
+                </span>
+                <span className="v1-hero-stat">
+                  <span className="v1-hero-stat-n">{verifiedCount}</span>
+                  <span className="v1-hero-stat-l">Verified</span>
+                </span>
+              </div>
+            </>
+          ) : (
+            // ── National /clubs — simplified, SweatPals-style compact search.
+            //    A small (SEO-bearing) headline sits above the bar; the big
+            //    italic headline and stats bar are gone. The search bar itself
+            //    lives in a sticky dock just below the hero (see .v1c-natl
+            //    below) so it pins to the top on scroll.
+            <>
+              <h1 className="v1c-search-h1">
+                Run <span className="accent">Clubs &amp; Experiences</span> in India
+              </h1>
+            </>
+          )}
         </div>
       </section>
 
-      {!isSearching && (
+      {/* National /clubs body. The search bar lives in a sticky dock that
+          pins below the fixed nav on scroll; the whole national block is
+          wrapped in .v1c-natl so the dock releases before the shared
+          onboarding banner. When a search is committed the three discovery
+          rails are replaced by two result lists (Events + Clubs); with no
+          committed search the default rails show. Both live inside .v1c-exp
+          so the result cards inherit its CSS vars (--exp-surf, --exp-bone-*,
+          etc.). */}
+      {!cityName && (
+        <div className="v1c-natl">
+          <span ref={dockSentinelRef} aria-hidden="true" className="v1c-searchdock-sentinel" />
+          <div className={`v1c-searchdock${dockStuck ? ' is-stuck' : ''}`}>
+            <div className="container">
+              <ClubsSearchBar
+                filters={searchFilters}
+                showFilters={showFilters}
+                onQChange={onQChange}
+                onSubmit={submitSearch}
+                onCityChange={onCityChange}
+                onWindowToggle={onWindowToggle}
+                onTypeToggle={onTypeToggle}
+                onDistanceToggle={onDistanceToggle}
+                onTagToggle={onTagToggle}
+                onVerifiedToggle={onVerifiedToggle}
+                onToggleFilters={() => setShowFilters((s) => !s)}
+                onCloseFilters={() => setShowFilters(false)}
+                onClearFilters={clearFilters}
+              />
+            </div>
+          </div>
+
+          {committedSearch && (
+            <section className="v1c-exp" ref={searchResultsRef}>
+              <div className="v1c-container">
+                <div className="v1c-search-resulthead">
+                  <h2 className="v1c-search-resulttitle">
+                    {searchStatus === 'fallback' ? (
+                      <>Nothing matched — here&rsquo;s what&rsquo;s on in <b>Mumbai</b></>
+                    ) : (
+                      <>
+                        Results
+                        {committedSearch.q ? <> for &ldquo;{committedSearch.q}&rdquo;</> : null}
+                        {committedSearch.city ? <> in {cityLabelOf(committedSearch.city)}</> : null}
+                      </>
+                    )}
+                  </h2>
+                  <button type="button" className="v1c-search-clear" onClick={clearSearch}>
+                    Clear search
+                  </button>
+                </div>
+
+                {searchStatus === 'loading' && (
+                  <div className="v1c-search-state">Searching…</div>
+                )}
+                {searchStatus === 'error' && (
+                  <div className="v1c-search-state">
+                    Couldn&rsquo;t load results.{' '}
+                    <button type="button" className="v1c-search-retry" onClick={submitSearch}>
+                      Try again
+                    </button>
+                  </div>
+                )}
+
+                {(searchStatus === 'ok' || searchStatus === 'fallback') && (
+                  <>
+                    {/* Result lists use the SAME rail markup as the default
+                        discovery rails — a horizontal scroller of compact
+                        cards with a See all toggle that expands to the grid —
+                        so the layout doesn't change between browse and search. */}
+                    {searchEvents.length > 0 && (
+                      <section className="v1c-exp-rail">
+                        <div className="v1c-exp-rail-head">
+                          <h3 className="v1c-exp-rail-title">Events</h3>
+                          {searchEvents.length > 4 && (
+                            <button
+                              type="button"
+                              className="v1c-exp-seeall"
+                              onClick={() => setOpenRail((p) => (p === 'search-ev' ? null : 'search-ev'))}
+                              aria-expanded={openRail === 'search-ev'}
+                            >
+                              {openRail === 'search-ev' ? 'Show less' : 'See all'}
+                            </button>
+                          )}
+                        </div>
+                        <div className={openRail === 'search-ev' ? 'v1c-exp-grid' : 'v1c-exp-scroller v1c-exp-evlist'}>
+                          {searchEvents.map((h) => (
+                            <EventCard
+                              key={h.id}
+                              hit={h}
+                              clubLogo={h.clubSlug ? clubLogoBySlug[h.clubSlug] : null}
+                            />
+                          ))}
+                        </div>
+                      </section>
+                    )}
+                    {searchClubs.length > 0 && (
+                      <section className="v1c-exp-rail">
+                        <div className="v1c-exp-rail-head">
+                          <h3 className="v1c-exp-rail-title">Clubs</h3>
+                          {searchClubs.length > 4 && (
+                            <button
+                              type="button"
+                              className="v1c-exp-seeall"
+                              onClick={() => setOpenRail((p) => (p === 'search-cl' ? null : 'search-cl'))}
+                              aria-expanded={openRail === 'search-cl'}
+                            >
+                              {openRail === 'search-cl' ? 'Show less' : 'See all'}
+                            </button>
+                          )}
+                        </div>
+                        <div className={openRail === 'search-cl' ? 'v1c-exp-grid' : 'v1c-exp-scroller'}>
+                          {searchClubs.map((c) => (
+                            <ExpClubCard key={c.id} c={c} />
+                          ))}
+                        </div>
+                      </section>
+                    )}
+                  </>
+                )}
+              </div>
+            </section>
+          )}
+
+          {/* Default discovery rails — shown when no search is committed.
+              Three rails (around you, this weekend, run clubs by city). */}
+          {!committedSearch && (eventsAround.length > 0 || eventsWeekend.length > 0 || clubs.length > 0) && (
+            <section className="v1c-exp">
+              <div className="v1c-container">
+                {(() => {
+                  // Same rails, order depends on the page identity: /clubs
+                  // leads with the directory, /experiences with the events.
+                  const clubsRail = <ClubsByCityRail key="clubs" clubs={clubs} />;
+                  const eventRails = (
+                    <>
+                      <EventRail
+                        key="around"
+                        title={aroundCity ? `Upcoming Events in ${aroundCity}` : 'Upcoming Events'}
+                        hits={eventsAround}
+                        clubLogos={clubLogoBySlug}
+                        isOpen={openRail === 'around'}
+                        onToggle={() => setOpenRail((p) => (p === 'around' ? null : 'around'))}
+                      />
+                      <EventRail
+                        key="weekend"
+                        title="Events this weekend"
+                        hits={eventsWeekend}
+                        clubLogos={clubLogoBySlug}
+                        isOpen={openRail === 'weekend'}
+                        onToggle={() => setOpenRail((p) => (p === 'weekend' ? null : 'weekend'))}
+                      />
+                    </>
+                  );
+                  return variant === 'clubs' ? (
+                    <>{clubsRail}{eventRails}</>
+                  ) : (
+                    <>{eventRails}{clubsRail}</>
+                  );
+                })()}
+              </div>
+            </section>
+          )}
+        </div>
+      )}
+
+      {cityName && !isSearching && (
         <>
           {/* Featured — top 5 by member count, full ApiClub data.
               Original FlagshipCard verbatim: bg image, logo, 4-stat
-              grid, tags, next-run footer with location + distance. */}
+              grid, tags, next-run footer with location + distance.
+              City pages only — the national page leads with the rails. */}
           {featuredFull.length > 0 && (
             <section className="v1c-featured">
               <div className="v1c-container">
@@ -806,7 +1869,12 @@ export default function ClubsView({
               pagination via .is-hidden. Cards use the original portrait
               design with image + logo overlay + tags + members + next-run.
               Pagination shows at top AND bottom so the user can flip
-              pages without scrolling to the foot every time. */}
+              pages without scrolling to the foot every time.
+              City pages only: this directory IS the city landing page's
+              content. The national /clubs page leads with the discovery
+              rails instead (the all-clubs ItemList JSON-LD in page.tsx
+              still exposes the full directory to crawlers). */}
+          {cityName && (
           <section className="v1c-clubs-section">
             <div className="v1c-container">
               <div className="v1c-section-header">
@@ -844,6 +1912,7 @@ export default function ClubsView({
               />
             </div>
           </section>
+          )}
         </>
       )}
 
@@ -854,7 +1923,9 @@ export default function ClubsView({
         </div>
       </section>
 
-      {/* Studio promotion tabs — always visible */}
+      {/* Studio promotion tabs — city pages only (dropped from the national
+          /clubs page, which now leads with the discovery rails). */}
+      {cityName && (
       <section className="v1c-admin-section">
         <div className="v1c-container">
           <div className="v1c-admin-head">
@@ -894,6 +1965,7 @@ export default function ClubsView({
           </div>
         </div>
       </section>
+      )}
 
       <JoinClubModal
         isOpen={modal?.kind === 'join'}

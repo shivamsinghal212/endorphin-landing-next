@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>endorfin · experiences — V1A Rails Classic</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="preconnect" href="https://api.fontshare.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500;1,9..144,600;1,9..144,700&family=Oswald:wght@400;500;600&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet" />
+<link href="https://api.fontshare.com/v2/css?f[]=clash-display@500,600,700&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --jet:#0A0A0A; --coal:#101010; --surf:#141312; --slate:#161616;
+    --bone:#F5F0EB; --bone-72:rgba(245,240,235,.72); --bone-55:rgba(245,240,235,.55); --bone-38:rgba(245,240,235,.38);
+    --hair:rgba(245,240,235,.10); --hair-2:rgba(245,240,235,.18);
+    --red:#E6232A; --orange:#FF6B35; --magenta:#FF2E88; --purple:#8B5CF6; --lime:#B6FF3C;
+    --chroma:linear-gradient(100deg,var(--red) 0%,var(--orange) 28%,var(--magenta) 55%,var(--purple) 85%);
+    --red-grad:linear-gradient(115deg,#E6232A,#ff3d44 50%,#E6232A);
+    --ease:cubic-bezier(.22,.8,.3,1);
+    --f-display:"Clash Display","Poppins",ui-sans-serif,system-ui,sans-serif;
+    --nav-h:76px; --chip-h:60px;
+    --maxw:1240px;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0; background:var(--jet); color:var(--bone);
+    font-family:ui-sans-serif,system-ui,-apple-system,sans-serif; line-height:1.5;
+    -webkit-font-smoothing:antialiased; position:relative; min-height:100vh;
+  }
+  /* faint red radial glow behind header */
+  body::before{
+    content:""; position:fixed; inset:0; pointer-events:none; z-index:0;
+    background:radial-gradient(ellipse 70% 60% at 12% -10%, rgba(230,35,42,.16), transparent 60%);
+  }
+  /* very subtle grain */
+  body::after{
+    content:""; position:fixed; inset:0; pointer-events:none; z-index:1; opacity:.035;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+  }
+  .wrap{position:relative; z-index:2;}
+
+  .container{max-width:var(--maxw); margin:0 auto; padding:0 32px;}
+  @media(max-width:768px){ .container{padding:0 18px;} }
+
+  /* wordmark */
+  .wordmark{font-family:"Fraunces",serif; font-style:italic; font-weight:600; font-size:24px; letter-spacing:-.01em; color:var(--bone); text-decoration:none; white-space:nowrap;}
+  .wordmark .dot{font-style:normal; color:var(--red);}
+
+  a{color:inherit;}
+  button{font-family:inherit; cursor:pointer; border:none; background:none; color:inherit;}
+
+  /* ───────── NAV ───────── */
+  .nav{
+    position:sticky; top:0; z-index:40; height:var(--nav-h);
+    background:rgba(10,10,10,.86); backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
+    border-bottom:1px solid var(--hair);
+  }
+  .nav-inner{height:var(--nav-h); display:flex; align-items:center; gap:24px;}
+  .nav-search{flex:1; display:flex; align-items:center; justify-content:center; gap:14px;}
+
+  /* location pill (OUTSIDE the field) */
+  .loc{
+    display:inline-flex; align-items:center; gap:7px; flex-shrink:0;
+    padding:9px 13px; border-radius:999px; border:1px solid var(--hair); background:transparent;
+    color:var(--bone-72); transition:border-color .18s var(--ease), color .18s var(--ease);
+  }
+  .loc:hover{border-color:var(--hair-2); color:var(--bone);}
+  .loc .city{font-family:"Oswald",sans-serif; text-transform:uppercase; letter-spacing:.12em; font-size:11.5px; font-weight:500;}
+  .loc svg{flex-shrink:0;}
+
+  /* the slim airy field */
+  .field{
+    display:flex; align-items:center; gap:11px; flex:1; max-width:480px;
+    padding:11px 16px; border-radius:12px; border:1px solid var(--hair); background:rgba(245,240,235,.02);
+    transition:border-color .18s var(--ease), background .18s var(--ease);
+  }
+  .field:focus-within{border-color:var(--hair-2); background:rgba(245,240,235,.04);}
+  .field svg{flex-shrink:0; color:var(--bone-55);}
+  .field input{
+    flex:1; border:none; outline:none; background:transparent; color:var(--bone);
+    font-family:"Fraunces",serif; font-style:italic; font-weight:500; font-size:15.5px; letter-spacing:-.01em;
+  }
+  .field input::placeholder{color:var(--bone-38); font-style:italic;}
+
+  /* map toggle (separate ghost icon-button) */
+  .icon-btn{
+    flex-shrink:0; width:42px; height:42px; border-radius:10px; display:inline-flex; align-items:center; justify-content:center;
+    border:1px solid var(--hair); color:var(--bone-72);
+    transition:border-color .18s var(--ease), color .18s var(--ease), background .18s var(--ease);
+  }
+  .icon-btn:hover{border-color:var(--hair-2); color:var(--bone); background:rgba(245,240,235,.03);}
+
+  .nav-actions{display:flex; align-items:center; gap:10px; flex-shrink:0;}
+
+  /* PRIMARY create-experience button */
+  .btn-red{
+    flex-shrink:0; display:inline-flex; align-items:center; justify-content:center; gap:7px;
+    padding:11px 18px; border-radius:10px; border:1px solid transparent;
+    background:var(--red-grad); color:#fff; text-decoration:none;
+    font-family:"Oswald",sans-serif; text-transform:uppercase; letter-spacing:.12em; font-size:11.5px; font-weight:600;
+    box-shadow:0 4px 18px rgba(230,35,42,.32), inset 0 1px 0 rgba(255,255,255,.18);
+    transition:transform .18s var(--ease), box-shadow .18s var(--ease);
+  }
+  .btn-red:hover{transform:translateY(-2px); box-shadow:0 8px 26px rgba(230,35,42,.42), inset 0 1px 0 rgba(255,255,255,.22);}
+  .btn-red svg{flex-shrink:0;}
+  .btn-red .short{display:none;}
+  .btn-red.lg{padding:15px 26px; font-size:13px; border-radius:12px;}
+
+  /* SECONDARY ghost list-club button */
+  .list-club, .btn-ghost{
+    flex-shrink:0; padding:11px 18px; border-radius:10px; border:1px solid var(--hair-2); background:transparent; color:var(--bone);
+    font-family:"Oswald",sans-serif; text-transform:uppercase; letter-spacing:.12em; font-size:11.5px; font-weight:500; text-decoration:none;
+    display:inline-flex; align-items:center; justify-content:center; gap:8px;
+    transition:background .2s var(--ease), color .2s var(--ease), border-color .2s var(--ease);
+  }
+  .list-club:hover, .btn-ghost:hover{background:rgba(245,240,235,.05); border-color:var(--bone-38);}
+  .btn-ghost.lg{padding:15px 22px; font-size:13px; border-radius:12px;}
+
+  @media(max-width:980px){
+    .nav-search{gap:10px;}
+    .field{max-width:none;}
+  }
+  @media(max-width:768px){
+    .nav-inner{gap:12px;}
+    .nav-search{display:none;}
+    .list-club{display:none;}
+    .btn-red{padding:10px 14px;}
+    .btn-red .full{display:none;}
+    .btn-red .short{display:inline;}
+  }
+
+  /* mobile search row (under nav, only small screens) */
+  .mobile-search{display:none;}
+  @media(max-width:768px){
+    .mobile-search{
+      display:flex; align-items:center; gap:10px; padding:12px 18px;
+      background:rgba(10,10,10,.86); backdrop-filter:blur(14px); border-bottom:1px solid var(--hair);
+      position:sticky; top:var(--nav-h); z-index:39;
+    }
+    .mobile-search .field{max-width:none;}
+  }
+
+  /* ───────── VIEWS ───────── */
+  .view{display:none;}
+  .view.active{display:block;}
+
+  /* ───────── DATE CHIP ROW (home only) ───────── */
+  .chiprow{
+    position:sticky; top:var(--nav-h); z-index:38; height:var(--chip-h);
+    background:rgba(10,10,10,.82); backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
+    border-bottom:1px solid var(--hair);
+  }
+  @media(max-width:768px){ .chiprow{top:calc(var(--nav-h) + 65px);} }
+  .chips{
+    height:var(--chip-h); display:flex; align-items:center; gap:9px;
+    overflow-x:auto; scrollbar-width:none;
+  }
+  .chips::-webkit-scrollbar{display:none;}
+  .chip{
+    flex-shrink:0; display:inline-flex; align-items:center; gap:7px; padding:8px 15px;
+    border-radius:10px; border:1px solid var(--hair); background:transparent; color:var(--bone-72);
+    font-family:"Oswald",sans-serif; text-transform:uppercase; letter-spacing:.1em; font-size:11px; font-weight:500;
+    transition:border-color .15s var(--ease), color .15s var(--ease), background .15s var(--ease);
+    white-space:nowrap;
+  }
+  .chip:hover{border-color:var(--hair-2); color:var(--bone);}
+  .chip.active{background:var(--bone); color:var(--jet); border-color:var(--bone);}
+  .chip.trailing{margin-left:auto;}
+  @media(max-width:768px){ .chip.trailing{margin-left:0;} }
+
+  /* ───────── RAILS ───────── */
+  main{padding:46px 0 30px;}
+  .rail{margin-bottom:54px;}
+  .rail-head{display:flex; align-items:baseline; gap:14px; margin-bottom:20px;}
+  .rail-title{
+    font-family:"Fraunces",serif; font-style:italic; font-weight:600; font-size:26px; letter-spacing:-.01em;
+    color:var(--bone); margin:0; display:inline-flex; align-items:baseline; gap:10px; background:none; cursor:pointer;
+  }
+  .rail-title .arrow{
+    font-style:normal; color:var(--red); display:inline-block; transition:transform .2s var(--ease); font-weight:500;
+  }
+  .rail-head:hover .arrow{transform:translateX(6px);}
+  .see-all{
+    margin-left:auto; flex-shrink:0; text-decoration:none; color:var(--bone-55); background:none;
+    font-family:"Oswald",sans-serif; text-transform:uppercase; letter-spacing:.12em; font-size:11px; font-weight:500;
+    transition:color .15s var(--ease);
+  }
+  .see-all:hover{color:var(--bone);}
+  @media(max-width:768px){ .rail-title{font-size:22px;} }
+
+  /* city sub-chips (clubs-by-city rail) */
+  .city-chips{display:flex; gap:8px; overflow-x:auto; scrollbar-width:none; margin-bottom:18px;}
+  .city-chips::-webkit-scrollbar{display:none;}
+  .city-chip{
+    flex-shrink:0; padding:7px 14px; border-radius:999px; border:1px solid var(--hair); background:transparent; color:var(--bone-72);
+    font-family:"Oswald",sans-serif; text-transform:uppercase; letter-spacing:.1em; font-size:10.5px; font-weight:500;
+    transition:border-color .15s var(--ease), color .15s var(--ease), background .15s var(--ease); white-space:nowrap;
+  }
+  .city-chip:hover{border-color:var(--hair-2); color:var(--bone);}
+  .city-chip.active{background:var(--bone); color:var(--jet); border-color:var(--bone);}
+
+  .scroller{
+    display:flex; gap:18px; overflow-x:auto; scroll-snap-type:x mandatory;
+    scrollbar-width:none; padding-bottom:4px;
+    margin:0 -32px; padding-left:32px; padding-right:32px;
+  }
+  @media(max-width:768px){ .scroller{margin:0 -18px; padding-left:18px; padding-right:18px;} }
+  .scroller::-webkit-scrollbar{display:none;}
+
+  /* ───────── EVENT CARD ───────── */
+  .card{
+    flex-shrink:0; width:286px; scroll-snap-align:start; text-decoration:none; color:inherit;
+    display:flex; flex-direction:column;
+  }
+  @media(max-width:768px){ .card{width:78vw; max-width:340px;} }
+
+  /* FIXED 4:5 MEDIA — whole image always visible, letterboxed on blurred self */
+  .card-media{
+    position:relative; aspect-ratio:4/5; border-radius:16px; overflow:hidden;
+    background:var(--surf); border:1px solid var(--hair);
+    transition:border-color .18s var(--ease), transform .25s var(--ease);
+  }
+  .card-media .bg{
+    position:absolute; inset:0; background-size:cover; background-position:center;
+    filter:blur(34px) saturate(1.15); transform:scale(1.2); opacity:.5;
+  }
+  .card-media img{position:absolute; inset:0; width:100%; height:100%; object-fit:contain;}
+  .card:hover .card-media{border-color:var(--hair-2); transform:translateY(-4px);}
+
+  /* ONLY overlay element: category chip */
+  .badge{
+    position:absolute; top:10px; left:10px; z-index:2; display:inline-flex; align-items:center; gap:6px;
+    padding:5px 10px; border-radius:999px;
+    background:rgba(10,10,10,.6); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px);
+    border:1px solid var(--hair-2); color:var(--bone);
+    font-family:"Oswald",sans-serif; text-transform:uppercase; letter-spacing:.1em; font-size:10.5px; font-weight:500;
+  }
+  .badge svg{flex-shrink:0;}
+
+  .card-body{padding:14px 2px 0;}
+  .byline{display:flex; align-items:center; gap:8px; margin-bottom:9px;}
+  .mono{
+    flex-shrink:0; width:24px; height:24px; border-radius:50%; border:1px solid var(--hair-2); background:var(--surf);
+    display:inline-flex; align-items:center; justify-content:center;
+    font-family:"Oswald",sans-serif; font-size:9.5px; letter-spacing:.05em; color:var(--bone-72); font-weight:500;
+  }
+  .club-name{
+    font-family:"Oswald",sans-serif; text-transform:uppercase; letter-spacing:.1em; font-size:10.5px; font-weight:500;
+    color:var(--bone-55); display:inline-flex; align-items:center; gap:5px; min-width:0;
+  }
+  .club-name span{overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .verified{flex-shrink:0;}
+  /* event titles → Clash Display (Poppins fallback) */
+  .event-title{
+    font-family:var(--f-display); font-weight:600; font-size:18px; letter-spacing:-.005em;
+    color:var(--bone); margin:0 0 10px; line-height:1.2;
+    display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;
+    min-height:2.4em; /* keeps meta line aligned across single- & two-line titles */
+  }
+  .meta{
+    font-family:"Oswald",sans-serif; text-transform:uppercase; letter-spacing:.08em; font-size:11.5px; font-weight:400;
+    color:var(--bone-72);
+  }
+  .meta .sep{color:var(--bone-38); margin:0 3px;}
+
+  /* ───────── CLUB CARD ───────── */
+  .club-card{
+    flex-shrink:0; width:200px; scroll-snap-align:start; text-decoration:none; color:inherit;
+  }
+  @media(max-width:768px){ .club-card{width:58vw; max-width:240px;} }
+  .club-cover{
+    position:relative; width:100%; aspect-ratio:1/1; border-radius:14px; border:1px solid var(--hair); background:var(--surf);
+    overflow:hidden; transition:border-color .2s var(--ease), transform .25s var(--ease);
+  }
+  .club-card:hover .club-cover{border-color:var(--hair-2); transform:translateY(-4px);}
+  .club-cover img{display:block; width:100%; height:100%; object-fit:cover;}
+  .club-card .name{
+    font-family:"Fraunces",serif; font-style:italic; font-weight:600; font-size:17px; letter-spacing:-.01em;
+    color:var(--bone); margin:13px 0 5px; display:flex; align-items:center; gap:6px; line-height:1.2;
+  }
+  .club-card .name span{overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .club-card .cmeta{
+    font-family:"Oswald",sans-serif; text-transform:uppercase; letter-spacing:.1em; font-size:11px; font-weight:400; color:var(--bone-55);
+  }
+  .club-card .cmeta .sep{color:var(--bone-38); margin:0 3px;}
+
+  /* ───────── LISTING (See all) ───────── */
+  .backbtn{
+    display:inline-flex; align-items:center; gap:8px; margin:26px 0 2px;
+    padding:9px 15px; border-radius:10px; border:1px solid var(--hair-2); background:transparent; color:var(--bone-72);
+    font-family:"Oswald",sans-serif; text-transform:uppercase; letter-spacing:.12em; font-size:11px; font-weight:500;
+    transition:border-color .15s var(--ease), color .15s var(--ease), background .15s var(--ease);
+  }
+  .backbtn:hover{border-color:var(--bone-38); color:var(--bone); background:rgba(245,240,235,.04);}
+  .list-head{display:flex; align-items:baseline; gap:14px; margin:18px 0 8px; flex-wrap:wrap;}
+  .list-title{font-family:"Fraunces",serif; font-style:italic; font-weight:600; font-size:32px; letter-spacing:-.01em; margin:0;}
+  .list-count{font-family:"Oswald",sans-serif; text-transform:uppercase; letter-spacing:.12em; font-size:11.5px; color:var(--bone-55);}
+  .grid{
+    display:grid; grid-template-columns:repeat(4,1fr); gap:30px 22px; padding:22px 0 20px;
+  }
+  @media(max-width:1100px){ .grid{grid-template-columns:repeat(3,1fr);} }
+  @media(max-width:768px){ .grid{grid-template-columns:repeat(2,1fr); gap:24px 16px;} }
+  @media(max-width:480px){ .grid{grid-template-columns:1fr;} }
+  .grid .card, .grid .club-card{width:auto; max-width:none;}
+
+  /* ───────── EVENT DETAIL ───────── */
+  .detail-wrap{padding:0 0 20px;}
+  .detail-hero{display:grid; grid-template-columns:0.82fr 1fr; gap:42px; padding:14px 0 8px; align-items:start;}
+  @media(max-width:900px){ .detail-hero{grid-template-columns:1fr; gap:24px;} }
+  .detail-media{
+    position:relative; width:100%; aspect-ratio:4/5; border-radius:20px; overflow:hidden;
+    border:1px solid var(--hair); background:var(--surf); position:sticky; top:calc(var(--nav-h) + 22px);
+  }
+  @media(max-width:900px){ .detail-media{position:relative; top:0; max-height:none;} }
+  .detail-media .bg{position:absolute; inset:0; background-size:cover; background-position:center; filter:blur(40px) saturate(1.15); transform:scale(1.2); opacity:.5;}
+  .detail-media img{position:absolute; inset:0; width:100%; height:100%; object-fit:contain;}
+  .detail-media .badge{top:14px; left:14px;}
+
+  .detail-cat{ /* category as a small static chip above title */
+    display:inline-flex; align-items:center; gap:7px; padding:6px 12px; border-radius:999px;
+    border:1px solid var(--hair-2); color:var(--bone-72); margin-bottom:16px;
+    font-family:"Oswald",sans-serif; text-transform:uppercase; letter-spacing:.12em; font-size:10.5px; font-weight:500;
+  }
+  .detail-title{
+    font-family:var(--f-display); font-weight:600; font-size:clamp(30px,4.4vw,46px); line-height:1.04; letter-spacing:-.01em;
+    color:var(--bone); margin:0 0 18px;
+  }
+  .detail-club{display:flex; align-items:center; gap:10px; margin-bottom:26px;}
+  .detail-club .mono{width:34px; height:34px; font-size:12px;}
+  .detail-club .dc-name{font-family:"Oswald",sans-serif; text-transform:uppercase; letter-spacing:.1em; font-size:13px; font-weight:500; color:var(--bone); display:inline-flex; align-items:center; gap:6px;}
+  .detail-club .follow{margin-left:auto;}
+
+  .detail-meta{display:grid; grid-template-columns:1fr 1fr; gap:14px 18px; padding:22px 0; border-top:1px solid var(--hair); border-bottom:1px solid var(--hair); margin-bottom:26px;}
+  @media(max-width:480px){ .detail-meta{grid-template-columns:1fr;} }
+  .mrow{display:flex; align-items:center; gap:12px;}
+  .mrow .mi{flex-shrink:0; width:38px; height:38px; border-radius:11px; border:1px solid var(--hair); background:var(--surf); display:inline-flex; align-items:center; justify-content:center; color:var(--bone-72);}
+  .mrow .ml{font-family:"Oswald",sans-serif; text-transform:uppercase; letter-spacing:.12em; font-size:9.5px; color:var(--bone-38);}
+  .mrow .mv{font-family:"Oswald",sans-serif; text-transform:uppercase; letter-spacing:.06em; font-size:13px; color:var(--bone); font-weight:500; margin-top:2px;}
+
+  .detail-desc{font-size:15.5px; line-height:1.75; color:var(--bone-72); max-width:60ch; margin:0 0 26px;}
+  .detail-cta{display:flex; gap:12px; flex-wrap:wrap; margin-bottom:8px;}
+
+  .detail-sub{padding:34px 0 0;}
+  .detail-sub h3{font-family:"Fraunces",serif; font-style:italic; font-weight:600; font-size:22px; letter-spacing:-.01em; margin:0 0 16px;}
+  .about-club{display:flex; align-items:center; gap:14px; padding:18px; border:1px solid var(--hair); border-radius:16px; background:rgba(245,240,235,.02);}
+  .about-club .mono{width:46px; height:46px; font-size:14px;}
+  .about-club .ac-name{font-family:"Oswald",sans-serif; text-transform:uppercase; letter-spacing:.1em; font-size:13px; font-weight:500; color:var(--bone); display:inline-flex; align-items:center; gap:6px;}
+  .about-club .ac-meta{font-family:"Oswald",sans-serif; text-transform:uppercase; letter-spacing:.1em; font-size:10.5px; color:var(--bone-55); margin-top:4px;}
+  .about-club .ac-go{margin-left:auto;}
+
+  .map-box{position:relative; height:230px; border-radius:18px; overflow:hidden; border:1px solid var(--hair); background:
+      repeating-linear-gradient(0deg, rgba(245,240,235,.05) 0 1px, transparent 1px 46px),
+      repeating-linear-gradient(90deg, rgba(245,240,235,.05) 0 1px, transparent 1px 46px),
+      radial-gradient(circle at 60% 40%, rgba(230,35,42,.10), transparent 55%),
+      var(--coal);}
+  .map-pin{position:absolute; top:42%; left:58%; transform:translate(-50%,-100%); color:var(--red); filter:drop-shadow(0 6px 10px rgba(0,0,0,.5));}
+  .map-venue{position:absolute; left:16px; bottom:14px; right:16px; display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;}
+  .map-venue .mv-text{font-family:"Oswald",sans-serif; text-transform:uppercase; letter-spacing:.08em; font-size:12px; color:var(--bone); background:rgba(10,10,10,.6); backdrop-filter:blur(6px); padding:8px 12px; border-radius:10px; border:1px solid var(--hair-2);}
+
+  /* ───────── FOOTER ───────── */
+  footer{border-top:1px solid var(--hair); margin-top:30px; padding:38px 0 56px;}
+  .foot-inner{display:flex; align-items:center; justify-content:space-between; gap:20px; flex-wrap:wrap;}
+  .foot-note{
+    font-family:"Oswald",sans-serif; text-transform:uppercase; letter-spacing:.12em; font-size:10.5px; font-weight:400; color:var(--bone-38);
+  }
+
+  /* focus visibility */
+  a:focus-visible, button:focus-visible, input:focus-visible{outline:2px solid var(--red); outline-offset:2px;}
+
+  @media(prefers-reduced-motion:reduce){
+    *{transition:none !important; scroll-behavior:auto !important;}
+    .rail-head:hover .arrow{transform:none;}
+    .card:hover .card-media,.club-card:hover .club-cover{transform:none;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- ───────── NAV ───────── -->
+  <nav class="nav">
+    <div class="container nav-inner">
+      <a href="#home" class="wordmark" id="brand">endorfin<span class="dot">.</span></a>
+
+      <div class="nav-search">
+        <button class="loc" aria-label="Change location">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+          <span class="city">New Delhi</span>
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+        </button>
+
+        <div class="field">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+          <input type="text" placeholder="Search experiences &amp; clubs…" aria-label="Search experiences and clubs" />
+        </div>
+
+        <button class="icon-btn" aria-label="Map view">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m9 4-6 2v14l6-2 6 2 6-2V4l-6 2-6-2Z"/><path d="M9 4v14M15 6v14"/></svg>
+        </button>
+      </div>
+
+      <div class="nav-actions">
+        <button class="list-club">List your club</button>
+        <a href="#create" class="btn-red" aria-label="Create experience">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+          <span class="full">Create experience</span><span class="short">Create</span>
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- mobile search row -->
+  <div class="mobile-search">
+    <button class="loc" aria-label="Change location">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+    </button>
+    <div class="field">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+      <input type="text" placeholder="Search experiences &amp; clubs…" aria-label="Search experiences and clubs" />
+    </div>
+    <button class="icon-btn" aria-label="Map view">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m9 4-6 2v14l6-2 6 2 6-2V4l-6 2-6-2Z"/><path d="M9 4v14M15 6v14"/></svg>
+    </button>
+  </div>
+
+  <!-- ═══════════ HOME VIEW ═══════════ -->
+  <div class="view active" id="view-home">
+
+    <!-- date chips -->
+    <div class="chiprow">
+      <div class="container chips" id="chips">
+        <button class="chip active">This weekend</button>
+        <button class="chip">Today</button>
+        <button class="chip">Tomorrow</button>
+        <button class="chip">Thu 18</button>
+        <button class="chip">Fri 19</button>
+        <button class="chip">Sat 20</button>
+        <button class="chip">Sun 21</button>
+        <button class="chip">Mon 22</button>
+        <button class="chip">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+          Choose date
+        </button>
+        <button class="chip trailing">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h10M18 6h2M4 12h2M10 12h10M4 18h14M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="8" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg>
+          Filters
+        </button>
+      </div>
+    </div>
+
+    <main>
+      <div class="container">
+
+        <!-- RAIL 1: Events around you -->
+        <section class="rail">
+          <div class="rail-head">
+            <button class="rail-title" data-list="around">Events around you <span class="arrow">&rarr;</span></button>
+            <button class="see-all" data-list="around">See all</button>
+          </div>
+          <div class="scroller" id="rail-around"></div>
+        </section>
+
+        <!-- RAIL 2: Events this weekend -->
+        <section class="rail">
+          <div class="rail-head">
+            <button class="rail-title" data-list="weekend">Events this weekend <span class="arrow">&rarr;</span></button>
+            <button class="see-all" data-list="weekend">See all 18</button>
+          </div>
+          <div class="scroller" id="rail-weekend"></div>
+        </section>
+
+        <!-- RAIL 3: Run Clubs By City -->
+        <section class="rail">
+          <div class="rail-head">
+            <button class="rail-title" data-list="clubs">Run Clubs By City <span class="arrow">&rarr;</span></button>
+            <button class="see-all" data-list="clubs">See all</button>
+          </div>
+          <div class="city-chips" id="city-chips"></div>
+          <div class="scroller" id="rail-clubs"></div>
+        </section>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- ═══════════ LISTING VIEW (See all) ═══════════ -->
+  <div class="view" id="view-list">
+    <div class="container">
+      <button class="backbtn" data-back>
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+        Back
+      </button>
+      <div class="list-head">
+        <h1 class="list-title" id="list-title">All experiences</h1>
+        <span class="list-count" id="list-count"></span>
+      </div>
+      <div class="grid" id="list-grid"></div>
+    </div>
+  </div>
+
+  <!-- ═══════════ EVENT DETAIL VIEW ═══════════ -->
+  <div class="view" id="view-detail">
+    <div class="container detail-wrap">
+      <button class="backbtn" data-back>
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+        Back
+      </button>
+      <div id="detail-body"></div>
+    </div>
+  </div>
+
+  <!-- ───────── FOOTER ───────── -->
+  <footer>
+    <div class="container foot-inner">
+      <a href="#home" class="wordmark">endorfin<span class="dot">.</span></a>
+      <span class="foot-note">Find your people · Run together · India</span>
+    </div>
+  </footer>
+
+</div>
+
+<script>
+  var BASE = "https://endorfin-media.shivam-8a5.workers.dev/storage/v1/object/public/media/clubs/";
+
+  /* category icons */
+  var ICONS = {
+    Trail:'<path d="m3 19 5-8 4 5 3-4 6 7Z"/>',
+    "Yoga + Run":'<path d="m12 4 6 7H6Z"/><path d="M6 14h12M6 19h12"/>',
+    HYROX:'<circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/>',
+    "Social 5K":'<path d="m13 2-9 12h7l-1 8 9-12h-7Z"/>',
+    Expedition:'<path d="m3 20 6-12 4 6 2-3 6 9Z"/><path d="m9 8 1.5 3"/>',
+    "Night Run":'<path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5Z"/>'
+  };
+  function catSvg(cat, sz){ sz = sz||12; return '<svg width="'+sz+'" height="'+sz+'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'+(ICONS[cat]||'')+'</svg>'; }
+  var VBADGE = '<svg class="verified" width="13" height="13" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" fill="#E6232A"/><path d="m8 12 2.5 2.5L16 9" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+
+  /* ───────── DATA ───────── */
+  var EVENTS = [
+    {id:"e1", club:"Run With Me Club", mono:"RW", verified:false, members:"410 members", cat:"Trail",
+      img:"runwithme-club/events/DZo7obtTGtT/cover.jpg", title:"Gairatpur Bass &rarr; Raiseena Trail Run",
+      date:"Sat Jun 20", time:"5:30 AM", dist:"12K", venue:"Gairatpur Bass, Aravalli · Gurgaon", city:"Gurgaon",
+      desc:"A rough, technical point-to-point trail from Village Gairatpur Bass to Raiseena and back. Expect Aravalli single-track, an early flag-off and light refreshments at the finish. Trail shoes strongly recommended."},
+    {id:"e2", club:"D3X Running Club", mono:"D3", verified:false, members:"540 members", cat:"Yoga + Run",
+      img:"d3xrunningclub/events/DZpKwH-SFZt/cover.jpg", title:"Move. Breathe. Achieve — Community Run",
+      date:"Sat Jun 20", time:"5:45 AM", dist:"5 / 10K", venue:"Lodhi Garden · Delhi", city:"Delhi",
+      desc:"Start your weekend right — a guided morning yoga flow followed by an easy community run through Lodhi Garden. All paces welcome, bring a friend."},
+    {id:"e3", club:"Bombay On Foot", mono:"BF", verified:true, members:"1.2K members", cat:"HYROX",
+      img:"bombayonfoot/events/DZnS0pPDDO7/cover.jpg", title:"HYROX Simulation + Ice Bath",
+      date:"Sun Jun 21", time:"6:30 AM", dist:"HYROX", venue:"TRF Space, Lower Parel · Mumbai", city:"Mumbai",
+      desc:"A full HYROX-format simulation — runs, sleds, wall balls, the works — capped with a recovery ice bath. 15 slots only, so lock yours in early."},
+    {id:"e4", club:"Kochi Run Club", mono:"KR", verified:false, members:"320 members", cat:"Social 5K",
+      img:"kochirunclub/events/DZruvaZSsNY/cover.jpg", title:"Saturday Run with Xude",
+      date:"Sat Jun 20", time:"6:15 AM", dist:"5K", venue:"Panampilly Nagar · Kochi", city:"Kochi",
+      desc:"An easy social 5K around Panampilly Nagar with the Kochi crew, fuelled by Xude after. Perfect for first-timers and a relaxed Saturday start."},
+    {id:"e5", club:"Run&Rally Club", mono:"RR", verified:true, members:"2.1K members", cat:"Expedition",
+      img:"runrallyclub/events/DZUpr8HShWg/cover.jpg", title:"Manali–Leh–Khardungla Cycling Expedition",
+      date:"Fri Jun 19", time:"6:00 PM", dist:"10 days", venue:"Manali &rarr; Leh", city:"Manali",
+      desc:"A 10-day supported cycling expedition from Manali over Khardung La to Leh. Bikes, stays, meals and a support vehicle included. Early-bird pricing live now."},
+    {id:"e6", club:"Run Club Haridwar", mono:"RH", verified:false, members:"290 members", cat:"Night Run",
+      img:"runclubharidwar/events/DZpDh0HOGGX/cover.jpg", title:"Summer Night Run",
+      date:"Thu Jun 18", time:"7:30 PM", dist:"5K", venue:"Om Setu · Haridwar", city:"Haridwar",
+      desc:"A feel-good night 5K along Om Setu — lights, music and good company by the Ganga. Beginner friendly, all ages."}
+  ];
+  var EV = {}; EVENTS.forEach(function(e){ EV[e.id] = e; });
+
+  /* club model grouped by city */
+  var CLUBS = [
+    {name:"Run&Rally Club", verified:true, group:"Delhi NCR", city:"Delhi", members:"2.1K members", img:"runrallyclub/events/DZUpr8HShWg/cover.jpg"},
+    {name:"D3X Running Club", verified:false, group:"Delhi NCR", city:"Delhi", members:"540 members", img:"d3xrunningclub/events/DZpKwH-SFZt/cover.jpg"},
+    {name:"Run With Me Club", verified:false, group:"Delhi NCR", city:"Gurgaon", members:"410 members", img:"runwithme-club/events/DZo7obtTGtT/cover.jpg"},
+    {name:"Bombay On Foot", verified:true, group:"Mumbai", city:"Mumbai", members:"1.2K members", img:"bombayonfoot/events/DZnS0pPDDO7/cover.jpg"},
+    {name:"Namma Run Tribe", verified:false, group:"Bangalore", city:"Bengaluru", members:"870 members", img:"kochirunclub/events/DZruvaZSsNY/cover.jpg"},
+    {name:"Cubbon Run Club", verified:true, group:"Bangalore", city:"Bengaluru", members:"1.5K members", img:"runwithme-club/events/DZo7obtTGtT/cover.jpg"},
+    {name:"Pune Road Runners", verified:false, group:"Pune", city:"Pune", members:"620 members", img:"d3xrunningclub/events/DZpKwH-SFZt/cover.jpg"},
+    {name:"Kochi Run Club", verified:false, group:"Others", city:"Kochi", members:"320 members", img:"kochirunclub/events/DZruvaZSsNY/cover.jpg"},
+    {name:"Run Club Haridwar", verified:false, group:"Others", city:"Haridwar", members:"290 members", img:"runclubharidwar/events/DZpDh0HOGGX/cover.jpg"}
+  ];
+  var CITY_GROUPS = ["Delhi NCR","Mumbai","Bangalore","Pune","Others"];
+
+  /* curated home rails */
+  var RAIL_AROUND = ["e2","e1","e5","e6"];
+  var RAIL_WEEKEND = ["e1","e2","e3","e4","e5"];
+
+  /* ───────── RENDERERS ───────── */
+  function mono(m){ return '<span class="mono">'+m+'</span>'; }
+  function clubNameInline(name, verified){ return '<span class="club-name"><span>'+name+'</span>'+(verified?VBADGE:'')+'</span>'; }
+
+  function eventCardHTML(e){
+    return '<a href="#event/'+e.id+'" class="card" data-ev="'+e.id+'">'
+      + '<div class="card-media">'
+        + '<div class="bg" style="background-image:url('+BASE+e.img+')"></div>'
+        + '<span class="badge">'+catSvg(e.cat)+e.cat+'</span>'
+        + '<img src="'+BASE+e.img+'" alt="'+e.title.replace(/&rarr;/g,'to')+'" loading="lazy" />'
+      + '</div>'
+      + '<div class="card-body">'
+        + '<div class="byline">'+mono(e.mono)+clubNameInline(e.club,e.verified)+'</div>'
+        + '<h3 class="event-title">'+e.title+'</h3>'
+        + '<div class="meta">'+e.date+' <span class="sep">·</span> '+e.time+' <span class="sep">·</span> '+e.dist+'</div>'
+      + '</div></a>';
+  }
+
+  function clubCardHTML(c){
+    var m = c.name.split(/\s+/).slice(0,2).map(function(w){return w[0];}).join('').toUpperCase();
+    return '<a href="#" class="club-card" aria-label="'+c.name+'">'
+      + '<div class="club-cover"><img src="'+BASE+c.img+'" alt="'+c.name+'" loading="lazy" /></div>'
+      + '<div class="name"><span>'+c.name+'</span>'+(c.verified?VBADGE:'')+'</div>'
+      + '<div class="cmeta">'+c.city+' <span class="sep">·</span> '+c.members+'</div></a>';
+  }
+
+  /* populate home rails */
+  document.getElementById('rail-around').innerHTML = RAIL_AROUND.map(function(id){return eventCardHTML(EV[id]);}).join('');
+  document.getElementById('rail-weekend').innerHTML = RAIL_WEEKEND.map(function(id){return eventCardHTML(EV[id]);}).join('');
+
+  /* clubs-by-city rail */
+  var activeGroup = "Delhi NCR";
+  function renderCityChips(){
+    document.getElementById('city-chips').innerHTML = CITY_GROUPS.map(function(g){
+      return '<button class="city-chip'+(g===activeGroup?' active':'')+'" data-group="'+g+'">'+g+'</button>';
+    }).join('');
+  }
+  function renderCityClubs(){
+    var list = CLUBS.filter(function(c){return c.group===activeGroup;});
+    document.getElementById('rail-clubs').innerHTML = list.map(clubCardHTML).join('');
+  }
+  renderCityChips(); renderCityClubs();
+
+  /* ───────── LISTING ───────── */
+  function openList(key){
+    var title="All experiences", count="", html="";
+    if(key==="around"){ title="Events around you"; var a=EVENTS.slice(); count=a.length+" experiences near New Delhi"; html=a.map(eventCardHTML).join(''); }
+    else if(key==="weekend"){ title="Events this weekend"; count="18 experiences · Jun 19–21"; html=RAIL_WEEKEND.concat(["e6"]).map(function(id){return eventCardHTML(EV[id]);}).join(''); }
+    else if(key==="clubs"){ title="Run clubs in "+activeGroup; var cl=CLUBS.filter(function(c){return c.group===activeGroup;}); count=cl.length+" clubs"; html=cl.map(clubCardHTML).join(''); }
+    document.getElementById('list-title').textContent = title;
+    document.getElementById('list-count').textContent = count;
+    document.getElementById('list-grid').innerHTML = html;
+    showView('list');
+  }
+
+  /* ───────── DETAIL ───────── */
+  function metaRow(icon, label, value){
+    return '<div class="mrow"><span class="mi">'+icon+'</span><div><div class="ml">'+label+'</div><div class="mv">'+value+'</div></div></div>';
+  }
+  function openDetail(id){
+    var e = EV[id]; if(!e) return;
+    var icCal='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>';
+    var icClk='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>';
+    var icRte='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="19" r="2"/><circle cx="18" cy="5" r="2"/><path d="M8 19h7a4 4 0 0 0 0-8H9a4 4 0 0 1 0-8h7"/></svg>';
+    var icPin='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>';
+
+    document.getElementById('detail-body').innerHTML =
+      '<div class="detail-hero">'
+        + '<div class="detail-media">'
+          + '<div class="bg" style="background-image:url('+BASE+e.img+')"></div>'
+          + '<span class="badge">'+catSvg(e.cat)+e.cat+'</span>'
+          + '<img src="'+BASE+e.img+'" alt="'+e.title.replace(/&rarr;/g,'to')+'" />'
+        + '</div>'
+        + '<div class="detail-info">'
+          + '<span class="detail-cat">'+catSvg(e.cat,12)+e.cat+'</span>'
+          + '<h1 class="detail-title">'+e.title+'</h1>'
+          + '<div class="detail-club">'+mono(e.mono)+'<span class="dc-name">'+e.club+(e.verified?VBADGE:'')+'</span>'
+            + '<button class="btn-ghost follow">Follow</button></div>'
+          + '<div class="detail-meta">'
+            + metaRow(icCal,"Date",e.date+", 2026")
+            + metaRow(icClk,"Time",e.time)
+            + metaRow(icRte,"Distance",e.dist)
+            + metaRow(icPin,"Where",e.venue)
+          + '</div>'
+          + '<p class="detail-desc">'+e.desc+'</p>'
+          + '<div class="detail-cta">'
+            + '<a href="#register" class="btn-red lg"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Register now</a>'
+            + '<button class="btn-ghost lg"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2Z"/></svg>Save</button>'
+            + '<button class="btn-ghost lg"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 13.5 6.8 4M15.4 6.5 8.6 10.5"/></svg>Share</button>'
+          + '</div>'
+        + '</div>'
+      + '</div>'
+      + '<div class="detail-sub">'
+        + '<h3>About the club</h3>'
+        + '<div class="about-club">'+mono(e.mono)
+          + '<div><div class="ac-name">'+e.club+(e.verified?VBADGE:'')+'</div><div class="ac-meta">'+e.city+' · '+e.members+'</div></div>'
+          + '<button class="btn-ghost ac-go">View club</button></div>'
+      + '</div>'
+      + '<div class="detail-sub">'
+        + '<h3>Where</h3>'
+        + '<div class="map-box"><span class="map-pin"><svg width="30" height="30" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a7 7 0 0 0-7 7c0 5 7 13 7 13s7-8 7-13a7 7 0 0 0-7-7Zm0 9.5A2.5 2.5 0 1 1 12 6a2.5 2.5 0 0 1 0 5.5Z"/></svg></span>'
+          + '<div class="map-venue"><span class="mv-text">'+e.venue+'</span><button class="btn-ghost">Open in Maps</button></div></div>'
+      + '</div>';
+    showView('detail');
+  }
+
+  /* ───────── VIEW ROUTER ───────── */
+  function showView(name){
+    document.querySelectorAll('.view').forEach(function(v){ v.classList.remove('active'); });
+    document.getElementById('view-'+name).classList.add('active');
+    window.scrollTo(0,0);
+  }
+
+  /* delegated clicks */
+  document.body.addEventListener('click', function(e){
+    var card = e.target.closest('.card');
+    if(card && card.dataset.ev){ e.preventDefault(); openDetail(card.dataset.ev); return; }
+
+    var seeAll = e.target.closest('[data-list]');
+    if(seeAll){ e.preventDefault(); openList(seeAll.dataset.list); return; }
+
+    var cityChip = e.target.closest('.city-chip');
+    if(cityChip){ activeGroup = cityChip.dataset.group; renderCityChips(); renderCityClubs(); return; }
+
+    var back = e.target.closest('[data-back]');
+    if(back){ e.preventDefault(); showView('home'); return; }
+
+    var brand = e.target.closest('#brand');
+    if(brand){ e.preventDefault(); showView('home'); return; }
+
+    // date chip toggle (visual only) — excludes the trailing Filters chip
+    var chip = e.target.closest('#chips .chip');
+    if(chip && !chip.classList.contains('trailing')){
+      document.querySelectorAll('#chips .chip.active').forEach(function(c){ c.classList.remove('active'); });
+      chip.classList.add('active');
+    }
+  });
+</script>
+</body>
+</html>
