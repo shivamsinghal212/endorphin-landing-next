@@ -114,6 +114,33 @@ export const updateEvent = (token: string, id: string, data: Record<string, unkn
 export const deleteEvent = (token: string, id: string) =>
   adminFetch(`/events/${id}`, token, { method: 'DELETE' });
 
+// ── Organiser event review (draft / pending_review → live | cancelled) ───────
+// Surfaces organiser-published events awaiting super-admin approval. The
+// backend returns the public Event shape; we read just what the queue needs.
+export interface ReviewEvent {
+  id: string;
+  slug: string | null;
+  title: string;
+  eventStatus: string;
+  category: string;
+  organizerName: string | null;
+  startTime: string;
+  coverImageUrl?: string | null;
+  imageUrl?: string | null;
+}
+
+export const listPendingEvents = (token: string) =>
+  adminFetch<ReviewEvent[]>('/events/pending', token);
+
+export const approveEvent = (token: string, id: string) =>
+  adminFetch<ReviewEvent>(`/events/${id}/approve`, token, { method: 'POST' });
+
+export const rejectEvent = (token: string, id: string, reason?: string) =>
+  adminFetch<ReviewEvent>(`/events/${id}/reject`, token, {
+    method: 'POST',
+    body: JSON.stringify({ reason: reason ?? null }),
+  });
+
 // ── Users ──────────────────────────────────────────────────────────────────
 
 export interface AdminUser {
