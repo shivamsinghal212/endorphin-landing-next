@@ -266,7 +266,7 @@ export default function ExperienceDetailView({
       {/* ═══ ABOUT ═══ */}
       <section className="exd-section">
         <div className="exd-wrap rv">
-          <div className="exd-section-h"><h2 className="exd-h2">About this experience</h2></div>
+          <div className="exd-section-h"><h2 className="exd-h2">About this {event.category === 'experience' ? 'experience' : 'run'}</h2></div>
           <div className="exd-card">
             <div className="exd-prose"><ReactMarkdown>{buildEventNarrative(event)}</ReactMarkdown></div>
           </div>
