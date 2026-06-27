@@ -338,10 +338,17 @@ export default function ExperienceDetailView({
           <div className="exd-wrap rv">
             <div className="exd-section-h"><h2 className="exd-h2">Where your money goes</h2></div>
             <div className="exd-card exd-org">
-              <div className="exd-org-av" style={{ overflow: 'hidden' }}>
+              <div
+                className="exd-org-av"
+                style={event.ngoLogoUrl ? { overflow: 'hidden', background: '#fff', padding: 6 } : undefined}
+              >
                 {event.ngoLogoUrl ? (
                   // eslint-disable-next-line @next/next/no-img-element
-                  <img src={event.ngoLogoUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  <img
+                    src={event.ngoLogoUrl}
+                    alt={`${event.ngoName} logo`}
+                    style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                  />
                 ) : (
                   event.ngoName.charAt(0).toUpperCase()
                 )}
