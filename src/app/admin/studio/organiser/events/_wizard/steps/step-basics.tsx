@@ -364,6 +364,77 @@ export function StepBasics({
           </button>
         </div>
       </SectionCard>
+
+      <SectionCard
+        title="Charity / fundraising"
+        description="Optional. Set an NGO and we'll show a “Proceeds to …” badge plus a “Where your money goes” section on the event page."
+      >
+        <div className="space-y-3">
+          <div>
+            <FieldLabel>NGO / cause name</FieldLabel>
+            <input
+              value={draft.ngoName ?? ''}
+              onChange={(e) => set({ ngoName: e.target.value || null })}
+              placeholder="e.g. Goonj"
+              className="w-full px-3 py-2.5 rounded-xl border border-jet/10 text-sm bg-white outline-none focus:border-jet"
+            />
+          </div>
+
+          {draft.ngoName && (
+            <>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <FieldLabel>NGO website <span className="text-jet/30">· optional</span></FieldLabel>
+                  <input
+                    type="url"
+                    value={draft.ngoUrl ?? ''}
+                    onChange={(e) => set({ ngoUrl: e.target.value || null })}
+                    placeholder="https://…"
+                    className="w-full px-3 py-2.5 rounded-xl border border-jet/10 text-sm bg-white outline-none focus:border-jet"
+                  />
+                </div>
+                <div>
+                  <FieldLabel>% of proceeds donated <span className="text-jet/30">· optional</span></FieldLabel>
+                  <input
+                    type="number"
+                    min={1}
+                    max={100}
+                    value={draft.donationPercent ?? ''}
+                    onChange={(e) => {
+                      const n = parseInt(e.target.value, 10);
+                      set({ donationPercent: Number.isFinite(n) ? Math.min(100, Math.max(1, n)) : null });
+                    }}
+                    placeholder="100"
+                    className="w-full px-3 py-2.5 rounded-xl border border-jet/10 text-sm bg-white outline-none focus:border-jet"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <p className="text-[11px] uppercase tracking-wider text-jet/50 mb-2">
+                  NGO logo <span className="text-jet/30">· optional</span>
+                </p>
+                <ImageUploader
+                  label="NGO logo"
+                  value={draft.ngoLogoUrl ? { url: draft.ngoLogoUrl } : null}
+                  aspectRatio="1/1"
+                  folder="studio/events"
+                  onChange={(next) => set({ ngoLogoUrl: next?.url ?? null })}
+                />
+              </div>
+
+              <MarkdownEditor
+                label="Where the money goes"
+                value={draft.donationNoteMd ?? ''}
+                onChange={(v) => set({ donationNoteMd: v || null })}
+                maxLength={500}
+                rows={4}
+                placeholder="One or two lines on the cause and how funds are used."
+              />
+            </>
+          )}
+        </div>
+      </SectionCard>
     </div>
   );
 }

@@ -135,6 +135,11 @@ export function makeEmptyDraft(): WizardDraft {
     descriptionMd: '',
     refundPolicyMd: '',
     termsMd: '',
+    ngoName: null,
+    ngoUrl: null,
+    ngoLogoUrl: null,
+    donationNoteMd: null,
+    donationPercent: null,
     collectDob: true,
     collectGender: true,
     collectTshirt: false,
@@ -189,6 +194,11 @@ export function fromServerEvent(
     descriptionMd: string | null;
     refundPolicyMd: string | null;
     termsMd: string | null;
+    ngoName: string | null;
+    ngoUrl: string | null;
+    ngoLogoUrl: string | null;
+    donationNoteMd: string | null;
+    donationPercent: number | null;
     collectDob: boolean;
     collectGender: boolean;
     collectTshirt: boolean;
@@ -243,6 +253,11 @@ export function fromServerEvent(
     descriptionMd: e.descriptionMd ?? '',
     refundPolicyMd: e.refundPolicyMd ?? '',
     termsMd: e.termsMd ?? '',
+    ngoName: e.ngoName ?? null,
+    ngoUrl: e.ngoUrl ?? null,
+    ngoLogoUrl: e.ngoLogoUrl ?? null,
+    donationNoteMd: e.donationNoteMd ?? null,
+    donationPercent: e.donationPercent ?? null,
     collectDob: e.collectDob,
     collectGender: e.collectGender,
     collectTshirt: e.collectTshirt,

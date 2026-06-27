@@ -138,6 +138,12 @@ export interface Event {
   descriptionMd?: string | null;
   refundPolicyMd?: string | null;
   termsMd?: string | null;
+  // Charity / NGO donation (opt-in). `ngoName` set ⇒ charity event.
+  ngoName?: string | null;
+  ngoUrl?: string | null;
+  ngoLogoUrl?: string | null;
+  donationNoteMd?: string | null;
+  donationPercent?: number | null;
   acceptingRegistrations?: boolean;
   registrationOpenAt?: string | null;
   registrationCloseAt?: string | null;

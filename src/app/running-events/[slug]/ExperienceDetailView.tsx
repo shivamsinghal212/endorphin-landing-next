@@ -223,6 +223,9 @@ export default function ExperienceDetailView({
                 <span className="exd-pill">{I.pin}<b>{event.venueName || event.locationName}</b></span>
               )}
               <span className="exd-pill">{I.tag}From <b>{priceStr}</b></span>
+              {event.ngoName && (
+                <span className="exd-pill">❤️&nbsp;Proceeds to <b>{event.ngoName}</b></span>
+              )}
               {isAlreadyRegistered ? (
                 <span className="exd-pill">{I.ppl}<b>You&rsquo;re in</b></span>
               ) : (event.totalTicketsSold ?? 0) > 0 ? (
@@ -323,6 +326,38 @@ export default function ExperienceDetailView({
                 <div style={{ marginTop: 16 }}>
                   <a className="exd-btn exd-btn-ghost" href={mapUrl} target="_blank" rel="noopener noreferrer">Open in Google Maps ↗</a>
                 </div>
+              )}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* ═══ WHERE YOUR MONEY GOES (charity) ═══ */}
+      {event.ngoName && (
+        <section className="exd-section">
+          <div className="exd-wrap rv">
+            <div className="exd-section-h"><h2 className="exd-h2">Where your money goes</h2></div>
+            <div className="exd-card exd-org">
+              <div className="exd-org-av" style={{ overflow: 'hidden' }}>
+                {event.ngoLogoUrl ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={event.ngoLogoUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                ) : (
+                  event.ngoName.charAt(0).toUpperCase()
+                )}
+              </div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div className="exd-org-name">
+                  {event.donationPercent != null
+                    ? `${event.donationPercent}% of proceeds support ${event.ngoName}`
+                    : `Proceeds support ${event.ngoName}`}
+                </div>
+                {event.donationNoteMd && (
+                  <div className="exd-prose exd-org-meta"><ReactMarkdown>{event.donationNoteMd}</ReactMarkdown></div>
+                )}
+              </div>
+              {event.ngoUrl && (
+                <a className="exd-btn exd-btn-ghost" href={event.ngoUrl} target="_blank" rel="noopener noreferrer">Visit {event.ngoName} ↗</a>
               )}
             </div>
           </div>

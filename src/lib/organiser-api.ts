@@ -123,6 +123,11 @@ export interface OrganiserEvent {
   descriptionMd: string | null;
   refundPolicyMd: string | null;
   termsMd: string | null;
+  ngoName: string | null;
+  ngoUrl: string | null;
+  ngoLogoUrl: string | null;
+  donationNoteMd: string | null;
+  donationPercent: number | null;
   collectDob: boolean;
   collectGender: boolean;
   collectTshirt: boolean;
@@ -190,6 +195,11 @@ export interface OrganiserEventCreate {
   descriptionMd?: string | null;
   refundPolicyMd?: string | null;
   termsMd?: string | null;
+  ngoName?: string | null;
+  ngoUrl?: string | null;
+  ngoLogoUrl?: string | null;
+  donationNoteMd?: string | null;
+  donationPercent?: number | null;
   collectDob?: boolean;
   collectGender?: boolean;
   collectTshirt?: boolean;
