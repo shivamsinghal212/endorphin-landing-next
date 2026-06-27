@@ -712,9 +712,16 @@ export function BookingForm({ bundle }: { bundle: RegistrationEventBundle }) {
               {payLabel}
             </button>
             <p className="mt-3 text-[11px] text-bone/50 leading-relaxed">
-              You’ll be charged once via Razorpay (cards, UPI, netbanking) for
-              all {ticketCount > 0 ? ticketCount : ''} tickets. Refunds follow
-              this event’s policy.
+              By registering you agree to the terms &amp; conditions mentioned{' '}
+              <a
+                href={eventPath(event)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline hover:text-bone"
+              >
+                here
+              </a>
+              .
             </p>
           </section>
           <p className="mt-3 text-xs text-jet/50 text-center">

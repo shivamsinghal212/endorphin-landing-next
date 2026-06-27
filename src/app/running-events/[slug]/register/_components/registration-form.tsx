@@ -577,6 +577,7 @@ export function RegistrationForm({ bundle }: { bundle: RegistrationEventBundle }
             onPay={onSubmit}
             disabled={!distanceId || !sdkReady}
             loading={submitting || !sdkReady}
+            termsHref={eventPath(event)}
             // Coupon lives inside the order summary so the runner sees
             // the discount line item and the "Apply" button in the same
             // box where they decide to pay.

@@ -58,12 +58,15 @@ export function OrderSummary({
   loading,
   coupon,
   error,
+  termsHref,
 }: {
   data: OrderSummaryData;
   payLabel?: string;
   onPay: () => void;
   disabled?: boolean;
   loading?: boolean;
+  /** Event detail page URL — the terms line links "here" to it. */
+  termsHref?: string;
   /** Coupon input slot — rendered inside the summary on a bone-coloured
    *  card so it visually belongs to the order, not the form column. */
   coupon?: ReactNode;
@@ -149,10 +152,20 @@ export function OrderSummary({
          *  is actually running. */}
         {payCta}
       </button>
-      <p className="mt-3 text-[11px] text-bone/50 leading-relaxed">
-        You&rsquo;ll be charged via Razorpay (cards, UPI, netbanking). Refunds
-        follow this event&rsquo;s policy.
-      </p>
+      {termsHref && (
+        <p className="mt-3 text-[11px] text-bone/50 leading-relaxed">
+          By registering you agree to the terms &amp; conditions mentioned{' '}
+          <a
+            href={termsHref}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline hover:text-bone"
+          >
+            here
+          </a>
+          .
+        </p>
+      )}
     </section>
   );
 }
