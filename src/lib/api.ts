@@ -103,6 +103,7 @@ export interface Event {
   organizerName: string | null;
   organizerEmail: string | null;
   organizerPhone: string | null;
+  organizerLogoUrl?: string | null;
   maxParticipants: number | null;
   totalTicketsSold: number | null;
   priceMin: number | null;

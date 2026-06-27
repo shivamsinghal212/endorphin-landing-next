@@ -377,7 +377,21 @@ export default function ExperienceDetailView({
           <div className="exd-wrap rv">
             <div className="exd-section-h"><h2 className="exd-h2">Organiser</h2></div>
             <div className="exd-card exd-org">
-              <div className="exd-org-av">{event.organizerName.charAt(0).toUpperCase()}</div>
+              <div
+                className="exd-org-av"
+                style={event.organizerLogoUrl ? { overflow: 'hidden', background: '#fff', padding: 6 } : undefined}
+              >
+                {event.organizerLogoUrl ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={event.organizerLogoUrl}
+                    alt={`${event.organizerName} logo`}
+                    style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                  />
+                ) : (
+                  event.organizerName.charAt(0).toUpperCase()
+                )}
+              </div>
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div className="exd-org-name">{event.organizerName}</div>
                 <div className="exd-org-meta">
