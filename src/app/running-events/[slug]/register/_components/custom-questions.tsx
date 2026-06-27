@@ -157,10 +157,15 @@ export function CustomQuestions({
                         <input
                           type="tel"
                           value={strVal}
-                          onChange={(e) => setField(f.id, e.target.value)}
+                          // type="tel" doesn't restrict characters and
+                          // inputMode is only a keyboard hint — strip anything
+                          // that isn't a valid phone character as the user types.
+                          onChange={(e) =>
+                            setField(f.id, e.target.value.replace(/[^\d+()\-\s]/g, ''))
+                          }
                           placeholder={f.placeholder ?? undefined}
                           autoComplete="tel"
-                          inputMode="numeric"
+                          inputMode="tel"
                           className={inputCls}
                           required={f.required}
                         />
