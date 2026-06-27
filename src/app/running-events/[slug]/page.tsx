@@ -7,7 +7,6 @@ import { getSessionToken } from '@/lib/session';
 import { getStudioAuth } from '@/lib/studio/server-auth';
 import { eventPath } from '@/lib/event-path';
 import { RunnerProviders } from './register/_components/runner-providers';
-import RaceDetailView from './RaceDetailView';
 import ExperienceDetailView from './ExperienceDetailView';
 import './experience-detail.css';
 import {
@@ -15,7 +14,6 @@ import {
   buildEventMetaDescription,
   buildEventNarrative,
 } from '@/lib/event-seo';
-import './race-detail.css';
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -209,7 +207,7 @@ export default async function RaceDetailPage({ params }: PageProps) {
         }}
       />
       <Header />
-      {/* Always wrap in RunnerProviders so RaceDetailView can call
+      {/* Always wrap in RunnerProviders so ExperienceDetailView can call
        *  runner hooks (useMyRegistrations) safely. Pass studio=null for
        *  anonymous visitors; the hooks no-op via their `enabled: !!token`
        *  guard. Without this wrap, anonymous renders crashed with
@@ -224,7 +222,7 @@ export default async function RaceDetailPage({ params }: PageProps) {
   );
 }
 
-/** Mounts RunnerProviders unconditionally so RaceDetailView can safely
+/** Mounts RunnerProviders unconditionally so ExperienceDetailView can safely
  *  call runner hooks (useMyRegistrations). For anonymous visitors the
  *  studio resolves to null and hooks no-op via their `enabled: !!token`
  *  guard — no crash, no leaked queries. */
@@ -238,21 +236,16 @@ async function RaceDetailWithRunnerContext({
   reminderIsSet: boolean;
 }) {
   const studio = await getStudioAuth();
+  // All event detail pages — races and experiences alike — render with the
+  // experience layout (ExperienceDetailView). The two views show the same
+  // event data, so we reuse the one design across both URL prefixes.
   return (
     <RunnerProviders studio={studio}>
-      {event.category === 'experience' ? (
-        <ExperienceDetailView
-          event={event}
-          isAuthed={isAuthed}
-          reminderIsSet={reminderIsSet}
-        />
-      ) : (
-        <RaceDetailView
-          event={event}
-          isAuthed={isAuthed}
-          reminderIsSet={reminderIsSet}
-        />
-      )}
+      <ExperienceDetailView
+        event={event}
+        isAuthed={isAuthed}
+        reminderIsSet={reminderIsSet}
+      />
     </RunnerProviders>
   );
 }

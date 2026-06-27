@@ -38,6 +38,9 @@ function fmtPrice(amount: number | null, currency: string | null) {
 function hasAnyPrice(cats: DistanceCategory[]): boolean {
   return cats.some((d) => (d.discountedPrice ?? d.price) != null);
 }
+function titleCase(s: string): string {
+  return s.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+}
 
 // ── tiny inline icons for the meta pills ──────────────────────────────────
 const I = {
@@ -208,7 +211,7 @@ export default function ExperienceDetailView({
         <div className="exd-blob exd-blob-purple exd-blob-2" aria-hidden />
         <div className="exd-wrap">
           <div className="rv">
-            <span className="exd-eyebrow">Experience{event.eventType ? ` · ${event.eventType.replace('_', ' ')}` : ''}</span>
+            <span className="exd-eyebrow">{event.category === 'experience' ? 'Experience' : 'Run'}{event.eventType ? ` · ${titleCase(event.eventType)}` : ''}</span>
             <h1 className="exd-title"><span className="chroma-i">{event.title}</span></h1>
             {event.organizerName && (
               <p className="exd-byline">By <strong>{event.organizerName}</strong></p>
