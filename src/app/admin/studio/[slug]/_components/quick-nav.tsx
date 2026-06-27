@@ -39,6 +39,7 @@ export function QuickNav({
       rightSlot: adminsCount ? String(adminsCount) : undefined,
     },
     { href: `${base}/join-form`, label: 'Join form', group: 'club' },
+    { href: `${base}/coaches`, label: 'Coaches', group: 'club' },
     { href: `${base}/collaborations`, label: 'Brand & Instagram', group: 'club' },
     {
       href: `${base}/members`,

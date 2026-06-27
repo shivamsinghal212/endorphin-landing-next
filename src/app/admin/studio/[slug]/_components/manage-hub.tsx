@@ -388,7 +388,7 @@ function DesktopBento({
         </Link>
       )}
 
-      <div className="grid grid-cols-12 gap-4 auto-rows-[140px] [&>*]:min-w-0">
+      <div className="grid grid-cols-12 gap-4 auto-rows-[minmax(140px,_auto)] [&>*]:min-w-0">
         {/* Identity hero */}
         <Link
           href={`${base}/about`}
@@ -703,6 +703,39 @@ function DesktopBento({
               ? `You + ${Math.max(0, (club.admins?.length ?? 0) - 1)} others can edit this club.`
               : 'Invite a co-admin so you can share the load.'}
           </p>
+        </Link>
+
+        {/* Coaches */}
+        <Link
+          href={`${base}/coaches`}
+          className="col-span-12 lg:col-span-4 rounded-2xl bg-white border border-jet/10 p-5 hover:border-jet/30 transition-colors"
+        >
+          <div className="flex items-center justify-between mb-3">
+            <p className="font-display uppercase text-sm font-bold">Coaches</p>
+            <span className="text-xs text-signal">Edit</span>
+          </div>
+          {(club.coaches?.length ?? 0) > 0 ? (
+            <>
+              <div className="flex -space-x-2 mb-2">
+                {club.coaches.slice(0, 4).map((c) => (
+                  <div
+                    key={c.id}
+                    className="w-9 h-9 rounded-full ring-2 ring-white overflow-hidden bg-jet/5"
+                    title={c.name}
+                  >
+                    <ClubAvatar src={c.photos?.[0] ?? null} name={c.name} size={36} />
+                  </div>
+                ))}
+              </div>
+              <p className="text-xs text-jet/50">
+                {club.coaches.length} coach{club.coaches.length === 1 ? '' : 'es'} on your public page.
+              </p>
+            </>
+          ) : (
+            <p className="text-xs text-jet/50">
+              Add coach profiles to feature on your club page.
+            </p>
+          )}
         </Link>
 
         {/* Join form preview */}
