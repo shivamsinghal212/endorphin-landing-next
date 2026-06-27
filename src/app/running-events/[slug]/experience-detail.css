@@ -104,7 +104,8 @@
 }
 
 /* ═══ HERO ═══ */
-.exd .exd-hero { position: relative; padding: 88px 0 56px; overflow: hidden; }
+.exd .exd-hero { position: relative; padding: 44px 0 56px; overflow: hidden; }
+@media (max-width: 720px) { .exd .exd-hero { padding: 28px 0 40px; } }
 .exd .exd-hero .exd-blob-1 { width: 460px; height: 460px; top: -120px; left: -140px; }
 .exd .exd-hero .exd-blob-2 { width: 420px; height: 420px; top: -60px; right: -160px; }
 .exd .exd-meta { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
