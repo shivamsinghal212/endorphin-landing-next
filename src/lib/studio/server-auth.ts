@@ -1,6 +1,7 @@
 import 'server-only';
 import {
   claimsFromToken,
+  getImpersonationToken,
   getSessionToken,
   isJwtExpired,
 } from '@/lib/session';
@@ -12,6 +13,9 @@ export interface StudioAuth {
   name: string;
   pictureUrl: string | null;
   isSuperAdmin: boolean;
+  /** Set when a super-admin is viewing the studio as another user. Holds the
+   *  real super-admin's identity so the UI can show a banner + exit. */
+  impersonatedBy?: { name: string; email: string } | null;
 }
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE || 'https://api.endorfin.run';
@@ -73,6 +77,33 @@ async function authFromToken(token: string): Promise<StudioAuth | null> {
  *  Prefers the marketing-site `endorfin_session` cookie. Falls back to
  *  NextAuth's stored backend token for the super-admin Google flow. */
 export async function getStudioAuth(): Promise<StudioAuth | null> {
+  const real = await getRealStudioAuth();
+  if (!real) return null;
+
+  // Super-admin "view as user": swap in the impersonation token so the whole
+  // studio (clubs + organiser) renders from the target's POV. Ignored unless
+  // the real caller is a super-admin and the token is still valid.
+  if (real.isSuperAdmin) {
+    const impToken = await getImpersonationToken();
+    if (impToken && !isJwtExpired(impToken)) {
+      const asUser = await authFromToken(impToken);
+      if (asUser) {
+        return {
+          ...asUser,
+          // While impersonating you are NOT a super-admin — that's the point.
+          isSuperAdmin: false,
+          impersonatedBy: { name: real.name, email: real.email },
+        };
+      }
+    }
+  }
+
+  return real;
+}
+
+/** The signed-in user's own studio identity, before any impersonation.
+ *  Used by the impersonation route, which must act with the real token. */
+export async function getRealStudioAuth(): Promise<StudioAuth | null> {
   const marketingToken = await getSessionToken();
   if (marketingToken) {
     const resolved = await authFromToken(marketingToken);

@@ -7,6 +7,7 @@ import posthog from 'posthog-js';
 import { useStudioAuth } from '@/lib/studio/auth-context';
 import { useMyClubs, describeError } from '@/lib/studio/hooks';
 import { ClubAvatar, ErrorState, Skeleton, StudioTopBar } from './ui';
+import { ImpersonationPicker } from './impersonation';
 
 /** Entry surface for /admin/studio.
  *  - 0 workspaces  → empty state with "claim your club" guidance
@@ -82,6 +83,8 @@ export function StudioEntry() {
             {isSuper && <SuperAdminTile />}
           </div>
         )}
+
+        {isSuper && <ImpersonationPicker />}
       </main>
     </>
   );

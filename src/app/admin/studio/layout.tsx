@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation';
 import Header from '@/components/Header';
 import { getStudioAuth } from '@/lib/studio/server-auth';
 import { StudioAuthProvider } from '@/lib/studio/auth-context';
+import { ImpersonationBanner } from './_components/impersonation';
 
 export default async function StudioLayout({
   children,
@@ -18,6 +19,12 @@ export default async function StudioLayout({
   return (
     <>
       <Header />
+      {studio.impersonatedBy && (
+        <ImpersonationBanner
+          name={studio.name}
+          email={studio.email}
+        />
+      )}
       <StudioAuthProvider value={studio}>{children}</StudioAuthProvider>
     </>
   );

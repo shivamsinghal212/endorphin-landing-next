@@ -2,6 +2,7 @@ import 'server-only';
 import { cookies } from 'next/headers';
 
 const COOKIE_NAME = 'endorfin_session';
+const IMPERSONATE_COOKIE = 'endorfin_impersonate';
 const MAX_AGE_SECONDS = 60 * 60 * 24 * 30; // 30 days
 
 export async function getSessionToken(): Promise<string | null> {
@@ -23,6 +24,31 @@ export async function setSessionCookie(token: string): Promise<void> {
 export async function clearSessionCookie(): Promise<void> {
   const store = await cookies();
   store.delete(COOKIE_NAME);
+}
+
+/** Super-admin "view as user" token. Only honoured by getStudioAuth() when
+ *  the real caller is a super-admin, so a non-admin setting it is a no-op. */
+export async function getImpersonationToken(): Promise<string | null> {
+  const store = await cookies();
+  return store.get(IMPERSONATE_COOKIE)?.value ?? null;
+}
+
+export async function setImpersonationCookie(token: string): Promise<void> {
+  const store = await cookies();
+  store.set(IMPERSONATE_COOKIE, token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax',
+    path: '/',
+    // Short-lived: a fresh login token's natural lifetime is enough; we never
+    // want a forgotten impersonation session to outlive the tab by much.
+    maxAge: 60 * 60 * 12,
+  });
+}
+
+export async function clearImpersonationCookie(): Promise<void> {
+  const store = await cookies();
+  store.delete(IMPERSONATE_COOKIE);
 }
 
 export async function getSessionEmail(): Promise<string | null> {
