@@ -79,6 +79,13 @@ function fmtRupeesPaise(paise: number): string {
 export function BookingForm({ bundle }: { bundle: RegistrationEventBundle }) {
   const router = useRouter();
   const { event, extras } = bundle;
+  // Runs register "registrations" across "distances"; experiences sell
+  // "tickets" of various "types". Drive all user-facing copy off this.
+  const isRun = (event.category ?? '') !== 'experience';
+  const unit = isRun ? 'registration' : 'ticket';
+  const units = isRun ? 'registrations' : 'tickets';
+  const typeWord = isRun ? 'distance' : 'ticket type';
+  const typeWords = isRun ? 'distances' : 'ticket types';
   const distances = useMemo(
     () => pickActiveDistances(event.distanceCategories),
     [event.distanceCategories],
@@ -183,7 +190,7 @@ export function BookingForm({ bundle }: { bundle: RegistrationEventBundle }) {
       return;
     }
     if (subtotalPaise <= 0) {
-      setCouponError('Add a ticket first.');
+      setCouponError(`Add a ${unit} first.`);
       return;
     }
     try {
@@ -205,10 +212,10 @@ export function BookingForm({ bundle }: { bundle: RegistrationEventBundle }) {
 
   const friendlyError = (raw: string): string => {
     const m = raw.toLowerCase();
-    if (m.includes('sold out')) return 'One of these ticket types just sold out — adjust quantities and try again.';
+    if (m.includes('sold out')) return `One of these ${typeWords} just sold out — adjust quantities and try again.`;
     if (m.includes('not open') || m.includes('not accepting'))
       return 'Booking isn’t open for this event right now.';
-    if (m.includes('not found')) return 'This event or ticket type couldn’t be found. Try refreshing.';
+    if (m.includes('not found')) return `This event or ${typeWord} couldn’t be found. Try refreshing.`;
     if (m.includes('signature')) return 'Payment signature didn’t verify. Try again, and if it keeps happening contact support.';
     return raw;
   };
@@ -219,14 +226,14 @@ export function BookingForm({ bundle }: { bundle: RegistrationEventBundle }) {
   };
 
   const validate = (): string | null => {
-    if (ticketCount === 0) return 'Add at least one ticket to continue.';
+    if (ticketCount === 0) return `Add at least one ${unit} to continue.`;
     const stillMissing = profileDraftValidate(profile, missing);
     if (stillMissing) return `Please fill in ${stillMissing} (the booker’s details).`;
     for (const { d, qty } of lineItems) {
       const arr = cart[d.id!] ?? [];
       for (let i = 0; i < qty; i++) {
         const a = arr[i];
-        const who = `${d.categoryName} · ticket ${i + 1}`;
+        const who = `${d.categoryName} · ${unit} ${i + 1}`;
         if (!a.name.trim()) return `Enter a name for ${who}.`;
         if (!EMAIL_RE.test(a.email.trim())) return `Enter a valid email for ${who}.`;
         if (needsTshirt && tshirtSizes.length > 0 && !a.tshirt)
@@ -306,7 +313,7 @@ export function BookingForm({ bundle }: { bundle: RegistrationEventBundle }) {
         amount: created.amount,
         currency: created.currency,
         name: 'Endorfin',
-        description: `${event.title} · ${ticketCount} ${ticketCount === 1 ? 'ticket' : 'tickets'}`,
+        description: `${event.title} · ${ticketCount} ${ticketCount === 1 ? unit : units}`,
         prefill: created.prefill,
         themeColor: '#0A0A0A',
       });
@@ -359,7 +366,7 @@ export function BookingForm({ bundle }: { bundle: RegistrationEventBundle }) {
           Booking not open yet
         </p>
         <p className="text-sm text-jet/70 mt-2">
-          There are no active ticket types for this event right now. Check back
+          There are no active {typeWords} for this event right now. Check back
           soon or contact the organiser.
         </p>
         <Link
@@ -381,9 +388,9 @@ export function BookingForm({ bundle }: { bundle: RegistrationEventBundle }) {
         : payPhase === 'opening_modal'
           ? 'Opening payment…'
           : ticketCount === 0
-            ? 'Add a ticket'
+            ? `Add a ${unit}`
             : totalPaise === 0
-              ? `Get ${ticketCount === 1 ? 'ticket' : 'tickets'} free`
+              ? `Get ${ticketCount === 1 ? unit : units} free`
               : `Pay ${fmtRupeesPaise(totalPaise)}`;
 
   // Already booked? Show their confirmation instead of the booking form.
@@ -416,14 +423,14 @@ export function BookingForm({ bundle }: { bundle: RegistrationEventBundle }) {
 
       <header className="mb-8">
         <p className="text-[11px] uppercase tracking-widest text-signal mb-2 font-semibold">
-          Book tickets
+          {isRun ? 'Register' : 'Book tickets'}
         </p>
         <h1 className="font-display uppercase text-3xl md:text-4xl font-bold leading-tight text-jet mb-2">
           {event.title}
         </h1>
         <p className="text-sm text-jet/60 max-w-2xl">
           {event.locationName ? `${event.locationName} · ` : ''}Pick how many
-          tickets you need, add each guest’s details, and pay once. Secured by
+          {' '}{units} you need, add each guest’s details, and pay once. Secured by
           Razorpay.
         </p>
       </header>
@@ -446,10 +453,10 @@ export function BookingForm({ bundle }: { bundle: RegistrationEventBundle }) {
             <section className="bg-white border border-jet/10 rounded-2xl p-5 md:p-6 mb-4">
               <div className="mb-4">
                 <p className="font-display uppercase text-sm font-bold text-jet">
-                  Choose tickets
+                  {isRun ? 'Choose distance' : 'Choose tickets'}
                 </p>
                 <p className="text-xs text-jet/60 mt-0.5">
-                  Mix and match across types. Prices are inclusive of taxes.
+                  Mix and match across {typeWords}. Prices are inclusive of taxes.
                 </p>
               </div>
               <div className="flex flex-col gap-3">
@@ -527,7 +534,7 @@ export function BookingForm({ bundle }: { bundle: RegistrationEventBundle }) {
                     >
                       <div className="flex items-center justify-between mb-4">
                         <p className="font-display uppercase text-sm font-bold text-jet">
-                          {d.categoryName} · Ticket {i + 1}
+                          {d.categoryName} · {isRun ? 'Registration' : 'Ticket'} {i + 1}
                         </p>
                         <button
                           type="button"
@@ -623,7 +630,7 @@ export function BookingForm({ bundle }: { bundle: RegistrationEventBundle }) {
               Order summary
             </p>
             {lineItems.length === 0 ? (
-              <p className="text-sm text-bone/60">No tickets selected yet.</p>
+              <p className="text-sm text-bone/60">No {units} selected yet.</p>
             ) : (
               <dl className="text-sm space-y-2">
                 {lineItems.map(({ d, qty }) => (
