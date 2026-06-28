@@ -34,9 +34,12 @@ export function StudioEntry() {
   const hasClubs = !!clubs && clubs.length > 0;
   // Number of available workspace tiles for this user.
   const tileCount = (hasClubs ? 1 : 0) + (isSuper ? 1 : 0);
+  // While a super-admin is "viewing as user", stay on the entry — auto-jumping
+  // into their single club yanks the admin away before they can orient or exit.
+  const isImpersonating = !!studio?.impersonatedBy;
   // The auto-jump-on-single-club only fires when there's literally one path.
   const shouldAutoEnterSingleClub =
-    !isLoading && hasClubs && clubs.length === 1 && tileCount === 1;
+    !isLoading && !isImpersonating && hasClubs && clubs.length === 1 && tileCount === 1;
 
   useEffect(() => {
     if (shouldAutoEnterSingleClub && clubs) {
