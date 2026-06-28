@@ -283,7 +283,7 @@ export default function ExperienceDetailView({
             <div className="exd-section-h">
               {/* Runs sell distances, not "tickets" — label them as
                   Registration and list the distances (e.g. "3K / 6K"). */}
-              <h2 className="exd-h2">{event.category === 'experience' ? 'Tickets' : 'Registration'}</h2>
+              <h2 className="exd-h2">{event.category === 'experience' ? 'Tickets' : 'Distance'}</h2>
               <span className="exd-section-meta">
                 {event.category === 'experience'
                   ? `${event.distanceCategories.length} ${event.distanceCategories.length === 1 ? 'type' : 'types'}`
