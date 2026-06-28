@@ -1,8 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 import posthog from 'posthog-js';
 import { useStudioAuth } from '@/lib/studio/auth-context';
 import { useMyClubs, describeError } from '@/lib/studio/hooks';
@@ -11,16 +10,13 @@ import { ImpersonationPicker } from './impersonation';
 
 /** Entry surface for /admin/studio.
  *  - 0 workspaces  → empty state with "claim your club" guidance
- *  - 1 workspace + no super-admin → auto-jump in
  *  - else          → role picker tiles (Manage clubs / Organiser / Super-admin)
  *
- *  When the user has only one option (e.g. a single club and isn't a
- *  super-admin), we skip the picker entirely and route straight to their
- *  single workspace. */
+ *  Always shows the picker — even a single-club owner lands here and taps in,
+ *  so there's a consistent place to switch workspace or exit impersonation. */
 export function StudioEntry() {
   const studio = useStudioAuth();
   const isSuper = !!studio?.isSuperAdmin;
-  const router = useRouter();
   const {
     data: clubs,
     isLoading,
@@ -32,20 +28,6 @@ export function StudioEntry() {
   const firstName = studio?.name?.split(' ')[0];
 
   const hasClubs = !!clubs && clubs.length > 0;
-  // Number of available workspace tiles for this user.
-  const tileCount = (hasClubs ? 1 : 0) + (isSuper ? 1 : 0);
-  // While a super-admin is "viewing as user", stay on the entry — auto-jumping
-  // into their single club yanks the admin away before they can orient or exit.
-  const isImpersonating = !!studio?.impersonatedBy;
-  // The auto-jump-on-single-club only fires when there's literally one path.
-  const shouldAutoEnterSingleClub =
-    !isLoading && !isImpersonating && hasClubs && clubs.length === 1 && tileCount === 1;
-
-  useEffect(() => {
-    if (shouldAutoEnterSingleClub && clubs) {
-      router.replace(`/admin/studio/${encodeURIComponent(clubs[0].slug)}`);
-    }
-  }, [shouldAutoEnterSingleClub, clubs, router]);
 
   return (
     <>
