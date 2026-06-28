@@ -668,7 +668,13 @@ export function AlreadyRegisteredView({
   const isVirtual = reg.event?.eventFormat === 'virtual';
   const isRunning = reg.event?.category === 'running';
   const eventTitle = reg.event?.title ?? 'this event';
-  const bibNumber = reg.bibNumber ?? '—';
+  // Bib first; group-booking line items have no bib, so fall back to the
+  // booking code. Empty when neither exists (e.g. a run with no bibs) — the
+  // ticket then shows just the QR instead of a blank "Bib no. —".
+  const code = reg.bibNumber || reg.bookingCode || '';
+  const codeLabel = reg.bibNumber
+    ? (isRunning ? 'Bib no.' : 'Entry code')
+    : 'Booking code';
   const distance = reg.distance?.fullTitle ?? reg.distance?.categoryName ?? '';
 
   return (
@@ -687,8 +693,8 @@ export function AlreadyRegisteredView({
       <EventTicket
         className="max-w-md mx-auto"
         eventTitle={eventTitle}
-        code={bibNumber}
-        codeLabel={isRunning ? 'Bib no.' : 'Entry code'}
+        code={code}
+        codeLabel={codeLabel}
         startTime={reg.event?.startTime ?? null}
         venue={reg.event?.venueName || reg.event?.locationName || null}
         qrValue={typeof window !== 'undefined' ? window.location.origin + `/me/registrations/${reg.id}` : ''}
@@ -698,7 +704,7 @@ export function AlreadyRegisteredView({
       <div className="mt-6">
         <ShareRow
           eventTitle={eventTitle}
-          bibNumber={bibNumber}
+          bibNumber={code || '—'}
           distance={distance}
           eventSlug={eventSlug}
         />

@@ -78,13 +78,17 @@ export function EventTicket({
             <QRCodeSVG value={qrValue} size={96} level="M" marginSize={0} />
           </div>
           <div className="min-w-0">
-            <p className="text-[10px] uppercase tracking-[0.16em] text-jet/45">
-              {codeLabel}
-              {admits}
-            </p>
-            <p className="font-display font-bold text-jet text-2xl md:text-3xl leading-none mt-1 tracking-tight break-all">
-              {code}
-            </p>
+            {code ? (
+              <>
+                <p className="text-[10px] uppercase tracking-[0.16em] text-jet/45">
+                  {codeLabel}
+                  {admits}
+                </p>
+                <p className="font-display font-bold text-jet text-2xl md:text-3xl leading-none mt-1 tracking-tight break-all">
+                  {code}
+                </p>
+              </>
+            ) : null}
             <p className="text-[11px] text-jet/45 mt-1.5">Show this QR at entry</p>
           </div>
         </div>

@@ -164,8 +164,8 @@ function PaidView({ data }: { data: MyRegistrationItem }) {
       <EventTicket
         className="max-w-md mx-auto"
         eventTitle={eventTitle}
-        code={bibNumber}
-        codeLabel={isRunning ? 'Bib no.' : 'Entry code'}
+        code={data.bibNumber || data.bookingCode || ''}
+        codeLabel={data.bibNumber ? (isRunning ? 'Bib no.' : 'Entry code') : 'Booking code'}
         startTime={data.event.startTime}
         venue={data.event.venueName || data.event.locationName || null}
         qrValue={typeof window !== 'undefined' ? window.location.href : ''}

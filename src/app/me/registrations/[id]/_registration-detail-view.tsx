@@ -183,8 +183,8 @@ export function RegistrationDetailView({
           <EventTicket
             className="w-full"
             eventTitle={r.event.title}
-            code={r.bibNumber || r.bookingCode || '—'}
-            codeLabel={isRunning ? 'Bib no.' : 'Entry code'}
+            code={r.bibNumber || r.bookingCode || ''}
+            codeLabel={r.bibNumber ? (isRunning ? 'Bib no.' : 'Entry code') : 'Booking code'}
             startTime={r.event.startTime}
             venue={r.event.venueName || r.event.locationName || null}
             qrValue={typeof window !== 'undefined' ? window.location.href : ''}
