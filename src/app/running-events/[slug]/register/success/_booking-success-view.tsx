@@ -141,6 +141,7 @@ export function BookingSuccessView({
 function PaidView({ data }: { data: MyBookingItem }) {
   const eventTitle = data.event?.title ?? 'this event';
   const isVirtual = data.event?.eventFormat === 'virtual';
+  const isRun = (data.event?.category ?? '') !== 'experience';
 
   return (
     <Wrap centered>
@@ -155,7 +156,7 @@ function PaidView({ data }: { data: MyBookingItem }) {
         {data.totalPaise != null
           ? ` along with a receipt for ${fmtRupees(data.totalPaise, data.currency)}`
           : ''}
-        . Show this booking code at entry — it admits your whole group.
+        . Show this booking code at entry.
       </p>
 
       <EventTicket
@@ -168,6 +169,7 @@ function PaidView({ data }: { data: MyBookingItem }) {
         venue={data.event?.venueName || data.event?.locationName || null}
         attendees={data.attendees.map((a) => a.attendeeName || 'Guest')}
         qrValue={typeof window !== 'undefined' ? window.location.href : ''}
+        noun={isRun ? 'registration' : 'ticket'}
       />
 
       <div className="bg-jet text-bone rounded-2xl px-5 md:px-6 py-7 mb-6 mt-8 text-center">
