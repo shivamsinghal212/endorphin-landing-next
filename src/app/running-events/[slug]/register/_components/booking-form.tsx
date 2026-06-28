@@ -76,6 +76,27 @@ function fmtRupeesPaise(paise: number): string {
   return `₹${(paise / 100).toLocaleString('en-IN', { maximumFractionDigits: 0 })}`;
 }
 
+function fmtRupeesPaiseExact(paise: number): string {
+  return `₹${(paise / 100).toLocaleString('en-IN', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  })}`;
+}
+
+// Razorpay standard plan: 2% processing fee on the captured amount + 18% GST on
+// that fee. Display estimate only — the studio uses the actual fee Razorpay
+// returns at capture. ponytail: same rates also live in order-summary.tsx; keep
+// in sync (single named constant each so it's a one-line change per file).
+const PROCESSING_FEE_RATE = 0.02;
+const GST_RATE = 0.18;
+
+// Decompose the captured amount into its included fee components (total
+// unchanged). Computed off the post-discount total, so coupons are handled.
+function feeBreakdown(totalPaise: number): { feePaise: number; gstPaise: number } {
+  const feePaise = Math.round(totalPaise * PROCESSING_FEE_RATE);
+  return { feePaise, gstPaise: Math.round(feePaise * GST_RATE) };
+}
+
 export function BookingForm({ bundle }: { bundle: RegistrationEventBundle }) {
   const router = useRouter();
   const { event, extras } = bundle;
@@ -662,6 +683,19 @@ export function BookingForm({ bundle }: { bundle: RegistrationEventBundle }) {
                   <dt className="font-display uppercase">Total</dt>
                   <dd className="font-display uppercase font-bold">{fmtRupeesPaise(totalPaise)}</dd>
                 </div>
+                {totalPaise > 0 && (
+                  <div className="pt-1 space-y-1 text-xs text-bone/50">
+                    <p className="text-bone/40">Included in your total</p>
+                    <div className="flex justify-between">
+                      <dt>Payment processing fee (2%)</dt>
+                      <dd>{fmtRupeesPaiseExact(feeBreakdown(totalPaise).feePaise)}</dd>
+                    </div>
+                    <div className="flex justify-between">
+                      <dt>GST on processing fee (18%)</dt>
+                      <dd>{fmtRupeesPaiseExact(feeBreakdown(totalPaise).gstPaise)}</dd>
+                    </div>
+                  </div>
+                )}
               </dl>
             )}
 
