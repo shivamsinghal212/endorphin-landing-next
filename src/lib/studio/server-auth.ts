@@ -75,15 +75,23 @@ async function authFromToken(token: string): Promise<StudioAuth | null> {
 
 /** Resolve the user's studio identity from whichever session is available.
  *  Prefers the marketing-site `endorfin_session` cookie. Falls back to
- *  NextAuth's stored backend token for the super-admin Google flow. */
-export async function getStudioAuth(): Promise<StudioAuth | null> {
+ *  NextAuth's stored backend token for the super-admin Google flow.
+ *
+ *  `allowImpersonation` is opt-in and scoped to the studio surface only — the
+ *  public runner pages (event detail, register, my-registrations) must always
+ *  resolve the real signed-in user, or a super-admin who's "viewing as" someone
+ *  would see that user's registration state on the public site too. */
+export async function getStudioAuth(
+  { allowImpersonation = false }: { allowImpersonation?: boolean } = {},
+): Promise<StudioAuth | null> {
   const real = await getRealStudioAuth();
   if (!real) return null;
 
   // Super-admin "view as user": swap in the impersonation token so the whole
   // studio (clubs + organiser) renders from the target's POV. Ignored unless
-  // the real caller is a super-admin and the token is still valid.
-  if (real.isSuperAdmin) {
+  // the caller opted in, the real caller is a super-admin, and the token is
+  // still valid.
+  if (allowImpersonation && real.isSuperAdmin) {
     const impToken = await getImpersonationToken();
     if (impToken && !isJwtExpired(impToken)) {
       const asUser = await authFromToken(impToken);

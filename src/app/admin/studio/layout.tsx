@@ -9,7 +9,7 @@ export default async function StudioLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const studio = await getStudioAuth();
+  const studio = await getStudioAuth({ allowImpersonation: true });
   if (!studio) {
     // Send the user to the marketing home with the login modal open.
     // We always return them to /admin/studio (the role picker) post-sign

@@ -35,7 +35,9 @@ function safeFolder(input: string): string | null {
 export async function POST(request: Request) {
   // Accept either the marketing-site `endorfin_session` cookie or a
   // NextAuth session — matches the rest of the studio surface.
-  const studio = await getStudioAuth();
+  // Studio surface — honour an active "view as user" session so uploads are
+  // attributed consistently with the rest of the studio.
+  const studio = await getStudioAuth({ allowImpersonation: true });
   if (!studio) {
     return NextResponse.json({ ok: false, error: 'unauthorized' }, { status: 401 });
   }
