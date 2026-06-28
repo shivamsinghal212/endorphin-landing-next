@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import Script from 'next/script';
 import { toast } from 'sonner';
+import posthog from 'posthog-js';
 import type { Event } from '@/lib/api';
 import type {
   OrganiserEvent,
@@ -89,6 +90,9 @@ export function RegistrationForm({ bundle }: { bundle: RegistrationEventBundle }
   // ── Form state ──────────────────────────────────────────────────────────
   const meQ = useMe();
   const patchMeMut = usePatchMe();
+  // Fire `registration_started` once, on first interaction with the form —
+  // the "got to filling details" funnel step (distinct from race_register_clicked).
+  const startedRef = useRef(false);
   const [distanceId, setDistanceId] = useState<string | null>(
     distances.length === 1 ? distances[0].id ?? null : null,
   );
@@ -432,6 +436,15 @@ export function RegistrationForm({ bundle }: { bundle: RegistrationEventBundle }
 
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-6 items-start">
         <form
+          onFocusCapture={() => {
+            if (startedRef.current) return;
+            startedRef.current = true;
+            posthog.capture('registration_started', {
+              race_id: event.id,
+              race_slug: event.slug,
+              source: 'single',
+            });
+          }}
           onSubmit={(e) => {
             e.preventDefault();
             onSubmit();

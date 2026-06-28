@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import Script from 'next/script';
 import { toast } from 'sonner';
+import posthog from 'posthog-js';
 import type { DistanceCategory, Event } from '@/lib/api';
 import type { OrganiserEvent, RegistrationFormField } from '@/lib/organiser-api';
 import type {
@@ -130,6 +131,9 @@ export function BookingForm({ bundle }: { bundle: RegistrationEventBundle }) {
   const myRegsQ = useMyRegistrations();
 
   // Cart: tier id → attendee drafts (array length === quantity).
+  // Fire `registration_started` once, on first interaction with the form —
+  // the "got to filling details" funnel step (distinct from race_register_clicked).
+  const startedRef = useRef(false);
   const [cart, setCart] = useState<Record<string, AttendeeDraft[]>>({});
   const [profile, setProfile] = useState<ProfileDraft>(profileDraftFromMe(null));
   const [coupon, setCoupon] = useState<AmountAppliedCoupon | null>(null);
@@ -458,6 +462,15 @@ export function BookingForm({ bundle }: { bundle: RegistrationEventBundle }) {
 
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-6 items-start">
         <form
+          onFocusCapture={() => {
+            if (startedRef.current) return;
+            startedRef.current = true;
+            posthog.capture('registration_started', {
+              race_id: event.id,
+              race_slug: event.slug,
+              source: 'booking',
+            });
+          }}
           onSubmit={(e) => {
             e.preventDefault();
             onSubmit();
