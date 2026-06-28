@@ -86,8 +86,12 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   const url = `https://www.endorfin.run${eventPath(event)}`;
   const metaDescription = buildEventMetaDescription(event);
+  const ogImage = event.coverImageUrl || event.imageUrl;
   return {
-    title: buildEventTitle(event),
+    // `absolute` bypasses the root layout's "%s | Endorfin" template —
+    // buildEventTitle already appends the brand, so the template would
+    // otherwise double it ("… | Endorfin | Endorfin").
+    title: { absolute: buildEventTitle(event) },
     description: metaDescription,
     alternates: { canonical: url },
     openGraph: {
@@ -96,8 +100,16 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       // Social cards read cleaner without the "| Endorfin" suffix.
       title: event.title,
       description: metaDescription,
-      images: (event.coverImageUrl || event.imageUrl) ? [{ url: (event.coverImageUrl || event.imageUrl)! }] : undefined,
+      images: ogImage ? [{ url: ogImage, alt: event.title }] : undefined,
       siteName: 'Endorfin',
+    },
+    // Without this the root layout's generic Twitter card wins, so X/Twitter
+    // shows the site's default title/description/image instead of the event's.
+    twitter: {
+      card: 'summary_large_image',
+      title: event.title,
+      description: metaDescription,
+      images: ogImage ? [ogImage] : undefined,
     },
   };
 }
