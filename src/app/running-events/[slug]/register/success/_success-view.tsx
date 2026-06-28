@@ -143,6 +143,7 @@ function PaidView({ data }: { data: MyRegistrationItem }) {
   const distance = data.distance?.fullTitle ?? data.distance?.categoryName ?? '';
   const eventSlug = data.event.slug ?? data.event.id;
   const isRunning = data.event.category === 'running';
+  const passNoun = isRunning ? 'registration' : 'ticket';
 
   return (
     <Wrap centered>
@@ -157,7 +158,7 @@ function PaidView({ data }: { data: MyRegistrationItem }) {
         {data.amountPaid != null
           ? ` along with a receipt for ${fmtRupees(data.amountPaid, data.currency)}`
           : ''}
-        . Here&rsquo;s your ticket — show the QR at entry.
+        . Here&rsquo;s your {passNoun} — show the QR at entry.
       </p>
 
       <EventTicket
@@ -168,6 +169,7 @@ function PaidView({ data }: { data: MyRegistrationItem }) {
         startTime={data.event.startTime}
         venue={data.event.venueName || data.event.locationName || null}
         qrValue={typeof window !== 'undefined' ? window.location.href : ''}
+        noun={passNoun}
       />
 
       <div className="mt-6">
@@ -187,8 +189,8 @@ function PaidView({ data }: { data: MyRegistrationItem }) {
         </p>
         <p className="text-sm text-bone/70 mb-5 leading-relaxed max-w-md mx-auto">
           {isRunning
-            ? 'Event-day reminders, your ticket on your lock screen, and a record of every event you’ve done.'
-            : 'Event-day reminders, your ticket on your lock screen, and every event you’ve booked in one place.'}
+            ? 'Event-day reminders, your pass on your lock screen, and a record of every event you’ve done.'
+            : 'Event-day reminders, your pass on your lock screen, and every event you’ve booked in one place.'}
         </p>
         <AppStoreButtons variant="dark" />
       </div>

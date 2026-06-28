@@ -28,6 +28,7 @@ export function EventTicket({
   attendees,
   qrValue,
   className = '',
+  noun = 'ticket',
 }: {
   eventTitle: string;
   code: string;
@@ -40,6 +41,9 @@ export function EventTicket({
   /** Width/positioning is caller-controlled (centered on success screens,
    *  full-width inside the My Events detail). */
   className?: string;
+  /** What the pass is called — "ticket" for experiences, "registration" for
+   *  runs. Drives the "Your …" label and the attendee count line. */
+  noun?: string;
 }) {
   const when = fmtWhen(startTime);
   const admits = admitsCount > 1 ? ` · admits ${admitsCount}` : '';
@@ -50,7 +54,7 @@ export function EventTicket({
       <div className="h-1.5 bg-signal" aria-hidden />
 
       <div className="p-5 md:p-6">
-        <p className="text-[10px] uppercase tracking-[0.18em] text-jet/45">Your ticket</p>
+        <p className="text-[10px] uppercase tracking-[0.18em] text-jet/45">Your {noun}</p>
         <h3 className="font-display uppercase text-xl md:text-2xl font-bold text-jet leading-tight mt-1">
           {eventTitle}
         </h3>
@@ -89,7 +93,7 @@ export function EventTicket({
         {attendees && attendees.length > 1 && (
           <div className="mt-4">
             <p className="text-[10px] uppercase tracking-[0.16em] text-jet/45 mb-1.5">
-              {attendees.length} tickets
+              {attendees.length} {noun}s
             </p>
             <ul className="flex flex-col gap-1">
               {attendees.map((name, i) => (

@@ -188,6 +188,7 @@ export function RegistrationDetailView({
             startTime={r.event.startTime}
             venue={r.event.venueName || r.event.locationName || null}
             qrValue={typeof window !== 'undefined' ? window.location.href : ''}
+            noun={isRunning ? 'registration' : 'ticket'}
           />
         </div>
       )}
