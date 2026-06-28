@@ -655,7 +655,7 @@ function InlineFieldError({ error }: { error: string | undefined }) {
 /** Rendered when the runner lands on the registration page but already
  *  has a paid + non-cancelled registration for this event. We replace
  *  the form with a real bib design + share actions + app install push. */
-function AlreadyRegisteredView({
+export function AlreadyRegisteredView({
   reg,
   eventSlug,
 }: {
@@ -680,7 +680,7 @@ function AlreadyRegisteredView({
         {isRunning ? 'See you at the start line' : 'You’re all set'}
       </h1>
       <p className="text-sm text-jet/65 mb-7 mx-auto max-w-md">
-        Here’s your ticket for <strong>{eventTitle}</strong>. Screenshot it,
+        Here’s your {isRunning ? 'registration' : 'ticket'} for <strong>{eventTitle}</strong>. Screenshot it,
         share it, or show the QR at entry.
       </p>
 
@@ -692,6 +692,7 @@ function AlreadyRegisteredView({
         startTime={reg.event?.startTime ?? null}
         venue={reg.event?.venueName || reg.event?.locationName || null}
         qrValue={typeof window !== 'undefined' ? window.location.origin + `/me/registrations/${reg.id}` : ''}
+        noun={isRunning ? 'registration' : 'ticket'}
       />
 
       <div className="mt-6">

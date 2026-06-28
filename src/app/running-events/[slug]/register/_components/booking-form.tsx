@@ -16,6 +16,7 @@ import {
   useConfirmBooking,
   useCreateBooking,
   useMe,
+  useMyRegistrations,
   usePatchMe,
   usePreviewCouponAmount,
 } from '@/lib/runner-hooks';
@@ -38,7 +39,7 @@ import {
 } from './shipping-address';
 import { isRazorpayLoaded, openRazorpayCheckout } from './razorpay-checkout';
 import { eventPath } from '@/lib/event-path';
-import type { RegistrationEventBundle } from './registration-form';
+import { AlreadyRegisteredView, type RegistrationEventBundle } from './registration-form';
 
 /**
  * Group-booking (multi-ticket) registration flow. Rendered by the register
@@ -95,6 +96,10 @@ export function BookingForm({ bundle }: { bundle: RegistrationEventBundle }) {
   const createBooking = useCreateBooking();
   const confirmBooking = useConfirmBooking();
   const previewCoupon = usePreviewCouponAmount();
+  // Group bookings create one EventRegistration per attendee, so a buyer who
+  // already booked shows up in my-registrations — same guard as the single
+  // flow, so we send them to their confirmation instead of the booking form.
+  const myRegsQ = useMyRegistrations();
 
   // Cart: tier id → attendee drafts (array length === quantity).
   const [cart, setCart] = useState<Record<string, AttendeeDraft[]>>({});
@@ -380,6 +385,25 @@ export function BookingForm({ bundle }: { bundle: RegistrationEventBundle }) {
             : totalPaise === 0
               ? `Get ${ticketCount === 1 ? 'ticket' : 'tickets'} free`
               : `Pay ${fmtRupeesPaise(totalPaise)}`;
+
+  // Already booked? Show their confirmation instead of the booking form.
+  // Held in a loading state first so the form doesn't flash before the swap.
+  const existingReg = myRegsQ.data?.items.find(
+    (r) =>
+      r.eventId === event.id &&
+      r.registrationStatus !== 'cancelled' &&
+      (r.paymentStatus === 'paid' || r.paymentStatus === 'free'),
+  );
+  if (myRegsQ.isLoading) {
+    return (
+      <div className="max-w-md mx-auto py-24 text-center text-sm text-jet/45">
+        Loading…
+      </div>
+    );
+  }
+  if (existingReg) {
+    return <AlreadyRegisteredView reg={existingReg} eventSlug={event.slug || event.id} />;
+  }
 
   return (
     <>
