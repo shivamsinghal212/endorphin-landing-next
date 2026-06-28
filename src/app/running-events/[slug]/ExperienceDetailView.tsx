@@ -276,14 +276,18 @@ export default function ExperienceDetailView({
         </div>
       </section>
 
-      {/* ═══ TICKETS ═══ */}
+      {/* ═══ TICKETS / REGISTRATION ═══ */}
       {event.distanceCategories.length > 0 && (
         <section className="exd-section">
           <div className="exd-wrap rv">
             <div className="exd-section-h">
-              <h2 className="exd-h2">Tickets</h2>
+              {/* Runs sell distances, not "tickets" — label them as
+                  Registration and list the distances (e.g. "3K / 6K"). */}
+              <h2 className="exd-h2">{event.category === 'experience' ? 'Tickets' : 'Registration'}</h2>
               <span className="exd-section-meta">
-                {event.distanceCategories.length} {event.distanceCategories.length === 1 ? 'type' : 'types'}
+                {event.category === 'experience'
+                  ? `${event.distanceCategories.length} ${event.distanceCategories.length === 1 ? 'type' : 'types'}`
+                  : event.distanceCategories.map((d) => d.categoryName).join(' / ')}
               </span>
             </div>
             <div className="exd-tickets">
