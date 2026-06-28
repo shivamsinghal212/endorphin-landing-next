@@ -166,6 +166,10 @@ export interface OrganiserEventListItem {
   // names — keep aligned so the dashboard doesn't render ₹NaN.
   registrationsCount: number;
   revenuePaise: number;
+  // Razorpay processing fee + GST deducted from revenue, and the resulting
+  // net payout (revenuePaise − platformFeePaise) the organiser receives.
+  platformFeePaise: number;
+  netPayoutPaise: number;
 }
 
 export interface OrganiserEventListResponse {
@@ -239,6 +243,10 @@ export interface EventStats {
   revenuePaise: number;
   discountPaise: number;
   refundPaise: number;
+  // Razorpay processing fee + GST deducted from revenue, and the resulting
+  // net payout (revenuePaise − platformFeePaise) the organiser receives.
+  platformFeePaise: number;
+  netPayoutPaise: number;
   byDistance: EventStatsByDistance[];
 }
 

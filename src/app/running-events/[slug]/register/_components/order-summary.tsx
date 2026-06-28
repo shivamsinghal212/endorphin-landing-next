@@ -8,6 +8,29 @@ function fmtRupees(paise: number): string {
   return `₹${(paise / 100).toLocaleString('en-IN', { maximumFractionDigits: 0 })}`;
 }
 
+// Razorpay standard plan: 2% processing fee on the captured amount + 18% GST
+// on that fee. These are account-level rates, not stored in code — update here
+// if the negotiated rate changes. ponytail: display estimate only; the studio
+// uses the actual fee/tax Razorpay returns at capture (corporate/intl cards
+// differ from 2%).
+const PROCESSING_FEE_RATE = 0.02;
+const GST_RATE = 0.18;
+
+// Decompose the captured amount into the fee components included within it
+// (total is unchanged). Computed off the post-discount final paise, so coupons
+// are handled automatically.
+function feeBreakdown(finalPaise: number): { feePaise: number; gstPaise: number } {
+  const feePaise = Math.round(finalPaise * PROCESSING_FEE_RATE);
+  return { feePaise, gstPaise: Math.round(feePaise * GST_RATE) };
+}
+
+function fmtRupeesExact(paise: number): string {
+  return `₹${(paise / 100).toLocaleString('en-IN', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  })}`;
+}
+
 function fmtRupeesFromMajor(amount: number, currency: string | null): string {
   const cur = currency || 'INR';
   if (cur === 'INR') return `₹${amount.toLocaleString('en-IN')}`;
@@ -115,6 +138,19 @@ export function OrderSummary({
           <dt className="font-display uppercase">Total</dt>
           <dd className="font-display uppercase font-bold">{finalDisplay}</dd>
         </div>
+        {totals.finalPaise != null && totals.finalPaise > 0 && (
+          <div className="pt-1 space-y-1 text-xs text-bone/50">
+            <p className="text-bone/40">Included in your total</p>
+            <div className="flex justify-between">
+              <dt>Payment processing fee (2%)</dt>
+              <dd>{fmtRupeesExact(feeBreakdown(totals.finalPaise).feePaise)}</dd>
+            </div>
+            <div className="flex justify-between">
+              <dt>GST on processing fee (18%)</dt>
+              <dd>{fmtRupeesExact(feeBreakdown(totals.finalPaise).gstPaise)}</dd>
+            </div>
+          </div>
+        )}
       </dl>
 
       {/* Coupon slot is rendered inline (embedded variant) inside the

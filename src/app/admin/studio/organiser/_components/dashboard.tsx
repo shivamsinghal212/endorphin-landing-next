@@ -63,13 +63,17 @@ export function Dashboard({ organiser }: { organiser: Organiser }) {
         return open !== null && open >= yearStart;
       })
       .reduce((s, ev) => s + ev.registrationsCount, 0);
+    const inYear = (ev: (typeof items)[number]) => {
+      const open = ev.registrationOpenAt ? Date.parse(ev.registrationOpenAt) : null;
+      return open !== null && open >= yearStart;
+    };
     const yearRevenuePaise = items
-      .filter((ev) => {
-        const open = ev.registrationOpenAt ? Date.parse(ev.registrationOpenAt) : null;
-        return open !== null && open >= yearStart;
-      })
+      .filter(inYear)
       .reduce((s, ev) => s + ev.revenuePaise, 0);
-    return { liveCount, yearRegistrations, yearRevenuePaise };
+    const yearNetPayoutPaise = items
+      .filter(inYear)
+      .reduce((s, ev) => s + (ev.netPayoutPaise ?? 0), 0);
+    return { liveCount, yearRegistrations, yearRevenuePaise, yearNetPayoutPaise };
   }, [items, year]);
 
   return (
@@ -112,9 +116,13 @@ export function Dashboard({ organiser }: { organiser: Organiser }) {
         <StatCard
           label={`Revenue · ${year}`}
           value={stats.yearRevenuePaise > 0 ? inrFromPaise(stats.yearRevenuePaise) : '—'}
-          hint={stats.yearRevenuePaise > 0 ? 'Settled by Endorfin' : undefined}
+          hint={stats.yearRevenuePaise > 0 ? 'What runners paid' : undefined}
         />
-        <StatCard label="Discount given" value="—" />
+        <StatCard
+          label={`Net payout · ${year}`}
+          value={stats.yearRevenuePaise > 0 ? inrFromPaise(stats.yearNetPayoutPaise) : '—'}
+          hint={stats.yearRevenuePaise > 0 ? 'After Razorpay + GST' : undefined}
+        />
       </div>
 
       <ResumeDraftBanner />

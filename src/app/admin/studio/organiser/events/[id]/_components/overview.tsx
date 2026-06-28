@@ -87,8 +87,8 @@ function StatRow({
 }) {
   if (loading) {
     return (
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-        {Array.from({ length: 5 }).map((_, i) => (
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        {Array.from({ length: 7 }).map((_, i) => (
           <Skeleton key={i} className="h-[96px]" />
         ))}
       </div>
@@ -97,7 +97,7 @@ function StatRow({
   if (!stats) return null;
   const verifyPending = Math.max(0, stats.paidCount - stats.verifiedCount);
   return (
-    <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+    <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
       <StatCard
         label="Registrations"
         value={stats.registrationsCount.toLocaleString('en-IN')}
@@ -107,6 +107,16 @@ function StatRow({
         label="Revenue"
         value={formatINR(stats.revenuePaise)}
         hint={`${stats.paidCount.toLocaleString('en-IN')} paid`}
+      />
+      <StatCard
+        label="Platform fee"
+        value={stats.platformFeePaise > 0 ? `−${formatINR(stats.platformFeePaise)}` : '—'}
+        hint="Razorpay + GST"
+      />
+      <StatCard
+        label="Net payout"
+        value={formatINR(stats.netPayoutPaise)}
+        hint="Settled to you"
       />
       <StatCard
         label="Discount given"
