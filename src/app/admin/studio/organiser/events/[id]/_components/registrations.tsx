@@ -14,7 +14,9 @@ import {
   useCoupons,
   useEventRegistrations,
 } from '@/lib/studio/organiser-hooks';
+import { listEventRegistrations } from '@/lib/organiser-api';
 import type { Coupon, OrganiserEvent, RegistrationRow } from '@/lib/organiser-api';
+import { useAdminToken } from '@/lib/use-admin-token';
 import {
   describeRunner,
   formatINR,
@@ -78,6 +80,46 @@ export function Registrations({
   const couponsById = new Map<string, Coupon>(
     (couponsQ.data ?? []).map((c) => [c.id, c]),
   );
+
+  const token = useAdminToken();
+  // Custom-question fields (id → label) drive the expandable responses view
+  // and the per-question CSV columns.
+  const formFields = useMemo(
+    () => (event?.registrationForm ?? []).map((f) => ({ id: f.id, label: f.label })),
+    [event?.registrationForm],
+  );
+  const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [exporting, setExporting] = useState(false);
+
+  const handleExportCsv = async () => {
+    if (!token || exporting) return;
+    setExporting(true);
+    try {
+      // The table is paginated; the export is not — pull every matching row.
+      const all: RegistrationRow[] = [];
+      let off = 0;
+      for (;;) {
+        const res = await listEventRegistrations(token, eventId, {
+          limit: 200,
+          offset: off,
+          ...(search ? { search } : {}),
+          ...(paymentStatus ? { paymentStatus } : {}),
+          ...(distanceId ? { distanceId } : {}),
+        });
+        all.push(...res.items);
+        off += res.items.length;
+        if (res.items.length === 0 || off >= res.total) break;
+      }
+      const distanceName = (id: string | null) =>
+        event?.distanceCategories?.find((d) => d.id === id)?.categoryName ?? '';
+      const csv = buildRegistrationsCsv(all, { distanceName, couponsById, formFields });
+      downloadCsv(csv, `${event?.slug || 'registrations'}.csv`);
+    } catch (e) {
+      toast.error(describeOrganiserError(e));
+    } finally {
+      setExporting(false);
+    }
+  };
 
   const total = listQ.data?.total ?? 0;
   const rows = listQ.data?.items ?? [];
@@ -163,10 +205,8 @@ export function Registrations({
                 .map((d) => ({ value: d.id as string, label: d.categoryName })),
             ]}
           />
-          <SecondaryButton
-            onClick={() => toast.info('Export CSV is coming soon')}
-          >
-            Export CSV ↓
+          <SecondaryButton onClick={handleExportCsv} disabled={exporting || total === 0}>
+            {exporting ? 'Exporting…' : 'Export CSV ↓'}
           </SecondaryButton>
         </div>
       </div>
@@ -218,6 +258,11 @@ export function Registrations({
                     row={row}
                     distances={event?.distanceCategories ?? null}
                     couponsById={couponsById}
+                    formFields={formFields}
+                    expanded={expandedId === row.id}
+                    onToggle={() =>
+                      setExpandedId((id) => (id === row.id ? null : row.id))
+                    }
                     refundPending={pendingRefundIds.has(row.id)}
                     onRefund={() => setRefundTarget(row)}
                     onCancel={() => handleCancel(row)}
@@ -293,6 +338,9 @@ function Row({
   row,
   distances,
   couponsById,
+  formFields,
+  expanded,
+  onToggle,
   refundPending,
   onRefund,
   onCancel,
@@ -301,6 +349,9 @@ function Row({
   row: RegistrationRow;
   distances: OrganiserEvent['distanceCategories'] | null;
   couponsById: Map<string, Coupon>;
+  formFields: { id: string; label: string }[];
+  expanded: boolean;
+  onToggle: () => void;
   refundPending: boolean;
   onRefund: () => void;
   onCancel: () => void;
@@ -318,7 +369,10 @@ function Row({
   const cancelEligible =
     row.paymentStatus !== 'paid' && row.registrationStatus !== 'cancelled';
 
+  const hasResponses = formFields.length > 0;
+
   return (
+    <>
     <tr>
       <td className="px-5 py-2.5">
         <div className="flex items-center gap-2">
@@ -345,6 +399,16 @@ function Row({
                   ? `booked by ${row.user.name}`
                   : 'group booking'}
               </p>
+            )}
+            {hasResponses && (
+              <button
+                type="button"
+                onClick={onToggle}
+                className="text-[10px] text-signal hover:underline mt-0.5"
+                aria-expanded={expanded}
+              >
+                {expanded ? 'Hide responses' : 'View responses'}
+              </button>
             )}
           </div>
         </div>
@@ -416,5 +480,93 @@ function Row({
         </div>
       </td>
     </tr>
+    {expanded && hasResponses && (
+      <tr className="bg-jet/[0.015]">
+        <td colSpan={7} className="px-5 pb-4 pt-1">
+          <p className="text-[10px] uppercase tracking-wider text-jet/45 mb-2">
+            Form responses
+          </p>
+          <dl className="grid sm:grid-cols-2 gap-x-8 gap-y-1.5">
+            {formFields.map((f) => {
+              const raw = (row.formData ?? {})[f.id];
+              const val = Array.isArray(raw)
+                ? raw.join(', ')
+                : raw == null || raw === ''
+                  ? '—'
+                  : String(raw);
+              return (
+                <div key={f.id} className="flex gap-2 text-[12px]">
+                  <dt className="text-jet/50 flex-shrink-0">{f.label}:</dt>
+                  <dd className="text-jet font-medium break-words">{val}</dd>
+                </div>
+              );
+            })}
+          </dl>
+        </td>
+      </tr>
+    )}
+    </>
   );
+}
+
+// ── CSV export ──────────────────────────────────────────────────────────────
+
+function csvEscape(value: unknown): string {
+  const s = value == null ? '' : String(value);
+  return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+}
+
+function buildRegistrationsCsv(
+  rows: RegistrationRow[],
+  opts: {
+    distanceName: (id: string | null) => string;
+    couponsById: Map<string, Coupon>;
+    formFields: { id: string; label: string }[];
+  },
+): string {
+  const { distanceName, couponsById, formFields } = opts;
+  const headers = [
+    'Name',
+    'Email',
+    'Distance',
+    'Paid (INR)',
+    'Coupon',
+    'Payment',
+    'Status',
+    'Booking code',
+    'Registered at',
+    ...formFields.map((f) => f.label),
+  ];
+  const lines = [headers.map(csvEscape).join(',')];
+  for (const r of rows) {
+    const fd = (r.formData ?? {}) as Record<string, unknown>;
+    const cells = [
+      r.attendeeName || r.user?.name || '',
+      r.attendeeEmail || r.user?.email || '',
+      distanceName(r.distanceCategoryId),
+      r.amountPaid != null ? (r.amountPaid / 100).toString() : '',
+      r.couponId ? couponsById.get(r.couponId)?.code ?? '' : '',
+      r.paymentStatus,
+      r.registrationStatus,
+      r.bookingCode || '',
+      r.createdAt ? new Date(r.createdAt).toLocaleString('en-IN') : '',
+      ...formFields.map((f) => {
+        const v = fd[f.id];
+        return Array.isArray(v) ? v.join('; ') : v ?? '';
+      }),
+    ];
+    lines.push(cells.map(csvEscape).join(','));
+  }
+  return lines.join('\n');
+}
+
+function downloadCsv(csv: string, filename: string): void {
+  // Prepend a BOM so Excel reads UTF-8 (₹, names) correctly.
+  const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
 }
