@@ -862,6 +862,10 @@
 .club-page .row-actions .btn { height: 42px; padding: 0 18px; font-size: 12px; letter-spacing: 0.1em; white-space: nowrap; }
 .club-page .row-cta .btn { height: 42px; padding: 0 18px; font-size: 12px; letter-spacing: 0.1em; white-space: nowrap; }
 .club-page .upcoming-more { display: flex; justify-content: center; padding-top: 24px; }
+/* Organiser race rows are a single navigating link (no RSVP/expand), so reset
+   anchor styling and hover the title like the club-run trigger does. */
+.club-page .org-event-row { text-decoration: none; color: inherit; }
+.club-page .org-event-row:hover .row-title { color: var(--red); }
 @media (max-width: 860px) {
   .club-page .upcoming { padding: 36px 20px 24px; }
   .club-page .upcoming-title { font-size: 24px; }

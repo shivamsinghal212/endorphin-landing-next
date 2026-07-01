@@ -5,7 +5,7 @@ import Footer from '@/components/Footer';
 import DetailCrossNav from '@/components/DetailCrossNav';
 import ExploreMoreStrip from '@/components/ExploreMoreStrip';
 import { getClub, type Club, type ClubAdminPerson } from '@/lib/admin-api';
-import { clubsApi, remindersApi, type MyMembership, type Reminder } from '@/lib/api';
+import { clubsApi, remindersApi, type Event, type MyMembership, type Reminder } from '@/lib/api';
 import { getSessionEmail, getSessionToken } from '@/lib/session';
 import type { ClubEvent } from '../page';
 import { ClaimClubLink } from './claim-club-link';
@@ -17,6 +17,7 @@ import { PreviousRunsList } from './previous-runs-list';
 import { ExpandableDescription } from './expandable-description';
 import { NextRun } from './next-run';
 import { UpcomingList } from './upcoming-list';
+import { OrganiserEvents } from './organiser-events';
 import './club-page.css';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE || 'https://api.endorfin.run';
@@ -29,6 +30,23 @@ async function getClubEvents(slug: string): Promise<ClubEvent[]> {
     );
     if (!res.ok) return [];
     const data = (await res.json()) as ClubEvent[];
+    return Array.isArray(data) ? data : [];
+  } catch {
+    return [];
+  }
+}
+
+// Ticketed races published by the organiser this club is linked to (returns []
+// for a club that isn't also an organiser). Separate from the community runs
+// above — these are paid-events rows served off the club→organiser link.
+async function getClubOrganiserEvents(slug: string): Promise<Event[]> {
+  try {
+    const res = await fetch(
+      `${API_BASE}/api/v1/clubs/${encodeURIComponent(slug)}/organiser-events`,
+      { next: { revalidate: 60 } },
+    );
+    if (!res.ok) return [];
+    const data = (await res.json()) as Event[];
     return Array.isArray(data) ? data : [];
   } catch {
     return [];
@@ -220,9 +238,10 @@ function uniqueNeighborhoods(events: ClubEvent[]): string[] {
 export default async function ClubPage({ params }: PageProps) {
   const { slug } = await params;
   const token = await getSessionToken();
-  const [club, events, myMembership, userEmail, myReminders] = await Promise.all([
+  const [club, events, organiserEvents, myMembership, userEmail, myReminders] = await Promise.all([
     getClub(slug).catch(() => null),
     getClubEvents(slug),
+    getClubOrganiserEvents(slug),
     token
       ? clubsApi.getMyMembership(slug, token).catch(() => null)
       : Promise.resolve(null as MyMembership | null),
@@ -289,6 +308,7 @@ export default async function ClubPage({ params }: PageProps) {
             reminderEventIds={reminderClubEventIds}
           />
         )}
+        <OrganiserEvents events={organiserEvents} />
         {pastEvents.length > 0 && <PreviousRuns events={pastEvents} />}
         <CommentsSay events={pastEvents} />
         <BrandsStrip collaborations={club.collaborations} />
