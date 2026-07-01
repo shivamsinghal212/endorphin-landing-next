@@ -181,7 +181,14 @@ export function RegistrationForm({ bundle }: { bundle: RegistrationEventBundle }
     }
   }, [draftKey, distanceId, customData, tshirt, shipping]);
 
-  const missing = useMemo(() => missingProfileFields(meQ.data), [meQ.data]);
+  const missing = useMemo(
+    () =>
+      missingProfileFields(meQ.data, {
+        collectDob: event.collectDob,
+        collectGender: event.collectGender,
+      }),
+    [meQ.data, event.collectDob, event.collectGender],
+  );
 
   const createReg = useCreateRegistration();
   const confirmReg = useConfirmRegistration();

@@ -146,7 +146,14 @@ export function BookingForm({ bundle }: { bundle: RegistrationEventBundle }) {
   const [formError, setFormError] = useState<string | null>(null);
   const [sdkReady, setSdkReady] = useState<boolean>(() => isRazorpayLoaded());
 
-  const missing = useMemo(() => missingProfileFields(meQ.data), [meQ.data]);
+  const missing = useMemo(
+    () =>
+      missingProfileFields(meQ.data, {
+        collectDob: event.collectDob,
+        collectGender: event.collectGender,
+      }),
+    [meQ.data, event.collectDob, event.collectGender],
+  );
 
   useEffect(() => {
     if (meQ.data) setProfile(profileDraftFromMe(meQ.data));
