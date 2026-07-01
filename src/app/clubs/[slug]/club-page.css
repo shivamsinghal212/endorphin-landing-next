@@ -862,10 +862,122 @@
 .club-page .row-actions .btn { height: 42px; padding: 0 18px; font-size: 12px; letter-spacing: 0.1em; white-space: nowrap; }
 .club-page .row-cta .btn { height: 42px; padding: 0 18px; font-size: 12px; letter-spacing: 0.1em; white-space: nowrap; }
 .club-page .upcoming-more { display: flex; justify-content: center; padding-top: 24px; }
-/* Organiser race rows are a single navigating link (no RSVP/expand), so reset
-   anchor styling and hover the title like the club-run trigger does. */
-.club-page .org-event-row { text-decoration: none; color: inherit; }
-.club-page .org-event-row:hover .row-title { color: var(--red); }
+
+/* ─── "Events to look out for" — organiser races ───────────────────
+   Ticketed races from the organiser this club is linked to. A full-bleed
+   dark band (same --jet base as .previous-runs directly below, so the two
+   read as one continuous dark region) with the /for-clubs chromatic vibe —
+   gradient glow, Fraunces headline, chroma CTA — so it stands out from the
+   light sections above. Horizontal gutter comes from the shared container
+   rule, keeping content centered at --container-max like every section. */
+.club-page .lookout {
+  --chroma: linear-gradient(105deg, #E6232A 0%, #FF6B35 26%, #FF2E88 58%, #8B5CF6 100%);
+  position: relative;
+  padding-top: 64px;
+  padding-bottom: 72px;
+  background:
+    radial-gradient(90% 120% at 6% -10%, rgba(255, 46, 136, 0.20), transparent 52%),
+    radial-gradient(90% 120% at 100% 110%, rgba(124, 58, 237, 0.26), transparent 52%),
+    var(--jet);
+  color: var(--bone);
+  overflow: hidden;
+}
+.club-page .lookout-inner { position: relative; z-index: 1; }
+.club-page .lookout-head { margin-bottom: 28px; }
+.club-page .lookout-eyebrow {
+  display: inline-flex; align-items: center; gap: 10px;
+  font-family: var(--font-oswald), sans-serif;
+  font-weight: 600; font-size: 12px; letter-spacing: 0.2em; text-transform: uppercase;
+  color: rgba(245, 240, 235, 0.6);
+}
+.club-page .lookout-eyebrow::before {
+  content: ""; width: 26px; height: 2px; border-radius: 2px; background: var(--chroma);
+}
+.club-page .lookout-title {
+  font-family: var(--font-fraunces), "Times New Roman", serif;
+  font-optical-sizing: auto;
+  font-weight: 600; font-size: clamp(30px, 4.6vw, 50px); line-height: 1.04;
+  letter-spacing: -0.015em; color: #fff; margin-top: 14px;
+}
+.club-page .lookout-title em {
+  font-style: italic;
+  background: var(--chroma); -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+
+.club-page .lookout-grid { display: grid; gap: 18px; }
+.club-page .lookout-card {
+  display: grid;
+  grid-template-columns: 260px minmax(0, 1fr);
+  border-radius: 20px;
+  overflow: hidden;
+  background: rgba(245, 240, 235, 0.05);
+  border: 1px solid rgba(245, 240, 235, 0.12);
+  text-decoration: none; color: inherit;
+  transition: transform 0.3s cubic-bezier(.22,.8,.3,1), box-shadow 0.3s, border-color 0.3s;
+}
+.club-page .lookout-card--noposter { grid-template-columns: 1fr; }
+.club-page .lookout-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(255, 46, 136, 0.5);
+  box-shadow: 0 30px 70px -34px rgba(255, 46, 136, 0.55);
+}
+.club-page .lookout-poster { position: relative; background: #0a0a0a; overflow: hidden; }
+.club-page .lookout-poster-bg {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  object-fit: cover; filter: blur(26px) brightness(0.45); transform: scale(1.25);
+}
+.club-page .lookout-poster-fg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; }
+/* Content column — one left-aligned stack with a clear rhythm:
+   kicker → title → location → CTA. */
+.club-page .lookout-body {
+  position: relative;
+  padding: 32px 34px 92px; display: flex; flex-direction: column; justify-content: center;
+  align-items: flex-start;
+}
+/* Big-number date block + title — same mechanic as the .upcoming-row-trigger
+   club-run rows: fixed date column, vertically centered against the title. */
+.club-page .lookout-row {
+  display: grid; grid-template-columns: 72px minmax(0, 1fr); gap: 20px; align-items: center;
+}
+.club-page .lookout-datenum { min-width: 0; }
+.club-page .lookout-datenum b {
+  display: block;
+  font-family: var(--font-oswald), sans-serif; font-weight: 600; font-size: 40px; line-height: 1; color: #fff;
+}
+.club-page .lookout-datenum small {
+  display: block; margin-top: 6px;
+  font-family: var(--font-oswald), sans-serif; font-weight: 500; font-size: 12px;
+  letter-spacing: 0.1em; text-transform: uppercase; color: rgba(245, 240, 235, 0.6);
+}
+.club-page .lookout-info { min-width: 0; }
+.club-page .lookout-name {
+  font-family: var(--font-fraunces), "Times New Roman", serif; font-optical-sizing: auto;
+  font-weight: 600; font-size: clamp(22px, 2.4vw, 28px); line-height: 1.12; color: #fff;
+}
+.club-page .lookout-where {
+  margin-top: 6px; font-size: 14px; color: rgba(245, 240, 235, 0.6);
+}
+.club-page .lookout-cta {
+  position: absolute; right: 34px; bottom: 30px;
+  display: inline-flex; align-items: center; gap: 8px; height: 46px; padding: 0 24px;
+  border-radius: 12px; color: #fff;
+  font-family: var(--font-oswald), sans-serif; font-weight: 600; font-size: 12.5px;
+  letter-spacing: 0.14em; text-transform: uppercase;
+  background: linear-gradient(115deg, #E6232A, #FF2E88 65%, #8B5CF6);
+  background-size: 200% 100%; background-position: 0 0;
+  transition: background-position 0.35s ease, transform 0.2s;
+  box-shadow: 0 12px 30px -12px rgba(230, 35, 42, 0.6);
+}
+.club-page .lookout-cta svg { width: 16px; height: 16px; }
+.club-page .lookout-card:hover .lookout-cta { background-position: 100% 0; }
+@media (max-width: 860px) {
+  .club-page .lookout { padding-top: 44px; padding-bottom: 52px; }
+  .club-page .lookout-grid { max-width: none; }
+  .club-page .lookout-card, .club-page .lookout-card--noposter { grid-template-columns: 1fr; }
+  .club-page .lookout-poster { aspect-ratio: 16 / 9; }
+  .club-page .lookout-body { padding: 24px 24px 84px; }
+  .club-page .lookout-cta { right: 24px; bottom: 24px; }
+}
 @media (max-width: 860px) {
   .club-page .upcoming { padding: 36px 20px 24px; }
   .club-page .upcoming-title { font-size: 24px; }
@@ -1847,6 +1959,7 @@
 .club-page .hero,
 .club-page .nr-section,
 .club-page .upcoming,
+.club-page .lookout,
 .club-page .previous-runs,
 .club-page .say,
 .club-page .brands,
@@ -1873,6 +1986,7 @@
   .club-page .hero,
   .club-page .nr-section,
   .club-page .upcoming,
+  .club-page .lookout,
   .club-page .previous-runs,
   .club-page .say,
   .club-page .brands,
