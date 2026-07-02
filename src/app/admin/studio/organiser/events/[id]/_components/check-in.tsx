@@ -274,7 +274,9 @@ export function CheckIn({
                     <p className="text-[11px] text-jet/50 truncate">
                       {[
                         dist,
-                        r.bibNumber ? `Bib ${r.bibNumber}` : null,
+                        r.bibNumber || r.bookingCode
+                          ? `Bib ${r.bibNumber || r.bookingCode}`
+                          : null,
                         r.attendeeEmail || r.user?.email,
                       ]
                         .filter(Boolean)
@@ -392,7 +394,11 @@ export function CheckIn({
                   <p className="text-[11px] text-jet/50 truncate">
                     {[
                       dist,
-                      r.bibNumber ? `Bib ${r.bibNumber}` : null,
+                      // Single regs carry a per-attendee bib; group-booking
+                      // line items share the booking's entry code instead.
+                      r.bibNumber || r.bookingCode
+                        ? `Bib ${r.bibNumber || r.bookingCode}`
+                        : null,
                       r.attendeeEmail || r.user?.email,
                     ]
                       .filter(Boolean)
