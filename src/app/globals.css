@@ -356,6 +356,18 @@ body.nav-open { overflow: hidden; }
   .v1-nav { padding: 14px 0; }
   .v1-nav-toggle { display: inline-flex; }
   .v1-nav-inner > .v1-nav-cta { display: none; }
+  /* The desktop actions bar is hidden on mobile, so surface the primary CTA
+     (Create Experience / Download) inside the mobile menu instead — the base
+     `li:has(.v1-nav-cta) { display: none }` rule would otherwise hide it. */
+  .v1-nav-links li:has(.v1-nav-cta) { display: list-item; border: 0; }
+  .v1-nav-links .v1-nav-cta {
+    width: 100%;
+    justify-content: center;
+    margin-top: 28px;
+    padding: 18px 20px;
+    font-size: 14px;
+    letter-spacing: 0.16em;
+  }
   .v1-nav-links {
     position: fixed;
     top: var(--nav-h, 68px);
@@ -7887,14 +7899,21 @@ body { padding-top: var(--nav-h, 68px); }
 @media (max-width: 860px) {
   .v1-nav-actions-desktop { display: none; }
   .v1-nav-auth-mobile-li { display: list-item; }
+  /* Toned down — Sign out is a secondary action, so drop the box and render
+     it as a quiet centered link beneath the primary CTA. */
+  .v1-nav-auth-mobile-li { border-bottom: 0 !important; }
   .v1-nav-auth-mobile-li .v1-nav-auth {
     width: 100%;
     justify-content: center;
-    padding: 16px 20px;
-    font-size: 14px;
+    padding: 18px 20px;
+    font-size: 12px;
     letter-spacing: 0.16em;
-    border-color: rgba(245, 240, 235, 0.18);
-    color: var(--bone);
+    border: 0;
+    background: transparent;
+    color: rgba(245, 240, 235, 0.45);
+  }
+  .v1-nav-auth-mobile-li .v1-nav-auth:hover:not(:disabled) {
+    color: rgba(245, 240, 235, 0.8);
   }
 }
 

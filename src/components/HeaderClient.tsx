@@ -230,7 +230,6 @@ const HeaderClient = ({
             </ul>
           </li>
 
-          <li className="v1-nav-auth-mobile-li">{authButton}</li>
           <li>
             {canAccessStudio ? (
               <Link href="/admin/studio" className="v1-nav-cta" onClick={closeMenu}>
@@ -242,6 +241,7 @@ const HeaderClient = ({
               </a>
             )}
           </li>
+          <li className="v1-nav-auth-mobile-li">{authButton}</li>
         </ul>
 
         <div className="v1-nav-actions-desktop">
