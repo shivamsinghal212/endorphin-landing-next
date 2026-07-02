@@ -70,8 +70,15 @@ export function CheckIn({
 
   const cameraSupported =
     typeof window !== 'undefined' &&
+    // getUserMedia only exists in a secure context (HTTPS or localhost). On a
+    // plain-http LAN IP the browser refuses the camera without prompting, so
+    // navigator.mediaDevices is undefined — steer those users to manual entry.
+    window.isSecureContext &&
     !!window.BarcodeDetector &&
     !!navigator.mediaDevices?.getUserMedia;
+
+  const insecure =
+    typeof window !== 'undefined' && !window.isSecureContext;
 
   const stopCamera = useCallback(() => {
     if (scanTimer.current) {
@@ -156,9 +163,16 @@ export function CheckIn({
             /* transient detect error between frames — ignore */
           }
         }, 400);
-      } catch {
+      } catch (err) {
         if (!cancelled) {
-          toast.error('Camera unavailable — check browser permissions');
+          const name = (err as Error)?.name;
+          toast.error(
+            name === 'NotAllowedError'
+              ? 'Camera blocked. Enable camera access for this site in your browser settings, then retry.'
+              : name === 'NotFoundError' || name === 'OverconstrainedError'
+                ? 'No camera found on this device.'
+                : 'Camera unavailable — you can enter the ticket link below instead.',
+          );
           setPhase('idle');
         }
       }
@@ -312,9 +326,9 @@ export function CheckIn({
             </div>
           ) : (
             <p className="text-xs text-jet/50 bg-jet/[0.03] rounded-xl p-3">
-              Camera scanning isn't supported in this browser (try Chrome on
-              Android, or a laptop with a webcam). You can still check people in
-              by pasting their ticket link below.
+              {insecure
+                ? 'Camera scanning needs a secure connection (HTTPS). Open Studio over https://, or check people in by pasting their ticket link below.'
+                : "Camera scanning isn't supported in this browser (try Chrome on Android, or a laptop with a webcam). You can still check people in by pasting their ticket link below."}
             </p>
           )}
 
