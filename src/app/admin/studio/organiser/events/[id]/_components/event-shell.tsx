@@ -14,6 +14,7 @@ import {
 import type { EventStatus, OrganiserEvent } from '@/lib/organiser-api';
 import { Overview } from './overview';
 import { Registrations } from './registrations';
+import { CheckIn } from './check-in';
 import { VerificationsStub } from './verifications-stub';
 import { Coupons } from './coupons';
 import { CommunicationsStub } from './communications-stub';
@@ -23,6 +24,7 @@ import { formatShortDate } from './_utils';
 type TabKey =
   | 'overview'
   | 'registrations'
+  | 'check-in'
   | 'verifications'
   | 'coupons'
   | 'communications'
@@ -31,6 +33,7 @@ type TabKey =
 const TABS: { key: TabKey; label: string }[] = [
   { key: 'overview', label: 'Overview' },
   { key: 'registrations', label: 'Registrations' },
+  { key: 'check-in', label: 'Check-in' },
   { key: 'verifications', label: 'Verifications' },
   { key: 'coupons', label: 'Coupons' },
   { key: 'communications', label: 'Communications' },
@@ -82,6 +85,8 @@ export function EventShell({ eventId }: { eventId: string }) {
           <Overview eventId={eventId} event={eventQ.data ?? null} />
         ) : tab === 'registrations' ? (
           <Registrations eventId={eventId} event={eventQ.data ?? null} />
+        ) : tab === 'check-in' ? (
+          <CheckIn eventId={eventId} event={eventQ.data ?? null} />
         ) : tab === 'verifications' ? (
           <VerificationsStub />
         ) : tab === 'coupons' ? (

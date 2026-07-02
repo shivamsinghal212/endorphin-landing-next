@@ -301,6 +301,8 @@ export interface RegistrationRow {
   bookingCode?: string | null;
   attendeeName?: string | null;
   attendeeEmail?: string | null;
+  // Gate check-in arrival time (ISO); null until scanned in at the venue.
+  checkedInAt?: string | null;
   createdAt: string;
   updatedAt: string;
   // backend merges these in for the dashboard rendering
@@ -520,3 +522,39 @@ export const cancelRegistration = (
       body: JSON.stringify({ reason: reason ?? null }),
     },
   );
+
+// ── Gate check-in ────────────────────────────────────────────────────────────
+
+/** Roster returned by both lookup and check-in — the attendees behind a
+ *  scanned ticket, each with their `checkedInAt` state. */
+export interface CheckInRoster {
+  items: RegistrationRow[];
+}
+
+/** Resolve a scanned QR to its attendee roster. Pass exactly one of
+ *  `registrationId` (single-ticket QR, `?id=`) or `bookingId` (group QR,
+ *  `?booking=`). */
+export const checkInLookup = (
+  token: string,
+  eventId: string,
+  by: { registrationId?: string; bookingId?: string },
+) => {
+  const q = new URLSearchParams();
+  if (by.registrationId) q.set('registration_id', by.registrationId);
+  if (by.bookingId) q.set('booking_id', by.bookingId);
+  return orgFetch<CheckInRoster>(
+    `/organiser/events/${eventId}/check-in/lookup?${q.toString()}`,
+    token,
+  );
+};
+
+/** Mark the selected attendees present. Idempotent server-side. */
+export const checkInAttendees = (
+  token: string,
+  eventId: string,
+  registrationIds: string[],
+) =>
+  orgFetch<CheckInRoster>(`/organiser/events/${eventId}/check-in`, token, {
+    method: 'POST',
+    body: JSON.stringify({ registrationIds }),
+  });

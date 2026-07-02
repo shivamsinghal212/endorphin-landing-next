@@ -17,6 +17,7 @@ import {
   type RegistrationsFilters,
   approveEvent,
   cancelRegistration,
+  checkInAttendees,
   createCoupon,
   createOrganiserEvent,
   deleteCoupon,
@@ -238,6 +239,24 @@ export function useCancelRegistration(eventId: string) {
       reason,
     }: { registrationId: string; reason?: string }) =>
       cancelRegistration(token!, eventId, registrationId, reason),
+    onSuccess: () => {
+      qc.invalidateQueries({
+        predicate: (q) =>
+          Array.isArray(q.queryKey) &&
+          q.queryKey[0] === 'organiser' &&
+          q.queryKey[1] === 'registrations' &&
+          q.queryKey[2] === eventId,
+      });
+    },
+  });
+}
+
+export function useCheckIn(eventId: string) {
+  const token = useAdminToken();
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (registrationIds: string[]) =>
+      checkInAttendees(token!, eventId, registrationIds),
     onSuccess: () => {
       qc.invalidateQueries({
         predicate: (q) =>
