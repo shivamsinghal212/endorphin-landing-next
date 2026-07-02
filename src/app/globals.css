@@ -365,6 +365,15 @@ body.nav-open { overflow: hidden; }
     justify-content: center;
     margin-top: 28px;
     padding: 18px 20px;
+    /* Override the .v1-nav-links a serif rule — the CTA stays Oswald, matching
+       desktop. */
+    font-family: var(--font-oswald), sans-serif;
+    font-style: normal;
+    font-weight: 600;
+    font-size: 14px;
+    line-height: 1;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
   }
   .v1-nav-links {
     position: fixed;
@@ -402,16 +411,16 @@ body.nav-open { overflow: hidden; }
   .v1-nav.is-open .v1-nav-links li:nth-child(5) { transition-delay: 260ms; }
   .v1-nav-links a {
     display: flex;
-    align-items: baseline;
+    align-items: center;
     justify-content: space-between;
     padding: 22px 4px;
-    font-family: var(--font-fraunces), serif;
-    font-style: italic;
-    font-weight: 700;
-    font-size: 40px;
+    font-family: var(--font-oswald), sans-serif;
+    font-style: normal;
+    font-weight: 600;
+    font-size: 30px;
     line-height: 1;
-    letter-spacing: -0.02em;
-    text-transform: none;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
     color: var(--bone);
   }
   .v1-nav-links a.is-current { color: var(--red); }
@@ -431,13 +440,13 @@ body.nav-open { overflow: hidden; }
     width: 100%;
     justify-content: space-between;
     padding: 22px 4px;
-    font-family: var(--font-fraunces), serif;
-    font-style: italic;
-    font-weight: 700;
-    font-size: 40px;
+    font-family: var(--font-oswald), sans-serif;
+    font-style: normal;
+    font-weight: 600;
+    font-size: 30px;
     line-height: 1;
-    letter-spacing: -0.02em;
-    text-transform: none;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
     color: var(--bone);
   }
   .v1-nav-sub-trigger .v1-nav-sub-chevron { width: 20px; height: 20px; opacity: 0.55; }
@@ -468,12 +477,12 @@ body.nav-open { overflow: hidden; }
   .v1-nav-sub-wrap.is-sub-open .v1-nav-sub { display: flex; transform: none; }
   .v1-nav-sub::before { display: none; }
   .v1-nav-sub a {
-    font-family: var(--font-fraunces), serif;
-    font-style: italic;
-    font-weight: 600;
-    font-size: 22px;
-    letter-spacing: -0.01em;
-    text-transform: none;
+    font-family: var(--font-oswald), sans-serif;
+    font-style: normal;
+    font-weight: 500;
+    font-size: 18px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
     padding: 12px 4px 12px 22px;
     color: rgba(245, 240, 235, 0.62);
   }
