@@ -272,9 +272,13 @@ export function CheckIn({
                   <div className="min-w-0 flex-1">
                     <p className="text-sm font-medium leading-tight truncate">{name}</p>
                     <p className="text-[11px] text-jet/50 truncate">
-                      {[dist, r.bibNumber ? `Bib ${r.bibNumber}` : null]
+                      {[
+                        dist,
+                        r.bibNumber ? `Bib ${r.bibNumber}` : null,
+                        r.attendeeEmail || r.user?.email,
+                      ]
                         .filter(Boolean)
-                        .join(' · ') || (r.attendeeEmail || r.user?.email || '—')}
+                        .join(' · ') || '—'}
                     </p>
                   </div>
                   {alreadyIn ? (
@@ -386,9 +390,13 @@ export function CheckIn({
                 <div className="min-w-0 flex-1">
                   <p className="text-sm font-medium leading-tight truncate">{name}</p>
                   <p className="text-[11px] text-jet/50 truncate">
-                    {[dist, r.bibNumber ? `Bib ${r.bibNumber}` : null]
+                    {[
+                      dist,
+                      r.bibNumber ? `Bib ${r.bibNumber}` : null,
+                      r.attendeeEmail || r.user?.email,
+                    ]
                       .filter(Boolean)
-                      .join(' · ') || (r.attendeeEmail || r.user?.email || '—')}
+                      .join(' · ') || '—'}
                   </p>
                 </div>
                 {r.checkedInAt && (
