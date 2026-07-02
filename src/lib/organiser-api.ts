@@ -326,6 +326,7 @@ export interface RegistrationsFilters {
   resultStatus?: string;
   distanceId?: string;
   search?: string;
+  checkedIn?: boolean;
   limit?: number;
   offset?: number;
 }
@@ -407,6 +408,7 @@ export const listEventRegistrations = (
   if (filters.resultStatus) q.set('result_status', filters.resultStatus);
   if (filters.distanceId) q.set('distance_id', filters.distanceId);
   if (filters.search) q.set('search', filters.search);
+  if (filters.checkedIn != null) q.set('checked_in', String(filters.checkedIn));
   if (filters.limit != null) q.set('limit', String(filters.limit));
   if (filters.offset != null) q.set('offset', String(filters.offset));
   const qs = q.toString();

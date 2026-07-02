@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import { SectionCard, PrimaryButton, SecondaryButton, TextInput } from '@/app/admin/studio/_components/form';
-import { describeOrganiserError, useCheckIn } from '@/lib/studio/organiser-hooks';
+import { describeOrganiserError, useCheckIn, useEventRegistrations } from '@/lib/studio/organiser-hooks';
 import { checkInLookup } from '@/lib/organiser-api';
 import type { OrganiserEvent, RegistrationRow } from '@/lib/organiser-api';
 import { useAdminToken } from '@/lib/use-admin-token';
@@ -57,6 +57,12 @@ export function CheckIn({
 }) {
   const token = useAdminToken();
   const checkInMut = useCheckIn(eventId);
+  // Persistent roster of everyone already marked present. useCheckIn
+  // invalidates the registrations queries on success, so this refreshes
+  // automatically after each check-in.
+  const checkedInQ = useEventRegistrations(eventId, { checkedIn: true, limit: 200 });
+  const checkedIn = checkedInQ.data?.items ?? [];
+  const checkedInTotal = checkedInQ.data?.total ?? 0;
 
   const [phase, setPhase] = useState<Phase>('idle');
   const [roster, setRoster] = useState<RegistrationRow[]>([]);
@@ -296,6 +302,7 @@ export function CheckIn({
 
   // ── Scan / idle view ─────────────────────────────────────────────────────────
   return (
+    <div className="space-y-4">
     <SectionCard
       title="Check-in"
       description="Scan a runner's ticket QR to mark them present at the venue."
@@ -352,5 +359,58 @@ export function CheckIn({
         </div>
       )}
     </SectionCard>
+
+    <SectionCard
+      title="Checked in"
+      description="Everyone marked present so far."
+      rightSlot={
+        <span className="text-sm font-display font-bold text-jet/70">
+          {checkedInTotal.toLocaleString('en-IN')}
+        </span>
+      }
+    >
+      {checkedInQ.isLoading ? (
+        <p className="text-sm text-jet/50">Loading…</p>
+      ) : checkedIn.length === 0 ? (
+        <p className="text-sm text-jet/50">No one checked in yet.</p>
+      ) : (
+        <ul className="divide-y divide-jet/5">
+          {checkedIn.map((r) => {
+            const name = r.attendeeName || r.user?.name || 'Anonymous';
+            const dist = distanceName(r.distanceCategoryId);
+            return (
+              <li key={r.id} className="flex items-center gap-3 py-2.5">
+                <div className="w-8 h-8 rounded-full bg-emerald-600 text-bone grid place-items-center text-[11px] font-semibold shrink-0">
+                  {runnerInitials(name)}
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-medium leading-tight truncate">{name}</p>
+                  <p className="text-[11px] text-jet/50 truncate">
+                    {[dist, r.bibNumber ? `Bib ${r.bibNumber}` : null]
+                      .filter(Boolean)
+                      .join(' · ') || (r.attendeeEmail || r.user?.email || '—')}
+                  </p>
+                </div>
+                {r.checkedInAt && (
+                  <span className="text-[11px] text-jet/50 whitespace-nowrap">
+                    {new Date(r.checkedInAt).toLocaleTimeString('en-IN', {
+                      hour: 'numeric',
+                      minute: '2-digit',
+                    })}
+                  </span>
+                )}
+              </li>
+            );
+          })}
+        </ul>
+      )}
+      {checkedInTotal > checkedIn.length && (
+        <p className="text-[11px] text-jet/45 pt-3 mt-1 border-t border-jet/5">
+          Showing the most recent {checkedIn.length} of {checkedInTotal}. Use the
+          Registrations tab to search the full list.
+        </p>
+      )}
+    </SectionCard>
+    </div>
   );
 }
