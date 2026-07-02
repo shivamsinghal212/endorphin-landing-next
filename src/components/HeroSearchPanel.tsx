@@ -1194,10 +1194,11 @@ function ResultCard({ hit, position }: { hit: DiscoverHit; position: number }) {
       onClick={() => captureResultClick(hit, position)}
     >
       <div className="v1-discover-card-header">
-        <div className="v1-discover-card-fallback">{initials}</div>
-        {hit.imageUrl && (
+        {hit.imageUrl ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img src={hit.imageUrl} alt="" loading="lazy" />
+        ) : (
+          <div className="v1-discover-card-fallback">{initials}</div>
         )}
         {isPast && <span className="v1-discover-card-past">Past event</span>}
       </div>

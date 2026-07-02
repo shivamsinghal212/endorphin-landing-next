@@ -314,8 +314,7 @@ function ClubCard({
     <article className={`v1c-club-card ${hidden ? 'is-hidden' : ''}`}>
       <Link href={href} className="v1c-club-card-body-link" aria-label={`View ${c.title}`}>
         <div className="v1c-club-card-header">
-          <div className="v1c-club-card-header-fallback">{initials(c.title)}</div>
-          {headerImg && (
+          {headerImg ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img
               src={headerImg}
@@ -323,6 +322,8 @@ function ClubCard({
               loading="lazy"
               className="is-logo-fallback"
             />
+          ) : (
+            <div className="v1c-club-card-header-fallback">{initials(c.title)}</div>
           )}
         </div>
         <div className="v1c-club-card-body">
