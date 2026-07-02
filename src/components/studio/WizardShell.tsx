@@ -188,14 +188,6 @@ export function WizardShell({
             onRetry={onAutosaveRetry}
           />
         </span>
-        <button
-          type="button"
-          onClick={onSaveExit}
-          className="text-xs sm:text-sm text-jet/60 hover:text-jet whitespace-nowrap"
-        >
-          <span className="sm:hidden">Exit</span>
-          <span className="hidden sm:inline">Save & exit</span>
-        </button>
         <div className="flex items-center gap-2 ml-auto">
           <button
             type="button"
@@ -204,6 +196,13 @@ export function WizardShell({
             className="px-3 sm:px-4 py-2 rounded-lg border border-jet/15 text-xs sm:text-sm hover:bg-jet/5 disabled:opacity-40 disabled:cursor-not-allowed"
           >
             Back
+          </button>
+          <button
+            type="button"
+            onClick={onSaveExit}
+            className="px-3 sm:px-4 py-2 rounded-lg border border-jet/15 text-xs sm:text-sm hover:bg-jet/5 whitespace-nowrap"
+          >
+            Save & exit
           </button>
           <button
             type="button"
