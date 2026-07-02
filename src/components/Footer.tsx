@@ -34,6 +34,7 @@ const COMPANY = [
 const LEGAL = [
   { label: 'Privacy', href: '/privacy' },
   { label: 'Terms', href: '/terms' },
+  { label: 'Challenge Terms', href: '/challenge-terms' },
 ];
 
 const INSTAGRAM_URL = 'https://www.instagram.com/hacknflex/';
