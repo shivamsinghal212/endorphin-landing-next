@@ -8,6 +8,14 @@ export type UseAutosaveOptions = {
   /** Quiet period before a save fires, ms. Default 1500. */
   debounceMs?: number;
   /**
+   * When false, edits are still mirrored to `localStorage` (crash recovery)
+   * but no debounced server save is scheduled — persistence happens only via
+   * explicit `forceSave()` (Save & continue / Save & exit / Submit). Default
+   * true. Turning this off removes the background create/update races that
+   * fire while the user is still typing.
+   */
+  auto?: boolean;
+  /**
    * If provided, every value change is mirrored to `localStorage` under this
    * key so callers can offer the user a "restore your unsaved draft" prompt
    * after a crash or refresh. The hook never auto-restores — the caller
@@ -85,7 +93,7 @@ export function useAutosave<T>(
   save: (value: T) => Promise<void>,
   options: UseAutosaveOptions = {},
 ): UseAutosaveResult<T> {
-  const { debounceMs = 1500, localStorageKey } = options;
+  const { debounceMs = 1500, localStorageKey, auto = true } = options;
 
   const [status, setStatus] = useState<AutosaveStatus>(() =>
     isBrowser && !navigator.onLine ? 'offline' : 'saved',
@@ -201,6 +209,9 @@ export function useAutosave<T>(
       return;
     }
     writeLocal(localStorageKey, value);
+    // Autosave disabled: mirror to localStorage only, leave server saves to
+    // explicit forceSave() calls.
+    if (!auto) return;
     if (timerRef.current) clearTimeout(timerRef.current);
     // A fresh edit cancels any pending backoff and starts the retry counter
     // over — otherwise typing on a stuck event keeps the old backoff curve.
@@ -220,7 +231,7 @@ export function useAutosave<T>(
     // a primitive option set once). Adding them would reset the timer on
     // every render that recreated the save callback.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [value, localStorageKey]);
+  }, [value, localStorageKey, auto]);
 
   const forceSave = useCallback(async (): Promise<boolean> => {
     if (timerRef.current) {

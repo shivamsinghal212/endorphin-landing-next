@@ -35,6 +35,11 @@ export function AutosaveIndicator({
     return () => clearInterval(id);
   }, [status, lastSavedAt]);
 
+  // Saves are manual now (Save & continue / Save & exit). Until the first
+  // real save lands there's nothing truthful to show, so stay hidden rather
+  // than claim "Saved".
+  if (status === 'saved' && !lastSavedAt) return null;
+
   const { dotClass, label } = describe(status, lastSavedAt);
 
   return (

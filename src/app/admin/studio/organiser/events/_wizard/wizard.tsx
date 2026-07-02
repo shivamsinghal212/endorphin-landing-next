@@ -171,7 +171,7 @@ export function EventWizard({
     draft,
     save,
     {
-      debounceMs: 1500,
+      auto: false,
       localStorageKey: mode === 'new' ? DRAFT_LOCAL_KEY : undefined,
     },
   );
@@ -193,7 +193,7 @@ export function EventWizard({
     const ok = await forceSave();
     if (!ok) {
       toast.error("Couldn't save your changes", {
-        description: 'Stay on this page or click Retry on the autosave chip.',
+        description: 'Stay on this page or click Retry on the save chip.',
       });
       return;
     }
@@ -219,7 +219,7 @@ export function EventWizard({
         toast.error('Add a title and slug to start saving');
       } else {
         toast.error("Couldn't save this step", {
-          description: 'Click Retry on the autosave chip, or stay on the page.',
+          description: 'Click Retry on the save chip, or stay on the page.',
         });
       }
       return;
@@ -295,7 +295,7 @@ export function EventWizard({
     );
   }
 
-  const continueLabel = currentStepId === 'review' ? 'Submit for review →' : 'Continue →';
+  const continueLabel = currentStepId === 'review' ? 'Submit for review →' : 'Save & continue →';
 
   return (
     <WizardShell
