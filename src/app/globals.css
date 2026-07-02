@@ -365,8 +365,6 @@ body.nav-open { overflow: hidden; }
     justify-content: center;
     margin-top: 28px;
     padding: 18px 20px;
-    font-size: 14px;
-    letter-spacing: 0.16em;
   }
   .v1-nav-links {
     position: fixed;
