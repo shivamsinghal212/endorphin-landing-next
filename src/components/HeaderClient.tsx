@@ -50,10 +50,8 @@ const LogoMark = () => (
 
 const HeaderClient = ({
   isAuthed,
-  canAccessStudio = false,
 }: {
   isAuthed: boolean;
-  canAccessStudio?: boolean;
 }) => {
   const navRef = useRef<HTMLElement | null>(null);
   const subRef = useRef<HTMLLIElement | null>(null);
@@ -231,30 +229,26 @@ const HeaderClient = ({
           </li>
 
           <li>
-            {canAccessStudio ? (
-              <Link href="/admin/studio" className="v1-nav-cta" onClick={closeMenu}>
-                Create Experience
-              </Link>
-            ) : (
-              <a href={downloadHref} className="v1-nav-cta" onClick={closeMenu}>
-                Download
-              </a>
-            )}
+            <Link href="/admin/studio" className="v1-nav-cta" onClick={closeMenu}>
+              Create Experience
+            </Link>
+          </li>
+          <li>
+            <a href={downloadHref} className="v1-nav-cta-secondary" onClick={closeMenu}>
+              Download App
+            </a>
           </li>
           <li className="v1-nav-auth-mobile-li">{authButton}</li>
         </ul>
 
         <div className="v1-nav-actions-desktop">
           {authButton}
-          {canAccessStudio ? (
-            <Link href="/admin/studio" className="v1-nav-cta">
-              Create Experience
-            </Link>
-          ) : (
-            <a href={downloadHref} className="v1-nav-cta">
-              Download
-            </a>
-          )}
+          <a href={downloadHref} className="v1-nav-cta-secondary">
+            Download App
+          </a>
+          <Link href="/admin/studio" className="v1-nav-cta">
+            Create Experience
+          </Link>
         </div>
 
         <button

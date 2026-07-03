@@ -251,6 +251,27 @@ body.nav-open { overflow: hidden; }
 .v1-nav-cta:hover { background: #c41e24; }
 .v1-nav-links li:has(.v1-nav-cta) { display: none; }
 
+/* Secondary CTA — outline sibling of .v1-nav-cta (e.g. "Download App"). */
+.v1-nav-cta-secondary {
+  display: inline-flex;
+  align-items: center;
+  padding: 10px 20px;
+  background: transparent;
+  color: var(--bone);
+  border: 1px solid rgba(245, 240, 235, 0.32);
+  font-family: var(--font-oswald), sans-serif;
+  font-weight: 600;
+  font-size: 13px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  transition: border-color 160ms ease-out, background 160ms ease-out;
+}
+.v1-nav-cta-secondary:hover {
+  border-color: var(--bone);
+  background: rgba(245, 240, 235, 0.06);
+}
+.v1-nav-links li:has(.v1-nav-cta-secondary) { display: none; }
+
 /* ─── Clubs dropdown ─── */
 .v1-nav-sub-wrap { position: relative; }
 .v1-nav-sub-chevron { transition: transform 180ms ease-out; opacity: 0.4; }
@@ -359,13 +380,14 @@ body.nav-open { overflow: hidden; }
   /* The desktop actions bar is hidden on mobile, so surface the primary CTA
      (Create Experience / Download) inside the mobile menu instead — the base
      `li:has(.v1-nav-cta) { display: none }` rule would otherwise hide it. */
-  .v1-nav-links li:has(.v1-nav-cta) { display: list-item; border: 0; }
-  .v1-nav-links .v1-nav-cta {
+  .v1-nav-links li:has(.v1-nav-cta),
+  .v1-nav-links li:has(.v1-nav-cta-secondary) { display: list-item; border: 0; }
+  .v1-nav-links .v1-nav-cta,
+  .v1-nav-links .v1-nav-cta-secondary {
     width: 100%;
     justify-content: center;
-    margin-top: 28px;
     padding: 18px 20px;
-    /* Override the .v1-nav-links a serif rule — the CTA stays Oswald, matching
+    /* Override the .v1-nav-links a serif rule — the CTAs stay Oswald, matching
        desktop. */
     font-family: var(--font-oswald), sans-serif;
     font-style: normal;
@@ -375,6 +397,8 @@ body.nav-open { overflow: hidden; }
     letter-spacing: 0.16em;
     text-transform: uppercase;
   }
+  .v1-nav-links .v1-nav-cta { margin-top: 28px; }
+  .v1-nav-links .v1-nav-cta-secondary { margin-top: 12px; }
   .v1-nav-links {
     position: fixed;
     top: var(--nav-h, 68px);
@@ -409,6 +433,7 @@ body.nav-open { overflow: hidden; }
   .v1-nav.is-open .v1-nav-links li:nth-child(3) { transition-delay: 160ms; }
   .v1-nav.is-open .v1-nav-links li:nth-child(4) { transition-delay: 210ms; }
   .v1-nav.is-open .v1-nav-links li:nth-child(5) { transition-delay: 260ms; }
+  .v1-nav.is-open .v1-nav-links li:nth-child(6) { transition-delay: 310ms; }
   .v1-nav-links a {
     display: flex;
     align-items: center;
