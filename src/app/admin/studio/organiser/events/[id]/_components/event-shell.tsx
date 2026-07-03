@@ -18,7 +18,7 @@ import { CheckIn } from './check-in';
 import { VerificationsStub } from './verifications-stub';
 import { Coupons } from './coupons';
 import { CommunicationsStub } from './communications-stub';
-import { SettingsStub } from './settings-stub';
+import { Settings } from './settings-stub';
 import { formatShortDate } from './_utils';
 
 type TabKey =
@@ -94,7 +94,7 @@ export function EventShell({ eventId }: { eventId: string }) {
         ) : tab === 'communications' ? (
           <CommunicationsStub />
         ) : (
-          <SettingsStub />
+          <Settings event={eventQ.data ?? null} />
         )}
       </main>
     </>
@@ -116,12 +116,20 @@ const STATUS_PILL: Record<EventStatus, { label: string; className: string }> = {
     label: 'Draft',
     className: 'bg-jet/10 text-jet/60',
   },
+  offline: {
+    label: 'Offline',
+    className: 'bg-jet/15 text-jet/60',
+  },
   closed: {
     label: 'Closed',
     className: 'bg-jet/15 text-jet/60',
   },
   cancelled: {
     label: 'Cancelled',
+    className: 'bg-jet/15 text-jet/60',
+  },
+  completed: {
+    label: 'Completed',
     className: 'bg-jet/15 text-jet/60',
   },
 };

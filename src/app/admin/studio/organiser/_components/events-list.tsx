@@ -2,8 +2,10 @@
 
 import Link from 'next/link';
 import { useMemo, useState } from 'react';
+import { toast } from 'sonner';
 import {
   describeOrganiserError,
+  useDeleteOrganiserEvent,
   useOrganiserEvents,
 } from '@/lib/studio/organiser-hooks';
 import type { OrganiserEventListItem } from '@/lib/organiser-api';
@@ -71,15 +73,19 @@ function StatusPill({ status }: { status: OrganiserEventListItem['eventStatus'] 
     live: 'bg-signal text-bone',
     draft: 'bg-jet/10 text-jet/60',
     pending_review: 'bg-gold/20 text-jet',
+    offline: 'bg-jet/10 text-jet/60',
     closed: 'bg-jet/10 text-jet/60',
     cancelled: 'bg-jet/10 text-jet/60',
+    completed: 'bg-jet/10 text-jet/60',
   };
   const label: Record<OrganiserEventListItem['eventStatus'], string> = {
     live: 'Live',
     draft: 'Draft',
     pending_review: 'In review',
+    offline: 'Offline',
     closed: 'Closed',
     cancelled: 'Cancelled',
+    completed: 'Completed',
   };
   return (
     <span
@@ -91,6 +97,23 @@ function StatusPill({ status }: { status: OrganiserEventListItem['eventStatus'] 
 }
 
 function EventRow({ ev, accent }: { ev: OrganiserEventListItem; accent: string | null }) {
+  const del = useDeleteOrganiserEvent();
+  // Only true drafts can be deleted — a pending_review event is awaiting admin
+  // action, and live/past events carry state a delete would strand.
+  const canDelete = ev.eventStatus === 'draft';
+
+  const onDelete = async () => {
+    if (!window.confirm(`Delete "${ev.title}"? This draft will be removed and can't be recovered here.`)) {
+      return;
+    }
+    try {
+      await del.mutateAsync(ev.id);
+      toast.success('Draft deleted');
+    } catch (e) {
+      toast.error("Couldn't delete draft", { description: describeOrganiserError(e) });
+    }
+  };
+
   const titleShort = ev.title.split(/[·:]/)[0]?.trim().slice(0, 10) || ev.title.slice(0, 10);
   const coverBg = accent
     ? { backgroundColor: accent }
@@ -141,6 +164,16 @@ function EventRow({ ev, accent }: { ev: OrganiserEventListItem; accent: string |
       >
         Manage
       </Link>
+      {canDelete && (
+        <button
+          type="button"
+          onClick={onDelete}
+          disabled={del.isPending}
+          className="text-xs px-3 py-1.5 rounded-lg border border-signal/30 text-signal hover:bg-signal/5 shrink-0 disabled:opacity-50"
+        >
+          {del.isPending ? 'Deleting…' : 'Delete'}
+        </button>
+      )}
     </div>
   );
 }

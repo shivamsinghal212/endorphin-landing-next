@@ -32,6 +32,8 @@ import {
   onboardOrganiser,
   rejectEvent,
   submitEventForReview,
+  setOrganiserEventOnline,
+  deleteOrganiserEvent,
   updateCoupon,
   updateMyOrganiser,
   updateOrganiserEvent,
@@ -136,6 +138,30 @@ export function useSubmitEventForReview(eventId: string) {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: () => submitEventForReview(token!, eventId),
+    onSuccess: (event: OrganiserEvent) => {
+      qc.setQueryData(organiserKeys.event(eventId), event);
+      qc.invalidateQueries({ queryKey: organiserKeys.events() });
+    },
+  });
+}
+
+export function useDeleteOrganiserEvent() {
+  const token = useAdminToken();
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (eventId: string) => deleteOrganiserEvent(token!, eventId),
+    onSuccess: (_void, eventId) => {
+      qc.removeQueries({ queryKey: organiserKeys.event(eventId) });
+      qc.invalidateQueries({ queryKey: organiserKeys.events() });
+    },
+  });
+}
+
+export function useSetOrganiserEventOnline(eventId: string) {
+  const token = useAdminToken();
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (online: boolean) => setOrganiserEventOnline(token!, eventId, online),
     onSuccess: (event: OrganiserEvent) => {
       qc.setQueryData(organiserKeys.event(eventId), event);
       qc.invalidateQueries({ queryKey: organiserKeys.events() });

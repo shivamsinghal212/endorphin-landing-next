@@ -104,7 +104,14 @@ export interface DistanceCategory {
 }
 
 export type EventFormat = 'virtual' | 'in_person';
-export type EventStatus = 'draft' | 'pending_review' | 'live' | 'closed' | 'cancelled';
+export type EventStatus =
+  | 'draft'
+  | 'pending_review'
+  | 'live'
+  | 'offline'
+  | 'closed'
+  | 'cancelled'
+  | 'completed';
 
 export interface OrganiserEvent {
   id: string;
@@ -393,6 +400,21 @@ export const updateOrganiserEvent = (
 export const submitEventForReview = (token: string, eventId: string) =>
   orgFetch<OrganiserEvent>(`/organiser/events/${eventId}/submit`, token, {
     method: 'POST',
+  });
+
+// Soft-delete a draft event (backend flips event_status to 'deleted').
+export const deleteOrganiserEvent = (token: string, eventId: string) =>
+  orgFetch<void>(`/organiser/events/${eventId}`, token, { method: 'DELETE' });
+
+// Take a live event offline (hidden from all public listings) or bring it back.
+export const setOrganiserEventOnline = (
+  token: string,
+  eventId: string,
+  online: boolean,
+) =>
+  orgFetch<OrganiserEvent>(`/organiser/events/${eventId}/visibility`, token, {
+    method: 'POST',
+    body: JSON.stringify({ online }),
   });
 
 export const getEventStats = (token: string, eventId: string) =>
