@@ -310,6 +310,102 @@ export const broadcastNotification = (
 export const getQueueStatus = (token: string) =>
   adminFetch<{ pending: number; processed: number }>('/notifications/queue', token);
 
+// ── Notification Campaigns (targeted push + analytics) ───────────────────────
+
+export interface CampaignSegment {
+  emails?: string[];
+  city?: string;
+  gender?: string;
+  joinedAfter?: string;
+  challengeId?: string;
+  challengeState?: 'enrolled' | 'not_enrolled' | 'enrolled_no_run' | 'enrolled_inactive';
+  inactiveDays?: number;
+  registeredEventId?: string;
+}
+
+export interface CampaignSummary {
+  id: string;
+  title: string;
+  body: string;
+  segment: CampaignSegment;
+  status: 'draft' | 'queued' | 'sending' | 'sent' | 'failed';
+  audienceSize: number;
+  reachableSize: number;
+  sentCount: number;
+  deliveredCount: number;
+  openedCount: number;
+  failedCount: number;
+  createdAt: string | null;
+  sentAt: string | null;
+}
+
+export interface CampaignPreview {
+  audienceSize: number;
+  reachableSize: number;
+  sample: string[];
+}
+
+export interface CampaignDelivery {
+  id: string;
+  userId: string;
+  name: string | null;
+  city: string | null;
+  status: 'pending' | 'sent' | 'delivered' | 'failed' | 'opened';
+  errorDetail: string | null;
+  sentAt: string | null;
+  deliveredAt: string | null;
+  openedAt: string | null;
+}
+
+export interface CampaignDetail {
+  campaign: CampaignSummary;
+  deliveries: CampaignDelivery[];
+  total: number;
+  page: number;
+  limit: number;
+}
+
+export const previewCampaign = (token: string, segment: CampaignSegment) =>
+  adminFetch<CampaignPreview>('/campaigns/preview', token, {
+    method: 'POST',
+    body: JSON.stringify({ segment }),
+  });
+
+export const createCampaign = (
+  token: string,
+  data: { title: string; body: string; segment: CampaignSegment },
+) =>
+  adminFetch<CampaignSummary>('/campaigns', token, {
+    method: 'POST',
+    body: JSON.stringify(data),
+  });
+
+export const listCampaigns = (token: string, params: { page?: number; limit?: number } = {}) => {
+  const qs = new URLSearchParams();
+  for (const [k, v] of Object.entries(params)) {
+    if (v !== undefined && v !== null) qs.set(k, String(v));
+  }
+  return adminFetch<{ campaigns: CampaignSummary[]; total: number; page: number; limit: number }>(
+    `/campaigns?${qs}`,
+    token,
+  );
+};
+
+export const getCampaign = (token: string, id: string, params: { page?: number; limit?: number } = {}) => {
+  const qs = new URLSearchParams();
+  for (const [k, v] of Object.entries(params)) {
+    if (v !== undefined && v !== null) qs.set(k, String(v));
+  }
+  return adminFetch<CampaignDetail>(`/campaigns/${encodeURIComponent(id)}?${qs}`, token);
+};
+
+export interface CampaignOptions {
+  challenges: { id: string; title: string; status: string }[];
+}
+
+export const getCampaignOptions = (token: string) =>
+  adminFetch<CampaignOptions>('/campaigns-options', token);
+
 // ── Clubs ──────────────────────────────────────────────────────────────────
 // GET is public; POST upserts and requires the admin JWT.
 // Routes live at /api/v1/clubs/* (not under /admin), so we hit them directly.
