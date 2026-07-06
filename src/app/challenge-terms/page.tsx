@@ -21,8 +21,12 @@ const SECTIONS: { h: string; b: string }[] = [
     b: 'Runs must reflect genuine physical activity by the account holder. Spoofed GPS, treadmill emulation reported as outdoor GPS, shared devices, or any attempt to fabricate activity will void your standing and may result in removal from the challenge and forfeiture of rewards.',
   },
   {
-    h: 'Rewards & the draw',
-    b: 'Completing a challenge enters you into the reward draw for that challenge — finishing is all that is required, and how fast or at what time you run has no bearing on your chances. Where the reward is limited (e.g. 25 gift cards), winners are selected at random from everyone who completes, so every finisher has an equal chance regardless of age, pace, or speed. Winners are announced on the date and channel stated on the challenge (typically Endorfin’s Instagram). Any participation reward stated on the challenge (e.g. a digital certificate) is given to every finisher. Rewards are non-transferable, have no cash-alternative unless stated, and applicable taxes are the recipient’s responsibility.',
+    h: 'Disqualification & permanent ban',
+    b: 'Any attempt to game the platform — including creating multiple or fake accounts, colluding with others, using bots or automation, spoofing your location or activity, or using any other dishonest or illegal means — will result in immediate disqualification from the challenge and a permanent, lifetime ban from Endorfin, with forfeiture of all rewards and standings. Whether conduct amounts to gaming the platform, and the action taken as a result, is determined solely and finally at the discretion of the Endorfin team.',
+  },
+  {
+    h: 'Rewards',
+    b: 'Completing a challenge makes you eligible for its reward — finishing is all that is required, and how fast or at what time you run has no bearing. How winners are chosen is stated on the challenge itself and is one of two methods. First, first come, first served: the first set number of participants to complete the challenge each win (e.g. the first 40 to finish), determined by completion time. Second, a random draw: where the reward is limited (e.g. 25 gift cards), winners are selected at random from everyone who completes, so every finisher has an equal chance regardless of age, pace, or speed. For a draw, winners are announced on the date and channel stated on the challenge (typically Endorfin’s Instagram); for first-come-first-served, your reward is confirmed once you finish. Any participation reward stated on the challenge (e.g. a digital certificate) is given to every finisher. Rewards are non-transferable, have no cash-alternative unless stated, and applicable taxes are the recipient’s responsibility.',
   },
   {
     h: 'Timing & time zone',
