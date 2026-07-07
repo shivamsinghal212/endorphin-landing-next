@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 const SECTIONS: { h: string; b: string }[] = [
   {
     h: 'Eligibility',
-    b: 'Challenges are open to registered Endorfin users with a verified account. You must be 16 or older to join. Endorfin employees and their immediate families are not eligible for cash or gift-card rewards.',
+    b: 'Challenges are open to registered Endorfin users with a verified account. You must be 16 or older to join.',
   },
   {
     h: 'How runs qualify',
