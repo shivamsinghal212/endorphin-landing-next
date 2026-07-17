@@ -13,6 +13,10 @@ const SECTIONS: { h: string; b: string }[] = [
     b: 'Challenges are open to registered Endorfin users with a verified account. You must be 16 or older to join.',
   },
   {
+    h: 'Gender-specific challenges & verification',
+    b: 'Some challenges are open only to participants of a specified gender. By joining such a challenge you confirm you meet the stated eligibility. Endorfin may, at its sole discretion, request a valid government-issued photo ID or other reasonable proof of gender to verify eligibility — particularly before a prize is issued. If you do not provide the requested proof when asked, you may be removed from the challenge and lose eligibility for any prize or reward.',
+  },
+  {
     h: 'How runs qualify',
     b: 'Only runs recorded with the Endorfin app (or synced from a connected health source) count toward a challenge. A run must meet the challenge’s stated distance, duration, or streak criteria to qualify. GPS distance is the source of truth; manual or edited entries may be excluded.',
   },
