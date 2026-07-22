@@ -18,7 +18,7 @@ export default function TermsOfService() {
         <h1 className="text-4xl md:text-5xl font-display font-bold uppercase text-foreground mb-8">
           Terms of Service
         </h1>
-        <p className="text-sm text-muted-foreground font-body mb-10">Last updated: June 22, 2026</p>
+        <p className="text-sm text-muted-foreground font-body mb-10">Last updated: July 22, 2026</p>
 
         <div className="space-y-8 font-body text-muted-foreground leading-relaxed">
           <section>
@@ -56,7 +56,7 @@ export default function TermsOfService() {
           </section>
 
           <section>
-            <h2 className="text-xl font-display font-semibold uppercase text-foreground mb-3">6. Event Listings and Third-Party Registration Platforms</h2>
+            <h2 className="text-xl font-display font-semibold uppercase text-foreground mb-3">6. Event Listings, Registration &amp; Payments</h2>
             <p>Endorfin is a discovery platform for running events and is not the event organizer for the majority of events listed. We aggregate event information from a variety of public sources and third-party registration platforms, including but not limited to <span className="text-foreground/80">MySamay</span>, <span className="text-foreground/80">Townscript</span>, <span className="text-foreground/80">IndiaRunning</span>, and <span className="text-foreground/80">City Woofer</span>. Only events explicitly labelled as being hosted by Endorfin (i.e. where the event source is &ldquo;Organiser&rdquo; on the platform) are events for which Endorfin acts as the registration host; all other listings are third-party events for which Endorfin is solely a directory and discovery surface.</p>
             <p className="mt-3">When you click &ldquo;Register&rdquo; on a third-party event, you are redirected to the relevant third-party registration platform and your registration, payment, refund, and all related obligations are governed entirely by that platform&apos;s terms and the organizer&apos;s policies — not by Endorfin. You acknowledge that:</p>
             <ul className="list-disc list-inside space-y-2 ml-2 mt-3">
@@ -66,6 +66,8 @@ export default function TermsOfService() {
               <li>RSVP through Endorfin does not constitute official event registration unless the event is explicitly hosted on Endorfin (source = &ldquo;Organiser&rdquo;).</li>
               <li>Any trademarks, event names, logos, or brand assets shown alongside third-party listings remain the property of their respective owners and are used solely to identify the event being listed.</li>
             </ul>
+            <p className="mt-3">For events hosted directly on Endorfin (source &ldquo;Organiser&rdquo;), you register and pay <span className="text-foreground/80">within the App</span>. Payments are processed by our payment gateway, <span className="text-foreground/80">Razorpay</span>; by completing a paid registration you also agree to Razorpay&apos;s applicable terms. A completed registration is a <span className="text-foreground/80">personal, non-transferable</span> entry to the event for the ticket or category you selected, subject to the organizer&apos;s event rules.</p>
+            <p className="mt-3"><span className="text-foreground/80">Cancellations and refunds.</span> Refund eligibility for Endorfin-hosted events is set per event and shown to you at the time of registration. Where a refund window is offered, cancellations made before the stated deadline are refunded to your original payment method (less any non-refundable processing fees); no refund is due for cancellations after that deadline or for no-shows. If an event is cancelled or materially rescheduled by the organizer, the organizer&apos;s stated refund policy for that event applies. To request a cancellation or refund, use the App or contact us at <a href="mailto:hello@endorfin.run" className="text-accent hover:underline">hello@endorfin.run</a>.</p>
           </section>
 
           <section>
