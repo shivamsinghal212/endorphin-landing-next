@@ -7,6 +7,7 @@ import { getSessionEmail, getSessionToken } from '@/lib/session';
 import { getRequestGeo } from '@/lib/geo';
 import type { DiscoverHit } from '@/components/HeroSearchPanel';
 import { fetchFeaturedFull } from '@/lib/clubs-featured';
+import { eventPlaceJsonLd } from '@/lib/event-seo';
 
 // Shared body for the two national directory routes — /clubs and
 // /experiences. Identical data + layout; the only difference is `variant`,
@@ -185,9 +186,7 @@ function buildEventsJsonLd(events: DiscoverHit[]) {
         ...(e.endTime && { endDate: e.endTime }),
         url: `${SITE}${eventHref(e)}`,
         ...(e.imageUrl && { image: e.imageUrl }),
-        ...(e.locationName && {
-          location: { '@type': 'Place', name: e.locationName, address: e.city || undefined },
-        }),
+        location: eventPlaceJsonLd({ locationName: e.locationName, city: e.city }),
         ...(e.clubName && { organizer: { '@type': 'Organization', name: e.clubName } }),
       },
     }));

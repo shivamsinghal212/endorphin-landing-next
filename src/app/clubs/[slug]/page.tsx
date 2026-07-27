@@ -7,6 +7,7 @@ import ExploreMoreStrip from '@/components/ExploreMoreStrip';
 import { getClub, type Club, type ClubAdminPerson } from '@/lib/admin-api';
 import { clubsApi, remindersApi, type Event, type MyMembership, type Reminder } from '@/lib/api';
 import { getSessionEmail, getSessionToken } from '@/lib/session';
+import { eventPlaceJsonLd } from '@/lib/event-seo';
 import type { ClubEvent } from '../page';
 import { ClaimClubLink } from './claim-club-link';
 import { Coaches } from './coaches';
@@ -493,19 +494,12 @@ function ClubEventsJsonLd({
         if (e.endTime) item.endDate = e.endTime;
         if (e.description) item.description = e.description;
         if (e.coverImageUrl) item.image = e.coverImageUrl;
-        if (e.locationName || e.locationAddress) {
-          item.location = {
-            '@type': 'Place',
-            name: e.locationName || e.locationAddress,
-            address: {
-              '@type': 'PostalAddress',
-              streetAddress: e.locationAddress || undefined,
-              addressLocality: club.city,
-              ...(addressRegion ? { addressRegion } : {}),
-              addressCountry: 'IN',
-            },
-          };
-        }
+        item.location = eventPlaceJsonLd({
+          locationName: e.locationName,
+          locationAddress: e.locationAddress,
+          city: club.city,
+          region: addressRegion,
+        });
         if (schemaType === 'SportsEvent') {
           item.sport = 'Running';
         }

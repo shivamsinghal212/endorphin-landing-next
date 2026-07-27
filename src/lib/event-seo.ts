@@ -138,3 +138,31 @@ export function buildEventTitle(event: Event): string {
   const base = event.title.trim();
   return /endorfin/i.test(base) ? base : `${base} | Endorfin`;
 }
+
+/**
+ * Schema.org `Place` for an event's JSON-LD `location`.
+ *
+ * Google treats `location` as REQUIRED on Event — omitting it is a hard error
+ * in Search Console ("Missing field 'location'"), not a warning, and it drops
+ * the event from rich results entirely. Club events often have no venue filled
+ * in, so this never returns undefined: it degrades name from venue → street →
+ * city → country, all of which are facts we actually hold.
+ */
+export function eventPlaceJsonLd(loc: {
+  locationName?: string | null;
+  locationAddress?: string | null;
+  city?: string | null;
+  region?: string | null;
+}): Record<string, unknown> {
+  return {
+    '@type': 'Place',
+    name: loc.locationName || loc.locationAddress || loc.city || 'India',
+    address: {
+      '@type': 'PostalAddress',
+      ...(loc.locationAddress ? { streetAddress: loc.locationAddress } : {}),
+      ...(loc.city ? { addressLocality: loc.city } : {}),
+      ...(loc.region ? { addressRegion: loc.region } : {}),
+      addressCountry: 'IN',
+    },
+  };
+}

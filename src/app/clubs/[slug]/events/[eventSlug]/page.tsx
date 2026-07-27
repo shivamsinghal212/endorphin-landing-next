@@ -9,6 +9,7 @@ import ShareEventButton from '@/components/ShareEventButton';
 import { getClub, type Club } from '@/lib/admin-api';
 import { clubsApi, remindersApi, type MyMembership, type Reminder } from '@/lib/api';
 import { getSessionToken } from '@/lib/session';
+import { eventPlaceJsonLd } from '@/lib/event-seo';
 import type { ClubEvent } from '../../../page';
 import { RsvpButton } from '../../rsvp-button';
 import '../../club-page.css';
@@ -144,18 +145,11 @@ function EventJsonLd({ club, event }: { club: Club; event: ClubEvent }) {
   if (event.description) item.description = event.description;
   if (event.coverImageUrl) item.image = event.coverImageUrl;
   if (schemaType === 'SportsEvent') item.sport = 'Running';
-  if (event.locationName || event.locationAddress) {
-    item.location = {
-      '@type': 'Place',
-      name: event.locationName || event.locationAddress,
-      address: {
-        '@type': 'PostalAddress',
-        streetAddress: event.locationAddress || undefined,
-        addressLocality: club.city,
-        addressCountry: 'IN',
-      },
-    };
-  }
+  item.location = eventPlaceJsonLd({
+    locationName: event.locationName,
+    locationAddress: event.locationAddress,
+    city: club.city,
+  });
 
   const breadcrumb = {
     '@context': 'https://schema.org',
