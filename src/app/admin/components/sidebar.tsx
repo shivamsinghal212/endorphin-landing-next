@@ -4,15 +4,16 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { signOut } from 'next-auth/react';
 import {
-  LayoutDashboard,
-  Calendar,
-  Users,
-  Shield,
-  Cog,
   Bell,
-  Trophy,
+  Calendar,
+  Cog,
+  Dumbbell,
+  LayoutDashboard,
   LogOut,
   Menu,
+  Shield,
+  Trophy,
+  Users,
   X,
 } from 'lucide-react';
 import { useState } from 'react';
@@ -25,6 +26,7 @@ const NAV_ITEMS = [
   { href: '/admin/moderation', label: 'Moderation', icon: Shield },
   { href: '/admin/scrapers', label: 'Scrapers', icon: Cog },
   { href: '/admin/notifications', label: 'Notifications', icon: Bell },
+  { href: '/admin/coach', label: 'Coach', icon: Dumbbell },
 ];
 
 interface SidebarProps {
