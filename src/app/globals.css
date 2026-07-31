@@ -77,6 +77,39 @@
   }
 }
 
+/* Admin runs light; the marketing site runs dark.
+   The :root shadcn tokens above describe the marketing theme (--card at 10%
+   lightness, --background at 4%), so any shadcn component rendered under /admin
+   came out black-on-black with a red accent. The admin pages that predate this
+   sidestepped the tokens entirely and hand-rolled brand classes, which is why it
+   went unnoticed.
+   Re-scoping the tokens here is the smaller fix: shadcn components work
+   correctly anywhere under /admin, and brand classes (jet, signal) still work
+   because they are separate Tailwind colours, not tokens.
+   Same idea as the `text-jet` on the admin layout wrapper. */
+.admin-theme {
+  --background: 0 0% 100%;
+  --foreground: 0 0% 4%;          /* jet */
+  --card: 0 0% 100%;
+  --card-foreground: 0 0% 4%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 0 0% 4%;
+  --primary: 358 80% 52%;         /* signal — matches the sidebar active state */
+  --primary-foreground: 0 0% 100%;
+  --secondary: 0 0% 96%;
+  --secondary-foreground: 0 0% 12%;
+  --muted: 0 0% 95%;
+  --muted-foreground: 0 0% 40%;   /* the brand `dim` #666 — 5.7:1 on white */
+  --accent: 0 0% 95%;
+  --accent-foreground: 0 0% 4%;
+  --destructive: 358 70% 44%;     /* 6.1:1 on white; the marketing red is 4.5:1, too close to the floor */
+  --destructive-foreground: 0 0% 100%;
+  --border: 0 0% 90%;
+  --input: 0 0% 85%;
+  --ring: 358 80% 52%;
+  --radius: 0.5rem;               /* :root is 0rem for the marketing site's square look */
+}
+
 /* scroll-behavior: smooth is now opted-in via [data-scroll-behavior="smooth"]
    on <html> instead of being unconditional. Reason: when applied to <html>
    directly, programmatic scroll-position changes (Radix Dialog scroll-lock,

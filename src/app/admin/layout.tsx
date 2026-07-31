@@ -11,7 +11,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         {/* text-jet here cancels the global body `text-bone` set in
             globals.css for the marketing site. Without this, any element
             without an explicit text color renders cream-on-cream. */}
-        <div className="min-h-screen bg-[#F8F6F3] text-jet">
+        <div className="admin-theme min-h-screen bg-[#F8F6F3] text-jet">
           {children}
         </div>
         <Toaster
