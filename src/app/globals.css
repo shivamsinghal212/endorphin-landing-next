@@ -86,7 +86,16 @@
    Re-scoping the tokens here is the smaller fix: shadcn components work
    correctly anywhere under /admin, and brand classes (jet, signal) still work
    because they are separate Tailwind colours, not tokens.
-   Same idea as the `text-jet` on the admin layout wrapper. */
+   Same idea as the `text-jet` on the admin layout wrapper.
+
+   Scoped with :has() on the root rather than on .admin-theme alone, because
+   Radix renders Dialog, Drawer, Select, DropdownMenu and AlertDialog through a
+   Portal — mounted on document.body, outside the admin wrapper. Scoping to the
+   wrapper left every picker, unit dropdown and overflow menu painting with the
+   marketing --popover (10% lightness). Hoisting to the document means portalled
+   content inherits too. .admin-theme is kept in the selector list so the class
+   is still the switch, and the tokens only apply on pages that carry it. */
+:root:has(.admin-theme),
 .admin-theme {
   --background: 0 0% 100%;
   --foreground: 0 0% 4%;          /* jet */
@@ -108,6 +117,15 @@
   --input: 0 0% 85%;
   --ring: 358 80% 52%;
   --radius: 0.5rem;               /* :root is 0rem for the marketing site's square look */
+}
+
+/* Portalled content also needs an ink colour. The admin wrapper carries
+   `text-jet` to cancel the marketing body colour, but a Dialog/Drawer/Select
+   mounts on document.body and so inherits `text-bone` (cream) instead — which
+   rendered dialog titles cream-on-white while sibling text using an explicit
+   token looked fine. Setting it on body under the same scope reaches both. */
+:root:has(.admin-theme) body {
+  color: var(--jet);
 }
 
 /* scroll-behavior: smooth is now opted-in via [data-scroll-behavior="smooth"]
