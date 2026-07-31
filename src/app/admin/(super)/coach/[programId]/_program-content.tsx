@@ -2,9 +2,26 @@
 
 import * as React from 'react';
 import Link from 'next/link';
-import { Loader2, Sparkles, Target } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { Loader2, MoreVertical, Sparkles, Target, Trash2 } from 'lucide-react';
 
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import {
+  AlertDialog,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -16,6 +33,7 @@ import {
 import {
   useAthlete,
   useCoverage,
+  useDeleteProgram,
   useGenerateBlock,
   usePatchProgram,
   useProgram,
@@ -24,14 +42,18 @@ import {
 import { Fortnight } from '../_components/fortnight';
 
 export function ProgramContent({ programId }: { programId: number }) {
+  const router = useRouter();
   const { data: program, isLoading } = useProgram(programId);
   const { data: athlete } = useAthlete(program?.userId ?? null);
   const { data: coverage } = useCoverage(programId);
   const generate = useGenerateBlock(programId);
   const publish = usePublishDays(programId);
   const patch = usePatchProgram(programId);
+  const remove = useDeleteProgram();
 
   const [showCoverage, setShowCoverage] = React.useState(false);
+  const [confirmDelete, setConfirmDelete] = React.useState(false);
+  const [typed, setTyped] = React.useState('');
 
   if (isLoading || !program) {
     return (
@@ -149,6 +171,43 @@ export function ProgramContent({ programId }: { programId: number }) {
           <Target className="size-4 mr-1.5" />
           Race stations
         </Button>
+
+        {/* Destructive action lives behind a menu rather than sitting next to
+            Generate and Publish, so it can't be hit by a mis-tap on a phone. */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="size-11 md:size-9"
+              aria-label="More options for this plan"
+            >
+              <MoreVertical className="size-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            {program.status !== 'abandoned' ? (
+              <DropdownMenuItem
+                onClick={() => patch.mutate({ status: 'abandoned' })}
+              >
+                Stop this plan
+                <span className="sr-only">
+                  — the athlete stops seeing it, history is kept
+                </span>
+              </DropdownMenuItem>
+            ) : null}
+            <DropdownMenuItem
+              onClick={() => {
+                setTyped('');
+                setConfirmDelete(true);
+              }}
+              className="text-destructive focus:text-destructive"
+            >
+              <Trash2 className="size-4 mr-2" />
+              Delete this plan
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
 
       {generate.isPending ? (
@@ -183,6 +242,52 @@ export function ProgramContent({ programId }: { programId: number }) {
       ) : null}
 
       <Fortnight program={program} basePath={`/admin/coach/${program.id}`} />
+
+      <AlertDialog open={confirmDelete} onOpenChange={setConfirmDelete}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete this plan?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This removes <strong>{program.name}</strong> and all{' '}
+              {program.days.length} of its days for{' '}
+              {athlete?.name || athlete?.email || 'this athlete'}. It can&apos;t be
+              undone.
+              {' '}If you just want them to stop seeing it, use{' '}
+              <strong>Stop this plan</strong> instead — that keeps everything.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <div className="space-y-1.5">
+            <label htmlFor="confirm-delete" className="text-xs font-medium">
+              Type <strong>delete</strong> to confirm
+            </label>
+            <Input
+              id="confirm-delete"
+              value={typed}
+              onChange={(e) => setTyped(e.target.value)}
+              autoComplete="off"
+              className="h-11"
+            />
+          </div>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Keep it</AlertDialogCancel>
+            <Button
+              variant="destructive"
+              disabled={typed.trim().toLowerCase() !== 'delete' || remove.isPending}
+              onClick={async () => {
+                await remove.mutateAsync(program.id);
+                setConfirmDelete(false);
+                router.push('/admin/coach');
+              }}
+              className="h-11"
+            >
+              {remove.isPending ? (
+                <Loader2 className="size-4 mr-1.5 animate-spin" />
+              ) : null}
+              Delete plan
+            </Button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

@@ -16,6 +16,7 @@ import {
   createProgram,
   createWorkout,
   deleteDay,
+  deleteProgram,
   generateBlock,
   getAthlete,
   getCoverage,
@@ -205,6 +206,21 @@ export function usePatchProgram(id: number) {
       qc.invalidateQueries({ queryKey: ['coach', 'programs'] });
     },
     onError: (e) => toast.error(describeError(e)),
+  });
+}
+
+/** Delete a plan. 409 when the athlete has logged against it — the toast then
+ *  carries the backend's sentence, which names abandoning as the way out. */
+export function useDeleteProgram() {
+  const token = useToken();
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (id: number) => deleteProgram(token, id),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['coach', 'programs'] });
+      toast.success('Plan deleted');
+    },
+    onError: (e) => toast.error(describeError(e), { duration: 8000 }),
   });
 }
 

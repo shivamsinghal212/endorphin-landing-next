@@ -526,6 +526,15 @@ export const patchProgram = (
     body: JSON.stringify(body),
   });
 
+/** Delete a plan and everything under it.
+ *
+ *  Refused with 409 once the athlete has logged a session against it — that is a
+ *  record, not a draft. Patch `status` to `abandoned` in that case: the athlete
+ *  stops seeing it and their history survives.
+ */
+export const deleteProgram = (token: string, id: number) =>
+  coachFetch<void>(`/programs/${id}`, token, { method: 'DELETE' });
+
 /** Upserts a whole day. `activities` replaces whatever was there. */
 export const saveDay = (token: string, programId: number, body: DayInput) =>
   coachFetch<Day>(`/programs/${programId}/days`, token, {
