@@ -80,7 +80,9 @@ function DayStatus({ day }: { day: Day | undefined }) {
 function summary(day: Day | undefined): string {
   if (!day) return 'Nothing planned';
   if (day.isRest) return 'Rest';
-  const n = day.activities.length;
+  // activityCount is populated even where `activities` isn't (list endpoints),
+  // so this stays honest if the component is ever fed list data.
+  const n = day.activityCount || day.activities.length;
   if (!n) return 'Nothing planned';
   const mins = day.activities.reduce((t, a) => t + (a.durationMin ?? 0), 0);
   return `${n} workout${n === 1 ? '' : 's'}${mins ? ` · ${mins} min` : ''}`;

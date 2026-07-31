@@ -14,12 +14,26 @@ import {
 } from '@/lib/coach-api';
 import { useAthlete, usePrograms } from '@/lib/coach/hooks';
 
+/** Who the plan is for. The email is the part you can actually search a mailbox
+ *  or the DB with, so it shows even when the athlete has a display name. */
 function AthleteName({ userId }: { userId: string }) {
   const { data, isLoading } = useAthlete(userId);
-  if (isLoading) return <Skeleton className="h-3 w-24 mt-1" />;
+  if (isLoading) return <Skeleton className="h-3 w-40 mt-1" />;
+  if (!data?.name && !data?.email) {
+    return (
+      <span className="block text-xs text-muted-foreground">unknown athlete</span>
+    );
+  }
   return (
     <span className="block text-xs text-muted-foreground truncate">
-      {data?.name || data?.email || 'unknown athlete'}
+      {data.name ? (
+        <>
+          {data.name}
+          {data.email ? <span className="text-muted-foreground/70"> · {data.email}</span> : null}
+        </>
+      ) : (
+        data.email
+      )}
     </span>
   );
 }
@@ -45,7 +59,9 @@ function StatusBadge({ status }: { status: Program['status'] }) {
 }
 
 function planned(p: Program): string {
-  const filled = p.days.filter((d) => d.activities.length || d.isRest).length;
+  // activityCount, not activities.length — the list endpoint sends counts
+  // rather than every line of every day for every athlete.
+  const filled = p.days.filter((d) => d.activityCount || d.isRest).length;
   const total =
     Math.round(
       (new Date(p.endDate).getTime() - new Date(p.startDate).getTime()) / 86_400_000,

@@ -386,7 +386,11 @@ export interface Day {
   /** `draft` until the coach publishes it; athletes only ever see published. */
   status: 'draft' | 'published';
   isRest: boolean;
+  /** Empty on `listPrograms` — that endpoint sends counts, not prescriptions.
+   *  Use `activityCount` to tell a written day from an empty one. */
   activities: Activity[];
+  /** Always accurate, including where `activities` is empty. */
+  activityCount: number;
   session: SessionLog | null;
 }
 

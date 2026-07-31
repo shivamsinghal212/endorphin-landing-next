@@ -67,7 +67,7 @@ export function ProgramContent({ programId }: { programId: number }) {
 
   const draftDays = program.days.filter((d) => d.status === 'draft').length;
   const plannedDays = program.days.filter(
-    (d) => d.activities.length || d.isRest,
+    (d) => d.activityCount || d.isRest,
   ).length;
   const isLive = program.status === 'published';
 
