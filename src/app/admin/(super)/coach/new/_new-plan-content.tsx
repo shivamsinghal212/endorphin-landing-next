@@ -27,6 +27,15 @@ const GOALS: (keyof typeof GOAL_LABEL)[] = ['hyrox', 'run', 'strength'];
 const LEVELS: Level[] = ['beginner', 'intermediate', 'rx'];
 const WEEKDAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
+/** Minutes of unbroken running. Under 10 withholds continuous-run workouts. */
+const RUN_ABILITY: { label: string; value: number }[] = [
+  { label: 'Not yet', value: 0 },
+  { label: '1–2 min', value: 2 },
+  { label: '5 min', value: 5 },
+  { label: '10 min', value: 10 },
+  { label: '20+ min', value: 20 },
+];
+
 /**
  * New plan.
  *
@@ -46,6 +55,9 @@ export function NewPlanContent() {
   const [days, setDays] = React.useState<number[]>([0, 3, 5, 6]);
   const [cap, setCap] = React.useState('60');
   const [notes, setNotes] = React.useState('');
+  const [target, setTarget] = React.useState('');
+  const [targetDate, setTargetDate] = React.useState('');
+  const [runMin, setRunMin] = React.useState<'' | number>('');
 
   const [debounced, setDebounced] = React.useState('');
   React.useEffect(() => {
@@ -72,14 +84,20 @@ export function NewPlanContent() {
       name: planName,
       discipline: goal as Discipline,
       level,
-      goal: `${GOAL_LABEL[goal]} — ${LEVEL_LABEL[level].toLowerCase()}`,
+      // The athlete reads this on their plan screen as the answer to "what am I
+      // training for", so a coach's own words beat "Running — beginner".
+      goal: target.trim() || `${GOAL_LABEL[goal]} — ${LEVEL_LABEL[level].toLowerCase()}`,
       availableEquipment: kit,
       startDate,
       endDate: addDays(startDate, 13),
+      raceOn: targetDate || null,
       athleteContext: {
         notes: notes.trim() || null,
         availableWeekdays: days,
         sessionCapMinutes: Number(cap) || null,
+        // Gates one-unbroken-effort runs. Left unanswered, the assembler can
+        // hand a 5 km continuous run to somebody who run-walks.
+        continuousRunMinutes: runMin === '' ? null : Number(runMin),
       },
     });
     router.push(`/admin/coach/${program.id}`);
@@ -207,9 +225,43 @@ export function NewPlanContent() {
           </div>
         </div>
 
+        <div className="space-y-1.5">
+          <Label htmlFor="target" className="text-xs">
+            What are they working towards?
+          </Label>
+          <Input
+            id="target"
+            value={target}
+            onChange={(e) => setTarget(e.target.value)}
+            placeholder="Run 10 km under 1 hour 30"
+            className="h-11"
+          />
+          <p className="text-xs text-muted-foreground">
+            The athlete reads this on their plan screen. Leave blank and it just
+            says &ldquo;{GOAL_LABEL[goal]} — {LEVEL_LABEL[level].toLowerCase()}&rdquo;,
+            which tells them nothing.
+          </p>
+        </div>
+
+        <div className="space-y-1.5 max-w-[14rem]">
+          <Label htmlFor="targetDate" className="text-xs">
+            Target date (optional)
+          </Label>
+          <Input
+            id="targetDate"
+            type="date"
+            value={targetDate}
+            onChange={(e) => setTargetDate(e.target.value)}
+            className="h-11"
+          />
+          <p className="text-xs text-muted-foreground">
+            A race, or the date they want to hit it by. Drives the countdown.
+          </p>
+        </div>
+
         <p className="text-xs text-muted-foreground">
           The plan will be called <strong>{planName}</strong> and runs 14 days from
-          today. You can rename it and set a race date afterwards.
+          today. You can rename it afterwards.
         </p>
       </section>
 
@@ -232,6 +284,24 @@ export function NewPlanContent() {
             />
           ))}
         </div>
+        <div className="space-y-1.5">
+          <Label className="text-xs">How long can they run without walking?</Label>
+          <div className="grid grid-cols-3 gap-2 sm:grid-cols-5">
+            {RUN_ABILITY.map((o) => (
+              <ChoiceButton
+                key={o.label}
+                active={runMin === o.value}
+                onClick={() => setRunMin(o.value)}
+                label={o.label}
+              />
+            ))}
+          </div>
+          <p className="text-xs text-muted-foreground">
+            Under 10 minutes and the assembler won&apos;t prescribe a continuous
+            run — they get run-walk intervals instead.
+          </p>
+        </div>
+
         <div className="space-y-1.5 max-w-[12rem]">
           <Label htmlFor="cap" className="text-xs">
             Longest session (minutes)

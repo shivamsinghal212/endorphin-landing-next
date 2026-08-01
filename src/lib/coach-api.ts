@@ -406,6 +406,9 @@ export interface Program {
     notes?: string | null;
     availableWeekdays?: number[];
     sessionCapMinutes?: number | null;
+    /** Minutes of unbroken running. Under 10 withholds continuous-run
+     *  workouts, so the athlete gets run-walk intervals instead. */
+    continuousRunMinutes?: number | null;
   } | null;
   startDate: string;
   endDate: string;
