@@ -21,7 +21,6 @@ import {
 } from '@/components/ui/select';
 import { cn } from '@/lib/utils';
 import {
-  ROUND_SCORED,
   SECTION_LABEL,
   UNIT_LABEL,
   type QuantityUnit,
@@ -56,7 +55,6 @@ export function ActivityCard({
   onAddExercise?: () => void;
 }) {
   const isCustom = activity.workoutId === null;
-  const takesRounds = ROUND_SCORED.includes(activity.scoreType as never);
 
   const setLine = (i: number, patch: Partial<DraftLine>) => {
     const lines = activity.lines.map((l, n) => (n === i ? { ...l, ...patch } : l));
@@ -99,22 +97,28 @@ export function ActivityCard({
         )}
 
         <div className="ms-auto flex items-center gap-1">
-          {takesRounds ? (
-            <label className="flex items-center gap-1.5 text-xs text-muted-foreground mr-1">
-              <Input
-                type="number"
-                inputMode="numeric"
-                min={1}
-                value={activity.rounds ?? 1}
-                onChange={(e) =>
-                  onChange({ ...activity, rounds: Number(e.target.value) || 1 })
-                }
-                className="h-9 w-14 text-right tabular-nums"
-                aria-label="Rounds"
-              />
-              rounds
-            </label>
-          ) : null}
+          <label className="flex items-center gap-1.5 text-xs text-muted-foreground mr-1">
+            <Input
+              type="number"
+              inputMode="numeric"
+              min={1}
+              placeholder="—"
+              value={activity.rounds ?? ''}
+              onChange={(e) => {
+                // Empty clears it: a workout done once through has no round
+                // count, and the coach needs to be able to say so.
+                const raw = e.target.value.trim();
+                const n = Number(raw);
+                onChange({
+                  ...activity,
+                  rounds: raw === '' || !Number.isFinite(n) || n < 1 ? null : Math.floor(n),
+                });
+              }}
+              className="h-9 w-14 text-right tabular-nums"
+              aria-label="Rounds"
+            />
+            rounds
+          </label>
 
           <Button
             type="button"

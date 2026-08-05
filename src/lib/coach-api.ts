@@ -118,7 +118,13 @@ export const SCORE_LABEL: Record<ScoreType, string> = {
   'for-quality': 'Quality — no score',
 };
 
-/** Which score types take a round count. Mirrors ROUND_SCORES in the backend. */
+/** Score types where the round count *is* the score, so the generator is allowed
+ *  to choose it. Mirrors ROUND_SCORES in the backend.
+ *
+ *  Not a test for "can this workout have rounds" — any workout can. Using it that
+ *  way hid the rounds control from every strength session and stripped the count
+ *  on save, because those are all `for-load` or `for-quality`.
+ */
 export const ROUND_SCORED: ScoreType[] = [
   'amrap', 'emom', 'for-time', 'intervals', 'tabata',
 ];

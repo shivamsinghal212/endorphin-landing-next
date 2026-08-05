@@ -5,7 +5,6 @@
  *  out of the component so the round-trip is testable and readable on its own.
  */
 import {
-  ROUND_SCORED,
   type Activity,
   type ActivityInput,
   type Day,
@@ -184,7 +183,9 @@ export function workoutToDraft(
     title: w.name,
     description: w.description,
     scoreType: w.scoreType,
-    rounds: ROUND_SCORED.includes(w.scoreType) ? (w.defaultRounds ?? 3) : null,
+    // Whatever the workout declares, whatever its score type. Gating this on
+    // ROUND_SCORED meant a workout defined as 3 rounds was added as one pass.
+    rounds: w.defaultRounds ?? null,
     durationMin: w.durationMin,
     lines,
   };
@@ -241,7 +242,10 @@ export function dayInputFromDraft(draft: DayDraft): DayInput {
             ? {
                 section: a.section,
                 workoutId: a.workoutId,
-                rounds: ROUND_SCORED.includes(a.scoreType as never) ? a.rounds : null,
+                // Send what the coach set. This used to null the round count for
+                // any non-round-scored workout, so saving an edited day silently
+                // stripped the rounds off every strength session on it.
+                rounds: a.rounds,
                 lines: a.lines
                   .filter((l) => l.workoutItemId != null)
                   .map((l) => ({
