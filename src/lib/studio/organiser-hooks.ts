@@ -263,8 +263,9 @@ export function useCancelRegistration(eventId: string) {
     mutationFn: ({
       registrationId,
       reason,
-    }: { registrationId: string; reason?: string }) =>
-      cancelRegistration(token!, eventId, registrationId, reason),
+      withoutRefund,
+    }: { registrationId: string; reason?: string; withoutRefund?: boolean }) =>
+      cancelRegistration(token!, eventId, registrationId, reason, withoutRefund),
     onSuccess: () => {
       qc.invalidateQueries({
         predicate: (q) =>

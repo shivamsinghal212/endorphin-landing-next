@@ -532,18 +532,25 @@ export interface CancelRegistrationResponse {
   registrationStatus: RegistrationRow['registrationStatus'];
 }
 
+/** `withoutRefund` is the explicit confirmation the backend requires to
+ *  cancel a PAID registration — the spot is released, the captured payment
+ *  stays with the organiser. */
 export const cancelRegistration = (
   token: string,
   eventId: string,
   registrationId: string,
   reason?: string,
+  withoutRefund?: boolean,
 ) =>
   orgFetch<CancelRegistrationResponse>(
     `/organiser/events/${eventId}/registrations/${registrationId}/cancel`,
     token,
     {
       method: 'POST',
-      body: JSON.stringify({ reason: reason ?? null }),
+      body: JSON.stringify({
+        reason: reason ?? null,
+        withoutRefund: withoutRefund ?? false,
+      }),
     },
   );
 

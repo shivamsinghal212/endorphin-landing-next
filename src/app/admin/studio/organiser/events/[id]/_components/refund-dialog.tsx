@@ -9,12 +9,13 @@ import {
 } from '@/app/admin/studio/_components/form';
 import {
   describeOrganiserError,
+  useCancelRegistration,
   useInitiateRefund,
 } from '@/lib/studio/organiser-hooks';
 import type { RegistrationRow } from '@/lib/organiser-api';
 import { formatINR } from './_utils';
 
-type Mode = 'full' | 'partial';
+type Mode = 'full' | 'partial' | 'none';
 
 export function RefundDialog({
   eventId,
@@ -36,6 +37,8 @@ export function RefundDialog({
   const [partialRupees, setPartialRupees] = useState('');
   const [reason, setReason] = useState('');
   const mutation = useInitiateRefund(eventId);
+  const cancelMutation = useCancelRegistration(eventId);
+  const pending = mutation.isPending || cancelMutation.isPending;
 
   // Open/close the native dialog imperatively.
   useEffect(() => {
@@ -74,15 +77,37 @@ export function RefundDialog({
     Number.isFinite(partialPaise) &&
     partialPaise > 0 &&
     partialPaise <= amountPaid;
-  const canSubmit = mode === 'full' || partialValid;
+  const canSubmit = mode !== 'partial' || partialValid;
 
   const submit = async () => {
     if (!canSubmit) return;
+    const trimmedReason = reason.trim().slice(0, 280) || undefined;
+
+    // No refund: release the spot, keep the money. Different endpoint —
+    // Razorpay is never involved.
+    if (mode === 'none') {
+      try {
+        await cancelMutation.mutateAsync({
+          registrationId: registration.id,
+          reason: trimmedReason,
+          withoutRefund: true,
+        });
+        toast.success('Registration cancelled — payment kept, no refund issued');
+        // Deliberately NOT onRefundQueued: no refund is in flight, and that
+        // marker only clears when the row turns 'refunded' — which this never
+        // does. The mutation's invalidate refetches the cancelled row.
+        onClose();
+      } catch (err) {
+        toast.error(describeOrganiserError(err));
+      }
+      return;
+    }
+
     const payload: { registrationId: string; amountPaise?: number; reason?: string } = {
       registrationId: registration.id,
     };
     if (mode === 'partial') payload.amountPaise = partialPaise;
-    if (reason.trim()) payload.reason = reason.trim().slice(0, 280);
+    if (trimmedReason) payload.reason = trimmedReason;
     try {
       await mutation.mutateAsync(payload);
       toast.success(
@@ -135,8 +160,9 @@ export function RefundDialog({
             Paid {formatINR(amountPaid)}
           </p>
           <p className="mt-2 leading-snug">
-            This cancels the registration and queues a Razorpay refund. The
-            runner can re-register for the same distance afterwards.
+            {mode === 'none'
+              ? 'This cancels the registration without returning any money. The runner can re-register for the same distance afterwards.'
+              : 'This cancels the registration and queues a Razorpay refund. The runner can re-register for the same distance afterwards.'}
           </p>
         </div>
 
@@ -155,6 +181,11 @@ export function RefundDialog({
                 label="Partial refund"
                 checked={mode === 'partial'}
                 onClick={() => setMode('partial')}
+              />
+              <RadioPill
+                label="No refund"
+                checked={mode === 'none'}
+                onClick={() => setMode('none')}
               />
             </div>
           </div>
@@ -197,20 +228,17 @@ export function RefundDialog({
         </div>
 
         <p className="text-[11px] text-jet/50 mt-4 bg-jet/[0.03] rounded-lg p-2.5">
-          Razorpay processes refunds in 5–10 working days. The runner will get
-          an email when complete.
+          {mode === 'none'
+            ? `The spot is released and ${formatINR(amountPaid)} stays with you — no money goes back to the runner, and they aren't emailed.`
+            : 'Razorpay processes refunds in 5–10 working days. The runner will get an email when complete.'}
         </p>
 
         <div className="mt-5 flex items-center justify-end gap-2">
-          <SecondaryButton onClick={onClose} disabled={mutation.isPending}>
+          <SecondaryButton onClick={onClose} disabled={pending}>
             Cancel
           </SecondaryButton>
-          <PrimaryButton
-            onClick={submit}
-            disabled={!canSubmit}
-            loading={mutation.isPending}
-          >
-            Cancel & refund
+          <PrimaryButton onClick={submit} disabled={!canSubmit} loading={pending}>
+            {mode === 'none' ? 'Cancel without refund' : 'Cancel & refund'}
           </PrimaryButton>
         </div>
       </div>
