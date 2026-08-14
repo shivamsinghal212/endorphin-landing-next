@@ -460,7 +460,9 @@ function Row({
               disabled={refundPending}
               className="text-[11px] px-2.5 py-1 rounded-md border border-jet/15 hover:bg-jet/5 whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {refundPending ? 'Refund queued' : 'Cancel & refund'}
+              {/* Not "Cancel & refund" — the dialog it opens also offers
+                  cancelling without a refund. */}
+              {refundPending ? 'Refund queued' : 'Cancel…'}
             </button>
           )}
           {cancelEligible && (

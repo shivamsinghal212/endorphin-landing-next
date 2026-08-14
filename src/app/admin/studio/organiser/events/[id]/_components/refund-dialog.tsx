@@ -149,7 +149,7 @@ export function RefundDialog({
     >
       <div className="p-5">
         <p className="font-display uppercase text-sm font-bold mb-1">
-          Cancel & refund
+          Cancel registration
         </p>
         <div className="text-[12px] text-jet/60 mb-4">
           <p>
