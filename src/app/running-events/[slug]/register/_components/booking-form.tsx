@@ -56,13 +56,14 @@ const EMAIL_RE = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
 interface AttendeeDraft {
   name: string;
   email: string;
+  phone: string;
   tshirt: string;
   custom: CustomFormData;
   shipping: ShippingAddress;
 }
 
 function emptyAttendee(): AttendeeDraft {
-  return { name: '', email: '', tshirt: '', custom: {}, shipping: { ...EMPTY_SHIPPING } };
+  return { name: '', email: '', phone: '', tshirt: '', custom: {}, shipping: { ...EMPTY_SHIPPING } };
 }
 
 function unitRupees(d: DistanceCategory): number {
@@ -117,6 +118,9 @@ export function BookingForm({ bundle }: { bundle: RegistrationEventBundle }) {
     [extras.registrationForm],
   );
   const needsShipping = !!(extras.collectAddress || extras.shipsMedal);
+  // Asked per attendee, not per booking: the buyer isn't the runner, and the
+  // organiser needs to reach whoever is actually on the start line.
+  const needsPhone = event.collectPhone ?? true;
   const needsTshirt = !!extras.collectTshirt;
   const tshirtSizes = extras.tshirtSizes ?? [];
 
@@ -151,8 +155,9 @@ export function BookingForm({ bundle }: { bundle: RegistrationEventBundle }) {
       missingProfileFields(meQ.data, {
         collectDob: event.collectDob,
         collectGender: event.collectGender,
+        collectPhone: event.collectPhone,
       }),
-    [meQ.data, event.collectDob, event.collectGender],
+    [meQ.data, event.collectDob, event.collectGender, event.collectPhone],
   );
 
   useEffect(() => {
@@ -211,6 +216,7 @@ export function BookingForm({ bundle }: { bundle: RegistrationEventBundle }) {
     updateAttendee(tierId, idx, {
       name: meQ.data?.name ?? '',
       email: meQ.data?.email ?? '',
+      phone: meQ.data?.phone ?? '',
     });
   };
 
@@ -268,6 +274,8 @@ export function BookingForm({ bundle }: { bundle: RegistrationEventBundle }) {
         const who = `${d.categoryName} · ${unit} ${i + 1}`;
         if (!a.name.trim()) return `Enter a name for ${who}.`;
         if (!EMAIL_RE.test(a.email.trim())) return `Enter a valid email for ${who}.`;
+        if (needsPhone && a.phone.trim().length !== 10)
+          return `Enter a 10-digit phone number for ${who}.`;
         if (needsTshirt && tshirtSizes.length > 0 && !a.tshirt)
           return `Pick a T-shirt size for ${who}.`;
         const customCheck = validateCustomQuestions(customFields, a.custom);
@@ -287,6 +295,7 @@ export function BookingForm({ bundle }: { bundle: RegistrationEventBundle }) {
       attendees: (cart[d.id!] ?? []).map((a) => ({
         name: a.name.trim(),
         email: a.email.trim(),
+        phone: needsPhone ? a.phone.trim() : null,
         tshirtSize: needsTshirt ? a.tshirt || null : null,
         shippingAddress: needsShipping ? a.shipping : null,
         formData: customFields.length > 0 ? a.custom : null,
@@ -609,6 +618,25 @@ export function BookingForm({ bundle }: { bundle: RegistrationEventBundle }) {
                             className="w-full px-3 py-2.5 rounded-xl border border-jet/10 text-sm bg-white text-jet focus:border-jet outline-none"
                           />
                         </label>
+                        {needsPhone && (
+                          <label className="block">
+                            <span className="block text-[11px] uppercase tracking-wider text-jet/60 mb-1">
+                              Phone (10 digits) *
+                            </span>
+                            <input
+                              type="tel"
+                              value={a.phone}
+                              onChange={(e) =>
+                                updateAttendee(d.id!, i, {
+                                  phone: e.target.value.replace(/[^0-9]/g, '').slice(0, 10),
+                                })
+                              }
+                              inputMode="numeric"
+                              autoComplete="tel"
+                              className="w-full px-3 py-2.5 rounded-xl border border-jet/10 text-sm bg-white text-jet focus:border-jet outline-none"
+                            />
+                          </label>
+                        )}
                       </div>
 
                       {needsTshirt && tshirtSizes.length > 0 && (

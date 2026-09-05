@@ -3,9 +3,8 @@
 import Link from 'next/link';
 import { useMemo } from 'react';
 import type { Organiser, OrganiserEventListItem } from '@/lib/organiser-api';
-import { useOrganiserEvents } from '@/lib/studio/organiser-hooks';
+import { useStudioEventsList } from '@/lib/studio/organiser-hooks';
 import { EventsList } from './events-list';
-import { ResumeDraftBanner } from './resume-draft-banner';
 
 function inrFromPaise(paise: number): string {
   const rupees = Math.round(paise / 100);
@@ -39,10 +38,13 @@ function StatCard({
   );
 }
 
-export function Dashboard({ organiser }: { organiser: Organiser }) {
-  // Pull events once; tabs in EventsList re-use the same query via React
-  // Query's cache so this is a single network hit, not two.
-  const eventsQ = useOrganiserEvents({});
+export function Dashboard({ organiser }: { organiser: Organiser | null }) {
+  // Everything this user can manage — their own events, their clubs', and
+  // their organiser's. Deliberately not the organiser-scoped list: an event
+  // made through the composer may have no organiser at all, and it still
+  // has to show up here. Tabs in EventsList re-use this query from React
+  // Query's cache, so it's one network hit.
+  const eventsQ = useStudioEventsList();
   const items = eventsQ.data?.items ?? [];
 
   const year = new Date().toLocaleString('en-IN', {
@@ -80,15 +82,17 @@ export function Dashboard({ organiser }: { organiser: Organiser }) {
     <div>
       <div className="flex items-end justify-between mb-6 gap-3">
         <div className="min-w-0">
-          <p className="text-[11px] uppercase tracking-wider text-jet/40 mb-1">
-            {organiser.displayName}
-          </p>
+          {organiser && (
+            <p className="text-[11px] uppercase tracking-wider text-jet/40 mb-1">
+              {organiser.displayName}
+            </p>
+          )}
           <h1 className="font-display uppercase text-2xl sm:text-3xl font-bold">
-            Organiser home
+            Manage events
           </h1>
         </div>
         <Link
-          href="/admin/studio/organiser/events/new"
+          href="/create"
           className="inline-flex items-center gap-2 px-3 sm:px-4 py-2.5 rounded-lg bg-jet text-bone text-sm font-medium hover:bg-jet/90 shrink-0"
         >
           <span className="text-base leading-none">+</span> New event
@@ -125,7 +129,6 @@ export function Dashboard({ organiser }: { organiser: Organiser }) {
         />
       </div>
 
-      <ResumeDraftBanner />
 
       <EventsList />
     </div>

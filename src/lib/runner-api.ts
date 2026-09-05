@@ -254,6 +254,9 @@ export const getMyRegistration = (token: string, registrationId: string) =>
 export interface BookingAttendeeInput {
   name: string;
   email: string;
+  // Only sent when the event has `collectPhone` on — the backend requires
+  // one per attendee in that case.
+  phone?: string | null;
   tshirtSize?: string | null;
   shippingAddress?: ShippingAddress | null;
   formData?: Record<string, unknown> | null;
@@ -293,6 +296,7 @@ export interface MyBookingAttendee {
   distanceCategoryId: string | null;
   attendeeName: string | null;
   attendeeEmail: string | null;
+  attendeePhone: string | null;
   tshirtSize: string | null;
   amountPaid: number | null;
   paymentStatus: PaymentStatus;

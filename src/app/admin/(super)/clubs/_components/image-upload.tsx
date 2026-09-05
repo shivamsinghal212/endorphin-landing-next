@@ -40,7 +40,10 @@ async function compressIfNeeded(file: File): Promise<File> {
   }
 }
 
-async function uploadFile(file: File, folder: string): Promise<string> {
+/** Exported for the public event composer, which defers its upload until
+ *  after sign-in and so can't use `ImageUploadField`'s inline flow. Keeps the
+ *  compression + 413 handling in one place. */
+export async function uploadFile(file: File, folder: string): Promise<string> {
   const prepared = await compressIfNeeded(file);
   const fd = new FormData();
   fd.append('file', prepared);

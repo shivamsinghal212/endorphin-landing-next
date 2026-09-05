@@ -6,10 +6,6 @@
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE || 'https://api.endorfin.run';
 
-/** Shared between the wizard (writer) and the dashboard's resume banner (reader).
- *  Stored payload shape: { title?, currentStepId, currentStepLabel, updatedAt, ... }. */
-export const ORGANISER_EVENT_DRAFT_KEY = 'organiser:event-draft';
-
 export class OrganiserApiError extends Error {
   constructor(public status: number, message: string) {
     super(message);
@@ -121,6 +117,8 @@ export interface OrganiserEvent {
   // the public URL prefix and the wizard's wording.
   category: string;
   organiserId: string | null;
+  /** Run club hosting this event — set at creation or attached later. */
+  clubId: string | null;
   eventFormat: EventFormat;
   eventStatus: EventStatus;
   eventSourceType: string;
@@ -137,6 +135,7 @@ export interface OrganiserEvent {
   donationPercent: number | null;
   collectDob: boolean;
   collectGender: boolean;
+  collectPhone: boolean;
   collectTshirt: boolean;
   tshirtSizes: string[] | null;
   collectAddress: boolean;
@@ -144,6 +143,10 @@ export interface OrganiserEvent {
   shipsMedal: boolean;
   locationName: string | null;
   locationAddress: string | null;
+  /** When the event itself happens. Non-null on the wire — the backend
+   *  column is NOT NULL and derives a value when the caller omits one. */
+  startTime: string;
+  endTime: string | null;
   registrationOpenAt: string | null;
   registrationCloseAt: string | null;
   acceptingRegistrations: boolean;
@@ -167,6 +170,7 @@ export interface OrganiserEventListItem {
   eventFormat: EventFormat;
   eventStatus: EventStatus;
   coverImageUrl: string | null;
+  startTime: string;
   registrationOpenAt: string | null;
   registrationCloseAt: string | null;
   // Backend (organiser_event_service.list_organiser_events) emits these
@@ -213,6 +217,7 @@ export interface OrganiserEventCreate {
   donationPercent?: number | null;
   collectDob?: boolean;
   collectGender?: boolean;
+  collectPhone?: boolean;
   collectTshirt?: boolean;
   tshirtSizes?: string[] | null;
   collectAddress?: boolean;
@@ -308,6 +313,7 @@ export interface RegistrationRow {
   bookingCode?: string | null;
   attendeeName?: string | null;
   attendeeEmail?: string | null;
+  attendeePhone?: string | null;
   // Gate check-in arrival time (ISO); null until scanned in at the venue.
   checkedInAt?: string | null;
   createdAt: string;
@@ -317,6 +323,7 @@ export interface RegistrationRow {
     id: string;
     name: string | null;
     email: string | null;
+    phone?: string | null;
     gender: string | null;
     birthdate: string | null;
     city: string | null;
@@ -363,29 +370,8 @@ export const updateMyOrganiser = (token: string, body: OrganiserUpdate) =>
 
 // ── Organiser events ───────────────────────────────────────────────────────
 
-export const listOrganiserEvents = (
-  token: string,
-  params: { status?: string; limit?: number; offset?: number } = {},
-) => {
-  const q = new URLSearchParams();
-  if (params.status) q.set('status', params.status);
-  if (params.limit != null) q.set('limit', String(params.limit));
-  if (params.offset != null) q.set('offset', String(params.offset));
-  const qs = q.toString();
-  return orgFetch<OrganiserEventListResponse>(
-    `/organiser/events${qs ? `?${qs}` : ''}`,
-    token,
-  );
-};
-
 export const getOrganiserEvent = (token: string, eventId: string) =>
   orgFetch<OrganiserEvent>(`/organiser/events/${eventId}`, token);
-
-export const createOrganiserEvent = (token: string, body: OrganiserEventCreate) =>
-  orgFetch<OrganiserEvent>(`/organiser/events`, token, {
-    method: 'POST',
-    body: JSON.stringify(body),
-  });
 
 export const updateOrganiserEvent = (
   token: string,
@@ -588,4 +574,69 @@ export const checkInAttendees = (
   orgFetch<CheckInRoster>(`/organiser/events/${eventId}/check-in`, token, {
     method: 'POST',
     body: JSON.stringify({ registrationIds }),
+  });
+
+// ── Unified event creation (/studio/*) ─────────────────────────────────────
+// The composer's surface. Distinct from the `/organiser/events` calls above
+// in exactly one way that matters: these work for a signed-in user with no
+// organiser profile. Everything after creation still goes through the
+// organiser endpoints — the backend widened who may manage an event rather
+// than growing a second set of manage routes.
+
+/** localStorage key for the composer draft. Written from the first keystroke
+ *  so the draft survives a refresh and the sign-in round-trip. */
+export const STUDIO_EVENT_DRAFT_KEY = 'studio:event-draft';
+
+export interface StudioEventCreate {
+  title: string;
+  startTime: string;
+  endTime?: string | null;
+  eventFormat?: EventFormat;
+  category?: 'running' | 'experience';
+  coverImageUrl?: string | null;
+  descriptionMd?: string | null;
+  locationName?: string | null;
+  locationAddress?: string | null;
+  /** Only set when a Google Places suggestion was picked. */
+  latitude?: number | null;
+  longitude?: number | null;
+  /** 0 = free. A ₹0 ticket registers without touching Razorpay. */
+  price?: number;
+  currency?: string;
+  capacity?: number | null;
+  /** Max 20 chars — the distance-category column is narrow. */
+  ticketName?: string;
+  clubId?: string | null;
+}
+
+export const createStudioEvent = (token: string, body: StudioEventCreate) =>
+  orgFetch<OrganiserEvent>(`/studio/events`, token, {
+    method: 'POST',
+    body: JSON.stringify(body),
+  });
+
+export const listStudioEvents = (
+  token: string,
+  params: { status?: string; limit?: number; offset?: number } = {},
+) => {
+  const q = new URLSearchParams();
+  if (params.status) q.set('status', params.status);
+  if (params.limit != null) q.set('limit', String(params.limit));
+  if (params.offset != null) q.set('offset', String(params.offset));
+  const qs = q.toString();
+  return orgFetch<OrganiserEventListResponse>(
+    `/studio/events${qs ? `?${qs}` : ''}`,
+    token,
+  );
+};
+
+/** Attach a hosting run club, or pass `null` to detach. */
+export const setStudioEventClub = (
+  token: string,
+  eventId: string,
+  clubId: string | null,
+) =>
+  orgFetch<OrganiserEvent>(`/studio/events/${eventId}/club`, token, {
+    method: 'PUT',
+    body: JSON.stringify({ clubId }),
   });

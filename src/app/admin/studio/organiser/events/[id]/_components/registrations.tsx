@@ -530,6 +530,7 @@ function buildRegistrationsCsv(
   const headers = [
     'Name',
     'Email',
+    'Phone',
     'Distance',
     'Paid (INR)',
     'Coupon',
@@ -545,6 +546,7 @@ function buildRegistrationsCsv(
     const cells = [
       r.attendeeName || r.user?.name || '',
       r.attendeeEmail || r.user?.email || '',
+      r.attendeePhone || r.user?.phone || '',
       distanceName(r.distanceCategoryId),
       r.amountPaid != null ? (r.amountPaid / 100).toString() : '',
       r.couponId ? couponsById.get(r.couponId)?.code ?? '' : '',

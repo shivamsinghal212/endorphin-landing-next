@@ -6,7 +6,7 @@ import { toast } from 'sonner';
 import {
   describeOrganiserError,
   useDeleteOrganiserEvent,
-  useOrganiserEvents,
+  useStudioEventsList,
 } from '@/lib/studio/organiser-hooks';
 import type { OrganiserEventListItem } from '@/lib/organiser-api';
 import { ErrorState, Skeleton } from '../../_components/ui';
@@ -181,7 +181,10 @@ function EventRow({ ev, accent }: { ev: OrganiserEventListItem; accent: string |
 export function EventsList() {
   const [tab, setTab] = useState<Tab>('live');
   const [query, setQuery] = useState('');
-  const { data, isLoading, isError, error, refetch } = useOrganiserEvents({});
+  // Same source as the Dashboard, so the two share one cached request —
+  // and so an event created through the composer (which may have no
+  // organiser at all) actually appears in this list.
+  const { data, isLoading, isError, error, refetch } = useStudioEventsList();
 
   const items = data?.items ?? [];
 

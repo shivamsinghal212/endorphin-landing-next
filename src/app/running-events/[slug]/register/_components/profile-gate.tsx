@@ -16,18 +16,19 @@ export interface ProfileDraft {
   gender: string;
 }
 
-// Name + phone are always required (identity + Razorpay contact prefill).
-// Birthdate + gender are only collected when the event opts into them via
-// its `collectDob` / `collectGender` flags — otherwise a runner whose profile
-// lacks them shouldn't be forced to fill them for an event that doesn't ask.
+// Name is always required (identity on the start list). Phone, birthdate and
+// gender are collected only when the event opts into them via its `collect*`
+// flags — otherwise a runner whose profile lacks them shouldn't be forced to
+// fill them for an event that doesn't ask. `collectPhone` defaults to true,
+// matching how every event behaved before the flag existed.
 export function missingProfileFields(
   me: MeProfile | null | undefined,
-  opts?: { collectDob?: boolean; collectGender?: boolean },
+  opts?: { collectDob?: boolean; collectGender?: boolean; collectPhone?: boolean },
 ): ProfileFieldKey[] {
   if (!me) return [];
   const out: ProfileFieldKey[] = [];
   if (!me.name?.trim()) out.push('name');
-  if (!me.phone?.trim()) out.push('phone');
+  if ((opts?.collectPhone ?? true) && !me.phone?.trim()) out.push('phone');
   if (opts?.collectDob && !me.birthdate) out.push('birthdate');
   if (opts?.collectGender && !me.gender) out.push('gender');
   return out;

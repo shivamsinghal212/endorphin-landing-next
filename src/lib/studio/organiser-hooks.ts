@@ -10,7 +10,6 @@ import {
   type Organiser,
   type OrganiserCreate,
   type OrganiserEvent,
-  type OrganiserEventCreate,
   type OrganiserEventUpdate,
   type OrganiserUpdate,
   type PendingReviewEvent,
@@ -19,7 +18,6 @@ import {
   cancelRegistration,
   checkInAttendees,
   createCoupon,
-  createOrganiserEvent,
   deleteCoupon,
   getEventStats,
   getMyOrganiser,
@@ -27,10 +25,11 @@ import {
   initiateRefund,
   listCoupons,
   listEventRegistrations,
-  listOrganiserEvents,
   listPendingReviewEvents,
   onboardOrganiser,
   rejectEvent,
+  listStudioEvents,
+  setStudioEventClub,
   submitEventForReview,
   setOrganiserEventOnline,
   deleteOrganiserEvent,
@@ -89,16 +88,6 @@ export function useUpdateMyOrganiser() {
 
 // ── Events ────────────────────────────────────────────────────────────────
 
-export function useOrganiserEvents(params: { status?: string; limit?: number; offset?: number } = {}) {
-  const token = useAdminToken();
-  return useQuery({
-    queryKey: organiserKeys.events(params.status),
-    queryFn: () => listOrganiserEvents(token!, params),
-    enabled: !!token,
-    staleTime: 15_000,
-  });
-}
-
 export function useOrganiserEvent(eventId: string | null) {
   const token = useAdminToken();
   return useQuery({
@@ -106,18 +95,6 @@ export function useOrganiserEvent(eventId: string | null) {
     queryFn: () => getOrganiserEvent(token!, eventId!),
     enabled: !!token && !!eventId,
     staleTime: 5_000,
-  });
-}
-
-export function useCreateOrganiserEvent() {
-  const token = useAdminToken();
-  const qc = useQueryClient();
-  return useMutation({
-    mutationFn: (body: OrganiserEventCreate) => createOrganiserEvent(token!, body),
-    onSuccess: (event: OrganiserEvent) => {
-      qc.invalidateQueries({ queryKey: organiserKeys.events() });
-      qc.setQueryData(organiserKeys.event(event.id), event);
-    },
   });
 }
 
@@ -138,6 +115,35 @@ export function useSubmitEventForReview(eventId: string) {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: () => submitEventForReview(token!, eventId),
+    onSuccess: (event: OrganiserEvent) => {
+      qc.setQueryData(organiserKeys.event(eventId), event);
+      qc.invalidateQueries({ queryKey: organiserKeys.events() });
+    },
+  });
+}
+
+/** Every event this person can manage — their own drafts, their clubs',
+ *  their organiser's. Unlike `useOrganiserEvents`, this needs no organiser
+ *  profile, so it is the right list for someone who just created their
+ *  first event. */
+export function useStudioEventsList(status?: string) {
+  const token = useAdminToken();
+  return useQuery({
+    queryKey: [...organiserKeys.events(), 'studio', status ?? 'all'] as const,
+    queryFn: () => listStudioEvents(token!, { status, limit: 50 }),
+    enabled: !!token,
+    staleTime: 15_000,
+  });
+}
+
+/** Attach or detach the hosting run club — the optional post-create step.
+ *  Pass null to detach. */
+export function useSetEventClub(eventId: string) {
+  const token = useAdminToken();
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (clubId: string | null) =>
+      setStudioEventClub(token!, eventId, clubId),
     onSuccess: (event: OrganiserEvent) => {
       qc.setQueryData(organiserKeys.event(eventId), event);
       qc.invalidateQueries({ queryKey: organiserKeys.events() });

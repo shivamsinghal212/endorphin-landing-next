@@ -131,20 +131,20 @@ function OrganiserTile() {
       className="group block bg-white border border-jet/10 rounded-3xl p-6 md:p-8 hover:border-jet/30 transition-colors min-h-[200px]"
     >
       <p className="text-[10px] uppercase tracking-wider text-jet/40">
-        02 / Organiser
+        02 / Events
       </p>
       <p
         className="italic text-3xl md:text-4xl leading-[0.95] mt-6 text-jet"
         style={{ fontFamily: 'var(--font-fraunces), Georgia, serif' }}
       >
-        Races &amp;<br />events.
+        Manage<br />events.
       </p>
       <p className="text-xs text-jet/60 mt-4">
-        Listings, registrations, results.
+        Registrations, check-in, payouts.
       </p>
       <div className="mt-6">
         <span className="inline-block px-3 py-1.5 rounded-lg bg-jet text-bone text-xs font-medium group-hover:bg-jet/90">
-          Open organiser →
+          Manage events →
         </span>
       </div>
     </Link>

@@ -20,6 +20,13 @@ const CLUBS_SUBLINKS = [
   { label: 'For club owners', href: '/for-clubs' },
 ];
 
+// The signed-in account dropdown. Only real destinations — "my events"
+// lives inside Studio rather than getting a route of its own.
+const ACCOUNT_LINKS = [
+  { label: 'My registrations', href: '/me/registrations' },
+  { label: 'Studio', href: '/admin/studio' },
+];
+
 function isLinkActive(pathname: string | null, href: string) {
   if (!pathname) return false;
   if (href === '/') return pathname === '/';
@@ -50,15 +57,20 @@ const LogoMark = () => (
 
 const HeaderClient = ({
   isAuthed,
+  userName = null,
 }: {
   isAuthed: boolean;
+  userName?: string | null;
 }) => {
   const navRef = useRef<HTMLElement | null>(null);
   const subRef = useRef<HTMLLIElement | null>(null);
+  const acctRef = useRef<HTMLDivElement | null>(null);
   const [open, setOpen] = useState(false);
   // Controls the "Clubs" dropdown. Desktop also opens it on hover via CSS;
   // this state drives tap-to-open on touch and click-to-pin on desktop.
   const [subOpen, setSubOpen] = useState(false);
+  // Same pattern for the signed-in account dropdown.
+  const [acctOpen, setAcctOpen] = useState(false);
   const [loginOpen, setLoginOpen] = useState(false);
   const [isLoggingOut, startTransition] = useTransition();
   // Tracks the post-login server refresh so the modal can show a loader
@@ -101,25 +113,30 @@ const HeaderClient = ({
   useEffect(() => {
     document.body.classList.toggle('nav-open', open);
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') { setOpen(false); setSubOpen(false); }
+      if (e.key === 'Escape') { setOpen(false); setSubOpen(false); setAcctOpen(false); }
     };
     document.addEventListener('keydown', onKey);
     return () => document.removeEventListener('keydown', onKey);
   }, [open]);
 
-  // Click-outside closes the (click-pinned) Clubs dropdown on desktop.
+  // Click-outside closes whichever dropdown is click-pinned on desktop.
   useEffect(() => {
-    if (!subOpen) return;
+    const pinned: [boolean, React.RefObject<HTMLElement | null>, (v: boolean) => void][] = [
+      [subOpen, subRef, setSubOpen],
+      [acctOpen, acctRef, setAcctOpen],
+    ];
+    const active = pinned.filter(([isOpen]) => isOpen);
+    if (active.length === 0) return;
     const onDown = (e: PointerEvent) => {
-      if (subRef.current && !subRef.current.contains(e.target as Node)) {
-        setSubOpen(false);
+      for (const [, ref, close] of active) {
+        if (ref.current && !ref.current.contains(e.target as Node)) close(false);
       }
     };
     document.addEventListener('pointerdown', onDown);
     return () => document.removeEventListener('pointerdown', onDown);
-  }, [subOpen]);
+  }, [subOpen, acctOpen]);
 
-  const closeMenu = () => { setOpen(false); setSubOpen(false); };
+  const closeMenu = () => { setOpen(false); setSubOpen(false); setAcctOpen(false); };
 
   const clubsActive = ['/clubs', '/for-clubs', '/run-clubs'].some((h) => isLinkActive(pathname, h));
 
@@ -228,27 +245,96 @@ const HeaderClient = ({
             </ul>
           </li>
 
+          {/* One primary action. `/create` works signed out — the sign-in
+              gate is at the moment they commit the event, not here. */}
           <li>
-            <Link href="/admin/studio" className="v1-nav-cta" onClick={closeMenu}>
-              Create Experience
+            <Link href="/create" className="v1-nav-cta" onClick={closeMenu}>
+              Create event
             </Link>
           </li>
           <li>
             <a href={downloadHref} className="v1-nav-cta-secondary" onClick={closeMenu}>
-              Download App
+              Get the app
             </a>
           </li>
+
+          {/* Account, flattened into the drawer — a nested dropdown inside a
+              slide-out menu is worse than a labelled group. */}
+          {isAuthed && (
+            <>
+              <li className="v1-nav-group-label" aria-hidden="true">
+                Account
+              </li>
+              {ACCOUNT_LINKS.map((l) => (
+                <li key={l.href} className="v1-nav-drawer-only">
+                  <Link href={l.href} onClick={closeMenu}>
+                    {l.label}
+                  </Link>
+                </li>
+              ))}
+            </>
+          )}
           <li className="v1-nav-auth-mobile-li">{authButton}</li>
         </ul>
 
+        {/* Actions, weakest to strongest: text link → identity → primary.
+            Only one filled CTA, so "create" is unambiguously the ask. */}
         <div className="v1-nav-actions-desktop">
-          {authButton}
-          <a href={downloadHref} className="v1-nav-cta-secondary">
-            Download App
+          <a href={downloadHref} className="v1-nav-quiet">
+            Get the app
           </a>
-          <Link href="/admin/studio" className="v1-nav-cta">
-            Create Experience
+
+          {!isAuthed && authButton}
+
+          <Link href="/create" className="v1-nav-cta">
+            Create event
           </Link>
+
+          {isAuthed && (
+            <div
+              ref={acctRef}
+              className={`v1-nav-sub-wrap v1-nav-acct ${acctOpen ? 'is-sub-open' : ''}`}
+            >
+              <button
+                type="button"
+                className="v1-nav-acct-trigger"
+                aria-haspopup="true"
+                aria-expanded={acctOpen}
+                aria-label="Account menu"
+                onClick={() => setAcctOpen((v) => !v)}
+              >
+                <span className="v1-nav-toggle-bars" aria-hidden="true" />
+              </button>
+              <ul className="v1-nav-sub v1-nav-sub-end" role="menu">
+                {/* The icon says nothing about who you are, so the menu
+                    opens by naming the account it belongs to. */}
+                <li className="v1-nav-sub-user" role="presentation">
+                  {userName?.trim() || 'Signed in'}
+                </li>
+                {ACCOUNT_LINKS.map((l) => (
+                  <li key={l.href} role="none">
+                    <Link href={l.href} role="menuitem" onClick={closeMenu}>
+                      {l.label}
+                    </Link>
+                  </li>
+                ))}
+                {/* Separated: signing out shouldn't sit a slip away from
+                    ordinary navigation. */}
+                <li className="v1-nav-sub-divider" role="separator" />
+                <li role="none">
+                  <button
+                    type="button"
+                    role="menuitem"
+                    className="v1-nav-sub-danger"
+                    onClick={handleLogout}
+                    disabled={isLoggingOut}
+                  >
+                    {isLoggingOut ? 'Signing out…' : 'Sign out'}
+                  </button>
+                </li>
+              </ul>
+            </div>
+          )}
         </div>
 
         <button

@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { toast } from 'sonner';
 import { ErrorState, Skeleton, StudioTopBar } from '@/app/admin/studio/_components/ui';
 import {
@@ -16,7 +16,6 @@ import { Overview } from './overview';
 import { Registrations } from './registrations';
 import { CheckIn } from './check-in';
 import { VerificationsStub } from './verifications-stub';
-import { Coupons } from './coupons';
 import { CommunicationsStub } from './communications-stub';
 import { Settings } from './settings-stub';
 import { formatShortDate } from './_utils';
@@ -26,7 +25,6 @@ type TabKey =
   | 'registrations'
   | 'check-in'
   | 'verifications'
-  | 'coupons'
   | 'communications'
   | 'settings';
 
@@ -35,7 +33,6 @@ const TABS: { key: TabKey; label: string }[] = [
   { key: 'registrations', label: 'Registrations' },
   { key: 'check-in', label: 'Check-in' },
   { key: 'verifications', label: 'Verifications' },
-  { key: 'coupons', label: 'Coupons' },
   { key: 'communications', label: 'Communications' },
   { key: 'settings', label: 'Settings' },
 ];
@@ -48,6 +45,13 @@ export function EventShell({ eventId }: { eventId: string }) {
   const params = useSearchParams();
   const rawTab = params.get('tab');
   const tab: TabKey = isTabKey(rawTab) ? rawTab : 'overview';
+
+  // The tabs are query-only navigations on one route, and Next keeps the
+  // scroll position for those — so switching from a long tab to a short one
+  // landed you partway down, with the sticky bar covering the event header.
+  useEffect(() => {
+    window.scrollTo({ top: 0 });
+  }, [tab]);
 
   const eventQ = useOrganiserEvent(eventId);
   const statsQ = useEventStats(eventId);
@@ -89,8 +93,6 @@ export function EventShell({ eventId }: { eventId: string }) {
           <CheckIn eventId={eventId} event={eventQ.data ?? null} />
         ) : tab === 'verifications' ? (
           <VerificationsStub />
-        ) : tab === 'coupons' ? (
-          <Coupons eventId={eventId} />
         ) : tab === 'communications' ? (
           <CommunicationsStub />
         ) : (
@@ -202,10 +204,10 @@ function EventHeader({
                 </Link>
               )}
               <Link
-                href={`/admin/studio/organiser/events/${eventId}/edit`}
+                href={`/admin/studio/events/${eventId}`}
                 className="text-xs px-3 py-1.5 rounded-lg bg-jet text-bone whitespace-nowrap"
               >
-                Edit
+                Manage
               </Link>
             </div>
           </>
@@ -230,7 +232,7 @@ function StatusPill({ status }: { status: EventStatus }) {
  * Click-to-flip control for `event.acceptingRegistrations` — runtime master
  * switch for new signups. Renders inline next to the StatusPill in the
  * event header so the organiser can pause registrations from any sub-tab
- * without entering the edit wizard.
+ * without opening the event editor.
  *
  * UI reads the latest value straight from the cached event (React Query
  * does an in-place update on mutation success, so no manual optimistic

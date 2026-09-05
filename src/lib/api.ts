@@ -157,6 +157,7 @@ export interface Event {
   accentColor?: string | null;
   // Built-in collection toggles + custom-form config from the wizard.
   collectDob?: boolean;
+  collectPhone?: boolean;
   collectGender?: boolean;
   collectTshirt?: boolean;
   tshirtSizes?: string[] | null;

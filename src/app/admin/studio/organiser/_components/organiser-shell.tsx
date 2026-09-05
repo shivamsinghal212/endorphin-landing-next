@@ -1,26 +1,18 @@
 'use client';
 
-import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 import { useMyOrganiser, describeOrganiserError } from '@/lib/studio/organiser-hooks';
 import { ErrorState, Skeleton, StudioTopBar } from '../../_components/ui';
 import { Dashboard } from './dashboard';
 
-/** Entry surface for /admin/studio/organiser.
- *  - No organiser profile yet → redirect to onboarding.
- *  - Otherwise → render the dashboard. */
+/** Entry surface for /admin/studio/organiser — the events workspace.
+ *
+ *  It used to bounce anyone without an organiser profile straight to
+ *  onboarding, which is exactly the wall the unified flow removes: you can
+ *  create, publish and manage events without ever having one. The dashboard
+ *  now renders either way, and host details are edited per-event.
+ */
 export function OrganiserShell() {
-  const router = useRouter();
   const { data, isLoading, isError, error, refetch, isFetched } = useMyOrganiser();
-
-  useEffect(() => {
-    // `data === null` is the explicit "not onboarded" signal from
-    // `getMyOrganiser` (it swallows 404). `isFetched` guards against the
-    // initial undefined state.
-    if (isFetched && data === null) {
-      router.replace('/admin/studio/organiser/onboarding');
-    }
-  }, [isFetched, data, router]);
 
   return (
     <>
@@ -32,10 +24,12 @@ export function OrganiserShell() {
             message={describeOrganiserError(error)}
             onRetry={() => refetch()}
           />
-        ) : isLoading || data === null || data === undefined ? (
+        ) : isLoading || !isFetched ? (
           <DashboardSkeleton />
         ) : (
-          <Dashboard organiser={data} />
+          // `data === null` is the explicit "no profile" signal from
+          // `getMyOrganiser`, which swallows the 404. Not an error state.
+          <Dashboard organiser={data ?? null} />
         )}
       </main>
     </>

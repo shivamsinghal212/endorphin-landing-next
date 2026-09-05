@@ -186,8 +186,9 @@ export function RegistrationForm({ bundle }: { bundle: RegistrationEventBundle }
       missingProfileFields(meQ.data, {
         collectDob: event.collectDob,
         collectGender: event.collectGender,
+        collectPhone: event.collectPhone,
       }),
-    [meQ.data, event.collectDob, event.collectGender],
+    [meQ.data, event.collectDob, event.collectGender, event.collectPhone],
   );
 
   const createReg = useCreateRegistration();
