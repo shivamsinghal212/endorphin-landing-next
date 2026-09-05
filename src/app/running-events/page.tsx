@@ -16,7 +16,7 @@ export const metadata: Metadata = {
     url: 'https://www.endorfin.run/running-events',
     title: 'Running Events in India — every event, listed | Endorfin',
     description:
-      'Every running event in India, in one feed. Marathons, half marathons, 10K and 5K events across 25+ Indian cities.',
+      'Every running event in India, in one feed. Marathons, half marathons, 10K and 5K events across 45+ Indian cities.',
     siteName: 'Endorfin',
     locale: 'en_IN',
   },
@@ -103,7 +103,7 @@ function buildJsonLd(races: ApiEvent[]) {
     '@type': 'ItemList',
     name: 'Running Events in India',
     description:
-      'Every running event in India — marathons, half marathons, 10K and 5K events across 25+ cities',
+      'Every running event in India — marathons, half marathons, 10K and 5K events across 45+ cities',
     url: 'https://www.endorfin.run/running-events',
     numberOfItems: races.length,
     itemListElement: races.slice(0, 30).map((r, i) => {

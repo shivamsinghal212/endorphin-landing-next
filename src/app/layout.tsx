@@ -10,7 +10,7 @@ const jetbrainsMono = JetBrains_Mono({ subsets: ['latin'], weight: ['400', '500'
 
 export const metadata: Metadata = {
   title: { default: 'Endorfin — Run Clubs & Running Events in India', template: '%s | Endorfin' },
-  description: "India's platform for run clubs and running events. Find verified clubs near you, RSVP to the next group run, and discover 500+ marathons, 10K & 5K events.",
+  description: "India's platform for run clubs and running events. Find verified clubs near you, RSVP to the next group run, and discover 650+ marathons, 10K & 5K events.",
   keywords: ['run clubs India', 'run clubs near me', 'run clubs in Delhi', 'run clubs in Mumbai', 'run clubs in Bangalore', 'running club', 'join a run club', 'running events India', 'marathon India', 'half marathon', '10K run', '5K run', 'running app', 'running event finder', 'marathon near me', 'running events Mumbai', 'running events Delhi', 'running events Bangalore', 'community runs', 'trail running India', 'fun run', 'event registration', 'running community'],
   authors: [{ name: 'Endorfin' }],
   robots: { index: true, follow: true, 'max-image-preview': 'large', 'max-snippet': -1 },
@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     type: 'website',
     url: 'https://www.endorfin.run/',
     title: 'Endorfin — Run Clubs & Running Events in India',
-    description: "India's platform for run clubs and running events. Find verified clubs near you, RSVP to the next group run, and discover 500+ marathons, 10K & 5K events.",
+    description: "India's platform for run clubs and running events. Find verified clubs near you, RSVP to the next group run, and discover 650+ marathons, 10K & 5K events.",
     siteName: 'Endorfin',
     locale: 'en_IN',
     images: [{ url: 'https://www.endorfin.run/og-image.png', width: 1200, height: 630 }],
@@ -27,7 +27,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Endorfin — Run Clubs & Running Events in India',
-    description: "India's platform for run clubs and running events. Find verified clubs near you, RSVP to the next group run, and discover 500+ marathons, 10K & 5K events.",
+    description: "India's platform for run clubs and running events. Find verified clubs near you, RSVP to the next group run, and discover 650+ marathons, 10K & 5K events.",
     images: ['https://www.endorfin.run/og-image.png'],
     site: '@endorfinapp',
   },
@@ -55,9 +55,9 @@ const appJsonLd = {
   url: 'https://www.endorfin.run',
   applicationCategory: 'SportsApplication',
   operatingSystem: 'Android, iOS',
-  description: "India's platform for run clubs and running events. Discover verified run clubs in your city, join the next group run, and browse 500+ marathons, half marathons, 10K and 5K events. RSVP instantly, host community runs, and connect with runners.",
+  description: "India's platform for run clubs and running events. Discover verified run clubs in your city, join the next group run, and browse 650+ marathons, half marathons, 10K and 5K events. RSVP instantly, host community runs, and connect with runners.",
   featureList: [
-    'Verified run club directory across 25+ Indian cities',
+    'Verified run club directory across 45+ Indian cities',
     'Discover and join local run clubs',
     'Running event discovery — marathons, half marathons, 10K & 5K',
     'One-tap RSVP for club runs and events',
@@ -114,7 +114,7 @@ const websiteJsonLd = {
   '@type': 'WebSite',
   name: 'Endorfin',
   url: 'https://www.endorfin.run',
-  description: "India's platform for run clubs and running events. Find verified clubs near you and discover 500+ marathons, 10K & 5K events.",
+  description: "India's platform for run clubs and running events. Find verified clubs near you and discover 650+ marathons, 10K & 5K events.",
   inLanguage: 'en-IN',
   potentialAction: {
     '@type': 'SearchAction',

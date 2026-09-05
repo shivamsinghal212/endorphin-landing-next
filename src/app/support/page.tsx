@@ -20,7 +20,7 @@ const faqs = [
   },
   {
     q: "Which cities does Endorfin cover?",
-    a: "Endorfin lists running events across 25+ cities in India including Mumbai, Delhi, Bangalore, Pune, Hyderabad, Chennai, Kolkata, Ahmedabad, Jaipur, Chandigarh, and many more. We're constantly adding new cities.",
+    a: "Endorfin lists running events across 45+ cities in India including Mumbai, Delhi, Bangalore, Pune, Hyderabad, Chennai, Kolkata, Ahmedabad, Jaipur, Chandigarh, and many more. We're constantly adding new cities.",
   },
   {
     q: "Can I create my own community run?",

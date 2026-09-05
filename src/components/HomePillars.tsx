@@ -47,7 +47,7 @@ const HomePillars = ({ event, club }: { event?: FeaturedEvent | null; club?: Fea
           <Link href="/running-events" className="hp-tile hp-events">
             <span className="idx" aria-hidden="true">01</span>
             <h3>Find your<br />next start line.</h3>
-            <p>Discover 500+ running events across 30+ Indian cities — marathons, half marathons, 10Ks, 5Ks and trail runs. Dates, fees, one-tap RSVP.</p>
+            <p>Discover 650+ running events across 45+ Indian cities — marathons, half marathons, 10Ks, 5Ks and trail runs. Dates, fees, one-tap RSVP.</p>
             <div className="hp-chips"><span>Marathons</span><span>10K &amp; 5K</span><span>Trail</span></div>
             <div className="hp-prev"><div className="hp-card">
               <div className="hp-row">
@@ -64,7 +64,7 @@ const HomePillars = ({ event, club }: { event?: FeaturedEvent | null; club?: Fea
             <span className="idx" aria-hidden="true">02</span>
             <h3>Join a run club<br />built for your pace.</h3>
             <p>Find verified clubs near you — training groups, weekend long-run crews, beginner-friendly pods and women-only clubs. Your crew is out there.</p>
-            <div className="hp-chips"><span>Verified</span><span>All paces</span><span>110+ clubs</span></div>
+            <div className="hp-chips"><span>Verified</span><span>All paces</span><span>160+ clubs</span></div>
             <div className="hp-prev"><div className="hp-card">
               <div className="hp-row">
                 <span className="hp-av" style={{ background: 'linear-gradient(140deg,#e6232a,#7a1216)' }}>{cl.initials}</span>

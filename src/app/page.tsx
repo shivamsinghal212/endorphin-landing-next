@@ -91,12 +91,54 @@ export interface HeroStats {
   cities: number;
 }
 
-// Curated marketing numbers. We used to derive these from
-// /discover?includeFacets=true, but the backend folded that route into
-// /discover/smart (the old URL 404s, so the fallback always rendered) and its
-// facet counts don't match the marketing claims anyway — club_event counts
-// every occurrence ever and cities counts raw name variants.
-const HERO_STATS: HeroStats = { clubs: 110, races: 500, clubEvents: 200, cities: 30 };
+// Last-known-good numbers, used only when the counts fetch fails. Hand-typed
+// figures go stale silently — these sat at 110/500/200/30 while the real
+// catalogue grew past 168/667/3254 — so treat them as a floor, not a claim.
+const FALLBACK_STATS: HeroStats = { clubs: 160, races: 650, clubEvents: 3000, cities: 45 };
+
+interface FacetBucket {
+  value: string;
+  count: number;
+}
+
+/** Live catalogue size, from the same index that powers search.
+ *
+ *  Two calls: the unfiltered `kinds` facet counts clubs / races / club
+ *  events in one shot, but its `cities` facet is raw location strings
+ *  (full postal addresses among them, 165 buckets for what is really a few
+ *  dozen places). The club-scoped facet is the clean one — clubs carry a
+ *  typed city — so cities comes from there.
+ *
+ *  These are all-time counts, not what's still upcoming (3,254 club runs
+ *  against 78 on the calendar right now). The labels say so — "Races
+ *  Listed", "Club Runs Hosted" — because the claim being made is the depth
+ *  of the catalogue, not what you can enter this weekend.
+ */
+async function getHeroStats(): Promise<HeroStats> {
+  const url = (kind?: string) =>
+    `https://api.endorfin.run/api/v1/discover/smart?limit=1&includeFacets=true${kind ? `&kind=${kind}` : ''}`;
+  try {
+    const [allRes, clubRes] = await Promise.all([
+      fetch(url(), { next: { revalidate: 3600 } }),
+      fetch(url('club'), { next: { revalidate: 3600 } }),
+    ]);
+    if (!allRes.ok || !clubRes.ok) return FALLBACK_STATS;
+    const [all, club] = await Promise.all([allRes.json(), clubRes.json()]);
+    const kinds: FacetBucket[] = all?.facets?.kinds ?? [];
+    const countOf = (k: string) => kinds.find((b) => b.value === k)?.count ?? 0;
+    const stats: HeroStats = {
+      clubs: countOf('club'),
+      races: countOf('race'),
+      clubEvents: countOf('club_event'),
+      cities: (club?.facets?.cities ?? []).length,
+    };
+    // A partial answer is worse than the floor — one zero would read as
+    // "we have no run clubs".
+    return Object.values(stats).every((n) => n > 0) ? stats : FALLBACK_STATS;
+  } catch {
+    return FALLBACK_STATS;
+  }
+}
 
 function buildEventsJsonLd(events: ApiEvent[]) {
   if (!events.length) return null;
@@ -155,7 +197,11 @@ function buildEventsJsonLd(events: ApiEvent[]) {
 }
 
 export default async function Home() {
-  const [events, clubs] = await Promise.all([getUpcomingEvents(), getFeaturedClubs()]);
+  const [events, clubs, heroStats] = await Promise.all([
+    getUpcomingEvents(),
+    getFeaturedClubs(),
+    getHeroStats(),
+  ]);
   const eventsJsonLd = buildEventsJsonLd(events);
   const featuredEvent = events[0] ? deriveEvent(events[0]) : null;
   const featuredClub = pickClub(clubs);
@@ -171,7 +217,7 @@ export default async function Home() {
       <Header />
       <div className="hstreak">
         <HomeStreak />
-        <HeroSearch stats={HERO_STATS} />
+        <HeroSearch stats={heroStats} />
         <HomePillars event={featuredEvent} club={featuredClub} />
         <ForClubsBand />
         <CTASection />

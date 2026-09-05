@@ -592,7 +592,7 @@ export default function RunnersView() {
             </p>
             <div className="v1ru-hero-stats">
               <div>
-                <div className="v1ru-hero-stat-n">10K+</div>
+                <div className="v1ru-hero-stat-n">2K+</div>
                 <div className="v1ru-hero-stat-l">Runners</div>
               </div>
               <div>
