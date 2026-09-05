@@ -1,8 +1,13 @@
 'use server';
 
 import { authApi, ApiError, type AuthResponse, type OtpResponse, type User } from '@/lib/api';
-import { setSessionCookie, clearSessionCookie } from '@/lib/session';
+import {
+  setSessionCookie,
+  clearSessionCookie,
+  NEXTAUTH_COOKIE_NAMES,
+} from '@/lib/session';
 import { signOut } from '@/lib/auth';
+import { cookies } from 'next/headers';
 
 export type ActionState =
   | { ok: true; user?: User; message?: string }
@@ -104,8 +109,12 @@ export async function logoutAction(): Promise<{ ok: true }> {
   try {
     await signOut({ redirect: false });
   } catch {
-    // No active NextAuth session (or called outside its expected context) —
-    // the marketing cookie is already cleared, so logout still succeeds.
+    // No active NextAuth session, or signOut refusing to run in this server
+    // action context. Swallowing it silently used to leave the session alive:
+    // the header went signed-out while /create still saw a token and offered
+    // the host picker. Delete the cookies ourselves so logout means logout.
+    const store = await cookies();
+    for (const name of NEXTAUTH_COOKIE_NAMES) store.delete(name);
   }
   return { ok: true };
 }

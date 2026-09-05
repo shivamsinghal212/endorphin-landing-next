@@ -6,7 +6,6 @@ import { toast } from 'sonner';
 import posthog from 'posthog-js';
 import LoginModal from '@/components/LoginModal';
 import { useStudioAuth } from '@/lib/studio/auth-context';
-import { useAdminToken } from '@/lib/use-admin-token';
 import { useMyClubs } from '@/lib/studio/hooks';
 import { describeOrganiserError } from '@/lib/studio/organiser-hooks';
 import {
@@ -118,7 +117,10 @@ function toPayload(d: Draft): StudioEventCreate {
 export function EventComposer() {
   const router = useRouter();
   const studio = useStudioAuth();
-  const token = useAdminToken();
+  // The server's answer, not the client's. `useAdminToken` falls back to a
+  // NextAuth session when the studio one is null, which is how this page came
+  // to show the host picker to someone the header called signed-out.
+  const token = studio?.token ?? null;
   const isAuthed = !!token;
 
   const [draft, setDraft] = useState<Draft>(emptyDraft);

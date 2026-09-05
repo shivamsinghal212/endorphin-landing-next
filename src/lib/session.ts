@@ -2,6 +2,22 @@ import 'server-only';
 import { cookies } from 'next/headers';
 
 const COOKIE_NAME = 'endorfin_session';
+
+/** NextAuth v5's session cookie, and its `__Secure-` form over HTTPS. The
+ *  Google flow through /admin stores a backend token behind these, which is
+ *  a second way to be signed in — see `getRealStudioAuth`. */
+export const NEXTAUTH_COOKIE_NAMES = [
+  'authjs.session-token',
+  '__Secure-authjs.session-token',
+] as const;
+
+/** Whether a NextAuth session cookie is present at all. Cheap enough to call
+ *  on a public page, and lets callers skip `auth()` (which decrypts, and
+ *  throws outside a request context) when there's plainly nothing to read. */
+export async function hasNextAuthCookie(): Promise<boolean> {
+  const store = await cookies();
+  return NEXTAUTH_COOKIE_NAMES.some((name) => Boolean(store.get(name)?.value));
+}
 const IMPERSONATE_COOKIE = 'endorfin_impersonate';
 const MAX_AGE_SECONDS = 60 * 60 * 24 * 30; // 30 days
 
