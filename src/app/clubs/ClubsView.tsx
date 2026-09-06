@@ -16,6 +16,7 @@ import { ClaimClubModal } from './[slug]/claim-club-link';
 import { JoinClubModal } from './[slug]/join-club-modal';
 import type { MyClubClaim, MyClubMembership } from '@/lib/api';
 import type { ApiClub, ClubEvent } from './page';
+import { useImgFallback } from '@/lib/img-fallback';
 
 type Membership = MyClubMembership;
 type Claim = MyClubClaim;
@@ -645,15 +646,21 @@ function cityGroupId(g: CityGroup): string {
   return g.toLowerCase().replace(/\s+/g, '-');
 }
 
-// Event link mirrors page.tsx's eventHref: /clubs/{clubSlug}/events/{slug||id}.
+// Event link mirrors page.tsx's eventHref. Races are standalone events with
+// no club, so they link to /running-events/{slug}; club events link under
+// their club. Null only for a club event missing its club slug.
 function eventHref(hit: DiscoverHit): string | null {
+  if (hit.kind === 'race') return `/running-events/${hit.slug || hit.id}`;
   if (!hit.clubSlug) return null;
   return `/clubs/${hit.clubSlug}/events/${hit.slug || hit.id}`;
 }
 
 // Short experience-type label for the card chip — the ONLY element over
-// the image. Prefer a tag, else derive from event type / distance.
+// the image. Prefer a tag, else derive from kind / event type / distance.
 function eventTypeLabel(hit: DiscoverHit): string {
+  // Checked before tags: race hits come back with tags: [] today, but a
+  // future tag shouldn't relabel a race as something else.
+  if (hit.kind === 'race') return 'Race';
   if (hit.tags && hit.tags.length) return hit.tags[0];
   if (hit.eventType === 'race_event') return 'Race';
   if (hit.distanceKm != null) return `${hit.distanceKm}K run`;
@@ -674,18 +681,34 @@ function EventCard({ hit, clubLogo }: { hit: DiscoverHit; clubLogo?: string | nu
   const time = fmtTimeShort(hit.startTime);
   const dist = hit.distanceKm != null ? `${hit.distanceKm}K` : null;
   const club = hit.clubName || '';
+  // Race banners are landscape (sampled 24 upcoming: 19 exactly 16:9, 22 of
+  // 24 wider than tall) — the 4:5 portrait frame built for Instagram-style
+  // club posters cropped ~55% of their width off. Races get a 16:9 frame with
+  // `contain` + the blur backdrop, so a 16:9 banner fills it edge-to-edge and
+  // the rare portrait one letterboxes instead of losing its text.
+  const landscape = hit.kind === 'race';
+  const mod = landscape ? ' is-landscape' : '';
+  // A load failure falls back to the same tile a missing image gets — see
+  // useImgFallback for why the ref is needed as well as onError.
+  const { isFailed, imgProps } = useImgFallback();
+  const showImg = Boolean(img) && !isFailed(img!);
 
   const inner = (
     <>
-      <div className="v1c-exp-media">
-        {img ? (
+      <div className={`v1c-exp-media${mod}`}>
+        {showImg ? (
           <>
             <div className="v1c-exp-bg" style={{ backgroundImage: `url(${img})` }} aria-hidden />
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={img} alt={hit.title} loading="lazy" />
+            <img src={img!} alt={hit.title} loading="lazy" {...imgProps(img!)} />
           </>
         ) : (
-          <div className="v1c-exp-media-fallback" aria-hidden>{initials(hit.title)}</div>
+          // Name, not initials — a race is recognised by its title, and two
+          // letters tell you nothing about "Harvest Gold Global Race 2026".
+          // aria-hidden: the <h3> below already announces this exact text.
+          <div className="v1c-exp-media-fallback is-title" aria-hidden>
+            <span>{hit.title}</span>
+          </div>
         )}
         <span className="v1c-exp-badge"><RunIcon />{eventTypeLabel(hit)}</span>
       </div>
@@ -717,23 +740,26 @@ function EventCard({ hit, clubLogo }: { hit: DiscoverHit; clubLogo?: string | nu
   );
 
   return href ? (
-    <Link href={href} className="v1c-exp-card" aria-label={hit.title}>{inner}</Link>
+    <Link href={href} className={`v1c-exp-card${mod}`} aria-label={hit.title}>{inner}</Link>
   ) : (
-    <div className="v1c-exp-card">{inner}</div>
+    <div className={`v1c-exp-card${mod}`}>{inner}</div>
   );
 }
 
 function ExpClubCard({ c }: { c: DiscoverHit }) {
+  const { isFailed, imgProps } = useImgFallback();
   if (!c.slug) return null;
   const img = c.imageUrl;
   const members = formatMembers(c.members);
   return (
     <Link href={`/clubs/${c.slug}`} className="v1c-exp-club-card" aria-label={c.title}>
       <div className="v1c-exp-club-cover">
-        {img ? (
+        {img && !isFailed(img) ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={img} alt={c.title} loading="lazy" />
+          <img src={img} alt={c.title} loading="lazy" {...imgProps(img)} />
         ) : (
+          // Initials, not the name: the club's name already sits directly
+          // below this tile, and these covers are square logo crops.
           <div className="v1c-exp-media-fallback" aria-hidden>{initials(c.title)}</div>
         )}
       </div>
@@ -1048,6 +1074,7 @@ function ClubsSearchBar({
   onToggleFilters,
   onCloseFilters,
   onClearFilters,
+  includeRaces = false,
 }: {
   filters: ClubSearchFilters;
   showFilters: boolean;
@@ -1062,6 +1089,8 @@ function ClubsSearchBar({
   onToggleFilters: () => void;
   onCloseFilters: () => void;
   onClearFilters: () => void;
+  // /experiences searches races too, so the placeholder says so.
+  includeRaces?: boolean;
 }) {
   const cityLbl = cityLabelOf(filters.city);
   const activeFilterCount =
@@ -1085,9 +1114,13 @@ function ClubsSearchBar({
             className="v1c-search-input"
             type="text"
             value={filters.q}
-            placeholder="Search clubs & events"
+            placeholder={includeRaces ? 'Search races, clubs & events' : 'Search clubs & events'}
             onChange={(e) => onQChange(e.target.value)}
-            aria-label="Search run clubs and events"
+            aria-label={
+              includeRaces
+                ? 'Search races, run clubs and events'
+                : 'Search run clubs and events'
+            }
             autoComplete="off"
             spellCheck={false}
             enterKeyHint="search"
@@ -1254,6 +1287,8 @@ export default function ClubsView({
   featuredFull,
   cityFacets,
   eventsAround = [],
+  racesAround = [],
+  upcomingRaces = 0,
   aroundCity = null,
   eventsWeekend = [],
   membershipBySlug = {},
@@ -1273,12 +1308,19 @@ export default function ClubsView({
   // still renders on /run-clubs/[city] city pages.
   featuredFull: ApiClub[];
   cityFacets: { value: string; count: number }[];
-  // Events-first rails (national /clubs only) — soonest-upcoming and
-  // this-weekend club events from /discover/smart?kind=club_event.
+  // Events-first rails — soonest-upcoming and this-weekend club events from
+  // /discover/smart?kind=club_event.
   eventsAround?: DiscoverHit[];
-  // Visitor's IP-resolved city when the upcoming-events rail is scoped to it
-  // (the rail then titles itself "Upcoming Events in {aroundCity}"). null =
-  // the national soonest-upcoming list, titled just "Upcoming Events".
+  // Soonest-upcoming RACES (kind=race), same city scope as eventsAround but
+  // its own rail — races and club events are never interleaved. Empty on
+  // /clubs, which stays a club directory.
+  racesAround?: DiscoverHit[];
+  // National count of UPCOMING races, for the hero counter. 0 = hide it
+  // (also the failure value) — never render an all-time total as "upcoming".
+  upcomingRaces?: number;
+  // Visitor's IP-resolved city when the upcoming rails are scoped to it (they
+  // then title themselves "... in {aroundCity}"). null = the national
+  // soonest-upcoming lists, titled without a city.
   aroundCity?: string | null;
   eventsWeekend?: DiscoverHit[];
   membershipBySlug?: Record<string, Membership>;
@@ -1299,6 +1341,10 @@ export default function ClubsView({
   // pages (cityName set), which don't render these rails.
   variant?: 'clubs' | 'experiences';
 }) {
+  // /experiences carries races (own rail + own search result list);
+  // /clubs stays a club directory. Ignored on city pages, which render
+  // neither the rails nor the compact search.
+  const includeRaces = variant === 'experiences';
   const [isSearching, setIsSearching] = useState(false);
   // Page index instead of "visible count" — we paginate now (Prev/Next at
   // top + bottom) rather than infinite-scroll appending. All cards stay
@@ -1308,7 +1354,7 @@ export default function ClubsView({
   const [activeTab, setActiveTab] = useState<AdminTab>('members');
   // Which event rail is expanded into a full grid ("See all"). null = both
   // collapsed to horizontal scrollers.
-  const [openRail, setOpenRail] = useState<'around' | 'weekend' | 'search-ev' | 'search-cl' | null>(null);
+  const [openRail, setOpenRail] = useState<'races' | 'around' | 'weekend' | 'search-rc' | 'search-ev' | 'search-cl' | null>(null);
   const [modal, setModal] = useState<{ kind: 'join' | 'claim'; club: { name: string; slug: string } } | null>(null);
 
   // ── National compact search (only used when !cityName) ──
@@ -1328,6 +1374,9 @@ export default function ClubsView({
   const [committedSearch, setCommittedSearch] = useState<ClubSearchFilters | null>(null);
   const [showFilters, setShowFilters] = useState(false);
   const [searchEvents, setSearchEvents] = useState<DiscoverHit[]>([]);
+  // Race hits are kept in their own list, never folded into searchEvents —
+  // same rule as the browse rails.
+  const [searchRaces, setSearchRaces] = useState<DiscoverHit[]>([]);
   const [searchClubs, setSearchClubs] = useState<DiscoverHit[]>([]);
   const [searchStatus, setSearchStatus] = useState<'idle' | 'loading' | 'ok' | 'fallback' | 'error'>('idle');
   const searchAbort = useRef<AbortController | null>(null);
@@ -1409,6 +1458,7 @@ export default function ClubsView({
     if (!committedSearch) {
       setSearchStatus('idle');
       setSearchEvents([]);
+      setSearchRaces([]);
       setSearchClubs([]);
       return;
     }
@@ -1424,9 +1474,9 @@ export default function ClubsView({
     // Events query: q + city + the event-side filters (type, distance, window).
     // `eventType` is singular+repeatable; `tags`/`eventTypes` are no-ops here
     // (verified against the API), so club tags are deliberately NOT sent.
-    const eventsUrl = (city: string) => {
+    const eventsUrl = (city: string, kind: 'club_event' | 'race' = 'club_event') => {
       const p = new URLSearchParams();
-      p.set('kind', 'club_event');
+      p.set('kind', kind);
       if (c.q.trim()) p.set('q', c.q.trim());
       if (city) p.set('city', city);
       for (const t of c.types) p.append('eventType', t);
@@ -1454,6 +1504,7 @@ export default function ClubsView({
     // Mumbai fallback ignores the user's query — the point is to show
     // *something* lively when their search came up dry.
     const fallbackEventsUrl = `${DISCOVER}?kind=club_event&city=Mumbai&dateFrom=${istTodayFloor()}&sort=upcoming&limit=24`;
+    const fallbackRacesUrl = `${DISCOVER}?kind=race&city=Mumbai&dateFrom=${istTodayFloor()}&sort=upcoming&limit=24`;
     const fallbackClubsUrl = `${DISCOVER}?kind=club&city=Mumbai&limit=24`;
 
     const getItems = (url: string): Promise<DiscoverHit[]> =>
@@ -1468,6 +1519,14 @@ export default function ClubsView({
       Promise.all(queryCities.map((city) => getItems(eventsUrl(city)))).then((lists) =>
         mergeSearchEvents(lists.flat(), 24),
       );
+    // Races use the identical event-side filters (q, city, window, distance)
+    // — only the kind differs. Resolves to [] on /clubs.
+    const fetchRaces = () =>
+      includeRaces
+        ? Promise.all(queryCities.map((city) => getItems(eventsUrl(city, 'race')))).then((lists) =>
+            mergeSearchEvents(lists.flat(), 24),
+          )
+        : Promise.resolve([] as DiscoverHit[]);
     const fetchClubs = () =>
       Promise.all(queryCities.map((city) => getItems(clubsUrl(city)))).then((lists) =>
         mergeSearchClubs(lists.flat(), 24),
@@ -1475,27 +1534,33 @@ export default function ClubsView({
 
     (async () => {
       try {
-        const [ev, cl] = await Promise.all([fetchEvents(), fetchClubs()]);
+        const [ev, rc, cl] = await Promise.all([fetchEvents(), fetchRaces(), fetchClubs()]);
         if (ctrl.signal.aborted) return;
-        if (ev.length === 0 && cl.length === 0) {
-          const [fev, fcl] = await Promise.all([getItems(fallbackEventsUrl), getItems(fallbackClubsUrl)]);
+        if (ev.length === 0 && rc.length === 0 && cl.length === 0) {
+          const [fev, frc, fcl] = await Promise.all([
+            getItems(fallbackEventsUrl),
+            includeRaces ? getItems(fallbackRacesUrl) : Promise.resolve([] as DiscoverHit[]),
+            getItems(fallbackClubsUrl),
+          ]);
           if (ctrl.signal.aborted) return;
           setSearchEvents(fev);
+          setSearchRaces(frc);
           setSearchClubs(fcl);
           setSearchStatus('fallback');
           posthog.capture('clubs_search', {
             q: c.q || null, city: c.city || null, window: c.window || null,
             types: c.types, distance: c.distance || null, tags: c.tags, verified: c.verified,
-            events: 0, clubs: 0, fallback: true,
+            events: 0, races: 0, clubs: 0, fallback: true,
           });
         } else {
           setSearchEvents(ev);
+          setSearchRaces(rc);
           setSearchClubs(cl);
           setSearchStatus('ok');
           posthog.capture('clubs_search', {
             q: c.q || null, city: c.city || null, window: c.window || null,
             types: c.types, distance: c.distance || null, tags: c.tags, verified: c.verified,
-            events: ev.length, clubs: cl.length, fallback: false,
+            events: ev.length, races: rc.length, clubs: cl.length, fallback: false,
           });
         }
       } catch {
@@ -1504,7 +1569,7 @@ export default function ClubsView({
     })();
 
     return () => ctrl.abort();
-  }, [committedSearch, cityName]);
+  }, [committedSearch, cityName, includeRaces]);
 
   // Frost the sticky search dock once it pins under the nav. A zero-height
   // sentinel sits at the dock's resting position; when it scrolls above the
@@ -1596,9 +1661,17 @@ export default function ClubsView({
         <div className="container">
           <div className={`v1-hero-topline${cityName ? '' : ' is-compact'}`}>
             <span className="v1-hero-kicker">
-              {cityName ? `Run clubs · ${cityName}` : 'Run clubs & events · India'}
+              {cityName
+                ? `Run clubs · ${cityName}`
+                : includeRaces
+                  ? 'Races, clubs & events · India'
+                  : 'Run clubs & events · India'}
             </span>
-            <span className="v1-hero-meta">{totalClubs} clubs listed</span>
+            <span className="v1-hero-meta">
+              {includeRaces && upcomingRaces > 0
+                ? `${upcomingRaces} upcoming races · ${totalClubs} clubs`
+                : `${totalClubs} clubs listed`}
+            </span>
           </div>
 
           {cityName ? (
@@ -1647,7 +1720,15 @@ export default function ClubsView({
             //    below) so it pins to the top on scroll.
             <>
               <h1 className="v1c-search-h1">
-                Run <span className="accent">Clubs &amp; Experiences</span> in India
+                {includeRaces ? (
+                  <>
+                    <span className="accent">Races, Clubs &amp; Experiences</span> in India
+                  </>
+                ) : (
+                  <>
+                    Run <span className="accent">Clubs &amp; Experiences</span> in India
+                  </>
+                )}
               </h1>
             </>
           )}
@@ -1681,6 +1762,7 @@ export default function ClubsView({
                 onToggleFilters={() => setShowFilters((s) => !s)}
                 onCloseFilters={() => setShowFilters(false)}
                 onClearFilters={clearFilters}
+                includeRaces={includeRaces}
               />
             </div>
           </div>
@@ -1723,10 +1805,32 @@ export default function ClubsView({
                         discovery rails — a horizontal scroller of compact
                         cards with a See all toggle that expands to the grid —
                         so the layout doesn't change between browse and search. */}
+                    {searchRaces.length > 0 && (
+                      <section className="v1c-exp-rail">
+                        <div className="v1c-exp-rail-head">
+                          <h3 className="v1c-exp-rail-title">Races &amp; events</h3>
+                          {searchRaces.length > 4 && (
+                            <button
+                              type="button"
+                              className="v1c-exp-seeall"
+                              onClick={() => setOpenRail((p) => (p === 'search-rc' ? null : 'search-rc'))}
+                              aria-expanded={openRail === 'search-rc'}
+                            >
+                              {openRail === 'search-rc' ? 'Show less' : 'See all'}
+                            </button>
+                          )}
+                        </div>
+                        <div className={openRail === 'search-rc' ? 'v1c-exp-grid' : 'v1c-exp-scroller v1c-exp-evlist'}>
+                          {searchRaces.map((h) => (
+                            <EventCard key={h.id} hit={h} />
+                          ))}
+                        </div>
+                      </section>
+                    )}
                     {searchEvents.length > 0 && (
                       <section className="v1c-exp-rail">
                         <div className="v1c-exp-rail-head">
-                          <h3 className="v1c-exp-rail-title">Events</h3>
+                          <h3 className="v1c-exp-rail-title">Club events</h3>
                           {searchEvents.length > 4 && (
                             <button
                               type="button"
@@ -1778,19 +1882,35 @@ export default function ClubsView({
           )}
 
           {/* Default discovery rails — shown when no search is committed.
-              Three rails (around you, this weekend, run clubs by city). */}
-          {!committedSearch && (eventsAround.length > 0 || eventsWeekend.length > 0 || clubs.length > 0) && (
+              Races and club events get their OWN rails (never interleaved);
+              then this weekend, then run clubs by city. */}
+          {!committedSearch &&
+            (racesAround.length > 0 ||
+              eventsAround.length > 0 ||
+              eventsWeekend.length > 0 ||
+              clubs.length > 0) && (
             <section className="v1c-exp">
               <div className="v1c-container">
                 {(() => {
                   // Same rails, order depends on the page identity: /clubs
                   // leads with the directory, /experiences with the events.
                   const clubsRail = <ClubsByCityRail key="clubs" clubs={clubs} />;
+                  const inCity = aroundCity ? ` in ${aroundCity}` : '';
                   const eventRails = (
                     <>
+                      {/* Races first — the bigger catalogue, and what most
+                          visitors arrive looking for. Empty on /clubs. */}
+                      <EventRail
+                        key="races"
+                        title={`Upcoming races and events${inCity}`}
+                        hits={racesAround}
+                        clubLogos={clubLogoBySlug}
+                        isOpen={openRail === 'races'}
+                        onToggle={() => setOpenRail((p) => (p === 'races' ? null : 'races'))}
+                      />
                       <EventRail
                         key="around"
-                        title={aroundCity ? `Upcoming Events in ${aroundCity}` : 'Upcoming Events'}
+                        title={`Upcoming club events${inCity}`}
                         hits={eventsAround}
                         clubLogos={clubLogoBySlug}
                         isOpen={openRail === 'around'}
@@ -1798,7 +1918,7 @@ export default function ClubsView({
                       />
                       <EventRail
                         key="weekend"
-                        title="Events this weekend"
+                        title="Club events this weekend"
                         hits={eventsWeekend}
                         clubLogos={clubLogoBySlug}
                         isOpen={openRail === 'weekend'}

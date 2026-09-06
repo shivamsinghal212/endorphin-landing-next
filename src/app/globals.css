@@ -3530,6 +3530,41 @@ body { padding-top: var(--nav-h, 68px); }
   font-family: var(--font-fraunces), serif; font-style: italic; font-weight: 600;
   font-size: 40px; color: var(--exp-bone-38);
 }
+/* Name-instead-of-initials tile, used when a cover is missing OR its URL is
+   dead. Sized to read as a title rather than a monogram; the badge sits over
+   the top-left corner, hence the extra top padding. */
+.v1-clubs-page .v1c-exp-media .v1c-exp-media-fallback.is-title {
+  padding: 44px 18px 18px;
+  font-family: var(--font-poppins), sans-serif;
+  font-style: normal; font-weight: 600;
+  font-size: 16px; line-height: 1.34; text-align: center;
+  color: var(--exp-bone-72);
+}
+/* Clamp on the span, not the flex container — -webkit-box would override the
+   `display: flex` that centres it. */
+.v1-clubs-page .v1c-exp-media .v1c-exp-media-fallback.is-title > span {
+  display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+/* Landscape variant — race banners. Sampled 24 upcoming races: 19 were
+   exactly 16:9 and 22 of 24 were wider than tall, so the 4:5 portrait frame
+   above was cropping ~55% of their width away (headline text included).
+   These get a 16:9 frame + `contain`, which is a pixel-perfect full bleed
+   for the 16:9 majority and letterboxes the rare portrait one over the blur
+   backdrop rather than destroying it. Card widens so the shorter media still
+   holds the rail. */
+.v1-clubs-page .v1c-exp-card.is-landscape { width: 340px; }
+.v1-clubs-page .v1c-exp-grid .v1c-exp-card.is-landscape { width: auto; }
+.v1-clubs-page .v1c-exp-media.is-landscape { aspect-ratio: 16 / 9; }
+.v1-clubs-page .v1c-exp-media.is-landscape img { object-fit: contain; }
+/* Blur backdrop, on only for this variant. A static CSS blur on a plain div
+   (never an SVG, never re-blurred per frame) — the scale hides the soft
+   edge the blur leaves at the bounds. */
+.v1-clubs-page .v1c-exp-media.is-landscape .v1c-exp-bg {
+  display: block; position: absolute; inset: 0;
+  background-size: cover; background-position: center;
+  filter: blur(18px); transform: scale(1.15); opacity: 0.5;
+}
 .v1-clubs-page .v1c-exp-card:hover .v1c-exp-media { border-color: var(--exp-hair-2); transform: translateY(-4px); }
 .v1-clubs-page .v1c-exp-badge {
   position: absolute; top: 10px; left: 10px; z-index: 2; display: inline-flex; align-items: center; gap: 5px;
@@ -3580,6 +3615,9 @@ body { padding-top: var(--nav-h, 68px); }
   .v1-clubs-page .v1c-exp-evlist .v1c-exp-media {
     width: 124px; flex-shrink: 0; border-radius: 16px;
   }
+  /* Landscape thumbs are only 9/16 as tall at a given width, so give them a
+     bit more to work with in the mobile row layout. */
+  .v1-clubs-page .v1c-exp-evlist .v1c-exp-media.is-landscape { width: 156px; }
   .v1-clubs-page .v1c-exp-evlist .v1c-exp-card:hover .v1c-exp-media { transform: none; }
   .v1-clubs-page .v1c-exp-evlist .v1c-exp-body { flex: 1; min-width: 0; padding: 0; }
 }

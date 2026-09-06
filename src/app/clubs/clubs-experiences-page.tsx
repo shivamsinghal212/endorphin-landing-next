@@ -78,15 +78,17 @@ async function getAllClubs(): Promise<{ clubs: DiscoverHit[]; cityFacets: { valu
 }
 
 /**
- * Fetches club events from the unified discover endpoint for the two
- * events-first rails. `query` selects the window — `sort=upcoming` for
- * "Events around you" (soonest first), or `eventsWindow=this_weekend` for
- * "Events this weekend". Failures degrade to []: the rail simply doesn't
- * render, the rest of the page is unaffected.
+ * Fetches one kind of event from the unified discover endpoint for the
+ * events-first rails. `kind` is 'club_event' or 'race' — each kind gets its
+ * OWN rail, never merged, so a busy race calendar can't push club runs off
+ * the page (or vice versa). `query` selects the window — `sort=upcoming` for
+ * "upcoming in {city}", or `eventsWindow=this_weekend` for the weekend rail.
+ * Failures degrade to []: that rail simply doesn't render, the rest of the
+ * page is unaffected.
  */
-async function getClubEvents(query: string): Promise<DiscoverHit[]> {
+async function getEvents(kind: string, query: string): Promise<DiscoverHit[]> {
   try {
-    const res = await fetch(`${API}/discover/smart?kind=club_event&${query}`, {
+    const res = await fetch(`${API}/discover/smart?kind=${kind}&${query}`, {
       next: { revalidate: 900 },
     });
     if (!res.ok) return [];
@@ -94,6 +96,28 @@ async function getClubEvents(query: string): Promise<DiscoverHit[]> {
     return j.items ?? [];
   } catch {
     return [];
+  }
+}
+
+/**
+ * How many races are actually UPCOMING nationally, for the hero counter.
+ * `limit=1` — we want the `total`, not the rows. Must carry the same
+ * dateFrom floor as the rails: the unfiltered kind facet reports every race
+ * ever indexed (671 at time of writing vs ~254 upcoming), and labelling an
+ * all-time number as "upcoming" is the exact mislabel we fixed before.
+ * Returns 0 on failure, which hides the counter rather than showing a lie.
+ */
+async function getUpcomingRaceCount(dateFrom: string): Promise<number> {
+  try {
+    const res = await fetch(
+      `${API}/discover/smart?kind=race&dateFrom=${dateFrom}&limit=1`,
+      { next: { revalidate: 900 } },
+    );
+    if (!res.ok) return 0;
+    const j = (await res.json()) as DiscoverPage;
+    return Number(j.total) || 0;
+  } catch {
+    return 0;
   }
 }
 
@@ -129,39 +153,66 @@ function istTodayFloor(): string {
 }
 
 /**
- * "Events around you" — city-scoped when we can resolve the visitor's city
- * from IP (Vercel edge geo), else the soonest-upcoming events nationally.
- * NCR visitors get every NCR city merged together (fan-out) under the
- * "Delhi NCR" label. `city` is set only when the resolved location actually
- * yielded events; null falls back to the generic national list.
+ * "Around you" — city-scoped when we can resolve the visitor's city from IP
+ * (Vercel edge geo), else the soonest-upcoming nationally. NCR visitors get
+ * every NCR city fanned out under the "Delhi NCR" label. `city` is set only
+ * when the resolved location actually yielded something; null falls back to
+ * the national list.
+ *
+ * Returns races and club events as SEPARATE lists — they feed two distinct
+ * rails and are never interleaved. `includeRaces` is false on /clubs, which
+ * stays a club directory.
  */
 async function getEventsAroundYou(
   geoCity: string | null,
-): Promise<{ events: DiscoverHit[]; city: string | null }> {
+  includeRaces: boolean,
+): Promise<{ races: DiscoverHit[]; clubEvents: DiscoverHit[]; city: string | null }> {
   const dateFrom = istTodayFloor();
+
+  // Both kinds for one city scope, each capped to 12 SEPARATELY so they
+  // populate two independent rails rather than competing for one list.
+  const forScope = async (scope: string) => {
+    const [clubEvents, races] = await Promise.all([
+      getEvents('club_event', scope).then((h) => mergeUpcoming(h, 12)),
+      includeRaces
+        ? getEvents('race', scope).then((h) => mergeUpcoming(h, 12))
+        : Promise.resolve([] as DiscoverHit[]),
+    ]);
+    return { races, clubEvents };
+  };
+
+  const scopeQuery = (city?: string) =>
+    `${city ? `city=${encodeURIComponent(city)}&` : ''}dateFrom=${dateFrom}&sort=upcoming&limit=12`;
+
   if (geoCity) {
     if (isNcrCity(geoCity)) {
-      const perCity = await Promise.all(
-        NCR_CITIES.map((c) =>
-          getClubEvents(`city=${encodeURIComponent(c)}&dateFrom=${dateFrom}&sort=upcoming&limit=12`),
-        ),
-      );
-      const merged = mergeUpcoming(perCity.flat(), 12);
-      if (merged.length) return { events: merged, city: 'Delhi NCR' };
+      // The discover `city=` filter is per-city, so NCR fans out and the
+      // per-city results are merged WITHIN each kind (never across kinds).
+      const perCity = await Promise.all(NCR_CITIES.map((c) => forScope(scopeQuery(c))));
+      const found = {
+        races: mergeUpcoming(perCity.flatMap((p) => p.races), 12),
+        clubEvents: mergeUpcoming(perCity.flatMap((p) => p.clubEvents), 12),
+      };
+      // City scope holds if EITHER rail found something locally — otherwise
+      // one empty kind would drag the other back to the national list.
+      if (found.races.length || found.clubEvents.length) {
+        return { ...found, city: 'Delhi NCR' };
+      }
     } else {
-      const local = await getClubEvents(
-        `city=${encodeURIComponent(geoCity)}&dateFrom=${dateFrom}&sort=upcoming&limit=12`,
-      );
-      if (local.length) return { events: local, city: geoCity };
+      const found = await forScope(scopeQuery(geoCity));
+      if (found.races.length || found.clubEvents.length) {
+        return { ...found, city: geoCity };
+      }
     }
   }
-  const national = await getClubEvents(`dateFrom=${dateFrom}&sort=upcoming&limit=12`);
-  return { events: national, city: null };
+  return { ...(await forScope(scopeQuery())), city: null };
 }
 
-// Event link: /clubs/{clubSlug}/events/{eventSlug||id}. Returns null when
-// the hit is missing the club slug (can't build a valid path).
+// Event link. Races live on the standalone /running-events/{slug} pages;
+// club events live under their club. Returns null only for a club event
+// missing its club slug (can't build a valid path).
 function eventHref(hit: DiscoverHit): string | null {
+  if (hit.kind === 'race') return `/running-events/${hit.slug || hit.id}`;
   if (!hit.clubSlug) return null;
   return `/clubs/${hit.clubSlug}/events/${hit.slug || hit.id}`;
 }
@@ -253,19 +304,24 @@ export default async function ClubsExperiencesPage({
   variant: 'clubs' | 'experiences';
 }) {
   const token = await getSessionToken();
+  // /experiences carries races alongside club events (in their own rail);
+  // /clubs stays the club directory and shows club events only.
+  const includeRaces = variant === 'experiences';
   // Resolve the visitor's city from Vercel edge geo (IP-based). The page is
   // already dynamic (reads the session cookie), so headers() is free here.
   const { city: geoCity } = await getRequestGeo();
-  const [{ clubs, cityFacets }, around, eventsWeekend, myClubs, userEmail] = await Promise.all([
+  const [{ clubs, cityFacets }, around, eventsWeekend, upcomingRaces, myClubs, userEmail] = await Promise.all([
     getAllClubs(),
-    getEventsAroundYou(geoCity),
-    getClubEvents('eventsWindow=this_weekend&sort=upcoming&limit=12'),
+    getEventsAroundYou(geoCity, includeRaces),
+    getEvents('club_event', 'eventsWindow=this_weekend&sort=upcoming&limit=12'),
+    includeRaces ? getUpcomingRaceCount(istTodayFloor()) : Promise.resolve(0),
     token
       ? clubsApi.listMyClubs(token, 'all', { includePending: true }).catch(() => [])
       : Promise.resolve([]),
     getSessionEmail(),
   ]);
-  const eventsAround = around.events;
+  const eventsAround = around.clubEvents;
+  const racesAround = around.races;
   const aroundCity = around.city;
   // Featured strip — fetch rich detail for the top 5 by members.
   const featuredSlugs = clubs
@@ -282,7 +338,7 @@ export default async function ClubsExperiencesPage({
   const isAuthed = !!token;
   const canonicalUrl = `${SITE}${variant === 'experiences' ? '/experiences' : '/clubs'}`;
   const jsonLd = buildJsonLd(clubs, canonicalUrl);
-  const eventsJsonLd = buildEventsJsonLd([...eventsAround, ...eventsWeekend]);
+  const eventsJsonLd = buildEventsJsonLd([...racesAround, ...eventsAround, ...eventsWeekend]);
   const breadcrumbJsonLd = buildBreadcrumbJsonLd(variant);
 
   return (
@@ -312,6 +368,8 @@ export default async function ClubsExperiencesPage({
           featuredFull={featuredFull as ApiClub[]}
           cityFacets={cityFacets}
           eventsAround={eventsAround}
+          racesAround={racesAround}
+          upcomingRaces={upcomingRaces}
           aroundCity={aroundCity}
           eventsWeekend={eventsWeekend}
           geoCity={geoCity}

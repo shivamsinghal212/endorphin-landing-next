@@ -9,6 +9,7 @@ import posthog from 'posthog-js';
 import LoginModal from '@/components/LoginModal';
 import RaceCouponContext from '@/components/RaceCouponContext';
 import { ReminderButton } from '@/components/ReminderButton';
+import { useImgFallback } from '@/lib/img-fallback';
 import CouponTopStrip from '@/components/CouponTopStrip';
 import { couponCta } from '@/lib/coupon-cta';
 import { eventPath } from '@/lib/event-path';
@@ -102,8 +103,14 @@ export default function ExperienceDetailView({
   const dateStr = fmtFullDate(event.startTime);
   const timeStr = fmtTime(event.startTime);
   const priceStr = fmtPrice(event.priceMin, event.currency) || 'Free';
-  const cover = event.coverImageUrl || event.imageUrl || null;
-  const gallery = (event.galleryImages ?? []).filter((u) => u && u !== cover);
+  // Drop any image whose URL is dead rather than rendering a broken frame —
+  // the H1 above already names the event, so no placeholder is needed here.
+  const { isFailed, imgProps } = useImgFallback();
+  const coverSrc = event.coverImageUrl || event.imageUrl || null;
+  const cover = coverSrc && !isFailed(coverSrc) ? coverSrc : null;
+  const gallery = (event.galleryImages ?? []).filter(
+    (u) => u && u !== coverSrc && !isFailed(u),
+  );
   const mapUrl =
     event.latitude != null && event.longitude != null
       ? `https://maps.google.com/?q=${event.latitude},${event.longitude}`
@@ -252,14 +259,14 @@ export default function ExperienceDetailView({
           {cover && (
             <div className="exd-cover rv">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={cover} alt={event.title} />
+              <img src={cover} alt={event.title} {...imgProps(cover)} />
             </div>
           )}
           {gallery.length > 0 && (
             <div className="exd-gallery rv">
               {gallery.map((url) => (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img key={url} src={url} alt="" />
+                <img key={url} src={url} alt="" {...imgProps(url)} />
               ))}
             </div>
           )}
