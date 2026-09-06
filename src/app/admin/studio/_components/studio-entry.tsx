@@ -1,8 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import { useState } from 'react';
-import posthog from 'posthog-js';
+import LoginModal from '@/components/LoginModal';
+import { useClubOnboard } from '@/lib/use-club-onboard';
 import { useStudioAuth } from '@/lib/studio/auth-context';
 import { useMyClubs, describeError } from '@/lib/studio/hooks';
 import { ClubAvatar, ErrorState, Skeleton, StudioTopBar } from './ui';
@@ -179,39 +179,7 @@ function SuperAdminTile() {
 }
 
 function EmptyStateTile() {
-  const [handle, setHandle] = useState('');
-  const [submitted, setSubmitted] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
-
-  const cleanHandle = (raw: string) =>
-    raw
-      .trim()
-      .replace(/^https?:\/\/(www\.)?instagram\.com\//i, '')
-      .replace(/\/+$/, '')
-      .replace(/^@/, '');
-
-  async function onSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    const cleaned = cleanHandle(handle);
-    if (!cleaned || submitting) return;
-    setSubmitting(true);
-    try {
-      posthog.capture('club_onboard_request', { instagram_handle: cleaned, source: 'studio_empty_state' });
-    } catch {
-      // PostHog optional — never block the request on analytics.
-    }
-    try {
-      await fetch('https://api.endorfin.run/api/v1/clubs/onboard-requests', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ instagramHandle: cleaned }),
-      });
-    } catch {
-      // Swallow — the team can still be reached via the mailto fallback below.
-    }
-    setSubmitted(true);
-    setSubmitting(false);
-  }
+  const f = useClubOnboard('studio_empty_state');
 
   return (
     <div className="bg-white border border-jet/10 rounded-3xl p-6 md:p-8 min-h-[200px] flex flex-col">
@@ -224,7 +192,7 @@ function EmptyStateTile() {
       >
         Add your<br />club.
       </p>
-      {submitted ? (
+      {f.submitted ? (
         <p className="text-xs text-jet/60 mt-4" role="status" aria-live="polite">
           <strong className="text-jet">Thanks — we&apos;ll be in touch.</strong> We&apos;ve
           logged your club. Anything urgent? Email{' '}
@@ -236,7 +204,7 @@ function EmptyStateTile() {
             Drop your club&apos;s Instagram and we&apos;ll get you set up — or email{' '}
             <a className="underline" href="mailto:hello@endorfin.run">hello@endorfin.run</a>.
           </p>
-          <form onSubmit={onSubmit} className="mt-6 flex flex-col gap-2">
+          <form onSubmit={f.onSubmit} className="mt-6 flex flex-col gap-2">
             <div className="flex items-center border border-jet/15 rounded-lg px-3 focus-within:border-jet/40 transition-colors">
               <span className="text-jet/40 text-sm" aria-hidden>@</span>
               <input
@@ -244,8 +212,8 @@ function EmptyStateTile() {
                 className="flex-1 min-w-0 bg-transparent px-2 py-2.5 text-sm text-jet outline-none"
                 placeholder="your_club_handle"
                 aria-label="Your club's Instagram handle"
-                value={handle}
-                onChange={(e) => setHandle(e.target.value)}
+                value={f.handle}
+                onChange={(e) => f.setHandle(e.target.value)}
                 autoComplete="off"
                 spellCheck={false}
                 required
@@ -253,17 +221,28 @@ function EmptyStateTile() {
             </div>
             <button
               type="submit"
-              disabled={!cleanHandle(handle) || submitting}
+              disabled={!f.cleaned || f.submitting}
               className="self-start px-4 py-2 rounded-lg text-sm font-medium bg-jet text-bone hover:bg-jet/90 transition-colors disabled:opacity-40 disabled:hover:bg-jet"
             >
-              {submitting ? 'Adding…' : 'Add my club →'}
+              {f.submitting ? 'Adding…' : 'Add my club →'}
             </button>
           </form>
+          {f.error ? (
+            <p className="text-xs text-red mt-2" role="alert">{f.error}</p>
+          ) : null}
           <Link href="/clubs" className="mt-4 text-xs text-jet/50 underline hover:text-jet">
             Or browse clubs
           </Link>
         </>
       )}
+      {/* Studio is behind a session already, so the modal is a fallback for a
+          token that went stale mid-session rather than the usual path. */}
+      <LoginModal
+        open={f.loginOpen}
+        onClose={f.closeLogin}
+        onSuccess={f.onLoginSuccess}
+        title="Sign in to add your club."
+      />
     </div>
   );
 }

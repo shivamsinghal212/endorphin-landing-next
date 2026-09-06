@@ -10,6 +10,8 @@ import HeroSearchPanel, {
   type DiscoverHit,
   type QuickChip,
 } from '@/components/HeroSearchPanel';
+import LoginModal from '@/components/LoginModal';
+import { useClubOnboard } from '@/lib/use-club-onboard';
 import { ClaimClubModal } from './[slug]/claim-club-link';
 import { JoinClubModal } from './[slug]/join-club-modal';
 import type { MyClubClaim, MyClubMembership } from '@/lib/api';
@@ -389,37 +391,9 @@ function ClubCard({
   );
 }
 
-// ─── Onboard banner (unchanged) ──
+// ─── Onboard banner ──
 function OnboardClubBanner() {
-  const [handle, setHandle] = useState('');
-  const [submitted, setSubmitted] = useState(false);
-
-  const cleanHandle = (raw: string) =>
-    raw
-      .trim()
-      .replace(/^https?:\/\/(www\.)?instagram\.com\//i, '')
-      .replace(/\/+$/, '')
-      .replace(/^@/, '');
-
-  async function onSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    const cleaned = cleanHandle(handle);
-    if (!cleaned) return;
-    posthog.capture('club_onboard_request', { instagram_handle: cleaned });
-    // POST to the backend queue. We don't gate on success — even if the
-    // API write fails (offline, server down) the mailto still fires
-    // so the request reaches us out-of-band.
-    try {
-      await fetch('https://api.endorfin.run/api/v1/clubs/onboard-requests', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ instagramHandle: cleaned }),
-      });
-    } catch {
-      // Swallow — mailto is the fallback path.
-    }
-    setSubmitted(true);
-  }
+  const f = useClubOnboard('clubs_banner');
 
   return (
     <div className="v1c-onboard-card">
@@ -432,7 +406,7 @@ function OnboardClubBanner() {
           onboarded — verified listing, member tools, the works.
         </p>
       </div>
-      {submitted ? (
+      {f.submitted ? (
         <div className="v1c-onboard-thanks" role="status" aria-live="polite">
           <strong>Thanks — we&rsquo;ll be in touch.</strong>
           <span>
@@ -441,7 +415,7 @@ function OnboardClubBanner() {
           </span>
         </div>
       ) : (
-        <form className="v1c-onboard-form" onSubmit={onSubmit}>
+        <form className="v1c-onboard-form" onSubmit={f.onSubmit}>
           <div className="v1c-onboard-input-wrap">
             <span className="v1c-onboard-input-prefix" aria-hidden>@</span>
             <input
@@ -449,8 +423,8 @@ function OnboardClubBanner() {
               className="v1c-onboard-input"
               placeholder="your_club_handle"
               aria-label="Your club's Instagram handle"
-              value={handle}
-              onChange={(e) => setHandle(e.target.value)}
+              value={f.handle}
+              onChange={(e) => f.setHandle(e.target.value)}
               autoComplete="off"
               spellCheck={false}
               required
@@ -459,12 +433,20 @@ function OnboardClubBanner() {
           <button
             type="submit"
             className="v1c-btn v1c-btn-primary v1c-onboard-submit"
-            disabled={!cleanHandle(handle)}
+            disabled={!f.cleaned || f.submitting}
           >
-            Get my club listed →
+            {f.submitting ? 'Sending…' : 'Get my club listed →'}
           </button>
         </form>
       )}
+      {f.error ? <p className="v1c-onboard-error" role="alert">{f.error}</p> : null}
+      <LoginModal
+        open={f.loginOpen}
+        onClose={f.closeLogin}
+        onSuccess={f.onLoginSuccess}
+        title="Sign in to list your club."
+        subtitle={`So we know who to get back to about @${f.cleaned}.`}
+      />
     </div>
   );
 }

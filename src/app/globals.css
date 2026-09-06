@@ -1904,6 +1904,7 @@ body.nav-open { overflow: hidden; }
 }
 .v1-kip-onboard-thanks strong { color: var(--bone); }
 .v1-kip-onboard-thanks a { color: var(--bone); border-bottom: 0.5px solid rgba(245, 240, 235, 0.4); }
+.v1-kip-onboard-error { margin-top: 8px; max-width: 480px; font-size: 12px; color: var(--red); }
 @media (max-width: 560px) {
   .v1-kip-onboard-form { flex-direction: column; }
   .v1-kip-onboard-submit { width: 100%; }
@@ -4534,6 +4535,9 @@ body { padding-top: var(--nav-h, 68px); }
 }
 .v1-clubs-page .v1c-onboard-thanks a {
   color: var(--bone); text-decoration: underline;
+}
+.v1-clubs-page .v1c-onboard-error {
+  margin-top: 10px; font-size: 12px; color: var(--red);
 }
 @media (max-width: 860px) {
   .v1-clubs-page .v1c-onboard-section { padding: 0 0 64px; }

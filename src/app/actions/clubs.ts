@@ -8,6 +8,7 @@ import {
   type RsvpToggleResponse,
 } from '@/lib/api';
 import { getSessionToken } from '@/lib/session';
+import { getRealStudioAuth } from '@/lib/studio/server-auth';
 
 export type ClubActionState<T = undefined> =
   | { ok: true; data?: T }
@@ -114,6 +115,26 @@ export async function cancelRsvpAction(
   try {
     await clubsApi.cancelRsvp(slug, eventId, token);
     return { ok: true };
+  } catch (e) {
+    return toError(e);
+  }
+}
+
+/** "List your club" lead capture. Auth-gated: the backend now requires a
+ *  signed-in user so every request has someone we can reach out to.
+ *
+ *  Resolves the session the same way the studio does — the marketing cookie
+ *  first, then a NextAuth Google sign-in — so someone holding only the latter
+ *  isn't told to sign in again by a form the header says they're signed into.
+ */
+export async function submitClubOnboardAction(
+  instagramHandle: string,
+): Promise<ClubActionState<{ id: string }>> {
+  const auth = await getRealStudioAuth();
+  if (!auth) return { ok: false, error: 'Sign in to list your club', status: 401 };
+  try {
+    const data = await clubsApi.submitOnboardRequest(instagramHandle, auth.token);
+    return { ok: true, data: { id: data.id } };
   } catch (e) {
     return toError(e);
   }

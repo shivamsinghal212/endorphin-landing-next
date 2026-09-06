@@ -358,6 +358,15 @@ export const clubsApi = {
       `/clubs/${encodeURIComponent(slug)}/events/${encodeURIComponent(eventId)}/rsvp`,
       { method: 'DELETE', token },
     ),
+
+  /** "List your club" lead capture. Auth-gated on the backend so every
+   *  request carries a user we can reach out to. */
+  submitOnboardRequest: (instagramHandle: string, token: string) =>
+    api<{ id: string; instagramHandle: string }>('/clubs/onboard-requests', {
+      method: 'POST',
+      body: JSON.stringify({ instagramHandle }),
+      token,
+    }),
 };
 
 // ─── Kip founding-100 waitlist ────────────────────────────────────────────
