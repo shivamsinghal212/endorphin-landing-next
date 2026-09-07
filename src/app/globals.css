@@ -3490,6 +3490,10 @@ body { padding-top: var(--nav-h, 68px); }
 .v1-clubs-page .v1c-exp-scroller {
   display: flex; gap: 28px; overflow-x: auto; scroll-snap-type: x mandatory;
   scrollbar-width: none; padding-bottom: 4px;
+  /* overflow-x: auto forces overflow-y to compute to auto, so the -4px
+     hover lift on .v1c-exp-media was being clipped off at the top. Give it
+     room to paint, then pull the rail back up so spacing is unchanged. */
+  padding-top: 8px; margin-top: -8px;
   margin-left: calc(-1 * var(--v1c-gutter)); margin-right: calc(-1 * var(--v1c-gutter));
   padding-left: var(--v1c-gutter); padding-right: var(--v1c-gutter);
   /* Without this, snap pulls the first card's edge to the scrollport start

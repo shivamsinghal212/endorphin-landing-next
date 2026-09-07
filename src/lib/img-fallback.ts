@@ -26,6 +26,12 @@ export function useImgFallback() {
 
   const imgProps = useCallback(
     (url: string) => ({
+      // Hotlink protection: race-registration-cdn.indiarunning.com serves
+      // these covers with 200 for an absent Referer but 403 for
+      // "https://www.endorfin.run/" — so they loaded on localhost and broke
+      // in production. Suppressing the referrer restores them. Harmless on
+      // our own buckets, which don't check it.
+      referrerPolicy: 'no-referrer' as const,
       onError: () => mark(url),
       ref: (el: HTMLImageElement | null) => {
         if (el && el.complete && el.naturalWidth === 0) mark(url);
