@@ -6,14 +6,20 @@ import { clubsApi, type MyClubClaim, type MyClubMembership } from '@/lib/api';
 import { getSessionEmail, getSessionToken } from '@/lib/session';
 import { getRequestGeo } from '@/lib/geo';
 import type { DiscoverHit } from '@/components/HeroSearchPanel';
+import type { ApiEvent } from '@/app/running-events/page';
 import { fetchFeaturedFull } from '@/lib/clubs-featured';
 import { eventPlaceJsonLd } from '@/lib/event-seo';
 
 // Shared body for the two national directory routes — /clubs and
-// /experiences. Identical data + layout; the only difference is `variant`,
-// which ClubsView uses to decide rail order (clubs lead with the run-club
-// directory, experiences lead with the club-events rails). Each route file
-// owns its own metadata/canonical and renders this with the right variant.
+// /running-events. Identical data + layout; `variant` decides rail order
+// (clubs lead with the run-club directory, running-events lead with the
+// event rails) and whether races are fetched at all. Each route file owns
+// its own metadata/canonical and renders this with the right variant.
+//
+// /running-events keeps its URL deliberately: it is the ranked index, it is
+// in sitemap.ts at priority 0.9, and the whole /running-events/{scope}/{city}
+// lander cluster hangs off it. The old /experiences index had one event ever
+// and was not in the sitemap, so it 301s here rather than the reverse.
 
 const SITE = 'https://www.endorfin.run';
 const API = 'https://api.endorfin.run/api/v1';
@@ -283,10 +289,10 @@ function buildJsonLd(clubs: DiscoverHit[], canonicalUrl: string) {
   };
 }
 
-function buildBreadcrumbJsonLd(variant: 'clubs' | 'experiences') {
+function buildBreadcrumbJsonLd(variant: Variant) {
   const leaf =
-    variant === 'experiences'
-      ? { name: 'Experiences', item: `${SITE}/experiences` }
+    variant === 'running-events'
+      ? { name: 'Running Events', item: `${SITE}/running-events` }
       : { name: 'Run Clubs', item: `${SITE}/clubs` };
   return {
     '@context': 'https://schema.org',
@@ -298,15 +304,22 @@ function buildBreadcrumbJsonLd(variant: 'clubs' | 'experiences') {
   };
 }
 
+export type Variant = 'clubs' | 'running-events';
+
 export default async function ClubsExperiencesPage({
   variant,
+  races = [],
 }: {
-  variant: 'clubs' | 'experiences';
+  variant: Variant;
+  /** Every upcoming race, rendered as the closing grid on /running-events.
+   *  Fetched by that route (it needs the same list for its Event JSON-LD,
+   *  which wants price/currency fields the discover payload lacks). */
+  races?: ApiEvent[];
 }) {
   const token = await getSessionToken();
-  // /experiences carries races alongside club events (in their own rail);
+  // /running-events carries races alongside club events (in their own rail);
   // /clubs stays the club directory and shows club events only.
-  const includeRaces = variant === 'experiences';
+  const includeRaces = variant === 'running-events';
   // Resolve the visitor's city from Vercel edge geo (IP-based). The page is
   // already dynamic (reads the session cookie), so headers() is free here.
   const { city: geoCity } = await getRequestGeo();
@@ -336,7 +349,7 @@ export default async function ClubsExperiencesPage({
     if (c.claim) claimBySlug[c.slug] = c.claim;
   }
   const isAuthed = !!token;
-  const canonicalUrl = `${SITE}${variant === 'experiences' ? '/experiences' : '/clubs'}`;
+  const canonicalUrl = `${SITE}${variant === 'running-events' ? '/running-events' : '/clubs'}`;
   const jsonLd = buildJsonLd(clubs, canonicalUrl);
   const eventsJsonLd = buildEventsJsonLd([...racesAround, ...eventsAround, ...eventsWeekend]);
   const breadcrumbJsonLd = buildBreadcrumbJsonLd(variant);
@@ -369,6 +382,7 @@ export default async function ClubsExperiencesPage({
           cityFacets={cityFacets}
           eventsAround={eventsAround}
           racesAround={racesAround}
+          allRaces={races}
           upcomingRaces={upcomingRaces}
           geoCity={geoCity}
           aroundCity={aroundCity}

@@ -10,8 +10,9 @@ import { useStoreLink } from '@/lib/use-store-link';
 // Top-level links rendered as-is. "Clubs" is special — it's a hover/tap
 // dropdown (see CLUBS_SUBLINKS) rather than a direct link.
 const NAV_LINKS = [
+  // One entry: /experiences merged into /running-events, which now lists
+  // races, club events and clubs together.
   { label: 'Running Events', href: '/running-events', soon: false, primary: true },
-  { label: 'Experiences', href: '/experiences', soon: false, primary: true },
 ];
 
 // The "Clubs" dropdown. Both club surfaces live here now.

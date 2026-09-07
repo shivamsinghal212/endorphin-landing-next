@@ -2,7 +2,6 @@
 
 import { useEffect, useRef } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
 import { useMyBooking } from '@/lib/runner-hooks';
 import { AppStoreButtons } from '@/components/AppStoreButtons';
 import { EventTicket } from './_event-ticket';
@@ -30,9 +29,9 @@ export function BookingSuccessView({
   // We're already on the event's correct prefix (the booking form pushed us
   // here via eventPath). Mirror it on the back/try-again links so an
   // experience stays under /experiences.
-  const eventBase = (usePathname() || '').startsWith('/experiences')
-    ? '/experiences'
-    : '/running-events';
+  // One prefix since /experiences merged into /running-events; this used to
+  // branch on the pathname because events lived under both.
+  const eventBase = '/running-events';
   const pollStart = useRef<number | null>(null);
   const POLL_BUDGET_MS = 120_000;
   const q = useMyBooking(bookingId, { refetchIntervalMs: 5_000 });

@@ -14,7 +14,13 @@
 import type { ApiEvent } from '@/app/running-events/page';
 import { extractCity } from '@/lib/cities';
 
-export type RaceScope = 'in' | 'marathon-in' | 'half-marathon-in' | '10k-in' | '5k-in';
+export type RaceScope =
+  | 'in'
+  | 'marathon-in'
+  | 'half-marathon-in'
+  | '10k-in'
+  | '5k-in'
+  | 'ultra-in';
 
 export const RACE_SCOPES: RaceScope[] = [
   'in',
@@ -22,6 +28,7 @@ export const RACE_SCOPES: RaceScope[] = [
   'half-marathon-in',
   '10k-in',
   '5k-in',
+  'ultra-in',
 ];
 
 interface RaceScopeMeta {
@@ -65,6 +72,12 @@ export const RACE_SCOPE_META: Record<RaceScope, RaceScopeMeta> = {
     nounSingular: '5K',
     keyword: '5k',
     minCount: 3,
+  },
+  'ultra-in': {
+    noun: 'Ultra marathons',
+    nounSingular: 'ultra marathon',
+    keyword: 'ultra marathon',
+    minCount: 2,
   },
 };
 
@@ -196,20 +209,42 @@ export function raceMatchesScope(race: ApiEvent, scope: RaceScope): boolean {
   return cats.some((c) => categoryMatchesScope(c.categoryName || '', scope));
 }
 
+/** Distance in km when the category is written as a plain "42.2K", else null. */
+function categoryKm(u: string): number | null {
+  const m = /^(\d+(?:\.\d+)?)K$/.exec(u);
+  return m ? Number(m[1]) : null;
+}
+
 function categoryMatchesScope(rawCat: string, scope: RaceScope): boolean {
   const u = (rawCat || '').toUpperCase().replace(/\s+/g, '');
   if (!u) return false;
+  const km = categoryKm(u);
   switch (scope) {
     case 'marathon-in':
-      // Marathon ≈ 42K / FM. Exclude anything that's a half marathon.
+      // The full marathon is stored as "M" in the overwhelming majority of
+      // our rows (40 of them upcoming) — not "FM" or "42K". Matching only
+      // the latter meant marathon-in resolved to ZERO races in every city,
+      // so the whole cluster silently produced no pages.
       if (u === 'HM' || u === '21K' || u.includes('HALF')) return false;
-      return u === 'FM' || u === '42K' || u.includes('MARATHON');
+      if (u === 'ULTRA' || u.includes('ULTRA')) return false; // ultras have their own scope
+      if (km != null && km > 42.4) return false;
+      return (
+        u === 'M' ||
+        u === 'FM' ||
+        u === '42K' ||
+        u.includes('MARATHON') ||
+        (km != null && km >= 42 && km <= 42.4)
+      );
     case 'half-marathon-in':
       return u === 'HM' || u === '21K' || u.includes('HALFMARATHON');
     case '10k-in':
       return u === '10K';
     case '5k-in':
       return u === '5K';
+    case 'ultra-in':
+      // Stored either as the literal "ULTRA" or as the distance (50K, 65K,
+      // 100K). Anything past marathon distance counts.
+      return u === 'ULTRA' || u.includes('ULTRA') || (km != null && km > 42.4);
     case 'in':
       return true;
   }

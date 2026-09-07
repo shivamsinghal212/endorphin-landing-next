@@ -403,7 +403,7 @@ body.nav-open { overflow: hidden; }
   border: 1px solid rgba(10, 10, 10, 0.1);
   border-radius: 12px;
   overflow: hidden;
-  background: #fff;
+  background: rgba(245, 240, 235, 0.08);
 }
 .v1-md-editor:focus-within {
   border-color: #0a0a0a;
@@ -2129,15 +2129,21 @@ body { padding-top: var(--nav-h, 68px); }
    V1 RACES PAGE  (/running-events)
    All classes scoped under .v1-races-page
    ═══════════════════════════════════════════════ */
+/* The city × distance landers. These used to be a light page with dark
+   sections punched into it; the rest of the site is dark, so the tokens are
+   inverted here and the page reads as one surface. Markup is untouched —
+   H1, intro copy, cross-link chips, race list and JSON-LD are all as they
+   were, because those are what rank. */
 .v1-races-page {
-  --cream: #EDE7E0;
-  --text-secondary: #8A8278;
-  --text-muted: #B0A89E;
-  --hairline: rgba(10, 10, 10, 0.12);
-  --hairline-strong: rgba(10, 10, 10, 0.24);
+  --cream: #16151A;
+  --text-secondary: rgba(245, 240, 235, 0.62);
+  --text-muted: rgba(245, 240, 235, 0.45);
+  --hairline: rgba(245, 240, 235, 0.10);
+  --hairline-strong: rgba(245, 240, 235, 0.22);
   --v1r-container-max: 1280px;
   --v1r-gutter: max(28px, calc((100% - var(--v1r-container-max)) / 2));
-  background: var(--bone);
+  background: #0C0B10;
+  color: var(--bone);
   color: var(--jet);
 }
 .v1-races-page .v1r-container {
@@ -2148,13 +2154,18 @@ body { padding-top: var(--nav-h, 68px); }
 
 /* ─── Hero ─────────────────────────────── */
 .v1-races-page .v1r-hero {
+  /* Was a full-bleed city photo behind a 128px headline. Quiet, centred
+     treatment now, matching the /running-events hub. CSS only — the H1
+     string and the intro paragraph are untouched, since those rank. */
   position: relative; overflow: hidden;
-  background: var(--jet); color: var(--bone);
-  padding: 112px 0 96px;
+  background: radial-gradient(120% 90% at 50% -20%, #17121C 0%, #0C0B10 55%, #0A0A0C 100%);
+  color: var(--bone);
+  padding: 52px 0 42px;
+  text-align: center;
 }
 .v1-races-page .v1r-hero-bg {
-  position: absolute; inset: 0; z-index: 0;
-  pointer-events: none; overflow: hidden;
+  /* The city photo was the loud part. Element stays in the markup. */
+  display: none;
 }
 .v1-races-page .v1r-hero-bg::before {
   content: ''; position: absolute; inset: -30px;
@@ -2190,38 +2201,40 @@ body { padding-top: var(--nav-h, 68px); }
 }
 .v1-races-page .v1r-hero-title {
   font-family: var(--font-fraunces), serif;
-  font-style: italic; font-weight: 700;
-  font-size: 128px; line-height: 0.92;
-  letter-spacing: -0.035em;
+  font-style: italic; font-weight: 500;
+  font-size: clamp(26px, 3.4vw, 38px); line-height: 1.14;
+  letter-spacing: -0.015em;
   color: var(--bone);
-  max-width: 14ch;
+  max-width: 24ch; margin-inline: auto;
+  text-wrap: balance;
 }
 .v1-races-page .v1r-red { color: var(--red); }
 .v1-races-page .v1r-hero-foot {
-  margin-top: 40px; padding-top: 28px;
-  border-top: 0.5px solid rgba(245, 240, 235, 0.2);
-  display: grid; grid-template-columns: 1fr auto;
-  gap: 56px; align-items: end;
+  margin-top: 20px; padding-top: 0;
+  border-top: 0;
+  display: flex; flex-direction: column; align-items: center;
+  gap: 16px;
 }
 .v1-races-page .v1r-hero-sub {
-  font-size: 18px; line-height: 1.6;
-  color: rgba(245, 240, 235, 0.72);
-  max-width: 52ch;
+  font-size: 14.5px; line-height: 1.65;
+  color: rgba(245, 240, 235, 0.62);
+  max-width: 68ch;
+  margin-inline: auto;
 }
 .v1-races-page .v1r-hero-stats {
-  display: flex; gap: 48px;
+  display: flex; gap: 26px;
   font-family: var(--font-oswald), sans-serif;
-  text-align: right;
+  text-align: center;
 }
 .v1-races-page .v1r-hero-stat-n {
-  font-weight: 700; font-size: 44px; line-height: 1;
-  letter-spacing: -0.01em; color: var(--bone);
+  font-weight: 600; font-size: 19px; line-height: 1;
+  letter-spacing: 0.02em; color: var(--bone);
   font-variant-numeric: tabular-nums;
 }
 .v1-races-page .v1r-hero-stat-l {
-  margin-top: 8px; font-size: 11px;
+  margin-top: 6px; font-size: 9.5px;
   letter-spacing: 0.2em; text-transform: uppercase;
-  color: rgba(245, 240, 235, 0.55);
+  color: rgba(245, 240, 235, 0.5);
 }
 @media (max-width: 960px) {
   .v1-races-page .v1r-hero { padding: 48px 0 72px; }
@@ -2264,7 +2277,9 @@ body { padding-top: var(--nav-h, 68px); }
 
 /* ─── Filter strip (bone, sticky) ──────── */
 .v1-races-page .v1r-filter-strip {
-  background: var(--bone);
+  background: rgba(12, 11, 16, 0.92);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   border-bottom: 0.5px solid var(--hairline);
   padding: 22px 0;
   position: sticky; top: var(--nav-h, 68px); z-index: 5;
@@ -2294,15 +2309,15 @@ body { padding-top: var(--nav-h, 68px); }
   font-family: var(--font-oswald), sans-serif;
   font-weight: 500; font-size: 12px;
   letter-spacing: 0.12em; text-transform: uppercase;
-  color: var(--jet);
+  color: var(--bone);
   border-radius: 100px; white-space: nowrap;
   cursor: pointer;
   transition: all 160ms ease-out;
 }
-.v1-races-page .v1r-chip:hover { border-color: var(--jet); }
+.v1-races-page .v1r-chip:hover { border-color: rgba(245, 240, 235, 0.55); background: rgba(245, 240, 235, 0.07); }
 .v1-races-page .v1r-chip.is-active {
-  background: var(--jet); color: var(--bone);
-  border-color: var(--jet); font-weight: 600;
+  background: var(--bone); color: var(--jet);
+  border-color: var(--bone); font-weight: 600;
 }
 .v1-races-page .v1r-chip .v1r-count {
   margin-left: 6px; font-size: 10px;
@@ -2356,7 +2371,7 @@ body { padding-top: var(--nav-h, 68px); }
 
 /* ─── Featured / flagship (cream bg) ───── */
 .v1-races-page .v1r-featured {
-  background: var(--cream);
+  background: #100F14;
   padding: 88px 0 96px;
   border-bottom: 1px solid var(--jet);
 }
@@ -2627,8 +2642,11 @@ body { padding-top: var(--nav-h, 68px); }
 
 /* ─── Race card (dark variant) ─────────── */
 .v1-races-page .v1r-race-card {
-  background: #141414;
-  border: 0.5px solid rgba(245, 240, 235, 0.12);
+  background: rgba(245, 240, 235, 0.055);
+  border: 1px solid rgba(245, 240, 235, 0.10);
+  border-top-color: rgba(245, 240, 235, 0.15);
+  border-radius: 18px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.09);
   color: var(--bone);
   display: flex; flex-direction: column;
   flex: 0 0 340px;
@@ -2653,10 +2671,23 @@ body { padding-top: var(--nav-h, 68px); }
   overflow: hidden;
   border-bottom: 0.5px solid rgba(245, 240, 235, 0.1);
 }
+/* Contained banner needs something behind it — same blurred-cover backdrop
+   the hub's landscape cards use, so letterboxing reads as intentional. */
+.v1-races-page .v1r-race-card-image::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: inherit;
+  filter: blur(18px);
+  transform: scale(1.15);
+  opacity: 0.45;
+}
+.v1-races-page .v1r-race-card-image img { z-index: 1; }
 .v1-races-page .v1r-race-card-image img {
   position: absolute; inset: 0;
   width: 100%; height: 100%;
-  object-fit: cover;
+  /* contain, not cover: these banners are 16:9 and cover was still slicing
+     the odd square one. The blurred ::before behind fills the gap. */
+  object-fit: contain;
   transition: transform 400ms ease-out;
   display: block;
   z-index: 1;
@@ -2724,9 +2755,11 @@ body { padding-top: var(--nav-h, 68px); }
   white-space: nowrap;
 }
 .v1-races-page .v1r-race-title {
-  font-family: var(--font-fraunces), serif; font-style: italic;
-  font-weight: 700; font-size: 24px;
-  line-height: 1.12; letter-spacing: -0.015em;
+  /* Poppins, matching the hub's rail cards — Fraunces italic here made the
+     two card sets read as two different products. */
+  font-family: var(--font-poppins), sans-serif; font-style: normal;
+  font-weight: 600; font-size: 17px;
+  line-height: 1.28; letter-spacing: 0;
   margin-bottom: 10px;
   color: var(--bone);
   display: -webkit-box;
@@ -3480,6 +3513,74 @@ body { padding-top: var(--nav-h, 68px); }
   display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; margin-bottom: 18px;
 }
 .v1-clubs-page .v1c-exp-citychips::-webkit-scrollbar { display: none; }
+/* Count inside a city chip — dimmer than the label so the name leads. */
+/* ─── City × distance landers ───────────────────────────────
+   They render inside .v1-clubs-page so they inherit the hub's card, chip
+   and rail styling wholesale. Only the few bits the hub has no equivalent
+   for live here: the breadcrumb, the city intro paragraph, and the
+   cross-link rows. */
+.v1-clubs-page .v1c-lander-crumb {
+  margin: 0 auto 14px;
+  font-family: var(--font-oswald), sans-serif;
+  font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase;
+  color: rgba(245, 240, 235, 0.45);
+  text-align: center;
+}
+.v1-clubs-page .v1c-lander-crumb a { color: rgba(245, 240, 235, 0.62); }
+.v1-clubs-page .v1c-lander-crumb a:hover { color: var(--bone); }
+.v1-clubs-page .v1c-lander-crumb [aria-current] { color: rgba(245, 240, 235, 0.78); }
+
+/* The city intro, now below the race grid rather than in the hero. It is
+   the page's only unique copy — the thing that keeps these from reading as
+   doorway pages — so it keeps real measure and contrast. */
+.v1-clubs-page .v1c-lander-about {
+  max-width: 72ch;
+  margin: 46px 0 8px;
+  padding-top: 30px;
+  border-top: 1px solid rgba(245, 240, 235, 0.08);
+}
+.v1-clubs-page .v1c-lander-about-h {
+  font-family: var(--font-fraunces), serif;
+  font-style: italic; font-weight: 500;
+  font-size: 20px; line-height: 1.2;
+  color: var(--bone);
+  margin: 0 0 10px;
+}
+.v1-clubs-page .v1c-lander-about p {
+  margin: 0;
+  font-size: 14.5px; line-height: 1.75;
+  color: rgba(245, 240, 235, 0.62);
+}
+
+.v1-clubs-page .v1c-lander-links {
+  display: flex; flex-direction: column; gap: 14px;
+  padding: 26px 0 30px;
+  border-bottom: 1px solid rgba(245, 240, 235, 0.08);
+  margin-bottom: 30px;
+}
+.v1-clubs-page .v1c-lander-linkrow {
+  display: flex; align-items: flex-start; gap: 16px; flex-wrap: wrap;
+}
+.v1-clubs-page .v1c-lander-linklabel {
+  flex-shrink: 0; padding-top: 8px; min-width: 116px;
+  font-family: var(--font-oswald), sans-serif;
+  font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase;
+  color: rgba(245, 240, 235, 0.42);
+}
+.v1-clubs-page .v1c-lander-linkrow .v1c-exp-citychips {
+  flex: 1; min-width: 0; flex-wrap: wrap; overflow: visible;
+}
+@media (max-width: 860px) {
+  .v1-clubs-page .v1c-lander-linkrow { gap: 8px; }
+  .v1-clubs-page .v1c-lander-linklabel { min-width: 0; padding-top: 0; }
+}
+
+.v1-clubs-page .v1c-exp-chipn {
+  margin-left: 5px;
+  font-variant-numeric: tabular-nums;
+  color: rgba(245, 240, 235, 0.45);
+}
+.v1-clubs-page .v1c-exp-citychip.is-active .v1c-exp-chipn { color: rgba(10, 10, 10, 0.45); }
 .v1-clubs-page .v1c-exp-citychip {
   flex-shrink: 0; padding: 7px 14px; border-radius: 999px; cursor: pointer;
   border: 1px solid var(--exp-hair); background: transparent; color: var(--exp-bone-72);
@@ -3563,6 +3664,10 @@ body { padding-top: var(--nav-h, 68px); }
    holds the rail. */
 .v1-clubs-page .v1c-exp-card.is-landscape { width: 340px; }
 .v1-clubs-page .v1c-exp-grid .v1c-exp-card.is-landscape { width: auto; }
+/* The city filter hides cards with the `hidden` attribute so every race
+   anchor stays in the served HTML. The UA's [hidden]{display:none} loses to
+   .v1c-exp-card{display:flex}, so restate it at class specificity. */
+.v1-clubs-page .v1c-exp-card[hidden] { display: none; }
 .v1-clubs-page .v1c-exp-media.is-landscape { aspect-ratio: 16 / 9; }
 .v1-clubs-page .v1c-exp-media.is-landscape img { object-fit: contain; }
 /* Blur backdrop, on only for this variant. A static CSS blur on a plain div

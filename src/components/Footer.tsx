@@ -102,45 +102,49 @@ async function SeoFooterLinks() {
   const racesAllCities = citiesForScope('in');
   const marathonCities = citiesForScope('marathon-in');
   const halfMarathonCities = citiesForScope('half-marathon-in');
+  const tenKCities = citiesForScope('10k-in');
+  const ultraCities = citiesForScope('ultra-in');
 
-  if (
-    clubCities.length === 0 &&
-    racesAllCities.length === 0 &&
-    marathonCities.length === 0 &&
-    halfMarathonCities.length === 0
-  ) {
+  const scopeColumns = [
+    racesAllCities,
+    marathonCities,
+    halfMarathonCities,
+    tenKCities,
+    ultraCities,
+  ];
+  if (clubCities.length === 0 && scopeColumns.every((c) => c.length === 0)) {
     return null;
   }
 
   const columns: { title: string; links: { href: string; label: string }[] }[] = [];
 
-  if (racesAllCities.length > 0) {
+  /**
+   * A column needs a few cities to be worth showing. Each individual page is
+   * already gated on race count (passesQualityGate), but a column holding one
+   * lone link reads as broken and adds a footer row for almost no crawl value
+   * — ultra currently qualifies in exactly one city.
+   */
+  const MIN_CITIES_PER_COLUMN = 3;
+  const addScopeColumn = (
+    title: string,
+    scope: RaceScope,
+    cities: { page: { slug: string; name: string } }[],
+  ) => {
+    if (cities.length < MIN_CITIES_PER_COLUMN) return;
     columns.push({
-      title: 'Running events by city',
-      links: racesAllCities.map(({ page }) => ({
-        href: `/running-events/in/${page.slug}`,
-        label: `Running events in ${page.name}`,
+      title,
+      links: cities.map(({ page }) => ({
+        href: `/running-events/${scope}/${page.slug}`,
+        label: `${RACE_SCOPE_META[scope].noun} in ${page.name}`,
       })),
     });
-  }
-  if (marathonCities.length > 0) {
-    columns.push({
-      title: 'Marathons by city',
-      links: marathonCities.map(({ page }) => ({
-        href: `/running-events/marathon-in/${page.slug}`,
-        label: `${RACE_SCOPE_META['marathon-in'].noun} in ${page.name}`,
-      })),
-    });
-  }
-  if (halfMarathonCities.length > 0) {
-    columns.push({
-      title: 'Half marathons by city',
-      links: halfMarathonCities.map(({ page }) => ({
-        href: `/running-events/half-marathon-in/${page.slug}`,
-        label: `${RACE_SCOPE_META['half-marathon-in'].noun} in ${page.name}`,
-      })),
-    });
-  }
+  };
+
+  addScopeColumn('Running events by city', 'in', racesAllCities);
+  addScopeColumn('Marathons by city', 'marathon-in', marathonCities);
+  addScopeColumn('Half marathons by city', 'half-marathon-in', halfMarathonCities);
+  addScopeColumn('10K runs by city', '10k-in', tenKCities);
+  addScopeColumn('Ultra marathons by city', 'ultra-in', ultraCities);
   if (clubCities.length > 0) {
     columns.push({
       title: 'Run clubs by city',

@@ -1,19 +1,17 @@
 /**
  * Single source of truth for an event's public URL path.
  *
- * Running events live under `/running-events/{slug}`; non-running
- * "experience" events (yoga, workshops, socials) live under
- * `/experiences/{slug}`. A Next.js rewrite (see next.config.ts) serves
- * both prefixes from the same `running-events` route tree, so the only
- * thing that varies is the prefix we render in links + canonical/SEO.
+ * One prefix now. Events used to split across /running-events and
+ * /experiences by category, with a rewrite making both resolve; the two
+ * indexes have since merged into /running-events, and /experiences 301s
+ * there, so a second prefix would only create a redirect hop.
  *
  *   eventPath(ev)              -> "/running-events/monsoon-10k"
- *   eventPath(ev, '/register') -> "/experiences/sunset-yoga/register"
+ *   eventPath(ev, '/register') -> "/running-events/sunset-yoga/register"
  */
 export function eventPath(
   ev: { category?: string | null; slug?: string | null; id: string },
   sub = '',
 ): string {
-  const base = ev.category === 'experience' ? '/experiences' : '/running-events';
-  return `${base}/${ev.slug || ev.id}${sub}`;
+  return `/running-events/${ev.slug || ev.id}${sub}`;
 }

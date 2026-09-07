@@ -44,14 +44,6 @@ const nextConfig: NextConfig = {
   async rewrites() {
     return [
       {
-        // Experience events share the running-events route tree — only the
-        // public URL prefix differs. eventPath() renders /experiences/...
-        // links; this rewrite makes them resolve. Canonical tags (set
-        // per-event from event.category) disambiguate for SEO.
-        source: '/experiences/:path*',
-        destination: '/running-events/:path*',
-      },
-      {
         source: '/ingest/static/:path*',
         destination: 'https://us-assets.i.posthog.com/static/:path*',
       },
@@ -71,6 +63,24 @@ const nextConfig: NextConfig = {
       {
         source: '/races',
         destination: '/running-events',
+        permanent: true,
+      },
+      {
+        // /experiences folded into /running-events. It went this way
+        // round on purpose: /running-events is the ranked index (sitemap
+        // priority 0.9, and the whole {scope}/{city} lander cluster hangs
+        // off it), while /experiences had one event in its life and was
+        // never in the sitemap. Redirecting the valuable URL at the
+        // worthless one would have cost a reindex for nothing.
+        source: '/experiences',
+        destination: '/running-events',
+        permanent: true,
+      },
+      {
+        // Detail pages used to resolve here through a rewrite; now they
+        // redirect, so there is one canonical URL per event.
+        source: '/experiences/:path*',
+        destination: '/running-events/:path*',
         permanent: true,
       },
       {

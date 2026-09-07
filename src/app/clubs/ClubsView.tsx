@@ -17,6 +17,8 @@ import { JoinClubModal } from './[slug]/join-club-modal';
 import type { MyClubClaim, MyClubMembership } from '@/lib/api';
 import type { ApiClub, ClubEvent } from './page';
 import { useImgFallback } from '@/lib/img-fallback';
+import type { ApiEvent } from '@/app/running-events/page';
+import RaceCard from '@/components/RaceCard';
 
 type Membership = MyClubMembership;
 type Claim = MyClubClaim;
@@ -810,6 +812,84 @@ function EventRail({
   );
 }
 
+/**
+ * Every upcoming race, in the rails' visual language.
+ *
+ * This replaces the old /running-events page body, which was a second full
+ * design (cream ground, its own hero and ribbon) stacked under the dark
+ * rails and read as two pages glued together. What had to survive was the
+ * SEO, not the styling: the rails only show 12 races, and this grid is the
+ * SSR'd link to all ~250 detail pages.
+ *
+ * Filtering hides cards with the `hidden` attribute rather than dropping
+ * them from the tree, so every anchor stays in the served HTML whatever
+ * chip is selected.
+ */
+function AllRacesSection({ races }: { races: ApiEvent[] }) {
+  const [city, setCity] = useState<CityGroup | 'All'>('All');
+
+  const counts = useMemo(() => {
+    const m = new Map<CityGroup, number>();
+    for (const r of races) {
+      const g = cityGroupOf(r.locationName ?? null);
+      m.set(g, (m.get(g) ?? 0) + 1);
+    }
+    return m;
+  }, [races]);
+
+  const chips = useMemo(
+    () => CITY_GROUPS.filter((g) => (counts.get(g) ?? 0) > 0),
+    [counts],
+  );
+
+  return (
+    <section className="v1c-exp-rail">
+      <div className="v1c-exp-rail-head">
+        <h2 className="v1c-exp-rail-title">All upcoming races</h2>
+        <span className="v1c-exp-seeall" aria-hidden>
+          {races.length}
+        </span>
+      </div>
+
+      <div className="v1c-exp-citychips" role="group" aria-label="Filter races by city">
+        <button
+          type="button"
+          className={`v1c-exp-citychip ${city === 'All' ? 'is-active' : ''}`}
+          aria-pressed={city === 'All'}
+          onClick={() => setCity('All')}
+        >
+          All India <span className="v1c-exp-chipn">{races.length}</span>
+        </button>
+        {chips.map((g) => (
+          <button
+            key={g}
+            type="button"
+            className={`v1c-exp-citychip ${city === g ? 'is-active' : ''}`}
+            aria-pressed={city === g}
+            onClick={() => setCity(g)}
+          >
+            {g} <span className="v1c-exp-chipn">{counts.get(g)}</span>
+          </button>
+        ))}
+      </div>
+
+      {/* One scrolling row, not a grid: ~250 cards stacked into rows turned
+          the page into a wall. Every card is still in the DOM and SSR'd —
+          this is a horizontal scroller, NOT lazy-loaded infinite scroll,
+          which would drop most of the race links out of the served HTML. */}
+      <div className="v1c-exp-scroller v1c-exp-evlist">
+        {races.map((r) => (
+          <RaceCard
+            key={r.id}
+            r={r}
+            hidden={city !== 'All' && cityGroupOf(r.locationName ?? null) !== city}
+          />
+        ))}
+      </div>
+    </section>
+  );
+}
+
 function ClubsByCityRail({ clubs }: { clubs: DiscoverHit[] }) {
   const [active, setActive] = useState<CityGroup>('Delhi NCR');
 
@@ -1343,6 +1423,7 @@ export default function ClubsView({
   cityFacets,
   eventsAround = [],
   racesAround = [],
+  allRaces = [],
   upcomingRaces = 0,
   geoCity = null,
   aroundCity = null,
@@ -1370,6 +1451,9 @@ export default function ClubsView({
   // its own rail — races and club events are never interleaved. Empty on
   // /clubs, which stays a club directory.
   racesAround?: DiscoverHit[];
+  /** Every upcoming race, for the full grid below the rails. The rails cap
+   *  at 12; this is the crawl path to all the detail pages. */
+  allRaces?: ApiEvent[];
   // National count of UPCOMING races, for the hero counter. 0 = hide it
   // (also the failure value) — never render an all-time total as "upcoming".
   upcomingRaces?: number;
@@ -1391,15 +1475,14 @@ export default function ClubsView({
   // Undefined = the national /clubs experience (unchanged).
   cityName?: string;
   // National page identity. /clubs ('clubs') leads with the run-club
-  // directory rail; /experiences ('experiences') leads with the club-events
-  // rails. Same data + layout — only the rail order differs. Ignored on city
+  // directory rail; /running-events leads with the event rails. Same data + layout — only the rail order differs. Ignored on city
   // pages (cityName set), which don't render these rails.
-  variant?: 'clubs' | 'experiences';
+  variant?: 'clubs' | 'running-events';
 }) {
-  // /experiences carries races (own rail + own search result list);
+  // /running-events carries races (own rail + own search result list);
   // /clubs stays a club directory. Ignored on city pages, which render
   // neither the rails nor the compact search.
-  const includeRaces = variant === 'experiences';
+  const includeRaces = variant === 'running-events';
   const [isSearching, setIsSearching] = useState(false);
   // Page index instead of "visible count" — we paginate now (Prev/Next at
   // top + bottom) rather than infinite-scroll appending. All cards stay
@@ -1985,10 +2068,14 @@ export default function ClubsView({
                       />
                     </>
                   );
+                  // /running-events closes with the full race grid — the
+                  // rails are a preview, this is every race and every link.
+                  const allRacesSection =
+                    allRaces.length > 0 ? <AllRacesSection key="all" races={allRaces} /> : null;
                   return variant === 'clubs' ? (
                     <>{clubsRail}{eventRails}</>
                   ) : (
-                    <>{eventRails}{clubsRail}</>
+                    <>{eventRails}{allRacesSection}{clubsRail}</>
                   );
                 })()}
               </div>

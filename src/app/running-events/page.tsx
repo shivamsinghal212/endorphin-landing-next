@@ -1,7 +1,5 @@
 import type { Metadata } from 'next';
-import Header from '@/components/Header';
-import Footer from '@/components/Footer';
-import RacesView from './RacesView';
+import ClubsExperiencesPage from '../clubs/clubs-experiences-page';
 import { API_BASE } from '@/lib/api';
 import { eventPath } from '@/lib/event-path';
 import { getSessionToken } from '@/lib/session';
@@ -153,29 +151,39 @@ function buildJsonLd(races: ApiEvent[]) {
             },
           }),
           ...(r.imageUrl && { image: r.imageUrl }),
-          url: `https://endorfin.run/e/${r.slug || r.id}`,
+          url: `https://www.endorfin.run${eventPath(r)}`,
         },
       };
     }),
   };
 }
 
-const breadcrumbJsonLd = {
-  '@context': 'https://schema.org',
-  '@type': 'BreadcrumbList',
-  itemListElement: [
-    { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://www.endorfin.run/' },
-    { '@type': 'ListItem', position: 2, name: 'Running Events', item: 'https://www.endorfin.run/running-events' },
-  ],
-};
-
+/**
+ * The merged index: run clubs, club events and races on one page.
+ *
+ * This absorbed the old /experiences design rather than the other way round,
+ * deliberately. /running-events is the ranked URL — sitemap priority 0.9, and
+ * every /running-events/{scope}/{city} lander and /running-events/{slug}
+ * detail hangs off it. /experiences had one event in its life and was never
+ * in the sitemap, so it 301s here (see next.config.ts) and nothing that ranks
+ * has to move or reindex.
+ *
+ * The BreadcrumbList lives in ClubsExperiencesPage now — this page used to
+ * emit its own, and after the merge both fired, putting two identical
+ * breadcrumb graphs on one document.
+ *
+ * `races` is passed down for two jobs: the Event ItemList JSON-LD here, and
+ * the closing "All upcoming races" grid in ClubsView. The rails show 12; that
+ * grid SSRs an anchor for every upcoming race (~250) and is how Google reaches
+ * the detail pages, so it is not optional.
+ */
 export default async function RacesPage() {
   const token = await getSessionToken();
   const races = await getRaces(token);
   const jsonLd = buildJsonLd(races);
 
   return (
-    <main id="main-content" className="overflow-x-hidden">
+    <>
       {jsonLd && (
         <script
           type="application/ld+json"
@@ -184,17 +192,7 @@ export default async function RacesPage() {
           }}
         />
       )}
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify(breadcrumbJsonLd).replace(/</g, '\\u003c'),
-        }}
-      />
-      <Header />
-      <div className="v1-races-page">
-        <RacesView races={races} />
-      </div>
-      <Footer />
-    </main>
+      <ClubsExperiencesPage variant="running-events" races={races} />
+    </>
   );
 }

@@ -5,7 +5,7 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { API_BASE } from '@/lib/api';
 import type { ApiEvent } from '@/app/running-events/page';
-import RaceCardsList from './RaceCardsList';
+import RaceCard from '@/components/RaceCard';
 import {
   RACE_CITY_PAGES,
   RACE_SCOPES,
@@ -223,7 +223,7 @@ export default async function RaceCityScopePage({ params }: RouteParams) {
   );
 
   return (
-    <main id="main-content" className="overflow-x-hidden">
+    <main id="main-content" style={{ overflowX: 'clip' }}>
       {jsonLd && (
         <script
           type="application/ld+json"
@@ -233,105 +233,121 @@ export default async function RaceCityScopePage({ params }: RouteParams) {
         />
       )}
       <Header />
-      <div className="v1-races-page">
-        {/* Hero — matches /running-events styling exactly (v1r-* classes) */}
-        <section className="v1r-hero">
-          <div className="v1r-hero-bg" aria-hidden />
-          <div className="v1r-container">
-            <nav className="v1r-hero-crumb" aria-label="Breadcrumb">
-              <span className="v1r-hero-crumb-trail">
-                <Link href="/running-events">All events</Link>
-                <span className="v1r-sep" aria-hidden>·</span>
-                <span className="v1r-current">
-                  {meta.noun} in {cityPage.name}
-                </span>
+      {/* .v1-clubs-page, not .v1-races-page: these landers now share the hub's
+          card and rail styling outright, rather than a parallel set that kept
+          drifting out of sync with it. Every SEO-bearing element is unchanged
+          — H1 string, city intro, section H2 + count, the full race list, and
+          both cross-link blocks. */}
+      <div className="v1-clubs-page">
+        <section className="v1-hero v1c-hero-natl">
+          <div className="container">
+            <div className="v1-hero-topline is-compact">
+              <span className="v1-hero-kicker">
+                {meta.noun} · {cityPage.name}
+              </span>
+              <span className="v1-hero-meta">
+                {races.length} upcoming · {cityPage.region}
+              </span>
+            </div>
+
+            <nav className="v1c-lander-crumb" aria-label="Breadcrumb">
+              <Link href="/running-events">All running events</Link>
+              <span aria-hidden> · </span>
+              <span aria-current="page">
+                {meta.noun} in {cityPage.name}
               </span>
             </nav>
-            <h1 className="v1r-hero-title">
-              {meta.noun} in<br />
-              <span className="v1r-red">{cityPage.name}.</span>
+
+            <h1 className="v1c-search-h1">
+              <span className="accent">
+                {meta.noun} in {cityPage.name}
+              </span>
             </h1>
-            <div className="v1r-hero-foot">
-              <p className="v1r-hero-sub">{cityPage.intro}</p>
-              <div className="v1r-hero-stats">
-                <div>
-                  <div className="v1r-hero-stat-n">{races.length}</div>
-                  <div className="v1r-hero-stat-l">Upcoming</div>
-                </div>
-                <div>
-                  <div className="v1r-hero-stat-n">{cityPage.region}</div>
-                  <div className="v1r-hero-stat-l">Region</div>
-                </div>
-              </div>
-            </div>
           </div>
         </section>
 
-        {/* Cross-link chips: kept tight — small label + wrap chips,
-            no big section headings. */}
-        {(otherScopesInCity.length > 0 || sameScopeOtherCities.length > 0) && (
-          <section
-            className="v1r-filter-strip"
-            aria-label="Browse running events in other distances and cities"
-          >
-            <div className="v1r-container">
-              {otherScopesInCity.length > 0 && (
-                <div className="v1r-filter-row v1r-seo-links">
-                  <span className="v1r-filter-label">Other distances</span>
-                  <div className="v1r-filter-chips">
-                    {otherScopesInCity.map((s) => (
-                      <Link
-                        key={s}
-                        href={`/running-events/${s}/${cityPage.slug}`}
-                        className="v1r-chip"
-                      >
-                        {RACE_SCOPE_META[s].noun} in {cityPage.name}
-                      </Link>
-                    ))}
-                  </div>
-                </div>
+        <div className="v1c-natl">
+          <section className="v1c-exp">
+            <div className="v1c-container">
+              {/* Cross-links. These are the internal-linking spine of the
+                  city × distance cluster — every one points at a page that
+                  passed the quality gate. */}
+              {(otherScopesInCity.length > 0 || sameScopeOtherCities.length > 0) && (
+                <nav
+                  className="v1c-lander-links"
+                  aria-label="Browse running events in other distances and cities"
+                >
+                  {otherScopesInCity.length > 0 && (
+                    <div className="v1c-lander-linkrow">
+                      <span className="v1c-lander-linklabel">Other distances</span>
+                      <div className="v1c-exp-citychips">
+                        {otherScopesInCity.map((sc) => (
+                          <Link
+                            key={sc}
+                            href={`/running-events/${sc}/${cityPage.slug}`}
+                            className="v1c-exp-citychip"
+                          >
+                            {RACE_SCOPE_META[sc].noun} in {cityPage.name}
+                          </Link>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  {sameScopeOtherCities.length > 0 && (
+                    <div className="v1c-lander-linkrow">
+                      <span className="v1c-lander-linklabel">Other cities</span>
+                      <div className="v1c-exp-citychips">
+                        {sameScopeOtherCities.map((cp) => (
+                          <Link
+                            key={cp.slug}
+                            href={`/running-events/${scopeRes.scope}/${cp.slug}`}
+                            className="v1c-exp-citychip"
+                          >
+                            {meta.noun} in {cp.name}
+                          </Link>
+                        ))}
+                        <Link href="/running-events" className="v1c-exp-citychip">
+                          All events across India
+                        </Link>
+                      </div>
+                    </div>
+                  )}
+                </nav>
               )}
-              {sameScopeOtherCities.length > 0 && (
-                <div className="v1r-filter-row v1r-seo-links">
-                  <span className="v1r-filter-label">Other cities</span>
-                  <div className="v1r-filter-chips">
-                    {sameScopeOtherCities.map((p) => (
-                      <Link
-                        key={p.slug}
-                        href={`/running-events/${scopeRes.scope}/${p.slug}`}
-                        className="v1r-chip"
-                      >
-                        {meta.noun} in {p.name}
-                      </Link>
-                    ))}
-                    <Link href="/running-events" className="v1r-chip">
-                      All events across India
-                    </Link>
-                  </div>
+
+              <section className="v1c-exp-rail">
+                <div className="v1c-exp-rail-head">
+                  <h2 className="v1c-exp-rail-title">
+                    Upcoming {meta.noun.toLowerCase()} in {cityPage.name}
+                  </h2>
+                  <span className="v1c-exp-seeall" aria-hidden>
+                    {races.length === 1 ? '1 event' : `${races.length} events`}
+                  </span>
                 </div>
-              )}
+                {/* Grid, not the hub's scroller: on a lander this list IS the
+                    page, so it gets the full-width treatment. */}
+                <div className="v1c-exp-grid">
+                  {races.map((r) => (
+                    <RaceCard key={r.id} r={r} />
+                  ))}
+                </div>
+              </section>
+
+              {/* The city intro, moved out of the hero where it dominated the
+                  fold. It stays on the page on purpose: it is the only
+                  hand-written, city-specific copy here, and without it a
+                  lander is an H1 over a generated list — the doorway-page
+                  shape. Below the races it reads as context rather than
+                  preamble. */}
+              <section className="v1c-lander-about">
+                <h2 className="v1c-lander-about-h">
+                  Running in {cityPage.name}
+                </h2>
+                <p>{cityPage.intro}</p>
+              </section>
             </div>
           </section>
-        )}
-
-        {/* Race listing — uses the real /running-events race-card design */}
-        <section
-          className="v1r-races-section"
-          aria-label={`${meta.noun} in ${cityPage.name}`}
-        >
-          <div className="v1r-container">
-            <div className="v1r-section-header">
-              <h2 className="v1r-section-title">
-                Upcoming {meta.noun.toLowerCase()} in <b>{cityPage.name}.</b>
-              </h2>
-              <span className="v1r-section-count">
-                {races.length === 1 ? '1 event' : `${races.length} events`}
-              </span>
-            </div>
-
-            <RaceCardsList races={races} />
-          </div>
-        </section>
+        </div>
       </div>
       <Footer />
     </main>

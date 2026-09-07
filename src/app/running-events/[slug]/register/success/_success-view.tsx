@@ -2,7 +2,6 @@
 
 import { useEffect, useRef } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
 import { useMyRegistration } from '@/lib/runner-hooks';
 import { AppStoreButtons } from '@/components/AppStoreButtons';
 import { ShareRow } from '../_components/bib-card';
@@ -29,9 +28,9 @@ export function SuccessView({
   // webhook), poll every 5s. After 120s of being stuck pending we stop the
   // auto-poll and let the runner trigger refresh manually — Razorpay test
   // payments sometimes take longer than this; that's not an error.
-  const eventBase = (usePathname() || '').startsWith('/experiences')
-    ? '/experiences'
-    : '/running-events';
+  // One prefix since /experiences merged into /running-events; this used to
+  // branch on the pathname because events lived under both.
+  const eventBase = '/running-events';
   const pollStart = useRef<number | null>(null);
   const POLL_BUDGET_MS = 120_000;
   const reg = useMyRegistration(registrationId, { refetchIntervalMs: 5_000 });
