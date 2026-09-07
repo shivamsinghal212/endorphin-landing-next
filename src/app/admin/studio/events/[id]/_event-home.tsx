@@ -124,18 +124,23 @@ export function EventHome({ eventId }: { eventId: string }) {
         onClick: () => setSection('tickets'),
         cta: tiers.length ? 'Edit' : 'Add →',
       },
+    ];
+
+    list.push(
+      // Optional: both fields fall back to a standard house policy when the
+      // organiser leaves them blank, so an event is publishable without
+      // touching this. It stays on the list because the organiser should
+      // know what is being shown in their name.
       {
         id: 'policies',
         label: 'Refunds & terms',
         complete: !!event.refundPolicyMd?.trim() && !!event.termsMd?.trim(),
         done: 'Both written',
-        todo: 'We’ve drafted both — read them over and fix the dates.',
+        todo: 'Standard no-refund policy and terms apply unless you change them.',
         onClick: () => setSection('policies'),
-        cta: 'Review →',
-      },
-    ];
-
-    list.push(
+        cta: event.refundPolicyMd?.trim() ? 'Edit' : 'Review →',
+        optional: true,
+      } satisfies Task,
       // Only a priced ticket surfaces payouts at all. Nothing to do here
       // yet — ticket money is collected centrally and settled by hand — so
       // this row exists to say so rather than to ask for anything.

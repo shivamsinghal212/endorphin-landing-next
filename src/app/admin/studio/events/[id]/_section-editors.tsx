@@ -15,9 +15,7 @@ import {
 import {
   TSHIRT_SIZES,
   DEFAULT_REFUND_TEMPLATE,
-  DEFAULT_REFUND_TEMPLATE_EXPERIENCE,
   DEFAULT_TERMS_TEMPLATE,
-  DEFAULT_TERMS_TEMPLATE_EXPERIENCE,
 } from '@/lib/event-defaults';
 import {
   ImageGalleryField,
@@ -570,7 +568,6 @@ function fmtWhen(iso: string | null | undefined): string {
 // ── Policies ──────────────────────────────────────────────────────────────
 
 function PoliciesEditor({ open, onClose, busy, event, onSave }: EditorProps) {
-  const isExperience = event.category === 'experience';
   const [refund, setRefund] = useState(event.refundPolicyMd ?? '');
   const [terms, setTerms] = useState(event.termsMd ?? '');
   const [autoRefund, setAutoRefund] = useState(event.autoRefundOnCancel);
@@ -578,21 +575,14 @@ function PoliciesEditor({ open, onClose, busy, event, onSave }: EditorProps) {
     event.refundDeadlineDays == null ? '' : String(event.refundDeadlineDays),
   );
 
-  // Start from the template rather than a blank box — reviewing beats
-  // authoring, and these are the same defaults the old wizard offered.
+  // Start from the standard policy rather than a blank box — reviewing beats
+  // authoring. Races and experiences share one set now; they only differed
+  // because the running draft assumed a virtual run.
   useEffect(() => {
     if (!open) return;
-    setRefund(
-      event.refundPolicyMd?.trim() ||
-        (isExperience
-          ? DEFAULT_REFUND_TEMPLATE_EXPERIENCE
-          : DEFAULT_REFUND_TEMPLATE),
-    );
-    setTerms(
-      event.termsMd?.trim() ||
-        (isExperience ? DEFAULT_TERMS_TEMPLATE_EXPERIENCE : DEFAULT_TERMS_TEMPLATE),
-    );
-  }, [open, event.refundPolicyMd, event.termsMd, isExperience]);
+    setRefund(event.refundPolicyMd?.trim() || DEFAULT_REFUND_TEMPLATE);
+    setTerms(event.termsMd?.trim() || DEFAULT_TERMS_TEMPLATE);
+  }, [open, event.refundPolicyMd, event.termsMd]);
 
   return (
     <Sheet
@@ -602,7 +592,7 @@ function PoliciesEditor({ open, onClose, busy, event, onSave }: EditorProps) {
       eyebrow="Policies"
       title="Refunds and"
       accent="terms."
-      intro="Drafted for you — read them over and fix anything in braces."
+      intro="Our standard policies, applied unless you change them. No refunds by default; edit either one to suit your event."
       footer={
         <SheetActions
           onCancel={onClose}
