@@ -246,8 +246,11 @@ const HeaderClient = ({
           </li>
 
           {/* One primary action. `/create` works signed out — the sign-in
-              gate is at the moment they commit the event, not here. */}
-          <li>
+              gate is at the moment they commit the event, not here.
+              Hidden on mobile (v1-nav-cta-drawer): the bar now carries this
+              CTA permanently, and showing both puts two identical buttons on
+              screen at once whenever the drawer is open. */}
+          <li className="v1-nav-cta-drawer">
             <Link href="/create" className="v1-nav-cta" onClick={closeMenu}>
               Create event
             </Link>
@@ -336,6 +339,15 @@ const HeaderClient = ({
             </div>
           )}
         </div>
+
+        {/* Mobile only. Creating an event is the one thing we want a phone
+            visitor to be able to start without opening a menu first, so the
+            primary CTA rides in the bar rather than inside the drawer. */}
+        <Link href="/create" className="v1-nav-cta v1-nav-cta-bar" onClick={closeMenu}>
+          {/* The anchor keeps the 44px touch target; the span carries the
+              red so the block can be visually smaller than its hit area. */}
+          <span>Create event</span>
+        </Link>
 
         <button
           type="button"

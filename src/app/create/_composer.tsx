@@ -16,7 +16,6 @@ import {
 } from '@/lib/organiser-api';
 import { uploadFile } from '../admin/(super)/clubs/_components/image-upload';
 import { PlaceAutocomplete } from '@/components/PlaceAutocomplete';
-import { StudioTopBar } from '../admin/studio/_components/ui';
 
 /** Everything the composer collects. Persisted to localStorage as-is, so
  *  keep it flat and JSON-safe — it has to survive a full page load when the
@@ -319,26 +318,50 @@ export function EventComposer() {
 
   return (
     <>
-      {/* Signed in, this is a studio surface and needs the studio's sub-bar
-          — every other page under /admin/studio has one, and without it
-          there's no way back out of the composer. Signed out there's
-          nowhere to go back to, so the marketing header stands alone. */}
-      {isAuthed && (
-        <StudioTopBar back={{ href: '/admin/studio', label: 'Studio' }} />
-      )}
+      {/* StudioTopBar used to render here for signed-in hosts, purely because
+          there was otherwise no way back out. The close control provides that
+          now, and the bar is a light-themed studio component that would fight
+          this dark surface — /admin/studio still uses it, untouched. */}
 
       {/* Single column, deliberately. Two columns only balance when both
           carry comparable content, which was true for exactly one auth
           state; this way there is no dead space and no layout shift when
           signing in mid-draft. ~680px is also the right measure for eight
           short fields. */}
-      <main className="max-w-[680px] mx-auto px-4 md:px-6 pt-6 md:pt-9 pb-16 md:pb-20">
-        <div className="flex items-baseline justify-between mb-4">
-          <p className="text-[10px] uppercase tracking-wider text-jet/40">
-            New event
-          </p>
+      {/* pt-3 on mobile: the close button makes this first row 44px tall, so
+          the old pt-6 stacked 24px of padding on top of that and left a dead
+          band under the nav. Desktop keeps its own spacing below the modal
+          header. */}
+      <main className="max-w-[680px] mx-auto px-4 md:px-6 pt-3 md:pt-5 pb-16 md:pb-10">
+        <div className="flex items-center justify-between mb-2.5 md:mb-4">
+          <div className="flex items-center gap-2.5">
+            {/* Mobile only — on desktop CreateModalShell's header owns the
+                close. Signed out there is no StudioTopBar above either, so
+                without this the composer had no way out at all. The draft
+                lives in localStorage, so leaving costs nothing and needs no
+                confirm. history.length: opened cold in a fresh tab there is
+                nothing to go back TO and router.back() would no-op.
+                44px hit area, negative margin so the icon still lines up
+                with the text below it rather than the padding. */}
+            <button
+              type="button"
+              aria-label="Close and go back"
+              onClick={() => {
+                if (typeof window !== 'undefined' && window.history.length > 1) router.back();
+                else router.push('/');
+              }}
+              className="grid md:hidden place-items-center -ml-2.5 -my-2.5 w-11 h-11 rounded-full text-bone/68 transition-colors duration-150 hover:text-bone hover:bg-bone/[0.08] active:bg-bone/[0.14] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-bone/30"
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" aria-hidden="true">
+                <path d="M18 6L6 18M6 6l12 12" />
+              </svg>
+            </button>
+            <p className="text-[10px] uppercase tracking-wider text-bone/65">
+              New event
+            </p>
+          </div>
           {hydrated && (draft.title || draft.startTime) && (
-            <p className="text-[11px] text-jet/35">
+            <p className="text-[11px] text-bone/62">
               Draft saved on this device
             </p>
           )}
@@ -356,12 +379,12 @@ export function EventComposer() {
           {/* A card like every other field. As a bare underlined input with
               a 42px placeholder it read as a faded heading, not something
               you type into. */}
-          <section className="bg-white border border-jet/10 rounded-2xl px-4 md:px-[18px] py-3.5">
+          <section className="cx-field relative rounded-2xl px-4 md:px-[18px] py-3.5">
             <label
               htmlFor="title"
-              className="block text-[11px] uppercase tracking-wider text-jet/50 mb-1"
+              className="block text-[11px] uppercase tracking-wider text-bone/70 mb-1"
             >
-              Event name <span className="text-signal">·</span>
+              Event name <span className="text-[#FF6B6F]">·</span>
             </label>
             <input
               id="title"
@@ -369,18 +392,18 @@ export function EventComposer() {
               onChange={(e) => set('title', e.target.value)}
               placeholder="Monsoon Half Marathon"
               autoComplete="off"
-              className="w-full px-3 py-2.5 rounded-xl border border-jet/10 text-base font-medium bg-white focus:border-jet outline-none"
+              className="w-full px-3 py-2.5 rounded-xl cx-input text-base font-medium outline-none"
             />
           </section>
 
-          <section className="bg-white border border-jet/10 rounded-2xl p-4 md:p-[18px]">
+          <section className="cx-field relative rounded-2xl p-4 md:p-[18px]">
             <div className="grid sm:grid-cols-2 gap-3">
               <div>
                 <label
                   htmlFor="start"
-                  className="block text-[11px] uppercase tracking-wider text-jet/50 mb-1"
+                  className="block text-[11px] uppercase tracking-wider text-bone/70 mb-1"
                 >
-                  Starts <span className="text-signal">·</span>
+                  Starts <span className="text-[#FF6B6F]">·</span>
                 </label>
                 <input
                   id="start"
@@ -390,10 +413,10 @@ export function EventComposer() {
                   onChange={(e) => set('startTime', e.target.value)}
                   aria-invalid={startInPast || undefined}
                   aria-describedby={startInPast ? 'start-err' : undefined}
-                  className={`w-full px-3 py-2.5 rounded-xl border text-sm bg-white outline-none ${
+                  className={`w-full px-3 py-2.5 rounded-xl cx-input text-sm outline-none ${
                     startInPast
                       ? 'border-signal focus:border-signal'
-                      : 'border-jet/10 focus:border-jet'
+                      : 'border-bone/10 focus:border-bone/40'
                   }`}
                 />
                 {startInPast && (
@@ -409,7 +432,7 @@ export function EventComposer() {
               <div>
                 <label
                   htmlFor="end"
-                  className="block text-[11px] uppercase tracking-wider text-jet/50 mb-1"
+                  className="block text-[11px] uppercase tracking-wider text-bone/70 mb-1"
                 >
                   Ends
                 </label>
@@ -423,10 +446,10 @@ export function EventComposer() {
                   onChange={(e) => set('endTime', e.target.value)}
                   aria-invalid={endBeforeStart || undefined}
                   aria-describedby={endBeforeStart ? 'end-err' : undefined}
-                  className={`w-full px-3 py-2.5 rounded-xl border text-sm bg-white outline-none ${
+                  className={`w-full px-3 py-2.5 rounded-xl cx-input text-sm outline-none ${
                     endBeforeStart
                       ? 'border-signal focus:border-signal'
-                      : 'border-jet/10 focus:border-jet'
+                      : 'border-bone/10 focus:border-bone/40'
                   }`}
                 />
                 {endBeforeStart && (
@@ -442,14 +465,15 @@ export function EventComposer() {
             </div>
           </section>
 
-          <section className="bg-white border border-jet/10 rounded-2xl px-4 md:px-[18px] py-3.5">
+          <section className="cx-field relative rounded-2xl px-4 md:px-[18px] py-3.5">
             <label
               htmlFor="place"
-              className="block text-[11px] uppercase tracking-wider text-jet/50 mb-1"
+              className="block text-[11px] uppercase tracking-wider text-bone/70 mb-1"
             >
               Meeting point
             </label>
             <PlaceAutocomplete
+              theme="dark"
               id="place"
               value={draft.locationName}
               onChange={(v) =>
@@ -473,16 +497,16 @@ export function EventComposer() {
               }
             />
             {draft.locationAddress && (
-              <p className="text-[11px] text-jet/45 mt-1.5 leading-relaxed">
+              <p className="text-[11px] text-bone/68 mt-1.5 leading-relaxed">
                 {draft.locationAddress}
               </p>
             )}
           </section>
 
-          <section className="bg-white border border-jet/10 rounded-2xl px-4 md:px-[18px] py-3.5">
+          <section className="cx-field relative rounded-2xl px-4 md:px-[18px] py-3.5">
             <label
               htmlFor="desc"
-              className="block text-[11px] uppercase tracking-wider text-jet/50 mb-1"
+              className="block text-[11px] uppercase tracking-wider text-bone/70 mb-1"
             >
               Event description
             </label>
@@ -492,7 +516,7 @@ export function EventComposer() {
               value={draft.descriptionMd}
               onChange={(e) => set('descriptionMd', e.target.value)}
               placeholder="Pace groups, what to bring, coffee after."
-              className="w-full px-3 py-2 rounded-xl border border-jet/10 text-sm bg-white focus:border-jet outline-none"
+              className="w-full px-3 py-2 rounded-xl cx-input text-sm outline-none"
             />
           </section>
 
@@ -500,8 +524,8 @@ export function EventComposer() {
               option and a nudge to sign in is noise on the first screen.
               The club picker returns after creation, in the checklist. */}
           {isAuthed && (
-            <section className="bg-white border border-jet/10 rounded-2xl p-5">
-              <p className="text-[11px] uppercase tracking-wider text-jet/50 mb-2">
+            <section className="cx-field relative rounded-2xl p-5">
+              <p className="text-[11px] uppercase tracking-wider text-bone/70 mb-2">
                 Hosted by
               </p>
               {clubs.length > 0 ? (
@@ -510,7 +534,7 @@ export function EventComposer() {
                     value={draft.clubId ?? ''}
                     onChange={(e) => set('clubId', e.target.value || null)}
                     aria-label="Who is hosting this event"
-                    className="w-full px-3 py-2.5 rounded-xl border border-jet/10 text-sm bg-white focus:border-jet outline-none"
+                    className="w-full px-3 py-2.5 rounded-xl cx-input text-sm outline-none"
                   >
                     <option value="">
                       Just me{studio?.name ? ` — ${studio.name}` : ''}
@@ -521,7 +545,7 @@ export function EventComposer() {
                       </option>
                     ))}
                   </select>
-                  <p className="text-[11px] text-jet/40 mt-2 leading-relaxed">
+                  <p className="text-[11px] text-bone/65 mt-2 leading-relaxed">
                     {draft.clubId
                       ? 'Shows on the club page and notifies its members.'
                       : 'You can attach a club now or any time after creating it.'}
@@ -529,10 +553,10 @@ export function EventComposer() {
                 </>
               ) : (
                 <>
-                  <div className="w-full px-3 py-2.5 rounded-xl border border-jet/10 text-sm bg-jet/[0.03] text-jet/45">
+                  <div className="w-full px-3 py-2.5 rounded-xl border border-bone/10 text-sm bg-bone/[0.05] text-bone/68">
                     Just me{studio?.name ? ` — ${studio.name}` : ''}
                   </div>
-                  <p className="text-[11px] text-jet/40 mt-2 leading-relaxed">
+                  <p className="text-[11px] text-bone/65 mt-2 leading-relaxed">
                     Run a club? Claim it and you can host events as the club.
                   </p>
                 </>
@@ -541,21 +565,21 @@ export function EventComposer() {
           )}
 
           <div className="mt-2 flex flex-wrap items-baseline gap-x-2">
-            <p className="text-[10px] uppercase tracking-wider text-jet/40">
+            <p className="text-[10px] uppercase tracking-wider text-bone/65">
               Event options
             </p>
-            <p className="text-[11px] text-jet/35">
+            <p className="text-[11px] text-bone/62">
               More options available post creation.
             </p>
           </div>
-          <section className="bg-white border border-jet/10 rounded-2xl overflow-hidden">
+          <section className="cx-field relative rounded-2xl overflow-hidden">
             <div className="px-4 md:px-[18px] py-3">
               <div className="flex items-center gap-3">
                 <span className="flex-1 text-sm font-medium">Entry</span>
                 <div
                   role="radiogroup"
                   aria-label="Entry price"
-                  className="inline-flex rounded-xl border border-jet/10 p-0.5"
+                  className="inline-flex rounded-xl border border-bone/10 p-0.5"
                 >
                   {([false, true] as const).map((paid) => (
                     <button
@@ -566,8 +590,8 @@ export function EventComposer() {
                       onClick={() => set('isPaid', paid)}
                       className={`px-4 py-1.5 rounded-lg text-xs font-medium transition-colors ${
                         draft.isPaid === paid
-                          ? 'bg-jet text-bone'
-                          : 'text-jet/50 hover:text-jet'
+                          ? 'bg-bone text-jet'
+                          : 'text-bone/70 hover:text-bone'
                       }`}
                     >
                       {paid ? 'Paid' : 'Free'}
@@ -581,7 +605,7 @@ export function EventComposer() {
                   <div>
                     <label
                       htmlFor="ticket"
-                      className="block text-[11px] uppercase tracking-wider text-jet/50 mb-1"
+                      className="block text-[11px] uppercase tracking-wider text-bone/70 mb-1"
                     >
                       Ticket name
                     </label>
@@ -593,18 +617,18 @@ export function EventComposer() {
                       }
                       placeholder="Half Marathon"
                       maxLength={20}
-                      className="w-full px-3 py-2 rounded-xl border border-jet/10 text-sm bg-white focus:border-jet outline-none"
+                      className="w-full px-3 py-2 rounded-xl cx-input text-sm outline-none"
                     />
                   </div>
                   <div className="sm:w-40">
                     <label
                       htmlFor="price"
-                      className="block text-[11px] uppercase tracking-wider text-jet/50 mb-1"
+                      className="block text-[11px] uppercase tracking-wider text-bone/70 mb-1"
                     >
-                      Price <span className="text-signal">·</span>
+                      Price <span className="text-[#FF6B6F]">·</span>
                     </label>
-                    <div className="flex items-center px-3 rounded-xl border border-jet/10 bg-white focus-within:border-jet">
-                      <span className="text-sm text-jet/45 pr-1">₹</span>
+                    <div className="flex items-center px-3 rounded-xl cx-input">
+                      <span className="text-sm text-bone/68 pr-1">₹</span>
                       <input
                         id="price"
                         inputMode="numeric"
@@ -617,7 +641,7 @@ export function EventComposer() {
                       />
                     </div>
                   </div>
-                  <p className="sm:col-span-2 text-[11px] text-jet/45 leading-relaxed">
+                  <p className="sm:col-span-2 text-[11px] text-bone/68 leading-relaxed">
                     More tickets, early-bird pricing and coupons come after you
                     create it. We collect the ticket money and settle it with
                     you directly.
@@ -626,7 +650,7 @@ export function EventComposer() {
               )}
             </div>
 
-            <div className="h-px bg-jet/[0.07] mx-4 md:mx-[18px]" />
+            <div className="h-px bg-bone/[0.09] mx-4 md:mx-[18px]" />
 
             <div className="px-4 md:px-[18px] py-3 flex items-center gap-3">
               <label htmlFor="cap" className="flex-1 text-sm font-medium">
@@ -640,7 +664,7 @@ export function EventComposer() {
                   set('capacity', e.target.value.replace(/[^0-9]/g, ''))
                 }
                 placeholder="Unlimited"
-                className="w-36 px-3 py-1.5 rounded-xl border border-jet/10 text-sm bg-white focus:border-jet outline-none text-right tabular-nums"
+                className="w-36 px-3 py-1.5 rounded-xl cx-input text-sm outline-none text-right tabular-nums"
               />
             </div>
           </section>
@@ -649,11 +673,11 @@ export function EventComposer() {
             type="button"
             onClick={onCreate}
             disabled={!canCreate || busy}
-            className="mt-2 h-[52px] rounded-lg bg-jet text-bone text-[15px] font-medium hover:bg-jet/90 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            className="cx-cta mt-2 h-[52px] rounded-xl text-white text-[15px] font-semibold disabled:text-bone/40 disabled:cursor-not-allowed"
           >
             {busy ? 'Creating…' : 'Create event'}
           </button>
-          <p className="text-center text-[11px] text-jet/40">
+          <p className="text-center text-[11px] text-bone/65">
             Only a name and a start time are needed. Everything else can wait.
           </p>
         </div>
@@ -723,7 +747,7 @@ function CoverField({
 
   if (previewUrl) {
     return (
-      <div className="relative w-full rounded-2xl overflow-hidden border border-jet/10 bg-white">
+      <div className="relative w-full rounded-2xl overflow-hidden border border-bone/10">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={previewUrl}
@@ -757,9 +781,9 @@ function CoverField({
   }
 
   return (
-    <label className="w-full h-40 rounded-2xl border border-dashed border-jet/20 bg-white flex flex-col items-center justify-center gap-2 hover:border-jet/40 transition-colors cursor-pointer">
+    <label className="cx-cover w-full h-40 rounded-2xl flex flex-col items-center justify-center gap-2 cursor-pointer">
       {input}
-      <span className="w-11 h-11 rounded-xl bg-jet/5 flex items-center justify-center">
+      <span className="w-11 h-11 rounded-xl bg-bone/[0.07] flex items-center justify-center">
         <svg
           width="20"
           height="20"
@@ -769,7 +793,7 @@ function CoverField({
           strokeWidth="1.5"
           strokeLinecap="round"
           strokeLinejoin="round"
-          className="text-jet/45"
+          className="text-bone/68"
           aria-hidden
         >
           <rect x="3" y="3" width="18" height="18" rx="2" />
@@ -777,10 +801,10 @@ function CoverField({
           <path d="M21 15l-5-5L5 21" />
         </svg>
       </span>
-      <span className="text-[13px] font-medium text-jet/70">
+      <span className="text-[13px] font-medium text-bone/70">
         {uploading ? 'Uploading…' : 'Add a cover image'}
       </span>
-      <span className="text-[11px] text-jet/40">
+      <span className="text-[11px] text-bone/65">
         Wide 16:9 — used on cards and WhatsApp previews
       </span>
     </label>

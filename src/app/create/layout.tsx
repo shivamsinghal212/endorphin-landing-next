@@ -4,6 +4,7 @@ import AdminSessionProvider from '../admin/components/session-provider';
 import { StudioQueryProvider } from '../admin/components/query-provider';
 import { getStudioAuth } from '@/lib/studio/server-auth';
 import { StudioAuthProvider } from '@/lib/studio/auth-context';
+import CreateModalShell from './_modal-shell';
 
 /** Public composer shell.
  *
@@ -25,17 +26,28 @@ export default async function CreateLayout({
       <StudioQueryProvider>
         <StudioAuthProvider value={studio}>
           <Header />
-          {/* `admin-theme` flips the light palette + cancels the marketing
-              site's global cream body text (see globals.css). The ground is
-              #F8F6F3 to match /admin — signed in, this is a studio surface,
-              and bone (#F5F0EB) read as a different app. */}
-          <div className="admin-theme min-h-screen bg-[#F8F6F3] text-jet">
-            {children}
+          {/* Dark, like the rest of the site. This used to carry
+              `admin-theme` + #F8F6F3 to match /admin, on the reasoning that
+              a signed-in visitor is on a studio surface — but /create is
+              reached from the marketing site, and a white sheet dropped into
+              a black page read as a different product. The studio pages keep
+              their light theme; only this public composer is dark.
+              On desktop CreateModalShell lifts it into a centred modal, so
+              the page background drops out there and the card carries the
+              surface instead. */}
+          {/* color-scheme:dark makes the browser paint its own controls dark —
+              without it the datetime-local calendar glyph and picker render
+              near-black on our near-black field and vanish. */}
+          <div
+            className="cx-root relative min-h-screen bg-[#0C0B10] text-bone"
+            style={{ colorScheme: 'dark' }}
+          >
+            <CreateModalShell>{children}</CreateModalShell>
           </div>
         </StudioAuthProvider>
         <Toaster
           position="bottom-right"
-          theme="light"
+          theme="dark"
           richColors
           closeButton
           toastOptions={{

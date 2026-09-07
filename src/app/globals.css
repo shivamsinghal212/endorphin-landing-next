@@ -806,8 +806,13 @@ body.nav-open { overflow: hidden; }
   color: var(--bone);
   text-align: center;
   margin: 0 auto;
-  max-width: 22ch;
+  /* Wide enough for "Races, Run Clubs and Events" to hold line one, so the
+     headline breaks before the tail rather than mid-phrase. */
+  max-width: 28ch;
 }
+/* Keeps "in India" together — text-wrap: balance left it orphaning "India"
+   on a line of its own, and this is deterministic across browsers. */
+.v1-clubs-page .v1c-search-h1 .v1c-h1-tail { white-space: nowrap; }
 .v1-hero-title .accent { color: var(--red); }
 .v1-hero-stats-bar {
   margin-top: 72px;
@@ -3057,39 +3062,6 @@ body { padding-top: var(--nav-h, 68px); }
 .v1-clubs-page .v1c-search-input::placeholder { color: rgba(245, 240, 235, 0.55); font-weight: 400; }
 /* inline city picker — native <select> overlaid invisibly over a styled
    value so the trigger matches the bar's look but keeps OS-native UX */
-.v1-clubs-page .v1c-search-city {
-  position: relative;
-  flex-shrink: 0;
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  padding: 0 12px;
-  height: 30px;
-  border-left: 1px solid rgba(245, 240, 235, 0.18);
-  color: var(--bone);
-  cursor: pointer;
-}
-.v1-clubs-page .v1c-search-city-val {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  font-family: var(--font-oswald), sans-serif;
-  font-weight: 600;
-  font-size: 12px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  white-space: nowrap;
-}
-.v1-clubs-page .v1c-search-city-val svg { color: rgba(245, 240, 235, 0.5); }
-.v1-clubs-page .v1c-search-city select {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  opacity: 0;
-  cursor: pointer;
-  font-size: 16px; /* avoid iOS auto-zoom on focus */
-}
 /* Liquid glass — same language as the search bar, a touch brighter so the
    button still reads as the action within the frosted bar. */
 .v1-clubs-page .v1c-search-submit {
@@ -3200,6 +3172,25 @@ body { padding-top: var(--nav-h, 68px); }
 .v1c-fmodal .v1c-search-fgroup .v1c-search-tags {
   margin-top: 8px;
   justify-content: flex-start;
+}
+/* Free-text city, so anywhere in India is reachable and not just the preset
+   chips. 16px font-size avoids iOS auto-zoom on focus. */
+.v1c-fmodal .v1c-search-cityinput {
+  margin-top: 10px;
+  width: 100%;
+  padding: 9px 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(245, 240, 235, 0.16);
+  background: rgba(245, 240, 235, 0.04);
+  color: var(--bone, #f5f0eb);
+  font-family: var(--font-poppins), sans-serif;
+  font-size: 16px;
+  outline: none;
+}
+.v1c-fmodal .v1c-search-cityinput::placeholder { color: rgba(245, 240, 235, 0.38); }
+.v1c-fmodal .v1c-search-cityinput:focus {
+  border-color: rgba(245, 240, 235, 0.38);
+  background: rgba(245, 240, 235, 0.07);
 }
 
 /* ── Filter modal (Radix Dialog) ─────────────────────────────────
@@ -3388,10 +3379,23 @@ body { padding-top: var(--nav-h, 68px); }
 @media (max-width: 640px) {
   .v1-clubs-page .v1c-search-h1 { font-size: 24px; }
   .v1-clubs-page .v1c-search-bar { border-radius: 12px; padding: 5px 5px 5px 13px; }
-  .v1-clubs-page .v1c-search-city { padding: 0 10px; }
-  .v1-clubs-page .v1c-search-city-val { font-size: 11px; letter-spacing: 0.06em; }
   .v1-clubs-page .v1c-search-submit { width: 36px; height: 36px; }
-  .v1-clubs-page .v1c-search-chips { justify-content: flex-start; }
+  /* Wrapping dropped "Filters" onto a line of its own, reading as a stray
+     control. One row that scrolls instead — the four chips fit without
+     scrolling on a 360px screen, so it rarely even moves. */
+  .v1-clubs-page .v1c-search-chips {
+    justify-content: flex-start;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none;
+    /* Bleed to the gutters so the row scrolls edge to edge. */
+    margin-left: calc(-1 * var(--v1c-gutter));
+    margin-right: calc(-1 * var(--v1c-gutter));
+    padding-left: var(--v1c-gutter);
+    padding-right: var(--v1c-gutter);
+  }
+  .v1-clubs-page .v1c-search-chips::-webkit-scrollbar { display: none; }
+  .v1-clubs-page .v1c-search-chips > * { flex-shrink: 0; }
   .v1-clubs-page .v1c-search-tags { justify-content: flex-start; }
   .v1-clubs-page .v1c-search-resulttitle { font-size: 20px; }
 }
@@ -7797,11 +7801,20 @@ body { padding-top: var(--nav-h, 68px); }
 .v1-races-page .v1r-featured-ctas .v1r-btn-primary.is-success:hover { background: #0d8a37; }
 
 /* ─── LoginModal (generic — used by coupon flow + future) ─── */
+/* Above the /create composer's glass shell (z-120). The sign-in gate is a
+   modal over a modal — at z-100 it rendered behind the card, showing as
+   ghosted text through the glass. */
 .v1lm-overlay {
   position: fixed; inset: 0;
-  background: rgba(10, 10, 10, 0.72);
-  backdrop-filter: blur(2px);
-  z-index: 100;
+  /* Tinted, plus a faint red/violet wash so the glass card below has
+     something to refract — the modal opens over arbitrary pages, so it
+     can't rely on the ground the way /create's composer does. */
+  background:
+    radial-gradient(70% 60% at 28% 18%, rgba(255,45,54,.20), transparent 62%),
+    radial-gradient(65% 60% at 76% 88%, rgba(124,58,237,.20), transparent 64%),
+    rgba(8, 7, 10, 0.80);
+  backdrop-filter: blur(6px);
+  z-index: 200;
 }
 .v1lm-overlay[data-state='open'] { animation: v1lm-fade-in 180ms ease-out; }
 .v1lm-overlay[data-state='closed'] { animation: v1lm-fade-out 140ms ease-in; }
@@ -7813,10 +7826,19 @@ body { padding-top: var(--nav-h, 68px); }
   max-width: 460px;
   max-height: calc(100vh - 32px);
   overflow-y: auto;
-  background: #F5F0EB;
-  color: #0A0A0A;
-  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5), 0 8px 24px rgba(0, 0, 0, 0.3);
-  z-index: 101;
+  /* Same glass recipe as the /create card: white gradient for the frost,
+     dark tint under it so text keeps a contrast floor over any backdrop. */
+  background:
+    linear-gradient(155deg, rgba(245,240,235,.11) 0%, rgba(245,240,235,.055) 42%, rgba(245,240,235,.035) 100%),
+    linear-gradient(0deg, rgba(10,9,14,.55), rgba(10,9,14,.55));
+  backdrop-filter: blur(26px) saturate(150%);
+  -webkit-backdrop-filter: blur(26px) saturate(150%);
+  border: 1px solid rgba(245, 240, 235, 0.09);
+  border-top-color: rgba(245, 240, 235, 0.20);
+  border-radius: 20px;
+  color: #F5F0EB;
+  box-shadow: 0 40px 100px rgba(0,0,0,.62), inset 0 1px 0 rgba(255,255,255,.22);
+  z-index: 201;
   font-family: 'Poppins', system-ui, sans-serif;
 }
 .v1lm-modal[data-state='open'] { animation: v1lm-zoom-in 200ms cubic-bezier(0.16, 1, 0.3, 1); }
@@ -7834,15 +7856,15 @@ body { padding-top: var(--nav-h, 68px); }
   top: 12px; right: 14px;
   width: 28px; height: 28px;
   display: flex; align-items: center; justify-content: center;
-  color: #8A8278;
+  color: rgba(245,240,235,.45);
   background: transparent; border: 0; cursor: pointer;
   z-index: 3; border-radius: 50%;
   transition: all 160ms ease;
 }
-.v1lm-close:hover:not(:disabled) { color: #0A0A0A; background: rgba(10, 10, 10, 0.06); }
+.v1lm-close:hover:not(:disabled) { color: #F5F0EB; background: rgba(245, 240, 235, 0.10); }
 .v1lm-close:disabled { opacity: 0.4; cursor: not-allowed; }
 
-.v1lm-context { background: #EDE7E0; border-bottom: 1px solid rgba(10, 10, 10, 0.12); }
+.v1lm-context { background: rgba(245,240,235,.06); border-bottom: 1px solid rgba(245,240,235,.10); }
 .v1lm-context .v1rcc-strip { padding-right: 50px; }
 
 /* Finalizing: drop modal chrome so it reads as a floating loader, not a sheet. */
@@ -7888,33 +7910,34 @@ body { padding-top: var(--nav-h, 68px); }
   font-size: 30px; line-height: 1.05;
   letter-spacing: -0.02em; margin: 0 0 6px;
 }
-.v1lm-red { color: #E6232A; }
+.v1lm-red { color: #FF6B6F; }
 .v1lm-sub {
-  font-size: 13px; color: #8A8278;
+  font-size: 13px; color: rgba(245,240,235,.62);
   line-height: 1.55; margin-bottom: 20px;
 }
 
 .v1lm-btn-google {
   display: flex; align-items: center; justify-content: center; gap: 10px;
   width: 100%; height: 48px;
-  background: #fff; border: 1px solid rgba(10, 10, 10, 0.24);
+  background: rgba(245,240,235,.07); border: 1px solid rgba(245,240,235,.16);
+  border-radius: 12px;
   font-family: 'Oswald', sans-serif;
   font-weight: 600; font-size: 13px;
-  letter-spacing: 0.06em; color: #0A0A0A;
+  letter-spacing: 0.06em; color: #F5F0EB;
   cursor: pointer; transition: all 160ms ease;
 }
-.v1lm-btn-google:hover { background: #0A0A0A; color: #fff; border-color: #0A0A0A; }
+.v1lm-btn-google:hover { background: #F5F0EB; color: #0A0A0A; border-color: #F5F0EB; }
 
 .v1lm-or {
   display: flex; align-items: center; gap: 12px;
   margin: 16px 0 14px;
   font-family: 'Oswald', sans-serif;
   font-size: 10px; letter-spacing: 0.22em;
-  text-transform: uppercase; color: #B0A89E;
+  text-transform: uppercase; color: rgba(245,240,235,.60);
 }
 .v1lm-or::before, .v1lm-or::after {
   content: ''; flex: 1; height: 1px;
-  background: rgba(10, 10, 10, 0.12);
+  background: rgba(245, 240, 235, 0.12);
 }
 
 .v1lm-form { display: flex; flex-direction: column; }
@@ -7924,12 +7947,12 @@ body { padding-top: var(--nav-h, 68px); }
   display: flex; align-items: center; justify-content: space-between;
   font-family: 'Oswald', sans-serif;
   font-size: 10px; letter-spacing: 0.2em;
-  text-transform: uppercase; color: #8A8278;
+  text-transform: uppercase; color: rgba(245,240,235,.62);
   margin-bottom: 6px;
 }
 .v1lm-hint {
   background: transparent; border: 0;
-  color: #E6232A;
+  color: #FF6B6F;
   font-family: 'Oswald', sans-serif;
   font-size: 10px; letter-spacing: 0.06em;
   cursor: pointer; padding: 0;
@@ -7941,28 +7964,33 @@ body { padding-top: var(--nav-h, 68px); }
 .v1lm-input {
   width: 100%; height: 44px;
   padding: 0 14px;
-  background: #fff; border: 1px solid rgba(10, 10, 10, 0.24);
+  background: rgba(8, 7, 10, 0.42);
+  border: 1px solid rgba(245, 240, 235, 0.10);
+  border-radius: 11px;
+  box-shadow: inset 0 1px 3px rgba(0,0,0,.35);
   font-family: 'Poppins', sans-serif;
-  font-size: 14px; color: #0A0A0A;
+  font-size: 14px; color: #F5F0EB;
   outline: 0;
-  transition: border-color 160ms ease;
+  transition: border-color 160ms ease, box-shadow 160ms ease;
 }
-.v1lm-input:focus { border-color: #0A0A0A; }
-.v1lm-input::placeholder { color: #B0A89E; }
+.v1lm-input:focus { border-color: rgba(255,45,54,.7); box-shadow: inset 0 1px 3px rgba(0,0,0,.3), 0 0 0 3px rgba(255,45,54,.18); }
+.v1lm-input::placeholder { color: rgba(245,240,235,.38); }
 .v1lm-input.v1lm-has-icon { padding-right: 42px; }
 .v1lm-input-icon {
   position: absolute;
   right: 8px; top: 50%; transform: translateY(-50%);
   width: 28px; height: 28px;
   display: inline-flex; align-items: center; justify-content: center;
-  color: #8A8278;
+  color: rgba(245,240,235,.55);
   background: transparent; border: 0; cursor: pointer;
 }
-.v1lm-input-icon:hover { color: #0A0A0A; }
+.v1lm-input-icon:hover { color: #F5F0EB; }
 
 .v1lm-btn-primary {
   width: 100%; height: 46px;
-  background: #E6232A; color: #fff;
+  background: linear-gradient(180deg,#FF3B44,#DD0F17); color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(255,45,54,.40), inset 0 1px 0 rgba(255,255,255,.32);
   font-family: 'Oswald', sans-serif;
   font-weight: 600; font-size: 13px;
   letter-spacing: 0.14em; text-transform: uppercase;
@@ -7970,25 +7998,25 @@ body { padding-top: var(--nav-h, 68px); }
   margin-top: 4px;
   transition: background 160ms ease;
 }
-.v1lm-btn-primary:hover:not(:disabled) { background: #c41e24; }
-.v1lm-btn-primary:disabled { background: #B0A89E; cursor: not-allowed; }
+.v1lm-btn-primary:hover:not(:disabled) { box-shadow: 0 14px 38px rgba(255,45,54,.55), inset 0 1px 0 rgba(255,255,255,.34); }
+.v1lm-btn-primary:disabled { background: rgba(245,240,235,.12); box-shadow: none; color: rgba(245,240,235,.45); cursor: not-allowed; }
 
 .v1lm-toggle-row {
   margin-top: 14px;
   text-align: center;
-  font-size: 13px; color: #8A8278;
+  font-size: 13px; color: rgba(245,240,235,.62);
 }
 .v1lm-link {
   background: transparent; border: 0;
-  color: #0A0A0A; font-weight: 600;
-  border-bottom: 1px solid rgba(10, 10, 10, 0.24);
+  color: #F5F0EB; font-weight: 600;
+  border-bottom: 1px solid rgba(245, 240, 235, 0.35);
   cursor: pointer; padding: 0;
   font-family: inherit; font-size: inherit;
 }
-.v1lm-link:hover { border-bottom-color: #0A0A0A; }
+.v1lm-link:hover { border-bottom-color: #F5F0EB; }
 .v1lm-link-red {
   background: transparent; border: 0;
-  color: #E6232A; cursor: pointer;
+  color: #FF6B6F; cursor: pointer;
   padding: 0;
   font-family: inherit; font-size: inherit;
 }
@@ -8000,19 +8028,20 @@ body { padding-top: var(--nav-h, 68px); }
   font-family: 'Oswald', sans-serif;
   font-size: 10px; letter-spacing: 0.2em;
   text-transform: uppercase;
-  color: #8A8278; cursor: pointer;
+  color: rgba(245,240,235,.62); cursor: pointer;
   background: transparent; border: 0;
   padding: 0; align-self: flex-start;
 }
-.v1lm-back:hover { color: #0A0A0A; }
+.v1lm-back:hover { color: #F5F0EB; }
 
 .v1lm-step-marker {
   display: inline-flex; align-items: center; gap: 6px;
   padding: 4px 10px 3px;
-  background: #EDE7E0; border: 1px solid rgba(10, 10, 10, 0.12);
+  background: rgba(245,240,235,.07); border: 1px solid rgba(245,240,235,.12);
+  border-radius: 999px;
   font-family: 'Oswald', sans-serif;
   font-size: 9px; letter-spacing: 0.2em;
-  text-transform: uppercase; color: #8A8278;
+  text-transform: uppercase; color: rgba(245,240,235,.62);
   margin-bottom: 14px; align-self: flex-start;
 }
 
@@ -8024,53 +8053,56 @@ body { padding-top: var(--nav-h, 68px); }
   width: 100%; min-width: 0;
   height: 50px;
   padding: 0;
-  background: #fff;
-  border: 1px solid rgba(10, 10, 10, 0.24);
+  background: rgba(8, 7, 10, 0.42);
+  border: 1px solid rgba(245, 240, 235, 0.10);
+  border-radius: 10px;
+  box-shadow: inset 0 1px 3px rgba(0,0,0,.35);
   font-family: 'JetBrains Mono', ui-monospace, monospace;
   font-weight: 700; font-size: 20px;
-  color: #0A0A0A; text-align: center;
+  color: #F5F0EB; text-align: center;
   outline: 0;
   transition: border-color 160ms ease, box-shadow 160ms ease;
 }
-.v1lm-otp-cell.is-filled { border-color: #0A0A0A; }
-.v1lm-otp-cell:focus { border-color: #E6232A; box-shadow: 0 0 0 2px rgba(230, 35, 42, 0.16); }
+.v1lm-otp-cell.is-filled { border-color: rgba(245,240,235,.45); }
+.v1lm-otp-cell:focus { border-color: #FF2D36; box-shadow: 0 0 0 3px rgba(255, 45, 54, 0.20); }
 
 .v1lm-otp-resend {
   text-align: center;
-  font-size: 12px; color: #8A8278;
+  font-size: 12px; color: rgba(245,240,235,.62);
   margin-top: 12px;
 }
-.v1lm-countdown { color: #B0A89E; }
+.v1lm-countdown { color: rgba(245,240,235,.45); }
 
 .v1lm-feedback {
   margin: 6px 0 12px;
   padding: 9px 12px;
   font-family: 'Poppins', sans-serif;
   font-size: 12px; line-height: 1.5;
-  border-left: 3px solid #B0A89E;
-  background: rgba(10, 10, 10, 0.04);
+  border-left: 3px solid rgba(245,240,235,.35);
+  background: rgba(245, 240, 235, 0.05);
+  border-radius: 0 8px 8px 0;
 }
 .v1lm-feedback.is-error {
-  border-left-color: #E6232A;
-  background: rgba(230, 35, 42, 0.08);
-  color: #c41e24;
+  border-left-color: #FF2D36;
+  background: rgba(255, 45, 54, 0.12);
+  color: #FF9B9E;
 }
 .v1lm-feedback.is-info {
-  border-left-color: #07A039;
-  background: rgba(7, 160, 57, 0.08);
-  color: #075d22;
+  border-left-color: #34D06B;
+  background: rgba(52, 208, 107, 0.12);
+  color: #7BE8A4;
 }
 
 .v1lm-legal {
-  font-size: 11px; color: #B0A89E;
+  font-size: 11px; color: rgba(245,240,235,.48);
   line-height: 1.55; text-align: center;
   margin-top: 12px;
 }
-.v1lm-legal a { color: #8A8278; border-bottom: 0.5px solid rgba(10, 10, 10, 0.24); }
+.v1lm-legal a { color: rgba(245,240,235,.66); border-bottom: 0.5px solid rgba(245,240,235,.30); }
 
 .v1lm-app-row {
   margin-top: 22px; padding-top: 18px;
-  border-top: 1px solid rgba(10, 10, 10, 0.12);
+  border-top: 1px solid rgba(245, 240, 235, 0.10);
   display: flex; align-items: center; justify-content: space-between;
   gap: 12px;
 }
@@ -8079,18 +8111,19 @@ body { padding-top: var(--nav-h, 68px); }
   font-family: 'Oswald', sans-serif;
   font-size: 11px; letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: #8A8278; line-height: 1.4;
+  color: rgba(245,240,235,.62); line-height: 1.4;
 }
-.v1lm-app-copy strong { color: #0A0A0A; font-weight: 600; display: block; margin-bottom: 2px; }
+.v1lm-app-copy strong { color: #F5F0EB; font-weight: 600; display: block; margin-bottom: 2px; }
 .v1lm-stores { display: flex; gap: 8px; flex-shrink: 0; }
 .v1lm-store-btn {
   display: inline-flex; align-items: center; justify-content: center;
   width: 36px; height: 36px;
-  background: #0A0A0A; color: #fff;
-  border-radius: 6px;
+  background: rgba(245,240,235,.10); color: #F5F0EB;
+  border: 1px solid rgba(245,240,235,.14);
+  border-radius: 8px;
   transition: transform 160ms ease, background 160ms ease;
 }
-.v1lm-store-btn:hover { transform: translateY(-1px); background: #1c1c1c; }
+.v1lm-store-btn:hover { transform: translateY(-1px); background: rgba(245,240,235,.18); }
 
 .sr-only {
   position: absolute; width: 1px; height: 1px; padding: 0;
@@ -8200,8 +8233,65 @@ body { padding-top: var(--nav-h, 68px); }
    crowd the browse links and read as peers of them. */
 .v1-nav-drawer-only { display: none; }
 
+/* Primary CTA in the mobile bar. Hidden on desktop, where
+   .v1-nav-actions-desktop already carries a full-size one. */
+.v1-nav-cta-bar { display: none; }
+
 @media (max-width: 860px) {
   .v1-nav-actions-desktop { display: none; }
+  /* Compact so "Create event" still reads in full beside the logo and the
+     44px toggle at 360px — the narrowest phone we support. Height matches
+     the toggle so the two sit on one baseline. */
+  /* `.v1-nav-inner > .v1-nav-cta { display: none }` in the nav's own mobile
+     block is (0,2,0) and would otherwise keep this hidden — match it. */
+  /* Anchor is the 44px touch target and is itself invisible; the inner span
+     is the red block. Lets the CTA read as a compact 36px pill instead of a
+     slab nearly as tall as the bar, without shrinking the tap area. */
+  .v1-nav-inner > .v1-nav-cta-bar {
+    display: inline-flex;
+    flex-shrink: 0;
+    align-items: center;
+    height: 44px;
+    padding: 0;
+    background: transparent;
+    /* Absorbs the free space so the CTA and the menu glyph sit together on
+       the right. Under plain space-between the slack was split between both
+       gaps, which pushed the CTA toward the middle of the bar and grew with
+       screen width. */
+    margin-left: auto;
+  }
+  .v1-nav-inner > .v1-nav-cta-bar > span {
+    display: inline-flex;
+    align-items: center;
+    height: 36px;
+    padding: 0 13px;
+    background: var(--red);
+    color: #fff;
+    font-size: 10.5px;
+    letter-spacing: 0.12em;
+    white-space: nowrap;
+    transition: background 160ms ease-out;
+  }
+  .v1-nav-inner > .v1-nav-cta-bar:active > span { background: #c41e24; }
+
+  /* The outlined box made the menu glyph read as a second button of equal
+     weight to the CTA. Bare glyph, 44px hit area kept; the negative margin
+     optically aligns the bars with the container edge now that there is no
+     box edge to align instead. */
+  .v1-nav-toggle {
+    border: 0;
+    margin-right: -10px;
+    color: rgba(245, 240, 235, 0.78);
+  }
+  .v1-nav-toggle-bars { width: 20px; }
+  /* The bar went from two children to three. At 360px the inherited 32px
+     flex gap overflowed the content box and shoved the toggle into the
+     right padding; space-between still spreads them, just with room to. */
+  .v1-nav-inner { gap: 10px; }
+  /* The bar carries it now; two identical CTAs on one screen is noise.
+     Selector matches `.v1-nav-links li:has(.v1-nav-cta)` at (0,2,1) — a bare
+     class loses to it — and wins on being the later rule. */
+  .v1-nav-links li.v1-nav-cta-drawer { display: none; }
   .v1-nav-auth-mobile-li { display: list-item; }
   .v1-nav-drawer-only { display: list-item; }
   .v1-nav-drawer-only a {
@@ -8747,4 +8837,135 @@ body { padding-top: var(--nav-h, 68px); }
     padding: 0 22px;
     font-size: 12px;
   }
+}
+
+/* ─────────────────────────────────────────────────────────────
+   /create — glassmorphism composer
+   Ported from design-mockups/create-event-neon.html. Scoped to
+   .cx-root so none of it leaks into the light studio surfaces at
+   /admin, which share several of these components.
+   ───────────────────────────────────────────────────────────── */
+.cx-root {
+  /* The datetime-local picker panel is browser UI drawn outside the page —
+     its background, layout and fonts can't be styled. `color-scheme: dark`
+     (set on the wrapper) picks the dark panel; `accent-color` is the only
+     other hook, and it recolours the selected day / time from the OS blue
+     to brand red so the picker at least belongs to this design. */
+  accent-color: #ff2d36;
+  --cx-glass-field: rgba(245, 240, 235, 0.055);
+  --cx-glass-field-hi: rgba(245, 240, 235, 0.085);
+  --cx-well: rgba(8, 7, 10, 0.42);
+  --cx-hair: rgba(245, 240, 235, 0.10);
+  --cx-hair-top: rgba(245, 240, 235, 0.15);
+  --cx-red: #ff2d36;
+  --cx-ease: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Ambient ground. Glass over a flat colour reads as grey plastic — these
+   blobs are the thing the card actually refracts, so they sit directly
+   behind it and are deliberately strong. */
+.cx-ground { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+.cx-blob { position: absolute; border-radius: 50%; filter: blur(80px); }
+.cx-blob-red    { width: 520px; height: 520px; background: #ff2d36; opacity: 0.34; top: -120px; left: 50%; margin-left: -430px; }
+.cx-blob-violet { width: 480px; height: 480px; background: #7c3aed; opacity: 0.30; bottom: -160px; left: 50%; margin-left: 60px; }
+.cx-blob-lime   { width: 340px; height: 340px; background: #c2ff3d; opacity: 0.13; top: 46%; left: 50%; margin-left: -120px; }
+.cx-blob-cyan   { width: 300px; height: 300px; background: #4de8ff; opacity: 0.12; top: 8%; left: 50%; margin-left: 180px; }
+/* Large blurred gradients band badly on dark panels; grain hides it. */
+.cx-grain {
+  position: absolute; inset: 0; pointer-events: none; opacity: 0.16; mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='.5'/%3E%3C/svg%3E");
+}
+
+/* The frosted card. Two stacked backgrounds: the white gradient that makes
+   it glass, over a dark tint that guarantees a contrast floor — without the
+   tint, helper text measured 3.53:1 where the red blob sits behind. */
+.cx-card {
+  background:
+    linear-gradient(155deg, rgba(245,240,235,0.11) 0%, rgba(245,240,235,0.055) 42%, rgba(245,240,235,0.035) 100%),
+    linear-gradient(0deg, rgba(10,9,14,0.42), rgba(10,9,14,0.42));
+  /* The blur itself is applied with Tailwind's backdrop utilities on the
+     element (md: only — on mobile this is a full page, and blurring a
+     whole screen buys nothing but GPU time). Declaring it here as well got
+     stripped from the built stylesheet while the rest of the rule survived. */
+  border: 1px solid rgba(245, 240, 235, 0.09);
+  border-top-color: rgba(245, 240, 235, 0.20);
+  box-shadow:
+    0 40px 100px rgba(0, 0, 0, 0.62),
+    inset 0 1px 0 rgba(255, 255, 255, 0.22),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.25);
+}
+/* Diagonal specular sweep — the detail that sells "glass" over "dark panel". */
+.cx-card::after {
+  content: ''; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
+  background: linear-gradient(150deg, rgba(255,255,255,0.14) 0%, rgba(255,255,255,0.04) 22%, transparent 46%);
+}
+.cx-card > * { position: relative; z-index: 1; }
+
+/* Field card — plain translucency, NOT its own backdrop-filter. Nesting
+   blur per field costs real frames on mobile and muddies the colour; on
+   already-blurred glass it looks identical. */
+.cx-field {
+  background: var(--cx-glass-field);
+  border: 1px solid var(--cx-hair);
+  border-top-color: var(--cx-hair-top);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.09);
+  transition: background 0.22s var(--cx-ease), border-color 0.22s var(--cx-ease);
+}
+.cx-field:hover { background: var(--cx-glass-field-hi); border-color: rgba(245, 240, 235, 0.17); }
+/* Focus-within lifts the whole card and lights a neon rail down its edge. */
+.cx-field:focus-within { background: rgba(245, 240, 235, 0.10); border-color: rgba(255, 45, 54, 0.38); }
+.cx-field:focus-within::before {
+  content: ''; position: absolute; left: -1px; top: 12px; bottom: 12px; width: 2px; border-radius: 2px;
+  background: var(--cx-red); box-shadow: 0 0 12px var(--cx-red), 0 0 26px rgba(255, 45, 54, 0.6);
+}
+
+/* Inputs recess — card reads above, input below. */
+.cx-input {
+  background: var(--cx-well);
+  border: 1px solid var(--cx-hair);
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.35);
+  transition: border-color 0.18s var(--cx-ease), box-shadow 0.18s var(--cx-ease);
+}
+.cx-input::placeholder { color: rgba(245, 240, 235, 0.38); }
+.cx-input:focus, .cx-input:focus-within {
+  border-color: rgba(255, 45, 54, 0.7);
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3), 0 0 0 3px rgba(255, 45, 54, 0.18);
+}
+
+.cx-cover {
+  background: radial-gradient(90% 130% at 50% 0%, rgba(255,45,54,0.16), transparent 64%), var(--cx-glass-field);
+  border: 1px dashed rgba(245, 240, 235, 0.20);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  transition: border-color 0.22s var(--cx-ease), background 0.22s var(--cx-ease);
+}
+.cx-cover:hover {
+  border-color: rgba(255, 45, 54, 0.55);
+  background: radial-gradient(90% 130% at 50% 0%, rgba(255,45,54,0.22), transparent 64%), var(--cx-glass-field-hi);
+}
+
+/* Primary action carries the glow — one per screen. */
+.cx-cta {
+  background: linear-gradient(180deg, #ff3b44, #dd0f17);
+  box-shadow: 0 10px 30px rgba(255, 45, 54, 0.40), inset 0 1px 0 rgba(255, 255, 255, 0.32);
+  transition: transform 0.18s var(--cx-ease), box-shadow 0.18s var(--cx-ease);
+}
+.cx-cta:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 14px 38px rgba(255, 45, 54, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.34);
+}
+.cx-cta:disabled { background: rgba(245, 240, 235, 0.10); box-shadow: none; }
+
+/* Backdrop-filter is the expensive part on low-end Android, and some users
+   ask for less transparency outright. Both fall back to an opaque surface
+   that keeps every contrast guarantee above. */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .cx-card { background: #16151A; }
+}
+@media (prefers-reduced-transparency: reduce) {
+  .cx-card { background: #16151A; backdrop-filter: none; -webkit-backdrop-filter: none; }
+  .cx-blob, .cx-grain { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cx-field, .cx-input, .cx-cover, .cx-cta { transition: none; }
+  .cx-cta:hover:not(:disabled) { transform: none; }
 }

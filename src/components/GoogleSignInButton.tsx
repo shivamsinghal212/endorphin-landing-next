@@ -96,10 +96,14 @@ export default function GoogleSignInButton({
         });
         window.google.accounts.id.renderButton(containerRef.current, {
           type: 'standard',
-          theme: 'outline',
+          // Google renders this button itself, so our CSS can't reach it —
+          // 'outline' is their light variant and sat as a white slab on the
+          // dark glass modal. 'filled_black' is their sanctioned dark option,
+          // so the surface matches without touching their brand marks.
+          theme: 'filled_black',
           size: 'large',
           text: context === 'signup' ? 'signup_with' : 'continue_with',
-          shape: 'rectangular',
+          shape: 'pill',
           logo_alignment: 'left',
           width: width ?? containerRef.current.clientWidth,
         });

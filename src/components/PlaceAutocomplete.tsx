@@ -24,15 +24,33 @@ export function PlaceAutocomplete({
   onPick,
   placeholder = 'Search a place, or type your own',
   id,
+  theme = 'light',
 }: {
   value: string;
   onChange: (v: string) => void;
   onPick: (p: PickedPlace) => void;
   placeholder?: string;
   id?: string;
+  /** Palette of the surface this sits on. Defaults to the light studio
+   *  theme; the public /create composer is dark. */
+  theme?: 'light' | 'dark';
 }) {
   const reactId = useId();
   const inputId = id ?? `place-${reactId}`;
+  const dark = theme === 'dark';
+  const cls = {
+    input: dark
+      ? 'cx-input w-full px-3 py-2 rounded-xl text-sm outline-none'
+      : 'w-full px-3 py-2 rounded-xl border border-jet/10 text-sm bg-white focus:border-jet outline-none',
+    spinner: dark
+      ? 'absolute right-3 top-1/2 -translate-y-1/2 text-[10px] uppercase tracking-wider text-bone/60'
+      : 'absolute right-3 top-1/2 -translate-y-1/2 text-[10px] uppercase tracking-wider text-jet/30',
+    menu: dark
+      ? 'absolute z-30 left-0 right-0 mt-1 bg-[#16151A] border border-bone/15 rounded-xl shadow-[0_18px_50px_rgba(0,0,0,.6)] overflow-hidden max-h-64 overflow-y-auto'
+      : 'absolute z-30 left-0 right-0 mt-1 bg-white border border-jet/10 rounded-xl shadow-lg overflow-hidden max-h-64 overflow-y-auto',
+    optionActive: dark ? 'bg-bone/[0.08]' : 'bg-jet/[0.05]',
+    optionSub: dark ? 'block text-xs text-bone/68 truncate' : 'block text-xs text-jet/45 truncate',
+  };
   const listId = `${inputId}-listbox`;
 
   const [suggestions, setSuggestions] = useState<PlaceSuggestion[]>([]);
@@ -164,12 +182,12 @@ export function PlaceAutocomplete({
         onKeyDown={onKeyDown}
         onFocus={() => suggestions.length > 0 && setOpen(true)}
         placeholder={placeholder}
-        className="w-full px-3 py-2 rounded-xl border border-jet/10 text-sm bg-white focus:border-jet outline-none"
+        className={cls.input}
       />
 
       {loading && (
         <span
-          className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] uppercase tracking-wider text-jet/30"
+          className={cls.spinner}
           aria-hidden
         >
           …
@@ -180,7 +198,7 @@ export function PlaceAutocomplete({
         <ul
           id={listId}
           role="listbox"
-          className="absolute z-30 left-0 right-0 mt-1 bg-white border border-jet/10 rounded-xl shadow-lg overflow-hidden max-h-64 overflow-y-auto"
+          className={cls.menu}
         >
           {suggestions.map((s, i) => (
             <li
@@ -195,12 +213,12 @@ export function PlaceAutocomplete({
               }}
               onMouseEnter={() => setActive(i)}
               className={`px-3 py-2 cursor-pointer ${
-                i === active ? 'bg-jet/[0.05]' : ''
+                i === active ? cls.optionActive : ''
               }`}
             >
               <span className="block text-sm truncate">{s.mainText}</span>
               {s.secondaryText && (
-                <span className="block text-xs text-jet/45 truncate">
+                <span className={cls.optionSub}>
                   {s.secondaryText}
                 </span>
               )}

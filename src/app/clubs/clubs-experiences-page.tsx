@@ -370,9 +370,9 @@ export default async function ClubsExperiencesPage({
           eventsAround={eventsAround}
           racesAround={racesAround}
           upcomingRaces={upcomingRaces}
+          geoCity={geoCity}
           aroundCity={aroundCity}
           eventsWeekend={eventsWeekend}
-          geoCity={geoCity}
           membershipBySlug={membershipBySlug}
           claimBySlug={claimBySlug}
           isAuthed={isAuthed}

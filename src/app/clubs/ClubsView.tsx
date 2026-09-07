@@ -897,7 +897,7 @@ type SearchWindow = 'today' | 'tomorrow' | 'this_weekend' | 'this_month';
 type EventTypeKey = 'club_run' | 'club_race' | 'club_cross_train';
 // Distance buckets for events, mapped to the API's distanceMin/distanceMax
 // (both verified working). Single-select — picking a bucket sets the range.
-type DistanceKey = '5k' | '10k' | 'half' | 'full';
+type DistanceKey = '5k' | '10k' | 'half' | 'full' | 'ultra';
 
 interface ClubSearchFilters {
   q: string;
@@ -929,14 +929,22 @@ const TYPE_CHIPS: { key: EventTypeKey; label: string }[] = [
 ];
 
 // Distance buckets → distanceMin/distanceMax (km). null bound = open-ended.
+// Named for the race distance a runner actually searches for rather than the
+// raw range. "Full+ (21K+)" used to swallow ultras; marathon and ultra are
+// now separate so a 50K/100K is findable.
 // NOTE: ~half of upcoming events have no distance set (cross-train/social/
 // some races), so this is opt-in and never a default.
 const DISTANCE_CHIPS: { key: DistanceKey; label: string; min: number | null; max: number | null }[] = [
-  { key: '5k', label: '5K & under', min: null, max: 5 },
-  { key: '10k', label: '5–10K', min: 5, max: 10 },
-  { key: 'half', label: 'Half (10–21K)', min: 10, max: 21.1 },
-  { key: 'full', label: 'Full+ (21K+)', min: 21.1, max: null },
+  { key: '5k', label: '5K', min: null, max: 5 },
+  { key: '10k', label: '10K', min: 5, max: 10 },
+  { key: 'half', label: 'Half marathon', min: 10, max: 21.1 },
+  { key: 'full', label: 'Marathon', min: 21.1, max: 42.2 },
+  { key: 'ultra', label: 'Ultra', min: 42.2, max: null },
 ];
+
+// The three shown as quick chips under the search bar (the rest live in the
+// Filters panel). Order matches the row: longest first.
+const QUICK_DISTANCES: DistanceKey[] = ['half', '10k', '5k'];
 
 // Club tag filters revealed behind the "Filters" control. Tags are matched
 // against clubs.tags by the API (strict, multi). Picked by real club counts
@@ -979,8 +987,8 @@ function searchCitiesFor(city: string): string[] {
   return city === 'Delhi' ? [...NCR_SEARCH_CITIES] : [city];
 }
 
-// Map the visitor's IP-resolved city onto one of the picker values so the
-// bar opens pre-scoped to where they are. Unknown city → All India.
+// Map the visitor's IP-resolved city onto one of the preset values so the
+// search opens scoped to where they are. Unknown city → All India.
 function canonicalCity(geo: string | null | undefined): string {
   if (!geo) return '';
   const c = geo.toLowerCase();
@@ -991,6 +999,12 @@ function canonicalCity(geo: string | null | undefined): string {
   if (/hyderabad|secunderabad/.test(c)) return 'Hyderabad';
   if (/chennai|madras/.test(c)) return 'Chennai';
   return '';
+}
+
+// True when `city` is not one of the preset chips — i.e. the visitor typed
+// their own. Drives which value the "Other city" input shows.
+function isCustomCity(city: string): boolean {
+  return Boolean(city) && !SEARCH_CITIES.some((c) => c.value === city);
 }
 
 function cityLabelOf(value: string): string {
@@ -1048,12 +1062,6 @@ const SearchGlyph = () => (
   </svg>
 );
 
-const CaretGlyph = () => (
-  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-    <path d="m6 9 6 6 6-6" />
-  </svg>
-);
-
 const FilterGlyph = () => (
   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
     <path d="M3 5h18M6 12h12M10 19h4" />
@@ -1075,6 +1083,7 @@ function ClubsSearchBar({
   onCloseFilters,
   onClearFilters,
   includeRaces = false,
+  baseCity = '',
 }: {
   filters: ClubSearchFilters;
   showFilters: boolean;
@@ -1091,9 +1100,17 @@ function ClubsSearchBar({
   onClearFilters: () => void;
   // /experiences searches races too, so the placeholder says so.
   includeRaces?: boolean;
+  // The geo-derived default city; a city equal to this is not a user filter.
+  baseCity?: string;
 }) {
-  const cityLbl = cityLabelOf(filters.city);
+  // City and date window live in the panel now, so they count toward the
+  // badge — otherwise an active city filter would be invisible from the bar.
+  // The city only counts once it DIFFERS from the geo-derived default, or
+  // every visitor would land on a pre-lit "Filters · 1" they never set.
+  // Same rule isEmptySearch() uses to decide a search is idle.
   const activeFilterCount =
+    (filters.city !== baseCity ? 1 : 0) +
+    (filters.window ? 1 : 0) +
     filters.types.length +
     (filters.distance ? 1 : 0) +
     filters.tags.length +
@@ -1126,21 +1143,6 @@ function ClubsSearchBar({
             enterKeyHint="search"
           />
         </div>
-        <label className="v1c-search-city">
-          <span className="v1c-search-city-val">
-            {cityLbl}
-            <CaretGlyph />
-          </span>
-          <select
-            value={filters.city}
-            onChange={(e) => onCityChange(e.target.value)}
-            aria-label="Choose city"
-          >
-            {SEARCH_CITIES.map((c) => (
-              <option key={c.value || 'all'} value={c.value}>{c.label}</option>
-            ))}
-          </select>
-        </label>
         <button type="submit" className="v1c-search-submit" aria-label="Search">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
             <path d="M5 12h14" />
@@ -1149,18 +1151,19 @@ function ClubsSearchBar({
         </button>
       </form>
 
-      <div className="v1c-search-chips" role="group" aria-label="Date filters">
-        {WINDOW_CHIPS.map((w) => {
-          const active = filters.window === w.key;
+      <div className="v1c-search-chips" role="group" aria-label="Distance filters">
+        {QUICK_DISTANCES.map((key) => {
+          const d = DISTANCE_CHIPS.find((x) => x.key === key)!;
+          const active = filters.distance === d.key;
           return (
             <button
-              key={w.key}
+              key={d.key}
               type="button"
               className={`v1c-search-chip ${active ? 'is-active' : ''}`}
               aria-pressed={active}
-              onClick={() => onWindowToggle(w.key)}
+              onClick={() => onDistanceToggle(d.key)}
             >
-              {w.label}
+              {d.label}
             </button>
           );
         })}
@@ -1191,6 +1194,58 @@ function ClubsSearchBar({
             </header>
 
             <div className="v1c-fmodal-body">
+              <div className="v1c-search-fgroup" role="group" aria-label="City">
+                <span className="v1c-search-flabel">City</span>
+                <div className="v1c-search-tags">
+                  {SEARCH_CITIES.map((c) => {
+                    const active = filters.city === c.value;
+                    return (
+                      <button
+                        key={c.value || 'all'}
+                        type="button"
+                        className={`v1c-search-tag ${active ? 'is-active' : ''}`}
+                        aria-pressed={active}
+                        onClick={() => onCityChange(c.value)}
+                      >
+                        {c.label}
+                      </button>
+                    );
+                  })}
+                </div>
+                {/* Free text so anywhere in India is reachable, not just the
+                    seven presets — discover accepts any city string. */}
+                <input
+                  className="v1c-search-cityinput"
+                  type="text"
+                  value={isCustomCity(filters.city) ? filters.city : ''}
+                  placeholder="Or type any city…"
+                  onChange={(e) => onCityChange(e.target.value)}
+                  aria-label="Filter by a city not listed above"
+                  autoComplete="address-level2"
+                  spellCheck={false}
+                />
+              </div>
+
+              <div className="v1c-search-fgroup" role="group" aria-label="When">
+                <span className="v1c-search-flabel">When</span>
+                <div className="v1c-search-tags">
+                  {WINDOW_CHIPS.map((w) => {
+                    const active = filters.window === w.key;
+                    return (
+                      <button
+                        key={w.key}
+                        type="button"
+                        className={`v1c-search-tag ${active ? 'is-active' : ''}`}
+                        aria-pressed={active}
+                        onClick={() => onWindowToggle(w.key)}
+                      >
+                        {w.label}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
               <div className="v1c-search-fgroup" role="group" aria-label="Event type">
                 <span className="v1c-search-flabel">Type</span>
                 <div className="v1c-search-tags">
@@ -1289,6 +1344,7 @@ export default function ClubsView({
   eventsAround = [],
   racesAround = [],
   upcomingRaces = 0,
+  geoCity = null,
   aroundCity = null,
   eventsWeekend = [],
   membershipBySlug = {},
@@ -1296,7 +1352,6 @@ export default function ClubsView({
   isAuthed = false,
   userEmail = null,
   cityName,
-  geoCity = null,
   variant = 'clubs',
 }: {
   // Lean shape powering the all-clubs grid (SSR'd ~112 anchors for SEO).
@@ -1318,6 +1373,9 @@ export default function ClubsView({
   // National count of UPCOMING races, for the hero counter. 0 = hide it
   // (also the failure value) — never render an all-time total as "upcoming".
   upcomingRaces?: number;
+  // Visitor's IP-resolved city (Vercel edge geo). Seeds the search scope so
+  // it opens where they are; overridable in the Filters panel. National only.
+  geoCity?: string | null;
   // Visitor's IP-resolved city when the upcoming rails are scoped to it (they
   // then title themselves "... in {aroundCity}"). null = the national
   // soonest-upcoming lists, titled without a city.
@@ -1332,9 +1390,6 @@ export default function ClubsView({
   // second stat becomes "Verified", and the city quick-chips are dropped.
   // Undefined = the national /clubs experience (unchanged).
   cityName?: string;
-  // Visitor's IP-resolved city (Vercel edge geo). Seeds the compact search
-  // bar's city picker so it opens scoped to where they are. National only.
-  geoCity?: string | null;
   // National page identity. /clubs ('clubs') leads with the run-club
   // directory rail; /experiences ('experiences') leads with the club-events
   // rails. Same data + layout — only the rail order differs. Ignored on city
@@ -1358,9 +1413,11 @@ export default function ClubsView({
   const [modal, setModal] = useState<{ kind: 'join' | 'claim'; club: { name: string; slug: string } } | null>(null);
 
   // ── National compact search (only used when !cityName) ──
-  // baseCity = the visitor's own city; it's the picker's opening value and
-  // the "idle" baseline. A search returns to the default rails when it
-  // collapses back to (no query, no window, no tags, city === baseCity).
+  // Search opens scoped to the visitor's IP city, matching the rails above
+  // it; "All India" is the first chip in the Filters panel's City group for
+  // anyone who wants the whole catalogue. baseCity is also the "idle"
+  // baseline — a search collapses back to the default rails at
+  // (no query, no window, no tags, city === baseCity).
   const baseCity = useMemo(() => canonicalCity(geoCity), [geoCity]);
   const [searchFilters, setSearchFilters] = useState<ClubSearchFilters>(() => ({
     q: '',
@@ -1664,7 +1721,7 @@ export default function ClubsView({
               {cityName
                 ? `Run clubs · ${cityName}`
                 : includeRaces
-                  ? 'Races, clubs & events · India'
+                  ? 'Races, run clubs & events · India'
                   : 'Run clubs & events · India'}
             </span>
             <span className="v1-hero-meta">
@@ -1722,7 +1779,8 @@ export default function ClubsView({
               <h1 className="v1c-search-h1">
                 {includeRaces ? (
                   <>
-                    <span className="accent">Races, Clubs &amp; Experiences</span> in India
+                    <span className="accent">Races, Run Clubs and Events</span>{' '}
+                    <span className="v1c-h1-tail">in India</span>
                   </>
                 ) : (
                   <>
@@ -1763,6 +1821,7 @@ export default function ClubsView({
                 onCloseFilters={() => setShowFilters(false)}
                 onClearFilters={clearFilters}
                 includeRaces={includeRaces}
+                baseCity={baseCity}
               />
             </div>
           </div>

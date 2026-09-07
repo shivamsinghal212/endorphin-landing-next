@@ -1,0 +1,261 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Create Event — glassmorphism (Variant A)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@1,500;1,600&family=Oswald:wght@500;600;700&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --deep:#08070A;
+  --base:#0C0B10;
+
+  /* GLASS SCALE — only two real blur layers. Nested backdrop-filter is
+     expensive and muddy; the inner surfaces are plain translucency that
+     read as glass because the card behind them is already blurred. */
+  --glass-card:rgba(245,240,235,.085);
+  --glass-field:rgba(245,240,235,.055);
+  --glass-field-hi:rgba(245,240,235,.085);
+  --well:rgba(8,7,10,.42);
+
+  --edge:rgba(245,240,235,.20);   /* lit top edge  */
+  --edge-low:rgba(245,240,235,.09); /* shaded bottom */
+
+  --bone:#F5F0EB;
+  --dim:rgba(245,240,235,.70);
+  --dimmer:rgba(245,240,235,.62);
+  --red:#FF2D36;
+  --red-soft:#FF7A7E;
+  --lime:#C2FF3D;
+  --r:16px;
+  --ease:cubic-bezier(.16,1,.3,1);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--deep);color:var(--bone);
+  font-family:'Poppins',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+.page{max-width:1180px;margin:0 auto;padding:40px 24px 90px}
+.doc-h{font-family:'Fraunces',serif;font-style:italic;font-size:26px;margin:0 0 6px}
+.doc-p{color:var(--dimmer);font-size:13px;margin:0 0 30px;max-width:66ch;line-height:1.65}
+.note{font-size:12px;color:var(--dimmer);line-height:1.7;margin:16px 0 0;max-width:74ch}
+.note b{color:var(--dim);font-weight:500}
+
+/* ── stage: the vibrant ground the glass refracts ───────────── */
+.stage{
+  position:relative;border-radius:22px;overflow:hidden;
+  padding:40px 20px;display:flex;justify-content:center;
+  background:radial-gradient(120% 90% at 50% -10%, #16121F 0%, var(--base) 48%, var(--deep) 100%);
+  border:1px solid rgba(245,240,235,.08);
+}
+/* Blobs sit DIRECTLY BEHIND the card and are strong — glass with nothing
+   vibrant behind it just looks like grey plastic. */
+.blob{position:absolute;border-radius:50%;filter:blur(80px);pointer-events:none}
+.blob.red   {width:520px;height:520px;background:#FF2D36;opacity:.34;top:-120px;left:50%;margin-left:-430px}
+.blob.violet{width:480px;height:480px;background:#7C3AED;opacity:.30;bottom:-160px;left:50%;margin-left:60px}
+.blob.lime  {width:340px;height:340px;background:#C2FF3D;opacity:.13;top:46%;left:50%;margin-left:-120px}
+.blob.cyan  {width:300px;height:300px;background:#4DE8FF;opacity:.12;top:8%;left:50%;margin-left:180px}
+/* Grain: kills gradient banding on dark and gives the glass a physical feel. */
+.grain{position:absolute;inset:0;pointer-events:none;opacity:.16;mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='.5'/%3E%3C/svg%3E")}
+
+/* ── the glass card ─────────────────────────────────────────── */
+.card{
+  position:relative;width:100%;max-width:660px;border-radius:22px;
+  /* Two stacked layers: the white gradient that makes it glass, over a dark
+     tint that guarantees a contrast floor. Without the tint, helper text
+     measured 3.53:1 where the red blob sits behind the card. */
+  background:
+    linear-gradient(155deg, rgba(245,240,235,.11) 0%, rgba(245,240,235,.055) 42%, rgba(245,240,235,.035) 100%),
+    linear-gradient(0deg, rgba(10,9,14,.42), rgba(10,9,14,.42));
+  backdrop-filter:blur(26px) saturate(150%);
+  -webkit-backdrop-filter:blur(26px) saturate(150%);
+  border:1px solid var(--edge-low);
+  border-top-color:var(--edge);
+  box-shadow:
+    0 40px 100px rgba(0,0,0,.62),
+    inset 0 1px 0 rgba(255,255,255,.22),
+    inset 0 -1px 0 rgba(0,0,0,.25);
+}
+/* Specular sweep — the single detail that sells "glass" over "dark panel". */
+.card::after{
+  content:'';position:absolute;inset:0;border-radius:22px;pointer-events:none;
+  background:linear-gradient(150deg, rgba(255,255,255,.14) 0%, rgba(255,255,255,.04) 22%, transparent 46%);
+}
+.card-head{
+  position:relative;z-index:1;display:flex;align-items:center;justify-content:space-between;
+  padding:16px 18px;border-bottom:1px solid rgba(245,240,235,.10);
+}
+.eyebrow{display:flex;align-items:center;gap:9px;font-family:'Oswald',sans-serif;
+  font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--dim)}
+.pulse{width:7px;height:7px;border-radius:50%;background:var(--lime);
+  box-shadow:0 0 10px var(--lime),0 0 22px rgba(194,255,61,.55)}
+.x{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;
+  color:var(--dimmer);border:0;background:transparent;cursor:pointer;transition:.18s var(--ease)}
+.x:hover{color:var(--bone);background:rgba(245,240,235,.10)}
+.card-body{position:relative;z-index:1;padding:20px 18px 22px;display:flex;flex-direction:column;gap:12px}
+
+/* ── glass field cards (no own blur — see note in :root) ────── */
+.field{
+  position:relative;border-radius:var(--r);padding:13px 15px;
+  background:var(--glass-field);
+  border:1px solid rgba(245,240,235,.10);
+  border-top-color:rgba(245,240,235,.15);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.09);
+  transition:background .22s var(--ease),border-color .22s var(--ease);
+}
+.field:hover{background:var(--glass-field-hi);border-color:rgba(245,240,235,.17)}
+.lab{display:block;font-family:'Oswald',sans-serif;font-size:10px;letter-spacing:.15em;
+  text-transform:uppercase;color:var(--dim);margin-bottom:8px}
+.req{color:var(--red-soft)}
+.inp{
+  width:100%;padding:11px 13px;border-radius:11px;
+  border:1px solid rgba(245,240,235,.10);
+  background:var(--well);
+  box-shadow:inset 0 1px 3px rgba(0,0,0,.35);
+  color:var(--bone);font:500 15px/1.3 'Poppins',sans-serif;outline:none;
+  transition:border-color .18s var(--ease),box-shadow .18s var(--ease),background .18s var(--ease);
+}
+.inp::placeholder{color:rgba(245,240,235,.38)}
+.inp:focus{border-color:rgba(255,45,54,.7);
+  box-shadow:inset 0 1px 3px rgba(0,0,0,.3), 0 0 0 3px rgba(255,45,54,.18)}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+
+/* Focused field: lifts to brighter glass + neon rail. */
+.field.is-focus{background:rgba(245,240,235,.10);border-color:rgba(255,45,54,.38)}
+.field.is-focus::after{
+  content:'';position:absolute;left:-1px;top:12px;bottom:12px;width:2px;border-radius:2px;
+  background:var(--red);box-shadow:0 0 12px var(--red),0 0 26px rgba(255,45,54,.6);
+}
+
+/* ── cover dropzone ─────────────────────────────────────────── */
+.cover{
+  position:relative;border-radius:var(--r);padding:32px 18px;text-align:center;
+  border:1px dashed rgba(245,240,235,.20);overflow:hidden;
+  background:radial-gradient(90% 130% at 50% 0%, rgba(255,45,54,.16), transparent 64%), var(--glass-field);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.08);
+  transition:border-color .22s var(--ease),background .22s var(--ease);cursor:pointer
+}
+.cover:hover{border-color:rgba(255,45,54,.55);background:radial-gradient(90% 130% at 50% 0%, rgba(255,45,54,.22), transparent 64%), var(--glass-field-hi)}
+.cover-ic{width:48px;height:48px;border-radius:15px;margin:0 auto 11px;display:grid;place-items:center;
+  background:rgba(245,240,235,.10);border:1px solid rgba(245,240,235,.16);color:var(--bone);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.18)}
+.cover-t{font-weight:600;font-size:15px;margin:0 0 3px}
+.cover-s{font-size:11.5px;color:var(--dimmer);margin:0}
+
+/* ── entry / segmented ──────────────────────────────────────── */
+.opt-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.opt-t{font-weight:600;font-size:15px}
+.seg{display:inline-flex;padding:3px;border-radius:11px;background:var(--well);
+  border:1px solid rgba(245,240,235,.10);box-shadow:inset 0 1px 3px rgba(0,0,0,.3)}
+.seg button{border:0;background:transparent;color:var(--dim);cursor:pointer;
+  padding:7px 15px;border-radius:8px;font:500 12.5px 'Poppins',sans-serif;transition:.18s var(--ease)}
+.seg button.on{background:var(--bone);color:#0B0A0A;font-weight:600;
+  box-shadow:0 1px 6px rgba(0,0,0,.4)}
+.divider{height:1px;background:rgba(245,240,235,.10);margin:14px 0}
+.muted-row{display:flex;align-items:center;justify-content:space-between}
+.pill{padding:8px 14px;border-radius:10px;background:var(--well);
+  border:1px solid rgba(245,240,235,.10);color:var(--dim);font-size:13px}
+
+/* ── primary CTA ────────────────────────────────────────────── */
+.cta{
+  position:relative;width:100%;height:54px;border:0;border-radius:14px;cursor:pointer;margin-top:6px;
+  background:linear-gradient(180deg,#FF3B44,#DD0F17);
+  color:#fff;font:600 15.5px 'Poppins',sans-serif;
+  box-shadow:0 10px 30px rgba(255,45,54,.40), inset 0 1px 0 rgba(255,255,255,.32);
+  transition:transform .18s var(--ease),box-shadow .18s var(--ease)
+}
+.cta:hover{transform:translateY(-1px);box-shadow:0 14px 38px rgba(255,45,54,.55), inset 0 1px 0 rgba(255,255,255,.34)}
+.foot{text-align:center;font-size:11.5px;color:var(--dimmer);margin:11px 0 0}
+
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="page">
+  <h1 class="doc-h">Create Event — Variant A, glassmorphism</h1>
+  <p class="doc-p">
+    Same fields and flow as today. Frosted card at blur(26px) + 150% saturate over a
+    genuinely vibrant ground — glass needs colour behind it or it reads as grey plastic.
+    Two blur layers only; the inner surfaces are plain translucency, which looks like
+    glass because the card behind them is already blurred, and costs nothing.
+  </p>
+
+  <div class="stage">
+    <div class="blob red"></div><div class="blob violet"></div>
+    <div class="blob lime"></div><div class="blob cyan"></div>
+    <div class="grain"></div>
+
+    <div class="card">
+      <div class="card-head">
+        <span class="eyebrow"><span class="pulse"></span> New event</span>
+        <button class="x" aria-label="Close">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <div class="card-body">
+        <div class="cover">
+          <div class="cover-ic">
+            <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>
+          </div>
+          <p class="cover-t">Add a cover image</p>
+          <p class="cover-s">Wide 16:9 — used on cards and WhatsApp previews</p>
+        </div>
+
+        <div class="field is-focus">
+          <span class="lab">Event name <span class="req">·</span></span>
+          <input class="inp" value="Monsoon Half Marathon" />
+        </div>
+
+        <div class="field">
+          <span class="lab">When <span class="req">·</span></span>
+          <div class="row">
+            <input class="inp" value="12/09/2026, 05:30" />
+            <input class="inp" placeholder="Ends (optional)" />
+          </div>
+        </div>
+
+        <div class="field">
+          <span class="lab">Meeting point</span>
+          <input class="inp" placeholder="Search a place, or type your own" />
+        </div>
+
+        <div class="field">
+          <span class="lab">Event description</span>
+          <textarea class="inp" rows="3" placeholder="Pace groups, what to bring, coffee after."></textarea>
+        </div>
+
+        <div class="field">
+          <div class="opt-head">
+            <span class="opt-t">Entry</span>
+            <span class="seg"><button>Free</button><button class="on">Paid</button></span>
+          </div>
+          <div class="divider"></div>
+          <div class="row">
+            <input class="inp" value="Half Marathon" />
+            <input class="inp" value="₹ 499" />
+          </div>
+          <div class="divider"></div>
+          <div class="muted-row"><span class="opt-t">Capacity</span><span class="pill">Unlimited</span></div>
+        </div>
+
+        <button class="cta">Create event</button>
+        <p class="foot">Only a name and a start time are needed. Everything else can wait.</p>
+      </div>
+    </div>
+  </div>
+
+  <p class="note">
+    <b>Glass recipe:</b> card is <b>blur(26px) saturate(150%)</b> over a 155° translucent
+    gradient (11% → 3.5%), border brighter on top than bottom to imply a light source,
+    plus a diagonal specular sweep and an inset top highlight. Inputs go the other way —
+    recessed wells with an inner shadow — so the eye reads card <i>above</i>, input
+    <i>below</i>. Grain overlay stops the big blurred gradients banding on dark screens.
+    <br><br>
+    <b>Deliberately only two blur layers.</b> Nesting backdrop-filter on every field would
+    cost real frames on mobile and mud the colour; the field cards are plain translucency
+    sitting on already-blurred glass, which is visually identical here.
+  </p>
+</div>
+</body>
+</html>

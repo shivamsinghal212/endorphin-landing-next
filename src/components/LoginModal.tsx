@@ -232,13 +232,27 @@ export default function LoginModal({
   return (
     <Dialog.Root open={open} onOpenChange={(o) => !o && !finalizing && onClose()}>
       <Dialog.Portal>
+        {/* backdrop-filter is set inline, not in globals.css: declared there
+            it gets stripped from the built stylesheet while the rest of the
+            rule survives (same as /create's glass card). Dropped while
+            finalizing, where the modal deliberately sheds its chrome to read
+            as a bare loader. */}
         <Dialog.Overlay
           className="v1lm-overlay"
           data-finalizing={finalizing ? '' : undefined}
+          style={finalizing ? undefined : { backdropFilter: 'blur(6px)', WebkitBackdropFilter: 'blur(6px)' }}
         />
         <Dialog.Content
           className="v1lm-modal"
           data-finalizing={finalizing ? '' : undefined}
+          style={
+            finalizing
+              ? undefined
+              : {
+                  backdropFilter: 'blur(26px) saturate(150%)',
+                  WebkitBackdropFilter: 'blur(26px) saturate(150%)',
+                }
+          }
           aria-describedby={undefined}
           // Prevent auto-focusing the first input on open. Default behavior
           // scrolls the page to bring the focused input into view, which
