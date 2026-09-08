@@ -2,6 +2,9 @@ import type { Metadata } from 'next';
 import ClubsExperiencesPage from '../clubs/clubs-experiences-page';
 import { API_BASE } from '@/lib/api';
 import { eventPath } from '@/lib/event-path';
+import { eventAttendance, safeEndDate } from '@/lib/event-schema';
+import { toRaceCardData } from '@/lib/race-card-data';
+import { extractCity } from '@/lib/cities';
 import { getSessionToken } from '@/lib/session';
 
 export const metadata: Metadata = {
@@ -36,6 +39,9 @@ export interface ApiEvent {
   priceMin?: number;
   currency?: string;
   eventType?: string;
+  // The authoritative virtual/in-person column. `eventType` is not — see
+  // lib/event-schema.ts.
+  eventFormat?: 'virtual' | 'in_person' | null;
   totalTicketsSold?: number | null;
   venueName?: string;
   soldOut?: boolean;
@@ -96,6 +102,7 @@ async function getRaces(token: string | null): Promise<ApiEvent[]> {
 
 function buildJsonLd(races: ApiEvent[]) {
   if (!races.length) return null;
+  const listed = races.slice(0, 30);
   return {
     '@context': 'https://schema.org',
     '@type': 'ItemList',
@@ -103,13 +110,17 @@ function buildJsonLd(races: ApiEvent[]) {
     description:
       'Every running event in India — marathons, half marathons, 10K and 5K events across 45+ cities',
     url: 'https://www.endorfin.run/running-events',
-    numberOfItems: races.length,
-    itemListElement: races.slice(0, 30).map((r, i) => {
+    // Must match the number of itemListElement entries actually emitted, not
+    // the size of the underlying set — declaring 243 while shipping 30
+    // misrepresents the list.
+    numberOfItems: listed.length,
+    itemListElement: listed.map((r, i) => {
       const locationLabel = r.locationName || 'India';
       const validFromAnchor = r.registrationEndDate || r.startTime;
       const validFrom = new Date(
         new Date(validFromAnchor).getTime() - 90 * 24 * 60 * 60 * 1000,
       ).toISOString();
+      const eventUrl = `https://www.endorfin.run${eventPath(r)}`;
       return {
         '@type': 'ListItem',
         position: i + 1,
@@ -117,21 +128,19 @@ function buildJsonLd(races: ApiEvent[]) {
           '@type': 'Event',
           name: r.title,
           startDate: r.startTime,
-          endDate: r.endTime || r.startTime,
+          endDate: safeEndDate(r.startTime, r.endTime),
           eventStatus: 'https://schema.org/EventScheduled',
-          eventAttendanceMode:
-            r.eventType === 'virtual'
-              ? 'https://schema.org/OnlineEventAttendanceMode'
-              : 'https://schema.org/OfflineEventAttendanceMode',
-          location: {
-            '@type': 'Place',
-            name: r.locationName || 'India',
-            address: {
-              '@type': 'PostalAddress',
-              addressLocality: r.locationName || undefined,
-              addressCountry: 'IN',
+          ...eventAttendance(
+            r,
+            {
+              name: r.locationName || 'India',
+              address: {
+                addressLocality: extractCity(r.locationName || '') || r.locationName || undefined,
+                addressCountry: 'IN',
+              },
             },
-          },
+            eventUrl,
+          ),
           description:
             r.description ||
             `${r.title} — a running event in ${locationLabel}. Register on Endorfin.`,
@@ -145,13 +154,13 @@ function buildJsonLd(races: ApiEvent[]) {
               availability: r.soldOut
                 ? 'https://schema.org/SoldOut'
                 : 'https://schema.org/InStock',
-              url: `https://www.endorfin.run${eventPath(r)}`,
+              url: eventUrl,
               validFrom,
               ...(r.registrationEndDate && { validThrough: r.registrationEndDate }),
             },
           }),
           ...(r.imageUrl && { image: r.imageUrl }),
-          url: `https://www.endorfin.run${eventPath(r)}`,
+          url: eventUrl,
         },
       };
     }),
@@ -192,7 +201,12 @@ export default async function RacesPage() {
           }}
         />
       )}
-      <ClubsExperiencesPage variant="running-events" races={races} />
+      {/* Projected, not the raw array: ClubsView is a client component, so
+          whatever is passed here is serialised into the flight payload for
+          every visitor. Handing it full ApiEvent objects made this document
+          3.8 MB, 84% of it fields nothing renders. buildJsonLd above keeps
+          the full objects — that runs on the server only. */}
+      <ClubsExperiencesPage variant="running-events" races={races.map(toRaceCardData)} />
     </>
   );
 }

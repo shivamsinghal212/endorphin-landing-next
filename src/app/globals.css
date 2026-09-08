@@ -3670,12 +3670,17 @@ body { padding-top: var(--nav-h, 68px); }
 .v1-clubs-page .v1c-exp-card[hidden] { display: none; }
 .v1-clubs-page .v1c-exp-media.is-landscape { aspect-ratio: 16 / 9; }
 .v1-clubs-page .v1c-exp-media.is-landscape img { object-fit: contain; }
-/* Blur backdrop, on only for this variant. A static CSS blur on a plain div
-   (never an SVG, never re-blurred per frame) — the scale hides the soft
-   edge the blur leaves at the bounds. */
-.v1-clubs-page .v1c-exp-media.is-landscape .v1c-exp-bg {
+/* Blur backdrop, on only for this variant. A static CSS blur (never an SVG,
+   never re-blurred per frame) — the scale hides the soft edge the blur
+   leaves at the bounds.
+
+   This is an <img loading="lazy">, not a background-image: backgrounds load
+   eagerly, which defeated lazy loading on the sharp copy. It therefore needs
+   object-fit: cover to beat the `.is-landscape img { object-fit: contain }`
+   above — hence `img.v1c-exp-bg`, which outranks it rather than tying. */
+.v1-clubs-page .v1c-exp-media.is-landscape img.v1c-exp-bg {
   display: block; position: absolute; inset: 0;
-  background-size: cover; background-position: center;
+  object-fit: cover; object-position: center;
   filter: blur(18px); transform: scale(1.15); opacity: 0.5;
 }
 .v1-clubs-page .v1c-exp-card:hover .v1c-exp-media { border-color: var(--exp-hair-2); transform: translateY(-4px); }

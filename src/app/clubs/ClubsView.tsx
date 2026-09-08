@@ -15,10 +15,11 @@ import { useClubOnboard } from '@/lib/use-club-onboard';
 import { ClaimClubModal } from './[slug]/claim-club-link';
 import { JoinClubModal } from './[slug]/join-club-modal';
 import type { MyClubClaim, MyClubMembership } from '@/lib/api';
-import type { ApiClub, ClubEvent } from './page';
+import type { ApiClub } from './page';
 import { useImgFallback } from '@/lib/img-fallback';
-import type { ApiEvent } from '@/app/running-events/page';
 import RaceCard from '@/components/RaceCard';
+import type { RaceCardData } from '@/lib/race-card-data';
+import type { FeaturedClubCardData } from '@/lib/clubs-featured';
 
 type Membership = MyClubMembership;
 type Claim = MyClubClaim;
@@ -151,7 +152,10 @@ const VerifiedTick = ({ className }: { className?: string }) => (
 // tags row, next-run with location + distance, CTAs). The featured 5
 // are fetched via the legacy /clubs/{slug} + /events endpoints in
 // page.tsx; the all-clubs grid below stays on the lean DiscoverHit.
-function pickNextEvent(events: ClubEvent[] | undefined): ClubEvent | null {
+// Generic over the event shape: it reads only startTime, so it works for
+// both full ClubEvent objects and the slim projection the featured card
+// receives.
+function pickNextEvent<T extends { startTime: string }>(events: T[] | undefined): T | null {
   if (!events || events.length === 0) return null;
   const now = Date.now();
   const future = events
@@ -169,7 +173,10 @@ function FlagshipCard({
   onJoin,
   isLcp = false,
 }: {
-  c: ApiClub;
+  // Slim projection, not ApiClub — see lib/clubs-featured.ts. The full
+  // object drags each club's scraped Instagram comment threads into the
+  // client payload for a card that shows a next-run line.
+  c: FeaturedClubCardData;
   membership: Membership | null;
   onJoin: (club: { name: string; slug: string }) => void;
   isLcp?: boolean;
@@ -700,7 +707,11 @@ function EventCard({ hit, clubLogo }: { hit: DiscoverHit; clubLogo?: string | nu
       <div className={`v1c-exp-media${mod}`}>
         {showImg ? (
           <>
-            <div className="v1c-exp-bg" style={{ backgroundImage: `url(${img})` }} aria-hidden />
+            {/* See RaceCard: an <img loading="lazy">, not a CSS background —
+                a background-image on a visible element loads eagerly and
+                defeated lazy loading on the sharp copy below. */}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img className="v1c-exp-bg" src={img!} alt="" loading="lazy" aria-hidden />
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={img!} alt={hit.title} loading="lazy" {...imgProps(img!)} />
           </>
@@ -825,7 +836,7 @@ function EventRail({
  * them from the tree, so every anchor stays in the served HTML whatever
  * chip is selected.
  */
-function AllRacesSection({ races }: { races: ApiEvent[] }) {
+function AllRacesSection({ races }: { races: RaceCardData[] }) {
   const [city, setCity] = useState<CityGroup | 'All'>('All');
 
   const counts = useMemo(() => {
@@ -1442,7 +1453,7 @@ export default function ClubsView({
   // surface runs_this_month / km_this_month / years_running / events[].
   // On the national /clubs page the events rails replace this strip; it
   // still renders on /run-clubs/[city] city pages.
-  featuredFull: ApiClub[];
+  featuredFull: FeaturedClubCardData[];
   cityFacets: { value: string; count: number }[];
   // Events-first rails — soonest-upcoming and this-weekend club events from
   // /discover/smart?kind=club_event.
@@ -1453,7 +1464,7 @@ export default function ClubsView({
   racesAround?: DiscoverHit[];
   /** Every upcoming race, for the full grid below the rails. The rails cap
    *  at 12; this is the crawl path to all the detail pages. */
-  allRaces?: ApiEvent[];
+  allRaces?: RaceCardData[];
   // National count of UPCOMING races, for the hero counter. 0 = hide it
   // (also the failure value) — never render an all-time total as "upcoming".
   upcomingRaces?: number;
@@ -1866,8 +1877,11 @@ export default function ClubsView({
                     <span className="v1c-h1-tail">in India</span>
                   </>
                 ) : (
+                  // "Experiences" was a retired route (it now 308s to
+                  // /running-events); the H1 targeted a term the product no
+                  // longer uses. This matches the page's own title tag.
                   <>
-                    Run <span className="accent">Clubs &amp; Experiences</span> in India
+                    Run <span className="accent">Clubs</span> in India
                   </>
                 )}
               </h1>

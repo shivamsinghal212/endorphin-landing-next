@@ -6,9 +6,10 @@ import { clubsApi, type MyClubClaim, type MyClubMembership } from '@/lib/api';
 import { getSessionEmail, getSessionToken } from '@/lib/session';
 import { getRequestGeo } from '@/lib/geo';
 import type { DiscoverHit } from '@/components/HeroSearchPanel';
-import type { ApiEvent } from '@/app/running-events/page';
-import { fetchFeaturedFull } from '@/lib/clubs-featured';
+import type { RaceCardData } from '@/lib/race-card-data';
+import { fetchFeaturedFull, toFeaturedCardData } from '@/lib/clubs-featured';
 import { eventPlaceJsonLd } from '@/lib/event-seo';
+import { safeEndDate } from '@/lib/event-schema';
 
 // Shared body for the two national directory routes — /clubs and
 // /running-events. Identical data + layout; `variant` decides rail order
@@ -233,20 +234,39 @@ function buildEventsJsonLd(events: DiscoverHit[]) {
       seen.add(e.id);
       return Boolean(eventHref(e) && e.startTime);
     })
-    .map((e, i) => ({
-      '@type': 'ListItem',
-      position: i + 1,
-      item: {
-        '@type': 'Event',
-        name: e.title,
-        startDate: e.startTime,
-        ...(e.endTime && { endDate: e.endTime }),
-        url: `${SITE}${eventHref(e)}`,
-        ...(e.imageUrl && { image: e.imageUrl }),
-        location: eventPlaceJsonLd({ locationName: e.locationName, city: e.city }),
-        ...(e.clubName && { organizer: { '@type': 'Organization', name: e.clubName } }),
-      },
-    }));
+    .map((e, i) => {
+      const url = `${SITE}${eventHref(e)}`;
+      return {
+        '@type': 'ListItem',
+        position: i + 1,
+        item: {
+          '@type': 'Event',
+          name: e.title,
+          startDate: e.startTime,
+          // Guarded like the race builders: some feeds carry an endTime that
+          // precedes the start, which Google's Event validator hard-fails.
+          endDate: safeEndDate(e.startTime!, e.endTime),
+          // These were absent on all 28 events in this list while the race
+          // ItemList on the same page set them — Google treats eventStatus
+          // and eventAttendanceMode as expected fields for Event results.
+          eventStatus: 'https://schema.org/EventScheduled',
+          eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
+          performer: { '@type': 'PerformingGroup', name: 'Club members' },
+          description:
+            e.description?.trim() ||
+            `${e.title} — a run club event${e.city ? ` in ${e.city}` : ''}${
+              e.clubName ? ` hosted by ${e.clubName}` : ''
+            }. RSVP on Endorfin.`,
+          url,
+          ...(e.imageUrl && { image: e.imageUrl }),
+          location: eventPlaceJsonLd({ locationName: e.locationName, city: e.city }),
+          organizer: {
+            '@type': 'Organization',
+            name: e.clubName || 'Endorfin',
+          },
+        },
+      };
+    });
   if (!items.length) return null;
   return {
     '@context': 'https://schema.org',
@@ -314,7 +334,7 @@ export default async function ClubsExperiencesPage({
   /** Every upcoming race, rendered as the closing grid on /running-events.
    *  Fetched by that route (it needs the same list for its Event JSON-LD,
    *  which wants price/currency fields the discover payload lacks). */
-  races?: ApiEvent[];
+  races?: RaceCardData[];
 }) {
   const token = await getSessionToken();
   // /running-events carries races alongside club events (in their own rail);
@@ -376,9 +396,12 @@ export default async function ClubsExperiencesPage({
       )}
       <Header />
       <div className="v1-clubs-page">
+        {/* featuredFull is projected: full ApiClub objects carry each club's
+            event history, including scraped Instagram comment threads that
+            nothing on this page renders. */}
         <ClubsView
           clubs={clubs}
-          featuredFull={featuredFull as ApiClub[]}
+          featuredFull={featuredFull.map(toFeaturedCardData)}
           cityFacets={cityFacets}
           eventsAround={eventsAround}
           racesAround={racesAround}

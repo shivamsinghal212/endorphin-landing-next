@@ -32,3 +32,73 @@ export async function fetchFeaturedFull(slugs: string[]): Promise<ApiClub[]> {
   );
   return results.filter((c): c is ApiClub => !!c && !!c.slug);
 }
+
+/**
+ * The only fields the featured/flagship card renders.
+ *
+ * ApiClub carries each club's full event history, and a club event carries
+ * `recap` (summary, photos, videos), `sponsorsSeen`, `secondaryActivities`
+ * and `topComments` — the last being scraped Instagram threads: usernames,
+ * verbatim comment text with @-mentions of third parties, like counts, and
+ * signed cdninstagram.com profile-photo URLs.
+ *
+ * FlagshipCard is inside a client component, so handing it whole ApiClub
+ * objects serialised all of that into the public HTML of /running-events and
+ * /clubs, on a page that renders none of it: 383 `userPictureUrl` values and
+ * 758 `cdninstagram` references, ~206 KB, for five featured clubs.
+ */
+export interface FeaturedClubCardData {
+  slug: string;
+  name: string;
+  subtitle?: string | null;
+  city?: string | null;
+  logoUrl?: string | null;
+  headerImageUrl?: string | null;
+  isVerified?: boolean | null;
+  establishedYear?: number | null;
+  tags?: string[] | null;
+  stats?: {
+    members?: number | null;
+    runsThisMonth?: number | null;
+    kmThisMonth?: number | null;
+    yearsRunning?: number | null;
+  } | null;
+  /** Trimmed to what pickNextEvent() and the next-run footer read. */
+  events?: Array<{
+    startTime: string;
+    title?: string | null;
+    locationName?: string | null;
+    distanceKm?: number | null;
+    goingCount?: number | null;
+  }>;
+}
+
+/** Narrow full club payloads down to what the featured card renders. */
+export function toFeaturedCardData(c: ApiClub): FeaturedClubCardData {
+  return {
+    slug: c.slug,
+    name: c.name,
+    subtitle: c.subtitle,
+    city: c.city,
+    logoUrl: c.logoUrl,
+    headerImageUrl: c.headerImageUrl,
+    isVerified: c.isVerified,
+    establishedYear: c.establishedYear,
+    tags: c.tags,
+    stats: c.stats
+      ? {
+          members: c.stats.members,
+          runsThisMonth: c.stats.runsThisMonth,
+          kmThisMonth: c.stats.kmThisMonth,
+          yearsRunning: c.stats.yearsRunning,
+        }
+      : null,
+    events: (c.events ?? []).map((e) => ({
+      startTime: e.startTime,
+      title: e.title,
+      locationName: e.locationName,
+      distanceKm: e.distanceKm,
+      goingCount: e.goingCount,
+    })),
+  };
+}

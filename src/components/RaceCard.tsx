@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import type { ApiEvent } from '@/app/running-events/page';
+import type { RaceCardData } from '@/lib/race-card-data';
 import { eventPath } from '@/lib/event-path';
 import { useImgFallback } from '@/lib/img-fallback';
 
@@ -41,7 +41,7 @@ const RunIcon = () => (
 );
 
 /** Shortest honest distance label from the race's categories. */
-function distanceLabel(r: ApiEvent): string | null {
+function distanceLabel(r: RaceCardData): string | null {
   const cats = (r.distanceCategories ?? [])
     .map((c) => (c.categoryName || '').trim())
     .filter(Boolean);
@@ -52,7 +52,7 @@ function distanceLabel(r: ApiEvent): string | null {
   return cats[0];
 }
 
-export default function RaceCard({ r, hidden = false }: { r: ApiEvent; hidden?: boolean }) {
+export default function RaceCard({ r, hidden = false }: { r: RaceCardData; hidden?: boolean }) {
   const { isFailed, imgProps } = useImgFallback();
   const img = r.imageUrl;
   const showImg = Boolean(img) && !isFailed(img!);
@@ -70,11 +70,16 @@ export default function RaceCard({ r, hidden = false }: { r: ApiEvent; hidden?: 
       <div className="v1c-exp-media is-landscape">
         {showImg ? (
           <>
-            <div
-              className="v1c-exp-bg"
-              style={{ backgroundImage: `url(${img})` }}
-              aria-hidden
-            />
+            {/* Blurred backdrop that fills the letterbox bars behind a
+                landscape cover (the sharp copy below is object-fit: contain).
+                An <img loading="lazy">, NOT a CSS background-image: a
+                background on a visible element is fetched eagerly, which
+                silently defeated loading="lazy" on the sharp copy and made
+                every one of the ~243 covers on /running-events download at
+                once — 166 MB, 35s mobile LCP. Same src, so the browser still
+                issues a single request. */}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img className="v1c-exp-bg" src={img!} alt="" loading="lazy" aria-hidden />
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={img!} alt={r.title} loading="lazy" {...imgProps(img!)} />
           </>
