@@ -71,10 +71,10 @@ function SkeletonClubsRail() {
   );
 }
 
-const NAV = [
-  { label: 'Running Events', key: 'running-events' },
-  { label: 'Experiences', key: 'experiences' },
-] as const;
+// Mirrors HeaderClient's nav, which collapsed to a single primary entry when
+// /experiences was retired. The skeleton kept advertising "Experiences" — a
+// nav link to a route that now 308s away.
+const NAV = [{ label: 'Running Events', key: 'running-events' }] as const;
 
 export default function ClubsExperiencesSkeleton({
   active,
@@ -103,11 +103,11 @@ export default function ClubsExperiencesSkeleton({
             endorfin
           </span>
           <ul className="v1-nav-links">
+            {/* No is-current here: this skeleton only ever renders for
+                /clubs, so the current item is the "Clubs" trigger below. */}
             {NAV.map((l) => (
               <li key={l.key}>
-                <span className={`is-primary${l.key === active ? ' is-current' : ''}`}>
-                  {l.label}
-                </span>
+                <span className="is-primary">{l.label}</span>
               </li>
             ))}
             <li className="v1-nav-sub-wrap">
@@ -139,9 +139,14 @@ export default function ClubsExperiencesSkeleton({
               <span className="v1-hero-kicker">Run clubs &amp; events · India</span>
               <span className="v1c-sk v1c-sk-meta" />
             </div>
-            <h1 className="v1c-search-h1">
-              Run <span className="accent">Clubs &amp; Experiences</span> in India
-            </h1>
+            {/* Deliberately a <div>, not an <h1>. Streaming ships both this
+                skeleton and the resolved page in one HTML response, so an
+                <h1> here gave raw-HTML consumers (AI crawlers, social
+                scrapers) two <h1>s on /clubs. Styled identically, so there
+                is no visual change on commit. */}
+            <div className="v1c-search-h1">
+              Run <span className="accent">Clubs</span> in India
+            </div>
           </div>
         </section>
 
