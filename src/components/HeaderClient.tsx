@@ -311,9 +311,15 @@ const HeaderClient = ({
               </button>
               <ul className="v1-nav-sub v1-nav-sub-end" role="menu">
                 {/* The icon says nothing about who you are, so the menu
-                    opens by naming the account it belongs to. */}
+                    opens by naming the account it belongs to. Two lines: the
+                    caption is the label, the name is the content — one line
+                    in label styling read as a section heading, not an
+                    identity. */}
                 <li className="v1-nav-sub-user" role="presentation">
-                  {userName?.trim() || 'Signed in'}
+                  <span className="v1-nav-sub-user-label">Signed in as</span>
+                  <span className="v1-nav-sub-user-name">
+                    {userName?.trim() || 'your account'}
+                  </span>
                 </li>
                 {ACCOUNT_LINKS.map((l) => (
                   <li key={l.href} role="none">
