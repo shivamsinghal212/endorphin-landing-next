@@ -6,6 +6,8 @@ import { eventsApi, remindersApi, ApiError, type Event, type Reminder } from '@/
 import { getSessionToken } from '@/lib/session';
 import { getStudioAuth } from '@/lib/studio/server-auth';
 import { eventPath } from '@/lib/event-path';
+import { eventAttendance, safeEndDate } from '@/lib/event-schema';
+import { extractCity } from '@/lib/cities';
 import { RunnerProviders } from './register/_components/runner-providers';
 import ExperienceDetailView from './ExperienceDetailView';
 import './experience-detail.css';
@@ -132,19 +134,22 @@ function buildJsonLd(event: Event) {
     '@type': 'Event',
     name: event.title,
     startDate: event.startTime,
-    endDate: event.endTime || event.startTime,
+    endDate: safeEndDate(event.startTime, event.endTime),
     eventStatus: 'https://schema.org/EventScheduled',
-    eventAttendanceMode:
-      event.eventType === 'virtual'
-        ? 'https://schema.org/OnlineEventAttendanceMode'
-        : 'https://schema.org/OfflineEventAttendanceMode',
-    location: {
-      '@type': 'Place',
-      name: event.venueName || event.locationName || 'India',
-      address: event.locationAddress
-        ? { '@type': 'PostalAddress', streetAddress: event.locationAddress, addressCountry: 'IN' }
-        : { '@type': 'PostalAddress', addressLocality: event.locationName || undefined, addressCountry: 'IN' },
-    },
+    // Was `event.eventType === 'virtual'` — the wrong column. This page is
+    // where the bug was actually visible: the Great Himalaya Day virtual
+    // marathon shipped OfflineEventAttendanceMode with "Virtual · run
+    // anywhere" as a PostalAddress.addressLocality.
+    ...eventAttendance(
+      event,
+      {
+        name: event.venueName || event.locationName || 'India',
+        address: event.locationAddress
+          ? { streetAddress: event.locationAddress, addressLocality: extractCity(event.locationName || '') || undefined, addressCountry: 'IN' }
+          : { addressLocality: extractCity(event.locationName || '') || event.locationName || undefined, addressCountry: 'IN' },
+      },
+      `https://www.endorfin.run${eventPath(event)}`,
+    ),
     image: event.coverImageUrl || event.imageUrl || undefined,
     description,
     organizer: { '@type': 'Organization', name: organizerName },

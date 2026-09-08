@@ -6,6 +6,8 @@ import Footer from '@/components/Footer';
 import { API_BASE } from '@/lib/api';
 import type { ApiEvent } from '@/app/running-events/page';
 import RaceCard from '@/components/RaceCard';
+import { eventAttendance, safeEndDate } from '@/lib/event-schema';
+import { toRaceCardData } from '@/lib/race-card-data';
 import {
   RACE_CITY_PAGES,
   RACE_SCOPES,
@@ -130,12 +132,13 @@ function buildJsonLd(
     name: `${meta.noun} in ${cityPage.name}`,
     description: buildDescription(scope, cityPage.name),
     url,
-    numberOfItems: races.length,
+    numberOfItems: Math.min(races.length, 30),
     itemListElement: races.slice(0, 30).map((r, i) => {
       const validFromAnchor = r.registrationEndDate || r.startTime;
       const validFrom = new Date(
         new Date(validFromAnchor).getTime() - 90 * 24 * 60 * 60 * 1000,
       ).toISOString();
+      const eventUrl = `${SITE}/running-events/${r.slug || r.id}`;
       return {
         '@type': 'ListItem',
         position: i + 1,
@@ -143,19 +146,25 @@ function buildJsonLd(
           '@type': 'Event',
           name: r.title,
           startDate: r.startTime,
-          endDate: r.endTime || r.startTime,
+          endDate: safeEndDate(r.startTime, r.endTime),
           eventStatus: 'https://schema.org/EventScheduled',
-          eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
-          location: {
-            '@type': 'Place',
-            name: r.locationName || cityPage.name,
-            address: {
-              '@type': 'PostalAddress',
-              addressLocality: cityPage.name,
-              addressRegion: cityPage.region,
-              addressCountry: 'IN',
+          // Was a hardcoded Offline literal with no conditional — harmless
+          // only because the API list feed happens to exclude virtual events
+          // today. One virtual event reaching a lander would have been
+          // mislabelled, so route it through the shared helper like the
+          // other two builders.
+          ...eventAttendance(
+            r,
+            {
+              name: r.locationName || cityPage.name,
+              address: {
+                addressLocality: cityPage.name,
+                addressRegion: cityPage.region,
+                addressCountry: 'IN',
+              },
             },
-          },
+            eventUrl,
+          ),
           description:
             r.description ||
             `${r.title} — a running event in ${cityPage.name}. Register on Endorfin.`,
@@ -169,13 +178,13 @@ function buildJsonLd(
               availability: r.soldOut
                 ? 'https://schema.org/SoldOut'
                 : 'https://schema.org/InStock',
-              url: `${SITE}/running-events/${r.slug || r.id}`,
+              url: eventUrl,
               validFrom,
               ...(r.registrationEndDate && { validThrough: r.registrationEndDate }),
             },
           }),
           ...(r.imageUrl && { image: r.imageUrl }),
-          url: `${SITE}/running-events/${r.slug || r.id}`,
+          url: eventUrl,
         },
       };
     }),
@@ -326,9 +335,13 @@ export default async function RaceCityScopePage({ params }: RouteParams) {
                 </div>
                 {/* Grid, not the hub's scroller: on a lander this list IS the
                     page, so it gets the full-width treatment. */}
+                {/* toRaceCardData: RaceCard is a client component, so the
+                    raw ApiEvent would serialise ~30 full events (including
+                    descriptions and scraped Instagram comment threads) into
+                    this lander's flight payload. */}
                 <div className="v1c-exp-grid">
                   {races.map((r) => (
-                    <RaceCard key={r.id} r={r} />
+                    <RaceCard key={r.id} r={toRaceCardData(r)} />
                   ))}
                 </div>
               </section>
