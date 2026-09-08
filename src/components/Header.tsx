@@ -1,51 +1,50 @@
-import {
-  claimsFromToken,
-  getSessionToken,
-  hasNextAuthCookie,
-  isJwtExpired,
-} from '@/lib/session';
-import { auth } from '@/lib/auth';
+import { getSessionToken, hasNextAuthCookie, isJwtExpired } from '@/lib/session';
+import { getRealStudioAuth } from '@/lib/studio/server-auth';
 import HeaderClient from './HeaderClient';
 
-/** Whether this visitor is signed in, resolved the same way the rest of the
- *  app resolves it (`getRealStudioAuth`): the marketing cookie first, then
- *  NextAuth's stored backend token.
+/**
+ * Whether this visitor is signed in, and who they are.
  *
- *  The header used to read the cookie alone. Anyone holding only a NextAuth
- *  session — a Google sign-in through /admin — got a signed-out header while
- *  every token-reading surface treated them as signed in, so /create showed
- *  the host picker to someone the nav was offering "Sign in" to. Expired
- *  tokens counted as signed in too.
+ * Resolved through `getRealStudioAuth()` — the same helper every gated page
+ * uses — so the nav and the pages can never disagree. They used to: the
+ * header decoded the JWT locally while /me/registrations and the register
+ * flow pre-checked the `endorfin_session` cookie alone, so a Google
+ * (NextAuth) sign-in got a signed-in header and an immediate bounce to the
+ * login modal on click.
  *
- *  Deliberately not `getStudioAuth()`: that can hit /users/me, and this
- *  renders on every public page. Both reads here are local — a cookie and a
- *  JWT decode — and `auth()` is skipped entirely unless its cookie is
- *  actually there, which is also what keeps it out of static prerenders.
+ * The local decode also could not name the user: most backend-issued JWTs
+ * carry only `sub` + `exp`, so the account menu always read "Signed in".
+ * getRealStudioAuth falls back to /users/me for that, which `fetchMe`
+ * caches per token for 60s.
+ *
+ * The cheap guard below is what keeps this off the anonymous path — the
+ * overwhelming majority of traffic, and all crawler traffic. With no session
+ * cookie of either kind we return immediately, having made no API call.
  */
-async function resolveSessionToken(): Promise<string | null> {
+async function resolveIdentity(): Promise<{ isAuthed: boolean; userName: string | null }> {
   const cookieToken = await getSessionToken();
-  if (cookieToken && !isJwtExpired(cookieToken)) return cookieToken;
-
-  if (!(await hasNextAuthCookie())) return null;
-  try {
-    const session = await auth();
-    const backendToken =
-      (session as unknown as { backendToken?: string } | null)?.backendToken ??
-      null;
-    if (backendToken && !isJwtExpired(backendToken)) return backendToken;
-  } catch {
-    // No request context (static render) — the cookie is the only answer.
+  if (!cookieToken && !(await hasNextAuthCookie())) {
+    return { isAuthed: false, userName: null };
   }
-  return null;
+
+  const auth = await getRealStudioAuth();
+  if (auth) {
+    // authFromToken already falls back to the email's local part, then 'You',
+    // so `name` is non-empty whenever we got this far.
+    return { isAuthed: true, userName: auth.name || auth.email || null };
+  }
+
+  // getRealStudioAuth also returns null when /users/me is unreachable, not
+  // just when the session is bad. Falling straight through to signed-out
+  // would sign the whole site out visually during a backend blip, so trust a
+  // locally-valid JWT for the nav state and just go without the name.
+  if (cookieToken && !isJwtExpired(cookieToken)) {
+    return { isAuthed: true, userName: null };
+  }
+  return { isAuthed: false, userName: null };
 }
 
 export default async function Header() {
-  const token = await resolveSessionToken();
-  // Decode the JWT locally for the account menu's initial.
-  const claims = token ? claimsFromToken(token) : null;
-  const userName =
-    (claims?.name as string | undefined) ||
-    (claims?.email as string | undefined) ||
-    null;
-  return <HeaderClient isAuthed={!!token} userName={userName} />;
+  const { isAuthed, userName } = await resolveIdentity();
+  return <HeaderClient isAuthed={isAuthed} userName={userName} />;
 }

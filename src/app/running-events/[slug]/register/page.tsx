@@ -4,7 +4,6 @@ import Link from 'next/link';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { eventsApi, ApiError, type Event } from '@/lib/api';
-import { getSessionToken } from '@/lib/session';
 import { getStudioAuth } from '@/lib/studio/server-auth';
 import type { OrganiserEvent, RegistrationFormField } from '@/lib/organiser-api';
 import { RegistrationForm } from './_components/registration-form';
@@ -52,20 +51,19 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function RegisterPage({ params }: PageProps) {
   const { slug } = await params;
-  const token = await getSessionToken();
-  if (!token) {
+  // Single source of truth for "am I signed in": getStudioAuth() resolves the
+  // marketing cookie AND, failing that, a NextAuth (Google) session. A prior
+  // `getSessionToken()` pre-check here read the cookie ALONE, so anyone signed
+  // in through Google got bounced to the login modal by this page while the
+  // header — which does resolve both — showed them as signed in.
+  const studio = await getStudioAuth();
+  if (!studio) {
     // The marketing-site login modal returns the user here post-auth.
     const next = encodeURIComponent(`/running-events/${slug}/register`);
     redirect(`/?login=1&next=${next}`);
   }
 
-  const studio = await getStudioAuth();
-  if (!studio) {
-    const next = encodeURIComponent(`/running-events/${slug}/register`);
-    redirect(`/?login=1&next=${next}`);
-  }
-
-  const event = await loadEvent(slug, token);
+  const event = await loadEvent(slug, studio.token);
   if (!event) notFound();
 
   // Only Endorfin-hosted (organizer-owned) events run through our checkout.
