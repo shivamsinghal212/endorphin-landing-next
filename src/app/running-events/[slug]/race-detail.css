@@ -13,7 +13,7 @@
   --v1rd-hairline: rgba(10, 10, 10, 0.12);
   --v1rd-hairline-strong: rgba(10, 10, 10, 0.24);
   --v1rd-container-max: 840px;
-  --v1rd-gutter: max(20px, calc((100% - var(--v1rd-container-max)) / 2));
+  --v1rd-gutter: max(var(--gutter), calc((100% - var(--v1rd-container-max)) / 2));
 
   background: var(--v1rd-bone);
   color: var(--v1rd-jet);

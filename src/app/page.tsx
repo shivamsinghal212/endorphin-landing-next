@@ -3,6 +3,8 @@ import HeroSearch from '@/components/HeroSearch';
 import HomeStreak from '@/components/HomeStreak';
 import HomePillars, { type FeaturedEvent, type FeaturedClub } from '@/components/HomePillars';
 import ForClubsBand from '@/components/ForClubsBand';
+import TalkCoverBand from '@/components/TalkCoverBand';
+import { fetchTalkPosts, pickCover } from '@/lib/talk';
 import CTASection from '@/components/CTASection';
 import Footer from '@/components/Footer';
 
@@ -197,10 +199,11 @@ function buildEventsJsonLd(events: ApiEvent[]) {
 }
 
 export default async function Home() {
-  const [events, clubs, heroStats] = await Promise.all([
+  const [events, clubs, heroStats, talkPosts] = await Promise.all([
     getUpcomingEvents(),
     getFeaturedClubs(),
     getHeroStats(),
+    fetchTalkPosts(),
   ]);
   const eventsJsonLd = buildEventsJsonLd(events);
   const featuredEvent = events[0] ? deriveEvent(events[0]) : null;
@@ -219,6 +222,7 @@ export default async function Home() {
         <HomeStreak />
         <HeroSearch stats={heroStats} />
         <HomePillars event={featuredEvent} club={featuredClub} />
+        <TalkCoverBand post={pickCover(talkPosts)} />
         <ForClubsBand />
         <CTASection />
       </div>

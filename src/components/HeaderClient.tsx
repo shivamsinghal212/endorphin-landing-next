@@ -7,12 +7,13 @@ import LoginModal from '@/components/LoginModal';
 import { logoutAction } from '@/app/actions/auth';
 import { useStoreLink } from '@/lib/use-store-link';
 
-// Top-level links rendered as-is. "Clubs" is special — it's a hover/tap
-// dropdown (see CLUBS_SUBLINKS) rather than a direct link.
+// Top-level links rendered as-is, after "Run Clubs" — which is special: a
+// hover/tap dropdown (see CLUBS_SUBLINKS) rather than a direct link.
 const NAV_LINKS = [
   // One entry: /experiences merged into /running-events, which now lists
   // races, club events and clubs together.
   { label: 'Running Events', href: '/running-events', soon: false, primary: true },
+  { label: "Runners' Talk", href: '/runners-talk', soon: false, primary: true },
 ];
 
 // The "Clubs" dropdown. Both club surfaces live here now.
@@ -201,6 +202,30 @@ const HeaderClient = ({
         </Link>
 
         <ul className="v1-nav-links">
+          {/* Run Clubs — first, hover dropdown on desktop, tap-to-expand on mobile. */}
+          <li ref={subRef} className={`v1-nav-sub-wrap ${subOpen ? 'is-sub-open' : ''}`}>
+            <button
+              type="button"
+              className={`v1-nav-sub-trigger is-primary ${clubsActive ? 'is-current' : ''}`}
+              aria-haspopup="true"
+              aria-expanded={subOpen}
+              aria-current={clubsActive ? 'page' : undefined}
+              onClick={() => setSubOpen((v) => !v)}
+            >
+              Run Clubs
+              <ChevronIcon />
+            </button>
+            <ul className="v1-nav-sub" role="menu">
+              {CLUBS_SUBLINKS.map((s) => (
+                <li key={s.href} role="none">
+                  <Link href={s.href} role="menuitem" onClick={closeMenu}>
+                    {s.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </li>
+
           {NAV_LINKS.map((l) => {
             const active = isLinkActive(pathname, l.href);
             const cls = [
@@ -221,30 +246,6 @@ const HeaderClient = ({
               </li>
             );
           })}
-
-          {/* Clubs — hover dropdown on desktop, tap-to-expand on mobile. */}
-          <li ref={subRef} className={`v1-nav-sub-wrap ${subOpen ? 'is-sub-open' : ''}`}>
-            <button
-              type="button"
-              className={`v1-nav-sub-trigger is-primary ${clubsActive ? 'is-current' : ''}`}
-              aria-haspopup="true"
-              aria-expanded={subOpen}
-              aria-current={clubsActive ? 'page' : undefined}
-              onClick={() => setSubOpen((v) => !v)}
-            >
-              Clubs
-              <ChevronIcon />
-            </button>
-            <ul className="v1-nav-sub" role="menu">
-              {CLUBS_SUBLINKS.map((s) => (
-                <li key={s.href} role="none">
-                  <Link href={s.href} role="menuitem" onClick={closeMenu}>
-                    {s.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </li>
 
           {/* One primary action. `/create` works signed out — the sign-in
               gate is at the moment they commit the event, not here.

@@ -10,10 +10,11 @@ import {
 } from '@/lib/admin-api';
 import {
   MessageSquare, Image as ImageIcon, Trash2, RefreshCw,
-  ChevronLeft, ChevronRight, Tent,
+  ChevronLeft, ChevronRight, Tent, Newspaper,
 } from 'lucide-react';
+import { TalkNotesPanel } from './talk-notes-panel';
 
-type Tab = 'messages' | 'photos' | 'community';
+type Tab = 'messages' | 'photos' | 'community' | 'talk';
 
 export function ModerationContent() {
   const token = useAdminToken();
@@ -75,7 +76,8 @@ export function ModerationContent() {
   useEffect(() => {
     if (tab === 'messages') fetchMessages();
     else if (tab === 'photos') fetchPhotos();
-    else fetchCommunity();
+    else if (tab === 'community') fetchCommunity();
+    else setLoading(false);
   }, [tab, fetchMessages, fetchPhotos, fetchCommunity]);
 
   const handleDeleteMessage = async (id: string) => {
@@ -100,6 +102,7 @@ export function ModerationContent() {
           { key: 'messages' as Tab, label: 'Messages', icon: MessageSquare },
           { key: 'photos' as Tab, label: 'Photos', icon: ImageIcon },
           { key: 'community' as Tab, label: 'Community Events', icon: Tent },
+          { key: 'talk' as Tab, label: "Talk notes", icon: Newspaper },
         ].map(({ key, label, icon: Icon }) => (
           <button
             key={key}
@@ -114,7 +117,9 @@ export function ModerationContent() {
         ))}
       </div>
 
-      {loading ? (
+      {tab === 'talk' ? (
+        <TalkNotesPanel token={token} />
+      ) : loading ? (
         <div className="flex items-center justify-center h-40">
           <RefreshCw className="w-5 h-5 animate-spin text-jet/30" />
         </div>

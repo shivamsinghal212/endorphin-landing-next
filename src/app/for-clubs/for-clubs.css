@@ -37,7 +37,7 @@
 }
 .fcx *, .fcx *::before, .fcx *::after { box-sizing: border-box; }
 
-.fcx .wrap { max-width: 1140px; margin: 0 auto; padding: 0 24px; position: relative; }
+.fcx .wrap { max-width: 1140px; margin: 0 auto; padding: 0 var(--gutter); position: relative; }
 .fcx section { position: relative; padding: 110px 0; }
 @media (max-width: 720px) { .fcx section { padding: 72px 0; } }
 

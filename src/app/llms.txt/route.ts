@@ -12,6 +12,7 @@ import {
 } from '@/lib/club-city-pages';
 import { fetchAllClubsList } from '@/lib/clubs-list';
 import { fetchAllRaces } from '@/lib/races-list';
+import { TALK_NAME, TALK_PATH, fetchTalkPosts, talkUrl } from '@/lib/talk';
 
 /**
  * /llms.txt — the map handed to AI crawlers.
@@ -35,9 +36,10 @@ export const revalidate = 3600;
 type ListedClub = { slug: string; name: string; city: string; publishedAt?: string | null };
 
 export async function GET() {
-  const [races, allClubs] = await Promise.all([
+  const [races, allClubs, talkPosts] = await Promise.all([
     fetchAllRaces(3600),
     fetchAllClubsList<ListedClub>(3600),
+    fetchTalkPosts(),
   ]);
   const clubs = allClubs.filter((c) => c.publishedAt);
 
@@ -60,6 +62,16 @@ export async function GET() {
   push(`- [Privacy Policy](${SITE}/privacy) — Data handling and DPDPA 2023 compliance`);
   push(`- [Terms of Service](${SITE}/terms) — Usage terms for the Endorfin platform`);
   push(`- [Support](${SITE}/support) — Help and frequently asked questions`);
+  push(`- [${TALK_NAME}](${SITE}${TALK_PATH}) — Injury, training and strength advice for runners from physios and coaches`);
+
+  if (talkPosts.length) {
+    push();
+    push(`## ${TALK_NAME}`);
+    push();
+    for (const p of talkPosts) {
+      push(`- [${p.title}](${SITE}${talkUrl(p.slug)}) — ${p.dek ? `${p.dek}. ` : ''}By ${p.authorName}`);
+    }
+  }
 
   // Race landers, grouped by scope. Only pages that pass the same quality
   // gate the route enforces, so nothing here can 404.

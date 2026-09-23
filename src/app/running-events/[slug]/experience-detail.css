@@ -37,7 +37,7 @@
 }
 .exd *, .exd *::before, .exd *::after { box-sizing: border-box; }
 
-.exd .exd-wrap { max-width: 980px; margin: 0 auto; padding: 0 24px; position: relative; z-index: 1; }
+.exd .exd-wrap { max-width: 980px; margin: 0 auto; padding: 0 var(--gutter); position: relative; z-index: 1; }
 .exd .exd-section { position: relative; padding: 64px 0; }
 @media (max-width: 720px) { .exd .exd-section { padding: 44px 0; } }
 

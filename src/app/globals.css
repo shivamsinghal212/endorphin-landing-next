@@ -30,6 +30,11 @@
 
 @layer base {
   :root {
+    /* Side gutter for every page frame: 28px on phones, ~56px at 1000px,
+       capped at 96px on wide screens. .container and the hand-rolled
+       wrappers (footer, CTA, crossnav, for-clubs) all read it. */
+    --gutter: clamp(28px, 6vw - 4px, 96px);
+    --container-px: var(--gutter);
     --jet: #0A0A0A;
     --signal: #E6232A;
     --bone: #F5F0EB;
@@ -1885,7 +1890,7 @@ body.nav-open { overflow: hidden; }
 
 /* ─── Meet Kip (phone mockup section) ─── */
 .v1-kip { background: var(--jet); color: var(--bone); padding: 50px 0; position: relative; overflow: hidden; }
-.v1-kip-grid { display: grid; grid-template-columns: 1.2fr 1fr; gap: 64px; align-items: center; max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+.v1-kip-grid { display: grid; grid-template-columns: 1.2fr 1fr; gap: 64px; align-items: center; max-width: 1200px; margin: 0 auto; padding: 0 var(--gutter); }
 .v1-kip-kicker { color: var(--red); font-family: var(--font-oswald), sans-serif; font-weight: 600; font-size: 12px; letter-spacing: 0.24em; text-transform: uppercase; margin-bottom: 18px; }
 .v1-kip-title { font-family: var(--font-fraunces), serif; font-style: italic; font-weight: 700; font-size: 72px; line-height: 1; letter-spacing: -0.02em; color: var(--bone); margin: 0 0 24px; }
 .v1-kip-title .accent { color: var(--red); }
@@ -2083,7 +2088,7 @@ body.nav-open { overflow: hidden; }
 
 /* ─── CTA Footer ─── */
 .v1-cta-footer { background: var(--bone); color: var(--jet); padding: 50px 0; }
-.v1-cta-grid { display: grid; grid-template-columns: 1.2fr 1fr; gap: 64px; align-items: center; max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+.v1-cta-grid { display: grid; grid-template-columns: 1.2fr 1fr; gap: 64px; align-items: center; max-width: 1200px; margin: 0 auto; padding: 0 var(--gutter); }
 .v1-cta-heading { font-family: var(--font-fraunces), serif; font-style: italic; font-weight: 700; font-size: 64px; line-height: 1; letter-spacing: -0.02em; color: var(--jet); margin: 0 0 16px; }
 .v1-cta-heading .dash { color: var(--red); }
 .v1-cta-sub { color: rgba(10,10,10,0.7); font-size: 17px; line-height: 1.55; max-width: 48ch; margin: 0; }
@@ -2098,13 +2103,13 @@ body.nav-open { overflow: hidden; }
 
 /* ─── Site Footer ─── */
 .v1-footer { background: var(--jet); color: var(--bone); padding: 80px 0 40px; }
-.v1-footer-top { display: grid; grid-template-columns: 1fr repeat(3, auto); gap: 56px; padding: 0 24px 40px; border-bottom: 0.5px solid rgba(245, 240, 235, 0.12); margin-bottom: 28px; max-width: 1200px; margin-left: auto; margin-right: auto; }
+.v1-footer-top { display: grid; grid-template-columns: 1fr repeat(3, auto); gap: 56px; padding: 0 var(--gutter) 40px; border-bottom: 0.5px solid rgba(245, 240, 235, 0.12); margin-bottom: 28px; max-width: 1200px; margin-left: auto; margin-right: auto; }
 .v1-footer-brand-sub { margin-top: 12px; color: rgba(245, 240, 235, 0.55); font-size: 13px; max-width: 42ch; line-height: 1.55; }
 .v1-footer-col-title { font-family: var(--font-oswald), sans-serif; font-weight: 600; font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase; color: rgba(245, 240, 235, 0.55); margin-bottom: 18px; }
 .v1-footer-links { list-style: none; display: flex; flex-direction: column; gap: 10px; padding: 0; margin: 0; }
 .v1-footer-links a { font-family: var(--font-oswald), sans-serif; font-weight: 500; font-size: 13px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--bone); transition: color 160ms ease-out; }
 .v1-footer-links a:hover { color: var(--red); }
-.v1-footer-bottom { padding: 0 24px; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; font-family: var(--font-oswald), sans-serif; font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(245, 240, 235, 0.45); max-width: 1200px; margin: 0 auto; }
+.v1-footer-bottom { padding: 0 var(--gutter); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; font-family: var(--font-oswald), sans-serif; font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(245, 240, 235, 0.45); max-width: 1200px; margin: 0 auto; }
 .v1-footer-bottom-right { display: inline-flex; align-items: center; gap: 12px; }
 .v1-footer-bottom-right a { display: inline-flex; align-items: center; gap: 6px; color: rgba(245, 240, 235, 0.65); transition: color 160ms ease-out; }
 .v1-footer-bottom-right a:hover { color: var(--bone); }
@@ -2126,7 +2131,7 @@ body.nav-open { overflow: hidden; }
 .v1-races-page .v1r-seo-links + .v1r-seo-links { padding-top: 8px; }
 .v1-races-page .v1r-seo-links .v1r-filter-chips { flex-wrap: wrap; }
 
-.v1-footer-seo { padding: 24px 24px 36px; max-width: 1200px; margin: 0 auto; border-bottom: 0.5px solid rgba(245, 240, 235, 0.12); margin-bottom: 28px; }
+.v1-footer-seo { padding: 24px var(--gutter) 36px; max-width: 1200px; margin: 0 auto; border-bottom: 0.5px solid rgba(245, 240, 235, 0.12); margin-bottom: 28px; }
 .v1-footer-seo-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 32px; }
 .v1-footer-seo .v1-footer-links a { font-family: inherit; font-weight: 400; font-size: 13px; letter-spacing: normal; text-transform: none; color: rgba(245, 240, 235, 0.7); }
 .v1-footer-seo .v1-footer-links a:hover { color: var(--bone); }
@@ -2157,7 +2162,7 @@ body { padding-top: var(--nav-h, 68px); }
   --hairline: rgba(245, 240, 235, 0.10);
   --hairline-strong: rgba(245, 240, 235, 0.22);
   --v1r-container-max: 1280px;
-  --v1r-gutter: max(28px, calc((100% - var(--v1r-container-max)) / 2));
+  --v1r-gutter: max(var(--gutter), calc((100% - var(--v1r-container-max)) / 2));
   background: #0C0B10;
   color: var(--bone);
   color: var(--jet);
@@ -2901,7 +2906,7 @@ body { padding-top: var(--nav-h, 68px); }
   --hairline: rgba(10, 10, 10, 0.12);
   --hairline-strong: rgba(10, 10, 10, 0.24);
   --v1c-container-max: 1280px;
-  --v1c-gutter: max(28px, calc((100% - var(--v1c-container-max)) / 2));
+  --v1c-gutter: max(var(--gutter), calc((100% - var(--v1c-container-max)) / 2));
   background: var(--bone);
   color: var(--jet);
 }
@@ -4998,7 +5003,7 @@ body { padding-top: var(--nav-h, 68px); }
   --hairline: rgba(10, 10, 10, 0.12);
   --hairline-strong: rgba(10, 10, 10, 0.24);
   --v1w-container-max: 1280px;
-  --v1w-gutter: max(28px, calc((100% - var(--v1w-container-max)) / 2));
+  --v1w-gutter: max(var(--gutter), calc((100% - var(--v1w-container-max)) / 2));
   background: var(--bone);
   color: var(--jet);
   font-family: var(--font-poppins), system-ui, sans-serif;
@@ -6362,7 +6367,7 @@ body { padding-top: var(--nav-h, 68px); }
   --hairline: rgba(10, 10, 10, 0.12);
   --hairline-strong: rgba(10, 10, 10, 0.24);
   --v1ru-container-max: 1280px;
-  --v1ru-gutter: max(28px, calc((100% - var(--v1ru-container-max)) / 2));
+  --v1ru-gutter: max(var(--gutter), calc((100% - var(--v1ru-container-max)) / 2));
   background: var(--bone);
   color: var(--jet);
   font-family: var(--font-poppins), system-ui, sans-serif;
@@ -7064,7 +7069,7 @@ body { padding-top: var(--nav-h, 68px); }
   --hairline: rgba(10, 10, 10, 0.12);
   --hairline-strong: rgba(10, 10, 10, 0.24);
   --v1co-container-max: 1280px;
-  --v1co-gutter: max(28px, calc((100% - var(--v1co-container-max)) / 2));
+  --v1co-gutter: max(var(--gutter), calc((100% - var(--v1co-container-max)) / 2));
   background: var(--bone);
   color: var(--jet);
   font-family: var(--font-poppins), system-ui, sans-serif;
@@ -8796,7 +8801,7 @@ body { padding-top: var(--nav-h, 68px); }
   gap: 16px;
   max-width: 1200px;
   margin: 0 auto;
-  padding: 10px 20px;
+  padding: 10px var(--gutter);
 }
 .v1-detail-crossnav-link {
   display: inline-flex;
@@ -9094,4 +9099,25 @@ body { padding-top: var(--nav-h, 68px); }
 @media (prefers-reduced-motion: reduce) {
   .cx-field, .cx-input, .cx-cover, .cx-cta { transition: none; }
   .cx-cta:hover:not(:disabled) { transform: none; }
+}
+
+/* Site-wide gutter. Tailwind's container config has a fixed 2rem, which left
+   laptop widths nearly edge to edge; this wins because it comes after
+   @tailwind components. */
+.container { padding-left: var(--gutter); padding-right: var(--gutter); }
+
+/* Narrow desktop (861–1199px): with the wider gutter and three top-level
+   links the bar ran out of room and labels wrapped ("GET / THE / APP").
+   Keep every label on one line, tighten the spacing, and below 1100px drop
+   the quiet "Get the app" link; the homepage and footer carry store links. */
+@media (min-width: 861px) {
+  .v1-nav-links a, .v1-nav-links button, .v1-nav-actions-desktop > * { white-space: nowrap; }
+}
+@media (min-width: 861px) and (max-width: 1199px) {
+  .v1-nav-inner { gap: 20px; }
+  .v1-nav-links { gap: 20px; }
+  .v1-nav-actions-desktop { gap: 10px; }
+}
+@media (min-width: 861px) and (max-width: 1099px) {
+  .v1-nav-actions-desktop .v1-nav-quiet { display: none; }
 }

@@ -13,6 +13,7 @@ import {
 } from '@/lib/race-city-pages';
 import { fetchAllClubsList } from '@/lib/clubs-list';
 import { fetchAllRaces } from '@/lib/races-list';
+import { TALK_PATH, fetchTalkPosts, talkUrl } from '@/lib/talk';
 
 const SITE = 'https://www.endorfin.run';
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE || 'https://api.endorfin.run';
@@ -98,6 +99,19 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${SITE}/terms`,   lastModified: new Date('2026-04-01'), changeFrequency: 'yearly', priority: 0.3 },
     { url: `${SITE}/support`, lastModified: new Date('2026-04-10'), changeFrequency: 'yearly', priority: 0.3 },
   ];
+
+  const talkPosts = await fetchTalkPosts();
+  if (talkPosts.length) {
+    staticRoutes.push({ url: `${SITE}${TALK_PATH}`, lastModified: now, changeFrequency: 'weekly', priority: 0.8 });
+    for (const p of talkPosts) {
+      staticRoutes.push({
+        url: `${SITE}${talkUrl(p.slug)}`,
+        lastModified: new Date(p.updatedAt || p.publishedAt || now),
+        changeFrequency: 'monthly',
+        priority: 0.75,
+      });
+    }
+  }
 
   // Paginated: the list endpoint caps at 50/page, so a single fetch would
   // drop every club past the first 50 from the sitemap (and undercount the

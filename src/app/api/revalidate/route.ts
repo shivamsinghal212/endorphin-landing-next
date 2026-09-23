@@ -10,6 +10,7 @@ import { auth } from '@/lib/auth';
 // New uses:
 //   POST { entity: 'race', slug }  → revalidates /running-events + /running-events/{slug}
 //   POST { entity: 'races' }       → revalidates /running-events listing only
+//   POST { entity: 'talk', slug? } → revalidates Runners' Talk hub, the piece, homepage + sitemap
 //
 // Admin can hit this after flipping is_featured / coupon fields so the
 // public listing reflects the change immediately instead of waiting for
@@ -17,7 +18,7 @@ import { auth } from '@/lib/auth';
 
 interface Body {
   slug?: string;
-  entity?: 'club' | 'race' | 'races';
+  entity?: 'club' | 'race' | 'races' | 'talk';
 }
 
 export async function POST(request: Request) {
@@ -55,6 +56,10 @@ export async function POST(request: Request) {
   } else if (entity === 'races') {
     revalidatePath('/running-events');
     revalidated.push('/running-events');
+  } else if (entity === 'talk') {
+    const paths = ['/runners-talk', '/', '/sitemap.xml', '/llms.txt', ...(slug ? [`/runners-talk/${slug}`] : [])];
+    paths.forEach((p) => revalidatePath(p));
+    revalidated.push(...paths);
   } else {
     return NextResponse.json({ ok: false, error: 'unknown entity' }, { status: 400 });
   }

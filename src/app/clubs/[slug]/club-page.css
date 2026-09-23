@@ -1149,8 +1149,8 @@
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
   padding-bottom: 8px;
-  margin-inline: calc(-1 * max(28px, (100% - var(--container-max)) / 2));
-  padding-inline: max(28px, calc((100% - var(--container-max)) / 2));
+  margin-inline: calc(-1 * max(var(--gutter), (100% - var(--container-max)) / 2));
+  padding-inline: max(var(--gutter), calc((100% - var(--container-max)) / 2));
 }
 .club-page .last-run-reel::-webkit-scrollbar { display: none; }
 .club-page .last-run-card {
@@ -1966,14 +1966,14 @@
 .club-page .coaches,
 .club-page .led-by,
 .club-page .cta-footer {
-  padding-left: max(28px, calc((100% - var(--container-max)) / 2));
-  padding-right: max(28px, calc((100% - var(--container-max)) / 2));
+  padding-left: max(var(--gutter), calc((100% - var(--container-max)) / 2));
+  padding-right: max(var(--gutter), calc((100% - var(--container-max)) / 2));
 }
 /* Stats is now a full-bleed dark band — internal padding centers the
    grid within the same fluid gutter as other sections. */
 .club-page .stats {
-  padding-left: max(28px, calc((100% - var(--container-max)) / 2));
-  padding-right: max(28px, calc((100% - var(--container-max)) / 2));
+  padding-left: max(var(--gutter), calc((100% - var(--container-max)) / 2));
+  padding-right: max(var(--gutter), calc((100% - var(--container-max)) / 2));
 }
 @media (max-width: 640px) {
   .club-page .stats {

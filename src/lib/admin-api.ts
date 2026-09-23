@@ -1,3 +1,5 @@
+import type { TalkComment, TalkPost } from '@/lib/talk';
+
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE || 'https://api.endorfin.run';
 
 export class AdminApiError extends Error {
@@ -1076,3 +1078,46 @@ export const rejectClubClaim = (token: string, id: string) =>
   adminFetch<ClubClaimRequest>(`/club-claims/${encodeURIComponent(id)}/reject`, token, {
     method: 'POST',
   });
+
+// ─── Runners' Talk ────────────────────────────────────────────────────────
+
+
+export interface AdminTalkPost extends TalkPost {
+  status: 'draft' | 'published';
+  authorUserId: string | null;
+  createdAt: string | null;
+}
+
+export type TalkPostInput = Omit<
+  AdminTalkPost,
+  'id' | 'createdAt' | 'updatedAt' | 'publishedAt' | 'readingMinutes' | 'highFives' | 'notes'
+>;
+
+export interface AdminTalkComment extends TalkComment {
+  isHidden: boolean;
+  postSlug: string;
+  postTitle: string;
+  userEmail: string;
+}
+
+export const listTalkPosts = (token: string) => adminFetch<AdminTalkPost[]>('/talk/posts', token);
+
+export const getTalkPost = (token: string, id: string) => adminFetch<AdminTalkPost>(`/talk/posts/${id}`, token);
+
+export const saveTalkPost = (token: string, data: TalkPostInput, id?: string) =>
+  adminFetch<AdminTalkPost>(id ? `/talk/posts/${id}` : '/talk/posts', token, {
+    method: id ? 'PATCH' : 'POST',
+    body: JSON.stringify(data),
+  });
+
+export const deleteTalkPost = (token: string, id: string) =>
+  adminFetch<void>(`/talk/posts/${id}`, token, { method: 'DELETE' });
+
+export const listTalkComments = (token: string, params: { page: number; limit: number }) =>
+  adminFetch<{ comments: AdminTalkComment[]; total: number }>(
+    `/talk/comments?page=${params.page}&limit=${params.limit}`,
+    token,
+  );
+
+export const setTalkCommentHidden = (token: string, id: string, isHidden: boolean) =>
+  adminFetch<void>(`/talk/comments/${id}`, token, { method: 'PATCH', body: JSON.stringify({ isHidden }) });
