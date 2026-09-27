@@ -141,18 +141,19 @@ export function EventHome({ eventId }: { eventId: string }) {
         cta: event.refundPolicyMd?.trim() ? 'Edit' : 'Review →',
         optional: true,
       } satisfies Task,
-      // Only a priced ticket surfaces payouts at all. Nothing to do here
-      // yet — ticket money is collected centrally and settled by hand — so
-      // this row exists to say so rather than to ask for anything.
+      // Only a priced ticket surfaces payouts at all. Informational either
+      // way: a linked Razorpay account means every ticket is paid out
+      // automatically; otherwise we settle by hand.
       ...(isPaid
         ? [
             {
               id: 'payouts',
               label: 'Payouts',
-              complete: false,
+              complete: !!event.payoutsEnabled,
+              done: 'Automatic — each ticket, minus the payment gateway fee, goes straight to your account.',
               todo:
                 'We collect ticket money and settle it with you directly. Self-serve payouts are on the way.',
-              cta: 'Coming soon',
+              cta: event.payoutsEnabled ? 'Active' : 'Coming soon',
               optional: true,
               soon: true,
             } satisfies Task,

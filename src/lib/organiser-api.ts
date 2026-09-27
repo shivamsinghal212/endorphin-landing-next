@@ -117,6 +117,8 @@ export interface OrganiserEvent {
   // the public URL prefix and the wizard's wording.
   category: string;
   organiserId: string | null;
+  /** Organiser's Razorpay account is linked — payouts are automatic. */
+  payoutsEnabled?: boolean;
   /** Run club hosting this event — set at creation or attached later. */
   clubId: string | null;
   eventFormat: EventFormat;
