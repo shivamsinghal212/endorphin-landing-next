@@ -12,6 +12,7 @@ import {
   type OrganiserEvent,
   type OrganiserEventUpdate,
   type OrganiserUpdate,
+  type PayoutAccountSubmit,
   type PendingReviewEvent,
   type RegistrationsFilters,
   approveEvent,
@@ -22,6 +23,8 @@ import {
   getEventStats,
   getMyOrganiser,
   getOrganiserEvent,
+  getPayoutAccount,
+  submitPayoutAccount,
   initiateRefund,
   listCoupons,
   listEventRegistrations,
@@ -309,6 +312,27 @@ export function useDeleteCoupon(eventId: string) {
     mutationFn: (couponId: string) => deleteCoupon(token!, eventId, couponId),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: organiserKeys.coupons(eventId) });
+    },
+  });
+}
+
+export function usePayoutAccount(eventId: string | null, enabled = true) {
+  const token = useAdminToken();
+  return useQuery({
+    queryKey: organiserKeys.payoutAccount(eventId ?? ''),
+    queryFn: () => getPayoutAccount(token!, eventId!),
+    enabled: !!token && !!eventId && enabled,
+    retry: false,
+  });
+}
+
+export function useSubmitPayoutAccount(eventId: string) {
+  const token = useAdminToken();
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (body: PayoutAccountSubmit) => submitPayoutAccount(token!, eventId, body),
+    onSuccess: (account) => {
+      qc.setQueryData(organiserKeys.payoutAccount(eventId), account);
     },
   });
 }

@@ -117,8 +117,6 @@ export interface OrganiserEvent {
   // the public URL prefix and the wizard's wording.
   category: string;
   organiserId: string | null;
-  /** Organiser's Razorpay account is linked — payouts are automatic. */
-  payoutsEnabled?: boolean;
   /** Run club hosting this event — set at creation or attached later. */
   clubId: string | null;
   eventFormat: EventFormat;
@@ -641,4 +639,36 @@ export const setStudioEventClub = (
   orgFetch<OrganiserEvent>(`/studio/events/${eventId}/club`, token, {
     method: 'PUT',
     body: JSON.stringify({ clubId }),
+  });
+
+// ── Payout bank account ────────────────────────────────────────────────────
+
+/** 'none' → nothing submitted; 'processing' → details received, Razorpay
+ *  account being linked by hand; 'active' → payouts are automatic. The
+ *  account number only ever comes back as its last 4 digits. */
+export interface PayoutAccount {
+  status: 'none' | 'processing' | 'active';
+  beneficiaryName: string | null;
+  accountLast4: string | null;
+  ifsc: string | null;
+}
+
+export interface PayoutAccountSubmit {
+  beneficiaryName: string;
+  accountNumber: string;
+  ifsc: string;
+  pan: string;
+}
+
+export const getPayoutAccount = (token: string, eventId: string) =>
+  orgFetch<PayoutAccount>(`/organiser/events/${eventId}/payout-account`, token);
+
+export const submitPayoutAccount = (
+  token: string,
+  eventId: string,
+  body: PayoutAccountSubmit,
+) =>
+  orgFetch<PayoutAccount>(`/organiser/events/${eventId}/payout-account`, token, {
+    method: 'PUT',
+    body: JSON.stringify(body),
   });

@@ -4,11 +4,12 @@ import Link from 'next/link';
 import { useMemo, useState } from 'react';
 import { toast } from 'sonner';
 import { eventPath } from '@/lib/event-path';
-import type { Organiser, OrganiserEvent } from '@/lib/organiser-api';
+import type { Organiser, OrganiserEvent, PayoutAccount } from '@/lib/organiser-api';
 import {
   describeOrganiserError,
   useMyOrganiser,
   useOrganiserEvent,
+  usePayoutAccount,
   useSubmitEventForReview,
   useUpdateOrganiserEvent,
 } from '@/lib/studio/organiser-hooks';
@@ -23,6 +24,7 @@ import { ClubSheet } from './_club-sheet';
 import { OrganiserSheet } from './_organiser-sheet';
 import { SectionEditor, type SectionId } from './_section-editors';
 import { CouponsSheet } from './_coupons-sheet';
+import { PayoutSheet } from './_payout-sheet';
 
 /** One thing still to do (or already done) before an event can go out. */
 interface Task {
@@ -71,6 +73,7 @@ export function EventHome({ eventId }: { eventId: string }) {
   const [organiserSheetOpen, setOrganiserSheetOpen] = useState(false);
   const [section, setSection] = useState<SectionId | null>(null);
   const [couponsOpen, setCouponsOpen] = useState(false);
+  const [payoutOpen, setPayoutOpen] = useState(false);
   const organiserQ = useMyOrganiser();
   // Only to name the attached club — the event carries just `clubId`, and
   // the clubs a user admins is already cached for the club picker.
@@ -84,6 +87,7 @@ export function EventHome({ eventId }: { eventId: string }) {
     [event],
   );
   const isPaid = paidTiers.length > 0;
+  const payout = usePayoutAccount(eventId, isPaid).data;
 
   const tasks: Task[] = useMemo(() => {
     if (!event) return [];
@@ -141,24 +145,9 @@ export function EventHome({ eventId }: { eventId: string }) {
         cta: event.refundPolicyMd?.trim() ? 'Edit' : 'Review →',
         optional: true,
       } satisfies Task,
-      // Only a priced ticket surfaces payouts at all. Informational either
-      // way: a linked Razorpay account means every ticket is paid out
-      // automatically; otherwise we settle by hand.
-      ...(isPaid
-        ? [
-            {
-              id: 'payouts',
-              label: 'Payouts',
-              complete: !!event.payoutsEnabled,
-              done: 'Automatic — each ticket, minus the payment gateway fee, goes straight to your account.',
-              todo:
-                'We collect ticket money and settle it with you directly. Self-serve payouts are on the way.',
-              cta: event.payoutsEnabled ? 'Active' : 'Coming soon',
-              optional: true,
-              soon: true,
-            } satisfies Task,
-          ]
-        : []),
+      // Only a priced ticket surfaces payouts at all. Active and processing
+      // are informational; only 'none' asks the organiser for anything.
+      ...(isPaid ? [payoutTask(payout, () => setPayoutOpen(true))] : []),
       {
         id: 'schedule',
         label: 'Schedule the opening',
@@ -201,7 +190,7 @@ export function EventHome({ eventId }: { eventId: string }) {
     );
 
     return list;
-  }, [event, eventId, isPaid]);
+  }, [event, eventId, isPaid, payout]);
 
   const required = tasks.filter((t) => !t.optional);
   const optional = tasks.filter((t) => t.optional);
@@ -393,6 +382,12 @@ export function EventHome({ eventId }: { eventId: string }) {
         </div>
       </main>
 
+      <PayoutSheet
+        open={payoutOpen}
+        onClose={() => setPayoutOpen(false)}
+        eventId={eventId}
+      />
+
       <CouponsSheet
         open={couponsOpen}
         onClose={() => setCouponsOpen(false)}
@@ -418,6 +413,46 @@ export function EventHome({ eventId }: { eventId: string }) {
       />
     </>
   );
+}
+
+function payoutTask(payout: PayoutAccount | undefined, open: () => void): Task {
+  const bank = payout?.accountLast4
+    ? [payout.beneficiaryName, `A/c ••${payout.accountLast4}`, payout.ifsc]
+        .filter(Boolean)
+        .join(' · ')
+    : null;
+  if (payout?.status === 'active') {
+    return {
+      id: 'payouts',
+      label: 'Payouts',
+      complete: true,
+      done: bank ?? 'Bank account linked — payouts are automatic',
+      todo: '',
+      cta: 'Active',
+      optional: true,
+      soon: true,
+    };
+  }
+  if (payout?.status === 'processing') {
+    return {
+      id: 'payouts',
+      label: 'Payouts',
+      complete: false,
+      todo: `${bank} — we're verifying it, usually within a day.`,
+      cta: 'Processing',
+      optional: true,
+      soon: true,
+    };
+  }
+  return {
+    id: 'payouts',
+    label: 'Payouts',
+    complete: false,
+    todo: 'Set-up bank account for payouts',
+    onClick: open,
+    cta: 'Set up →',
+    optional: true,
+  };
 }
 
 function TaskRow({ task }: { task: Task }) {

@@ -7,4 +7,5 @@ export const organiserKeys = {
   registrations: (eventId: string, filtersHash: string) =>
     ['organiser', 'registrations', eventId, filtersHash] as const,
   coupons: (eventId: string) => ['organiser', 'coupons', eventId] as const,
+  payoutAccount: (eventId: string) => ['organiser', 'payout-account', eventId] as const,
 };
