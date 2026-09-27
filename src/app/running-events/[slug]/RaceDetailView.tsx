@@ -188,6 +188,8 @@ export default function RaceDetailView({
   const dateStr = fmtFullDate(event.startTime);
   const timeStr = fmtTime(event.startTime);
   const priceStr = fmtPrice(event.priceMin, event.currency) || 'Free';
+  // "From"/"onwards" only make sense when ticket prices actually differ.
+  const hasPriceRange = new Set(event.distanceCategories.map((d) => d.discountedPrice ?? d.price).filter((p) => p != null)).size > 1;
 
   // Detect whether the signed-in runner already has an active paid
   // registration for this event. We swap the Register CTA for a "You're
@@ -331,7 +333,7 @@ export default function RaceDetailView({
               </div>
             </div>
             <div className="v1rd-ms-cell">
-              <div className="v1rd-l">From</div>
+              <div className="v1rd-l">{hasPriceRange ? 'From' : 'Price'}</div>
               <div className="v1rd-v">
                 {priceStr}
                 {event.distanceCategories.length > 0 && (
@@ -699,7 +701,7 @@ export default function RaceDetailView({
               <div className="v1rd-sticky-info">
                 <div className="v1rd-sticky-price">
                   {priceStr}
-                  <small> onwards</small>
+                  {hasPriceRange && <small> onwards</small>}
                 </div>
                 {event.registrationEndDate ? (
                   <div className="v1rd-sticky-deadline">

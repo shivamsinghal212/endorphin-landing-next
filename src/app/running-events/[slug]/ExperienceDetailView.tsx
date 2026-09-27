@@ -103,6 +103,8 @@ export default function ExperienceDetailView({
   const dateStr = fmtFullDate(event.startTime);
   const timeStr = fmtTime(event.startTime);
   const priceStr = fmtPrice(event.priceMin, event.currency) || 'Free';
+  // "From"/"onwards" only make sense when ticket prices actually differ.
+  const hasPriceRange = new Set(event.distanceCategories.map((d) => d.discountedPrice ?? d.price).filter((p) => p != null)).size > 1;
   // Drop any image whose URL is dead rather than rendering a broken frame —
   // the H1 above already names the event, so no placeholder is needed here.
   const { isFailed, imgProps } = useImgFallback();
@@ -229,7 +231,7 @@ export default function ExperienceDetailView({
               {(event.venueName || event.locationName) && (
                 <span className="exd-pill">{I.pin}<b>{event.venueName || event.locationName}</b></span>
               )}
-              <span className="exd-pill">{I.tag}From <b>{priceStr}</b></span>
+              <span className="exd-pill">{I.tag}{hasPriceRange && 'From '}<b>{priceStr}</b></span>
               {event.ngoName && (
                 <span className="exd-pill">❤️&nbsp;Proceeds to <b>{event.ngoName}</b></span>
               )}
@@ -459,7 +461,7 @@ export default function ExperienceDetailView({
         createPortal(
           <div className="exd-sticky-bar">
             <div>
-              <div className="exd-sticky-price">{priceStr}<small> onwards</small></div>
+              <div className="exd-sticky-price">{priceStr}{hasPriceRange && <small> onwards</small>}</div>
               {event.registrationEndDate ? (
                 <div className="exd-sticky-deadline">
                   Closes {new Date(event.registrationEndDate).toLocaleString('en-GB', { day: 'numeric', month: 'short', timeZone: IST })}
