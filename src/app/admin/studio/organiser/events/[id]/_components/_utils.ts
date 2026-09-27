@@ -8,17 +8,14 @@
 
 const IST = 'Asia/Kolkata';
 
-/** Paise → "₹1,44,600" up to a lakh, then "₹1.44L". */
+/** Paise → "₹1,44,600" or "₹5.85" — paise shown only when non-zero. */
 export function formatINR(paise: number): string {
-  const rupees = Math.round((paise ?? 0) / 100);
-  if (!Number.isFinite(rupees)) return '₹0';
-  if (Math.abs(rupees) >= 100_000) {
-    const lakhs = rupees / 100_000;
-    // Keep up to 2 decimals but trim trailing zeros.
-    const trimmed = lakhs.toFixed(2).replace(/\.?0+$/, '');
-    return `₹${trimmed}L`;
-  }
-  return `₹${rupees.toLocaleString('en-IN')}`;
+  const p = Number.isFinite(paise) ? paise : 0;
+  // Exact to the paisa — payouts are fee-deducted, so ₹5.85 must not read ₹6.
+  return `₹${(p / 100).toLocaleString('en-IN', {
+    minimumFractionDigits: p % 100 ? 2 : 0,
+    maximumFractionDigits: 2,
+  })}`;
 }
 
 /** "2 min ago" · "11 min ago" · "1 hr ago" · "Yesterday" · "May 19, 6:55 PM" (IST). */

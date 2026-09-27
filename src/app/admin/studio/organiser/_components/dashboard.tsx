@@ -5,11 +5,8 @@ import { useMemo } from 'react';
 import type { Organiser, OrganiserEventListItem } from '@/lib/organiser-api';
 import { useStudioEventsList } from '@/lib/studio/organiser-hooks';
 import { EventsList } from './events-list';
+import { formatINR as inrFromPaise } from '../events/[id]/_components/_utils';
 
-function inrFromPaise(paise: number): string {
-  const rupees = Math.round(paise / 100);
-  return `₹${rupees.toLocaleString('en-IN')}`;
-}
 
 function isLiveNow(ev: OrganiserEventListItem, now: number): boolean {
   if (ev.eventStatus !== 'live') return false;
