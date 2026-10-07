@@ -22,6 +22,7 @@ import { AdminsEditor } from './admins-editor';
 import { CoachesEditor } from './coaches-editor';
 import { CollaborationsEditor } from './collaborations-editor';
 import { JoinFormEditor } from './join-form-editor';
+import { ClubEmails } from './club-emails';
 
 // ── form state shape (mirrors ClubIn on the server) ───────────────────────
 
@@ -475,6 +476,10 @@ export function ClubFormContent({
 
           {!isNew && initialClub && (
             <>
+              <Card title="Send email">
+                <ClubEmails slug={initialClub.slug} />
+              </Card>
+
               <Card title="Coaches">
                 <CoachesEditor
                   slug={initialClub.slug}

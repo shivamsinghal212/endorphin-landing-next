@@ -650,6 +650,30 @@ export const setClubPublished = (token: string, slug: string, isPublished: boole
     body: JSON.stringify({ isPublished }),
   });
 
+// ── Club one-off emails (backend registry: CLUB_EMAIL_TEMPLATES) ───────────
+
+export interface ClubEmailTemplate {
+  key: string;
+  label: string;
+  description: string;
+}
+
+export const listClubEmailTemplates = (token: string) =>
+  adminFetch<ClubEmailTemplate[]>('/club-emails/templates', token);
+
+export const previewClubEmail = (token: string, slug: string, key: string) =>
+  adminFetch<{ subject: string; html: string }>(
+    `/clubs/${encodeURIComponent(slug)}/emails/${encodeURIComponent(key)}/preview`,
+    token,
+  );
+
+export const sendClubEmail = (token: string, slug: string, key: string, to: string) =>
+  adminFetch<{ ok: boolean }>(
+    `/clubs/${encodeURIComponent(slug)}/emails/${encodeURIComponent(key)}/send`,
+    token,
+    { method: 'POST', body: JSON.stringify({ to }) },
+  );
+
 // ── Club Instagram scrape ──────────────────────────────────────────────────
 
 export interface ClubScrapeTriggerResponse {
