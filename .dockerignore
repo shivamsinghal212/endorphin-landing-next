@@ -1,0 +1,12 @@
+node_modules
+.next
+.git
+.vercel
+.env*
+npm-debug.log*
+design-mockups
+mockups
+wireframes
+screenshots
+social-media-posts
+ncr-carousel-out
