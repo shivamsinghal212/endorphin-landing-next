@@ -18,9 +18,13 @@ export default function PrivacyPolicy() {
         <h1 className="text-4xl md:text-5xl font-display font-bold uppercase text-foreground mb-8">
           Privacy Policy
         </h1>
-        <p className="text-sm text-muted-foreground font-body mb-10">Last updated: September 4, 2026</p>
+        <p className="text-sm text-muted-foreground font-body mb-10">Last updated: October 27, 2026</p>
 
         <div className="space-y-8 font-body text-muted-foreground leading-relaxed">
+          <section>
+            <p>Endorfin (the &ldquo;App&rdquo;, &ldquo;we&rdquo;, &ldquo;us&rdquo;) is owned and operated by <span className="text-foreground/80">Ultragon Ventures (OPC) Private Limited</span>, a company incorporated in India with its registered office at A-49/4 Wave Executive Floors, Sector-5, Wave City, Ghaziabad 201002, Uttar Pradesh, India. This policy explains what personal data we collect, how we use it, who we share it with, and the choices you have.</p>
+          </section>
+
           <section>
             <h2 className="text-xl font-display font-semibold uppercase text-foreground mb-3">1. Information We Collect</h2>
             <p className="mb-3">We collect the following categories of information when you use Endorfin:</p>
@@ -34,6 +38,7 @@ export default function PrivacyPolicy() {
               <li><span className="text-foreground/80">Social graph:</span> Follow/unfollow actions, follow requests, and the relationships you build with other users.</li>
               <li><span className="text-foreground/80">Location data:</span> Your device&apos;s GPS coordinates (with your permission) to show nearby running events and personalize recommendations. When you start a run, we also record your live GPS location to map your route — tracking runs in a foreground service with a persistent notification so it continues while your screen is locked, and stopping when you end the run. We only access location while the app is in use; we do not track your location in the background outside of an active run.</li>
               <li><span className="text-foreground/80">Run and fitness data:</span> When you record a run, we collect its GPS route, distance, duration, pace, elevation, and step count/cadence (from your device&apos;s motion sensors and pedometer), along with an estimated calorie figure derived from these. This is stored on your account so you can review your run history and training stats.</li>
+              <li><span className="text-foreground/80">Data from connected services:</span> If you choose to connect your Garmin Connect account, we receive the activities you record on your Garmin device, as described in Section 4.</li>
               <li><span className="text-foreground/80">Device information:</span> Push notification tokens, device type, operating system version, and app version, used to deliver notifications and ensure compatibility.</li>
               <li><span className="text-foreground/80">Diagnostics:</span> Crash reports and error logs (which may include device metadata and the screen you were on at the time of the crash) used to fix bugs.</li>
             </ul>
@@ -52,7 +57,8 @@ export default function PrivacyPolicy() {
               <li>Send transactional emails — OTP codes, password resets, club admin notifications, club welcome emails, and rejection emails — via our email provider.</li>
               <li>Record and display the runs you track — route, distance, pace, duration, elevation, and cadence — and build your personal run history and training stats.</li>
               <li>If you turn on health sync (Settings → Fitness; off by default), write your completed runs to your device&apos;s health platform — Health Connect on Android or Apple Health on iOS — and read the runs and walks you recorded in other apps or on other devices — along with their route, pace, heart rate, steps, elevation and your VO₂ max — so they appear in your Endorfin history. See Section 3.</li>
-              <li>Generate a written analysis of an individual run, and build your training programme. These use two different AI providers and receive different data — see Section 4.</li>
+              <li>If you connect Garmin Connect, import your Garmin activities for your run history, run analytics, challenges and training, and — when you ask — send workouts to your Garmin device. See Section 4.</li>
+              <li>Through the Endorfin AI Trainer, generate a written analysis of an individual run and build your training programme. See Sections 4.4 and 5.</li>
               <li>Improve app performance, fix bugs, and develop new features.</li>
               <li>Enforce our Terms of Service and protect against misuse.</li>
             </ul>
@@ -88,9 +94,9 @@ export default function PrivacyPolicy() {
             <ul className="list-disc list-inside space-y-2 ml-2">
               <li><span className="text-foreground/80">Filtering:</span> Only foot-based workouts (runs, walks, hikes) are imported. Other activity types, and sessions under a minute or with no distance, are ignored. Workouts that Endorfin itself wrote to the health platform are excluded, so they are not duplicated.</li>
               <li><span className="text-foreground/80">Where imported workouts go, and who can see them:</span> Imported workouts are treated the same as runs you record in Endorfin. That means they are stored on our servers as part of your run history, count toward your stats, personal records and any challenges you have joined, and are visible to your followers in the activity feed. Because this shares health data beyond your device, we ask for your explicit confirmation before the first import, in addition to the platform permission prompt. If you would rather your workouts not be visible to others, you can set your account to private under Settings → Privacy, or leave import turned off.</li>
-              <li><span className="text-foreground/80">AI features:</span> If you ask for a written analysis of a run, that run&apos;s metrics — including those from an imported workout — are sent to Anthropic to generate it, as described in Section 4. Anthropic does not use this data to train its models. Our training-programme generator uses a different provider (Google) and is <span className="text-foreground/80">not</span> sent your health data: it receives only your training goal, experience level, available equipment, available days and how well you kept to your last programme. Health data is never sent to our analytics provider.</li>
+              <li><span className="text-foreground/80">AI features:</span> If you ask for a written analysis of a run, that run&apos;s metrics — including those from an imported workout — are sent to Anthropic to generate it, as described in Section 5. Anthropic does not use this data to train its models. Our training-programme generator uses a different provider (Google) and is <span className="text-foreground/80">not</span> sent your health data: it receives only your training goal, experience level, available equipment, available days and how well you kept to your last programme. Health data is never sent to our analytics provider.</li>
               <li><span className="text-foreground/80">What is stored on our servers:</span> For each imported workout we store its summary metrics and a reduced time series of readings — location, altitude, pace, heart rate and cadence (roughly one reading per second, thinned for long workouts) — which is what allows the app to draw the route, pace, elevation and heart-rate graphs. Your VO₂ max is stored on your account rather than against a workout.</li>
-              <li><span className="text-foreground/80">Retention and deletion:</span> Imported workouts are retained as part of your run history until you delete the individual run or your account. Deleting your account removes or anonymises them within 30 days, as described in Section 7. Turning import off stops all future reads; it does not delete workouts already imported — delete those individually in the app.</li>
+              <li><span className="text-foreground/80">Retention and deletion:</span> Imported workouts are retained as part of your run history until you delete the individual run or your account. Deleting your account removes or anonymises them within 30 days, as described in Section 8. Turning import off stops all future reads; it does not delete workouts already imported — delete those individually in the app.</li>
               <li><span className="text-foreground/80">Never for ads, never sold:</span> Health and fitness data read from your health platform is never used for advertising or marketing, never sold, never shared with data brokers, and never used to determine eligibility for employment, insurance or credit. It is used only to provide the running features described here. On iOS, data read from Apple Health is not stored in iCloud.</li>
               <li><span className="text-foreground/80">Revoking access:</span> Turn the switch off any time under Settings → Fitness, which stops both directions immediately. You can also review or revoke individual data-type permissions via <span className="text-foreground/80">Manage access</span> in the same screen, which opens the Health Connect app (Android), or in Settings → Privacy &amp; Security → Health (iOS).</li>
             </ul>
@@ -98,7 +104,52 @@ export default function PrivacyPolicy() {
           </section>
 
           <section>
-            <h2 className="text-xl font-display font-semibold uppercase text-foreground mb-3">4. Third-Party Services</h2>
+            <h2 className="text-xl font-display font-semibold uppercase text-foreground mb-3">4. Garmin Connect</h2>
+            <p className="mb-3">You can choose to connect your <span className="text-foreground/80">Garmin Connect</span> account to Endorfin. The connection is <span className="text-foreground/80">opt-in</span> and off by default. You start it from Settings → Connected Apps, and you sign in and grant permission on Garmin&apos;s own consent screen. Endorfin never sees or stores your Garmin password; Garmin gives us an access token that only works for the permissions you approved. We receive no Garmin data until you complete that step.</p>
+
+            <h3 className="text-base font-display font-semibold uppercase text-foreground mt-5 mb-2">4.1 What we receive from Garmin</h3>
+            <p className="mb-3">After you connect, Garmin sends us the activities you record on your Garmin device from that point on. For each activity we receive:</p>
+            <ul className="list-disc list-inside space-y-2 ml-2">
+              <li>Activity type, start time, duration and the device it was recorded on.</li>
+              <li>Distance, pace and speed, laps and splits, elevation gain and loss.</li>
+              <li>Heart rate (average, maximum and readings during the activity), cadence, and calories.</li>
+              <li>The GPS route of the activity.</li>
+            </ul>
+            <p className="mt-3">We do not request sleep, stress, body composition, women&apos;s health or other daily wellness data from Garmin.</p>
+
+            <h3 className="text-base font-display font-semibold uppercase text-foreground mt-5 mb-2">4.2 How we use Garmin data</h3>
+            <ul className="list-disc list-inside space-y-2 ml-2">
+              <li><span className="text-foreground/80">Run history and analytics:</span> your Garmin activities appear in your Endorfin run history with a route map, pace and heart-rate graphs, splits and elevation, and count toward your weekly totals, training stats and personal records.</li>
+              <li><span className="text-foreground/80">Run challenges:</span> Garmin activities count toward the club and community run challenges you have joined.</li>
+              <li><span className="text-foreground/80">Training:</span> we compare your completed Garmin activities with your training plan to mark sessions done and adjust the sessions that follow.</li>
+              <li><span className="text-foreground/80">Who can see it:</span> Garmin activities are treated like runs you record in Endorfin. You can see everything. Your followers can see your activities in the feed unless you set your account to private under Settings → Privacy. In a challenge you have joined, other participants see your total distance on the leaderboard. Wherever Garmin data is shown, it is credited to Garmin.</li>
+            </ul>
+            <p className="mt-3">Garmin data is never sold, never used for advertising or marketing, never shared with data brokers, never used to train any AI model, and never used to decide eligibility for employment, insurance or credit. We only share it with the service providers we need to run these features (listed in Section 5).</p>
+
+            <h3 className="text-base font-display font-semibold uppercase text-foreground mt-5 mb-2">4.3 Sending workouts to your Garmin device</h3>
+            <p>If you choose to send a workout from your Endorfin training plan to your Garmin device, we transfer that workout (its name, date, steps, durations or distances, and pace or heart-rate targets) to your Garmin Connect account. We show you what will be sent and ask for your consent before the first transfer. Once transferred, that data is also processed by Garmin under the <a href="https://www.garmin.com/privacy/connect" target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">Privacy Policy for Garmin Connect and Compatible Garmin Devices</a>. Do not send data to your Garmin Connect account if you are restricted from doing so.</p>
+
+            <h3 className="text-base font-display font-semibold uppercase text-foreground mt-5 mb-2">4.4 AI Transparency Statement</h3>
+            <p className="mb-3">The <span className="text-foreground/80">Endorfin AI Trainer</span> uses artificial intelligence to write an analysis of a run and to adapt your training plan. It can use your Garmin data <span className="text-foreground/80">only if you turn on AI features for your Garmin data</span>. This is off by default, and we ask for your explicit consent before any Garmin data is processed by AI.</p>
+            <ul className="list-disc list-inside space-y-2 ml-2">
+              <li><span className="text-foreground/80">What is sent:</span> the metrics of the relevant activities — date, activity type, distance, duration, pace and splits, heart-rate figures, cadence and elevation. We do not send your GPS route, name, email address or any other information that directly identifies you.</li>
+              <li><span className="text-foreground/80">Who processes it:</span> the request is processed by our AI model provider, either Anthropic (Claude) or Google (Gemini), through their paid business APIs. The provider uses it only to return a response to us. Neither provider is allowed to use it to train their models, and we do not use it to train any model either.</li>
+              <li><span className="text-foreground/80">What it is for:</span> only to produce the run analysis or training plan you see in the app. The output is general fitness guidance, not medical advice.</li>
+              <li><span className="text-foreground/80">Withdrawing consent:</span> turn AI features for Garmin data off at any time in Settings. From then on, no Garmin data is sent to any AI provider.</li>
+            </ul>
+
+            <h3 className="text-base font-display font-semibold uppercase text-foreground mt-5 mb-2">4.5 Disconnecting and deletion</h3>
+            <ul className="list-disc list-inside space-y-2 ml-2">
+              <li>You can disconnect Garmin at any time in Settings → Connected Apps, or remove Endorfin from the connected apps in your Garmin Connect account. Either way, we stop receiving your Garmin data immediately and delete our Garmin access token.</li>
+              <li>Activities already imported stay in your history until you delete them. You can delete individual activities in the app, or email <a href="mailto:hello@endorfin.run" className="text-accent hover:underline">hello@endorfin.run</a> to have all data we received from Garmin deleted; we complete such requests within 30 days.</li>
+              <li>If you delete your Endorfin account, all data we received from Garmin is deleted within 30 days, as described in Section 8.</li>
+              <li>You can ask for a copy of your Garmin data held by Endorfin at any time (see Section 9).</li>
+            </ul>
+            <p className="mt-3">Garmin<sup>®</sup> and Garmin Connect™ are trademarks of Garmin Ltd. or its subsidiaries. Endorfin is not affiliated with or endorsed by Garmin.</p>
+          </section>
+
+          <section>
+            <h2 className="text-xl font-display font-semibold uppercase text-foreground mb-3">5. Third-Party Services</h2>
             <p className="mb-3">Endorfin relies on the following third-party services to operate. Each may process some of your data on our behalf:</p>
             <ul className="list-disc list-inside space-y-2 ml-2">
               <li><span className="text-foreground/80">Google Sign-In:</span> Authentication for users who choose Google. Subject to <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">Google&apos;s Privacy Policy</a>.</li>
@@ -110,15 +161,15 @@ export default function PrivacyPolicy() {
               <li><span className="text-foreground/80">PostHog:</span> Product analytics — captures app screen views, interactions, and key events (such as starting or completing a run) to help us understand usage and improve the app. We do not send your health data to PostHog. Subject to <a href="https://posthog.com/privacy" target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">PostHog&apos;s Privacy Policy</a>.</li>
               <li><span className="text-foreground/80">Detour:</span> Deep linking and deferred deep links. Subject to <a href="https://godetour.com/privacy" target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">Detour&apos;s Privacy Policy</a>.</li>
               <li><span className="text-foreground/80">Razorpay:</span> Processes payments for events you register for directly through Endorfin. You enter your payment details with Razorpay; Endorfin receives only the transaction status, amount, and reference — never your card or UPI credentials. Subject to <a href="https://razorpay.com/privacy/" target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">Razorpay&apos;s Privacy Policy</a>.</li>
-              <li><span className="text-foreground/80">Anthropic (Claude):</span> Generates the written analysis of an individual run, shown in the app as &quot;Kip&apos;s take&quot; on the run detail screen. When that analysis is produced, that run&apos;s metrics — distance, duration, pace and per-kilometre splits, and heart-rate figures including average, maximum, time in zones and cardiac drift where recorded — are sent to Anthropic. Nothing else about you is sent, and the analysis is generated per run rather than as a conversation. Subject to <a href="https://www.anthropic.com/legal/privacy" target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">Anthropic&apos;s Privacy Policy</a>. Anthropic does not use your data to train its models.</li>
-              <li><span className="text-foreground/80">Google (Gemini):</span> Generates your training programme. When a programme is built, we send your training goal, experience level, available equipment, which weekdays you can train, how long a session can be, your target race date if you set one, and a summary of how well you kept to your previous programme. We do <span className="text-foreground/80">not</span> send heart rate, VO₂ max, route, weight, or any data read from Health Connect or Apple Health. Subject to <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">Google&apos;s Privacy Policy</a>.</li>
-              <li><span className="text-foreground/80">Third-party event registration platforms:</span> Many events listed on Endorfin are hosted on third-party registration platforms — including <span className="text-foreground/80">MySamay</span>, <span className="text-foreground/80">Townscript</span>, <span className="text-foreground/80">IndiaRunning</span>, and <span className="text-foreground/80">City Woofer</span>. Only events explicitly listed with source &ldquo;Organiser&rdquo; are registered through Endorfin directly. When you click &ldquo;Register&rdquo; on a third-party event, we redirect you to the relevant external platform. Any information you submit there (name, contact details, payment information, etc.) is collected and processed by that platform under its own privacy policy, not Endorfin&apos;s. We do not receive your registration or payment data from those platforms unless they share it with us in aggregate or you authorise it explicitly.</li>
+              <li><span className="text-foreground/80">Anthropic (Claude):</span> An AI model provider for the Endorfin AI Trainer. It generates the written analysis of an individual run shown on the run detail screen. When that analysis is produced, that run&apos;s metrics — distance, duration, pace and per-kilometre splits, and heart-rate figures including average, maximum, time in zones and cardiac drift where recorded — are sent to Anthropic. Nothing else about you is sent, and the analysis is generated per run rather than as a conversation. Subject to <a href="https://www.anthropic.com/legal/privacy" target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">Anthropic&apos;s Privacy Policy</a>. Anthropic does not use your data to train its models. If you have connected Garmin, Anthropic may also process Garmin data as described in the AI Transparency Statement (Section 4.4).</li>
+              <li><span className="text-foreground/80">Google (Gemini):</span> An AI model provider for the Endorfin AI Trainer. It generates your training programme. When a programme is built, we send your training goal, experience level, available equipment, which weekdays you can train, how long a session can be, your target race date if you set one, and a summary of how well you kept to your previous programme. We do <span className="text-foreground/80">not</span> send heart rate, VO₂ max, route, weight, or any data read from Health Connect or Apple Health. If you have connected Garmin and turned on AI features for your Garmin data, Google may also process Garmin data as described in the AI Transparency Statement (Section 4.4). Google does not use data sent through its paid API to train its models. Subject to <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">Google&apos;s Privacy Policy</a>.</li>
+              <li><span className="text-foreground/80">Third-party event registration platforms:</span> Many events listed on Endorfin are hosted on third-party registration platforms — including <span className="text-foreground/80">MySamay</span>, <span className="text-foreground/80">IndiaRunning</span>, and <span className="text-foreground/80">City Woofer</span>. Only events explicitly listed with source &ldquo;Organiser&rdquo; are registered through Endorfin directly. When you click &ldquo;Register&rdquo; on a third-party event, we redirect you to the relevant external platform. Any information you submit there (name, contact details, payment information, etc.) is collected and processed by that platform under its own privacy policy, not Endorfin&apos;s. We do not receive your registration or payment data from those platforms unless they share it with us in aggregate or you authorise it explicitly.</li>
               <li><span className="text-foreground/80">Event organizers:</span> When you RSVP to or register for an event through Endorfin (whether hosted by us or by a third-party platform), limited profile information (name, profile photo) may be visible to event organizers and other attendees.</li>
             </ul>
           </section>
 
           <section>
-            <h2 className="text-xl font-display font-semibold uppercase text-foreground mb-3">5. Data Sharing</h2>
+            <h2 className="text-xl font-display font-semibold uppercase text-foreground mb-3">6. Data Sharing</h2>
             <p className="mb-3">We may share your information in the following circumstances:</p>
             <ul className="list-disc list-inside space-y-2 ml-2">
               <li>With event organizers when you RSVP to their events (name and profile photo).</li>
@@ -129,53 +180,55 @@ export default function PrivacyPolicy() {
               <li>With other club members for content you post in a club discussion (your name, profile photo, messages, replies, polls, reactions, and any images you share). Club discussions are scoped to active members.</li>
               <li>With other event attendees for content you post in an event discussion (same scope as above).</li>
               <li>With other users based on your privacy settings (public profiles are visible to all users; private profiles require follow approval).</li>
-              <li>With service providers who help us operate the platform (see Section 3).</li>
+              <li>With service providers who help us operate the platform (see Section 5).</li>
               <li>When required by law, legal process, or to protect our rights and safety.</li>
               <li>In aggregated, anonymized form for analytics purposes.</li>
             </ul>
           </section>
 
           <section>
-            <h2 className="text-xl font-display font-semibold uppercase text-foreground mb-3">6. Data Storage and Security</h2>
-            <p>We implement industry-standard security measures to protect your personal information, including encryption in transit (HTTPS/TLS) and secure token storage on your device. Authentication tokens are stored using platform-native secure storage mechanisms. However, no method of electronic transmission or storage is 100% secure, and we cannot guarantee absolute security.</p>
+            <h2 className="text-xl font-display font-semibold uppercase text-foreground mb-3">7. Data Storage and Security</h2>
+            <p>We implement industry-standard security measures to protect your personal information, including encryption in transit (HTTPS/TLS), encryption at rest of the databases and file storage that hold your data, access to production systems limited to authorised personnel, and secure token storage on your device. Authentication tokens are stored using platform-native secure storage mechanisms. However, no method of electronic transmission or storage is 100% secure, and we cannot guarantee absolute security.</p>
           </section>
 
           <section>
-            <h2 className="text-xl font-display font-semibold uppercase text-foreground mb-3">7. Data Retention</h2>
+            <h2 className="text-xl font-display font-semibold uppercase text-foreground mb-3">8. Data Retention</h2>
             <p>We retain your personal information for as long as your account is active or as needed to provide our services. If you delete your account, we will delete or anonymize your personal data within 30 days, except where retention is required by law or for legitimate business purposes (such as resolving disputes or enforcing our terms).</p>
           </section>
 
           <section>
-            <h2 className="text-xl font-display font-semibold uppercase text-foreground mb-3">8. Your Rights</h2>
+            <h2 className="text-xl font-display font-semibold uppercase text-foreground mb-3">9. Your Rights</h2>
             <p className="mb-3">You have the following rights regarding your personal data:</p>
             <ul className="list-disc list-inside space-y-2 ml-2">
               <li><span className="text-foreground/80">Access and portability:</span> Request a copy of the personal data we hold about you.</li>
               <li><span className="text-foreground/80">Correction:</span> Update or correct inaccurate information through your profile settings.</li>
               <li><span className="text-foreground/80">Deletion:</span> Request deletion of your account and associated data.</li>
               <li><span className="text-foreground/80">Opt-out:</span> Disable push notifications through your device settings or opt out of marketing communications.</li>
-              <li><span className="text-foreground/80">Withdraw consent:</span> Revoke location or motion permissions at any time through your device settings. Turn off Sync with Health Connect (or Apple Health) under Settings → Fitness, and revoke health permissions in Health Connect (Android) or Settings → Privacy &amp; Security → Health (iOS).</li>
+              <li><span className="text-foreground/80">Withdraw consent:</span> Revoke location or motion permissions at any time through your device settings. Turn off Sync with Health Connect (or Apple Health) under Settings → Fitness, and revoke health permissions in Health Connect (Android) or Settings → Privacy &amp; Security → Health (iOS). Disconnect Garmin, or turn off AI features for your Garmin data, in Settings at any time (see Section 4).</li>
             </ul>
             <p className="mt-3">To exercise any of these rights, contact us at the address below or use the in-app settings.</p>
           </section>
 
           <section>
-            <h2 className="text-xl font-display font-semibold uppercase text-foreground mb-3">9. Applicable Law</h2>
+            <h2 className="text-xl font-display font-semibold uppercase text-foreground mb-3">10. Applicable Law</h2>
             <p>This Privacy Policy is governed by the laws of India, including the Information Technology Act, 2000 and the Digital Personal Data Protection Act, 2023 (DPDPA) as applicable. If you are located outside India, please be aware that your data may be transferred to and processed in India.</p>
           </section>
 
           <section>
-            <h2 className="text-xl font-display font-semibold uppercase text-foreground mb-3">10. Children&apos;s Privacy</h2>
+            <h2 className="text-xl font-display font-semibold uppercase text-foreground mb-3">11. Children&apos;s Privacy</h2>
             <p>Endorfin is not intended for children under 13 years of age. We do not knowingly collect personal information from children under 13. If we learn that we have collected data from a child under 13, we will delete it promptly.</p>
           </section>
 
           <section>
-            <h2 className="text-xl font-display font-semibold uppercase text-foreground mb-3">11. Changes to This Policy</h2>
+            <h2 className="text-xl font-display font-semibold uppercase text-foreground mb-3">12. Changes to This Policy</h2>
             <p>We may update this Privacy Policy from time to time. We will notify you of material changes through the app or via email. Continued use of Endorfin after changes constitutes acceptance of the updated policy.</p>
           </section>
 
           <section>
-            <h2 className="text-xl font-display font-semibold uppercase text-foreground mb-3">12. Contact Us</h2>
-            <p>If you have questions about this Privacy Policy or wish to exercise your data rights, please contact us at <a href="mailto:hello@endorfin.run" className="text-accent hover:underline">hello@endorfin.run</a>.</p>
+            <h2 className="text-xl font-display font-semibold uppercase text-foreground mb-3">13. Contact Us</h2>
+            <p className="mb-3">If you have questions about this Privacy Policy or wish to exercise your data rights, please contact us at <a href="mailto:hello@endorfin.run" className="text-accent hover:underline">hello@endorfin.run</a>.</p>
+            <p className="mb-3"><span className="text-foreground/80">Ultragon Ventures (OPC) Private Limited</span><br />A-49/4 Wave Executive Floors, Sector-5, Wave City, Ghaziabad 201002, Uttar Pradesh, India</p>
+            <p><span className="text-foreground/80">Grievance Officer:</span> Shivam Singhal, <a href="mailto:hello@endorfin.run" className="text-accent hover:underline">hello@endorfin.run</a>. We acknowledge grievances within 72 hours and aim to resolve them within 30 days.</p>
           </section>
         </div>
       </div>

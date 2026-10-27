@@ -18,12 +18,12 @@ export default function TermsOfService() {
         <h1 className="text-4xl md:text-5xl font-display font-bold uppercase text-foreground mb-8">
           Terms of Service
         </h1>
-        <p className="text-sm text-muted-foreground font-body mb-10">Last updated: July 22, 2026</p>
+        <p className="text-sm text-muted-foreground font-body mb-10">Last updated: October 27, 2026</p>
 
         <div className="space-y-8 font-body text-muted-foreground leading-relaxed">
           <section>
             <h2 className="text-xl font-display font-semibold uppercase text-foreground mb-3">1. Acceptance of Terms</h2>
-            <p>By accessing or using the Endorfin mobile application (&quot;App&quot;), you agree to be bound by these Terms of Service (&quot;Terms&quot;). If you do not agree to these Terms, you may not use the App.</p>
+            <p>The Endorfin mobile application (&quot;App&quot;) is owned and operated by Ultragon Ventures (OPC) Private Limited (&quot;we&quot;, &quot;us&quot;). By accessing or using the App, you agree to be bound by these Terms of Service (&quot;Terms&quot;). If you do not agree to these Terms, you may not use the App.</p>
           </section>
 
           <section>
@@ -33,12 +33,12 @@ export default function TermsOfService() {
 
           <section>
             <h2 className="text-xl font-display font-semibold uppercase text-foreground mb-3">3. Use of Service</h2>
-            <p>Endorfin provides a platform to discover running events, RSVP to them, connect with other runners, record and track your runs (route, distance, pace, and related metrics), and — optionally — sync those runs to your device&apos;s health platform. You are responsible for maintaining the confidentiality of your account credentials and for all activities that occur under your account. You agree to notify us immediately of any unauthorized use of your account.</p>
+            <p>Endorfin provides a platform to discover running events, RSVP to them, connect with other runners, record and track your runs (route, distance, pace, and related metrics), and — optionally — sync those runs to your device&apos;s health platform or import activities from connected services such as Garmin Connect. You are responsible for maintaining the confidentiality of your account credentials and for all activities that occur under your account. You agree to notify us immediately of any unauthorized use of your account.</p>
           </section>
 
           <section>
             <h2 className="text-xl font-display font-semibold uppercase text-foreground mb-3">4. Health, Fitness &amp; Physical Activity</h2>
-            <p className="mb-3">Endorfin&apos;s run tracking and any training suggestions (including those from Kip, our AI Coach) are provided for general informational and fitness purposes only and are <span className="text-foreground/80">not medical advice</span>. Endorfin is not a medical device.</p>
+            <p className="mb-3">Endorfin&apos;s run tracking and any training suggestions (including those from the Endorfin AI Trainer) are provided for general informational and fitness purposes only and are <span className="text-foreground/80">not medical advice</span>. Endorfin is not a medical device.</p>
             <p>Running and physical exercise carry inherent risks. You should consult a qualified physician before beginning or changing any exercise program, and you participate in any activity tracked through the App entirely at your own risk. GPS- and sensor-derived metrics — distance, pace, route, elevation, cadence, and calories — are estimates and may be inaccurate; you should not rely on them for medical, safety, or competitive purposes. Always stay aware of your surroundings and traffic while using the App outdoors.</p>
           </section>
 
@@ -57,7 +57,7 @@ export default function TermsOfService() {
 
           <section>
             <h2 className="text-xl font-display font-semibold uppercase text-foreground mb-3">6. Event Listings, Registration &amp; Payments</h2>
-            <p>Endorfin is a discovery platform for running events and is not the event organizer for the majority of events listed. We aggregate event information from a variety of public sources and third-party registration platforms, including but not limited to <span className="text-foreground/80">MySamay</span>, <span className="text-foreground/80">Townscript</span>, <span className="text-foreground/80">IndiaRunning</span>, and <span className="text-foreground/80">City Woofer</span>. Only events explicitly labelled as being hosted by Endorfin (i.e. where the event source is &ldquo;Organiser&rdquo; on the platform) are events for which Endorfin acts as the registration host; all other listings are third-party events for which Endorfin is solely a directory and discovery surface.</p>
+            <p>Endorfin is a discovery platform for running events and is not the event organizer for the majority of events listed. We aggregate event information from a variety of public sources and third-party registration platforms, including but not limited to <span className="text-foreground/80">MySamay</span>, <span className="text-foreground/80">IndiaRunning</span>, and <span className="text-foreground/80">City Woofer</span>. Only events explicitly labelled as being hosted by Endorfin (i.e. where the event source is &ldquo;Organiser&rdquo; on the platform) are events for which Endorfin acts as the registration host; all other listings are third-party events for which Endorfin is solely a directory and discovery surface.</p>
             <p className="mt-3">When you click &ldquo;Register&rdquo; on a third-party event, you are redirected to the relevant third-party registration platform and your registration, payment, refund, and all related obligations are governed entirely by that platform&apos;s terms and the organizer&apos;s policies — not by Endorfin. You acknowledge that:</p>
             <ul className="list-disc list-inside space-y-2 ml-2 mt-3">
               <li>Events may be cancelled, rescheduled, or modified by organizers or third-party platforms without notice to us, and listing details on Endorfin (including dates, pricing, course, and availability) may lag behind the source of truth.</li>
@@ -83,6 +83,7 @@ export default function TermsOfService() {
           <section>
             <h2 className="text-xl font-display font-semibold uppercase text-foreground mb-3">9. Limitation of Liability</h2>
             <p>Endorfin is provided &quot;as is&quot; and &quot;as available&quot; without warranties of any kind, either express or implied. To the fullest extent permitted by law, we shall not be liable for any indirect, incidental, special, consequential, or punitive damages arising from your use of the App, including but not limited to injuries sustained during events, loss of data, or service interruptions.</p>
+            <p className="mt-3"><span className="text-foreground/80">Connected services.</span> If you connect a third-party service such as Garmin Connect, your use of that service is governed by its own terms and privacy policy. Data received from connected services is provided &quot;as is&quot;, and neither we nor the provider of that service (including Garmin Ltd. and its subsidiaries) warrant that it is accurate, complete or available. To the fullest extent permitted by law, Garmin Ltd. and its subsidiaries are not liable to you for any damages arising from your use of the App or of data received from Garmin through the App, and the limitations in this section apply for their benefit as well as ours. Garmin<sup>®</sup> and Garmin Connect™ are trademarks of Garmin Ltd. or its subsidiaries; Endorfin is not affiliated with or endorsed by Garmin.</p>
           </section>
 
           <section>
