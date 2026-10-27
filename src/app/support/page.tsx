@@ -35,6 +35,10 @@ const faqs = [
     a: "Yes. We take data privacy seriously and comply with the Digital Personal Data Protection Act (DPDPA) 2023. Read our Privacy Policy for full details on how we handle your data.",
   },
   {
+    q: "How do I delete my account?",
+    a: "In the app, open Settings, go to Account and tap Delete Account. You can also email hello@endorfin.run from your account's address with the subject \"Delete my account\". What is deleted, what is kept and for how long is explained at endorfin.run/delete-account.",
+  },
+  {
     q: "How do I report incorrect event information?",
     a: "If you find an event with wrong details, please email us at hello@endorfin.run with the event name and what needs to be corrected. We'll update it within 24 hours.",
   },
