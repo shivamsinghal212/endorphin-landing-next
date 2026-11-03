@@ -20,7 +20,7 @@ import {
   usePatchMe,
 } from '@/lib/runner-hooks';
 import { AppStoreButtons } from '@/components/AppStoreButtons';
-import { eventPath } from '@/lib/event-path';
+import { eventPath, registrationClosed } from '@/lib/event-path';
 import type { ShippingAddress } from '@/lib/runner-api';
 import {
   missingProfileFields,
@@ -395,6 +395,25 @@ export function RegistrationForm({ bundle }: { bundle: RegistrationEventBundle }
   }
   if (existingPaid) {
     return <AlreadyRegisteredView reg={existingPaid} eventSlug={event.slug || event.id} />;
+  }
+
+  if (registrationClosed(event)) {
+    return (
+      <div className="bg-white border border-jet/10 rounded-2xl p-6">
+        <p className="font-display uppercase text-base font-bold text-jet">
+          Registration closed
+        </p>
+        <p className="text-sm text-jet/70 mt-2">
+          This event isn&rsquo;t taking registrations any more.
+        </p>
+        <Link
+          href={eventPath(event)}
+          className="mt-4 inline-block text-sm text-signal hover:underline"
+        >
+          ← Back to event
+        </Link>
+      </div>
+    );
   }
 
   if (distances.length === 0) {

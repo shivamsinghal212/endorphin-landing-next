@@ -13,7 +13,7 @@ import { ReminderButton } from '@/components/ReminderButton';
 import DetailCrossNav from '@/components/DetailCrossNav';
 import ExploreMoreStrip from '@/components/ExploreMoreStrip';
 import { couponCta } from '@/lib/coupon-cta';
-import { eventPath } from '@/lib/event-path';
+import { eventPath, registrationClosed } from '@/lib/event-path';
 import { buildEventNarrative } from '@/lib/event-seo';
 import type { Event, DistanceCategory } from '@/lib/api';
 import { useMyRegistrations } from '@/lib/runner-hooks';
@@ -395,6 +395,8 @@ export default function RaceDetailView({
                   </span>
                 </span>
               </Link>
+            ) : event.eventSourceType === 'organizer' && registrationClosed(event) ? (
+              <span className="v1rd-btn v1rd-btn-primary v1rd-disabled">Registration closed</span>
             ) : event.eventSourceType === 'organizer' ? (
               // Endorfin-hosted paid event — uses the internal /register
               // route. When the runner isn't signed in, we intercept the
@@ -724,6 +726,8 @@ export default function RaceDetailView({
                 >
                   ✓ Bib {myActiveRegistration!.bibNumber ?? '—'}
                 </Link>
+              ) : event.eventSourceType === 'organizer' && registrationClosed(event) ? (
+                <span className="v1rd-sticky-cta v1rd-sticky-cta-disabled">Registration closed</span>
               ) : event.eventSourceType === 'organizer' ? (
                 <Link
                   className="v1rd-sticky-cta"

@@ -12,7 +12,7 @@ import { ReminderButton } from '@/components/ReminderButton';
 import { useImgFallback } from '@/lib/img-fallback';
 import CouponTopStrip from '@/components/CouponTopStrip';
 import { couponCta } from '@/lib/coupon-cta';
-import { eventPath } from '@/lib/event-path';
+import { eventPath, registrationClosed } from '@/lib/event-path';
 import { buildEventNarrative } from '@/lib/event-seo';
 import { useMyRegistrations } from '@/lib/runner-hooks';
 import type { DistanceCategory, Event } from '@/lib/api';
@@ -174,6 +174,9 @@ export default function ExperienceDetailView({
           ✓ Show ticket
         </Link>
       );
+    }
+    if (event.eventSourceType === 'organizer' && registrationClosed(event)) {
+      return <span className={`${className} exd-btn-disabled`}>Registration closed</span>;
     }
     if (event.eventSourceType === 'organizer') {
       return (
@@ -472,6 +475,8 @@ export default function ExperienceDetailView({
             </div>
             {isAlreadyRegistered ? (
               <Link className="exd-sticky-cta" href={`/me/registrations/${myActiveRegistration!.id}`}>✓ Show ticket</Link>
+            ) : event.eventSourceType === 'organizer' && registrationClosed(event) ? (
+              <span className="exd-sticky-cta exd-sticky-cta-disabled">Registration closed</span>
             ) : event.eventSourceType === 'organizer' ? (
               <Link
                 className="exd-sticky-cta"

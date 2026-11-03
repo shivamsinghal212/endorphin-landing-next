@@ -39,7 +39,7 @@ import {
   validateShipping,
 } from './shipping-address';
 import { isRazorpayLoaded, openRazorpayCheckout } from './razorpay-checkout';
-import { eventPath } from '@/lib/event-path';
+import { eventPath, registrationClosed } from '@/lib/event-path';
 import { AlreadyRegisteredView, type RegistrationEventBundle } from './registration-form';
 
 /**
@@ -451,6 +451,25 @@ export function BookingForm({ bundle }: { bundle: RegistrationEventBundle }) {
   }
   if (existingReg) {
     return <AlreadyRegisteredView reg={existingReg} eventSlug={event.slug || event.id} />;
+  }
+
+  if (registrationClosed(event)) {
+    return (
+      <div className="bg-white border border-jet/10 rounded-2xl p-6">
+        <p className="font-display uppercase text-base font-bold text-jet">
+          Registration closed
+        </p>
+        <p className="text-sm text-jet/70 mt-2">
+          This event isn&rsquo;t taking registrations any more.
+        </p>
+        <Link
+          href={eventPath(event)}
+          className="mt-4 inline-block text-sm text-signal hover:underline"
+        >
+          ← Back to event
+        </Link>
+      </div>
+    );
   }
 
   return (

@@ -15,3 +15,21 @@ export function eventPath(
 ): string {
   return `/running-events/${ev.slug || ev.id}${sub}`;
 }
+
+/**
+ * Mirrors the backend's registration gate (registration_service): only a
+ * `live` event that is accepting registrations and isn't past its close date
+ * can take money. Anything else shows "Registration closed" instead of a
+ * Register button that would only fail at payment.
+ */
+export function registrationClosed(ev: {
+  eventStatus?: string;
+  acceptingRegistrations?: boolean;
+  registrationCloseAt?: string | null;
+}): boolean {
+  return (
+    ev.eventStatus !== 'live' ||
+    ev.acceptingRegistrations === false ||
+    (!!ev.registrationCloseAt && Date.parse(ev.registrationCloseAt) < Date.now())
+  );
+}
