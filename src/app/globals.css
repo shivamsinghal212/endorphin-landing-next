@@ -3538,8 +3538,7 @@ body { padding-top: var(--nav-h, 68px); }
 /* ─── City × distance landers ───────────────────────────────
    They render inside .v1-clubs-page so they inherit the hub's card, chip
    and rail styling wholesale. Only the few bits the hub has no equivalent
-   for live here: the breadcrumb, the city intro paragraph, and the
-   cross-link rows. */
+   for live here: the breadcrumb and the cross-link rows. */
 .v1-clubs-page .v1c-lander-crumb {
   margin: 0 auto 14px;
   font-family: var(--font-oswald), sans-serif;
@@ -3551,49 +3550,27 @@ body { padding-top: var(--nav-h, 68px); }
 .v1-clubs-page .v1c-lander-crumb a:hover { color: var(--bone); }
 .v1-clubs-page .v1c-lander-crumb [aria-current] { color: rgba(245, 240, 235, 0.78); }
 
-/* The city intro, now below the race grid rather than in the hero. It is
-   the page's only unique copy — the thing that keeps these from reading as
-   doorway pages — so it keeps real measure and contrast. */
-.v1-clubs-page .v1c-lander-about {
-  max-width: 72ch;
-  margin: 46px 0 8px;
-  padding-top: 30px;
+.v1-clubs-page .v1c-exp-rail.v1c-lander-rail { margin-top: 36px; }
+.v1-clubs-page .v1c-lander-links {
+  display: flex; flex-direction: column; gap: 22px;
+  margin-top: 56px; padding-top: 30px;
   border-top: 1px solid rgba(245, 240, 235, 0.08);
 }
-.v1-clubs-page .v1c-lander-about-h {
-  font-family: var(--font-fraunces), serif;
-  font-style: italic; font-weight: 500;
-  font-size: 20px; line-height: 1.2;
-  color: var(--bone);
-  margin: 0 0 10px;
-}
-.v1-clubs-page .v1c-lander-about p {
-  margin: 0;
-  font-size: 14.5px; line-height: 1.75;
-  color: rgba(245, 240, 235, 0.62);
-}
-
-.v1-clubs-page .v1c-lander-links {
-  display: flex; flex-direction: column; gap: 14px;
-  padding: 26px 0 30px;
-  border-bottom: 1px solid rgba(245, 240, 235, 0.08);
-  margin-bottom: 30px;
-}
-.v1-clubs-page .v1c-lander-linkrow {
-  display: flex; align-items: flex-start; gap: 16px; flex-wrap: wrap;
-}
+.v1-clubs-page .v1c-lander-linkrow { display: flex; flex-direction: column; gap: 10px; }
 .v1-clubs-page .v1c-lander-linklabel {
-  flex-shrink: 0; padding-top: 8px; min-width: 116px;
   font-family: var(--font-oswald), sans-serif;
   font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase;
   color: rgba(245, 240, 235, 0.42);
 }
-.v1-clubs-page .v1c-lander-linkrow .v1c-exp-citychips {
-  flex: 1; min-width: 0; flex-wrap: wrap; overflow: visible;
-}
-@media (max-width: 860px) {
-  .v1-clubs-page .v1c-lander-linkrow { gap: 8px; }
-  .v1-clubs-page .v1c-lander-linklabel { min-width: 0; padding-top: 0; }
+/* Wrap on desktop; on phones each group stays one swipeable row (the base
+   .v1c-exp-citychips scroller) instead of a tall stack of pills. */
+.v1-clubs-page .v1c-lander-linkrow .v1c-exp-citychips { margin-bottom: 0; flex-wrap: wrap; }
+@media (max-width: 768px) {
+  .v1-clubs-page .v1c-lander-linkrow .v1c-exp-citychips {
+    flex-wrap: nowrap;
+    margin-left: calc(-1 * var(--v1c-gutter)); margin-right: calc(-1 * var(--v1c-gutter));
+    padding-left: var(--v1c-gutter); padding-right: var(--v1c-gutter);
+  }
 }
 
 .v1-clubs-page .v1c-exp-chipn {

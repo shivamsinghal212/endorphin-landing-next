@@ -54,7 +54,8 @@ async function getRaces(): Promise<ApiEvent[]> {
     } while (page <= totalPages && page <= MAX_PAGES);
 
     const cutoff = Date.now() - 86_400_000;
-    return collected
+    // Offset pagination can repeat a row across pages (unstable sort) — dedupe by id.
+    return [...new Map(collected.map((e) => [e.id, e])).values()]
       .filter((e) => e.startTime && new Date(e.startTime).getTime() >= cutoff)
       .sort((a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime());
   } catch {
@@ -242,29 +243,15 @@ export default async function RaceCityScopePage({ params }: RouteParams) {
         />
       )}
       <Header />
-      {/* .v1-clubs-page, not .v1-races-page: these landers now share the hub's
-          card and rail styling outright, rather than a parallel set that kept
-          drifting out of sync with it. Every SEO-bearing element is unchanged
-          — H1 string, city intro, section H2 + count, the full race list, and
-          both cross-link blocks. */}
+      {/* Inherits the hub's card/rail styling via .v1-clubs-page. Order is
+          races-first: crumb + H1, the list, then the cross-link spine. */}
       <div className="v1-clubs-page">
         <section className="v1-hero v1c-hero-natl">
           <div className="container">
-            <div className="v1-hero-topline is-compact">
-              <span className="v1-hero-kicker">
-                {meta.noun} · {cityPage.name}
-              </span>
-              <span className="v1-hero-meta">
-                {races.length} upcoming · {cityPage.region}
-              </span>
-            </div>
-
             <nav className="v1c-lander-crumb" aria-label="Breadcrumb">
               <Link href="/running-events">All running events</Link>
               <span aria-hidden> · </span>
-              <span aria-current="page">
-                {meta.noun} in {cityPage.name}
-              </span>
+              <span aria-current="page">{cityPage.name}, {cityPage.region}</span>
             </nav>
 
             <h1 className="v1c-search-h1">
@@ -278,9 +265,27 @@ export default async function RaceCityScopePage({ params }: RouteParams) {
         <div className="v1c-natl">
           <section className="v1c-exp">
             <div className="v1c-container">
-              {/* Cross-links. These are the internal-linking spine of the
-                  city × distance cluster — every one points at a page that
-                  passed the quality gate. */}
+              <section className="v1c-exp-rail v1c-lander-rail">
+                <div className="v1c-exp-rail-head">
+                  <h2 className="v1c-exp-rail-title">
+                    Upcoming {meta.noun.toLowerCase()} in {cityPage.name}
+                  </h2>
+                  <span className="v1c-exp-seeall" aria-hidden>
+                    {races.length === 1 ? '1 event' : `${races.length} events`}
+                  </span>
+                </div>
+                {/* toRaceCardData: RaceCard is a client component, so the
+                    raw ApiEvent would serialise ~30 full events into this
+                    lander's flight payload. */}
+                <div className="v1c-exp-grid">
+                  {races.map((r) => (
+                    <RaceCard key={r.id} r={toRaceCardData(r)} />
+                  ))}
+                </div>
+              </section>
+
+              {/* Cross-links: the internal-linking spine of the city × distance
+                  cluster — every one points at a page that passed the gate. */}
               {(otherScopesInCity.length > 0 || sameScopeOtherCities.length > 0) && (
                 <nav
                   className="v1c-lander-links"
@@ -288,7 +293,7 @@ export default async function RaceCityScopePage({ params }: RouteParams) {
                 >
                   {otherScopesInCity.length > 0 && (
                     <div className="v1c-lander-linkrow">
-                      <span className="v1c-lander-linklabel">Other distances</span>
+                      <span className="v1c-lander-linklabel">More in {cityPage.name}</span>
                       <div className="v1c-exp-citychips">
                         {otherScopesInCity.map((sc) => (
                           <Link
@@ -304,7 +309,7 @@ export default async function RaceCityScopePage({ params }: RouteParams) {
                   )}
                   {sameScopeOtherCities.length > 0 && (
                     <div className="v1c-lander-linkrow">
-                      <span className="v1c-lander-linklabel">Other cities</span>
+                      <span className="v1c-lander-linklabel">{meta.noun} in other cities</span>
                       <div className="v1c-exp-citychips">
                         {sameScopeOtherCities.map((cp) => (
                           <Link
@@ -323,41 +328,6 @@ export default async function RaceCityScopePage({ params }: RouteParams) {
                   )}
                 </nav>
               )}
-
-              <section className="v1c-exp-rail">
-                <div className="v1c-exp-rail-head">
-                  <h2 className="v1c-exp-rail-title">
-                    Upcoming {meta.noun.toLowerCase()} in {cityPage.name}
-                  </h2>
-                  <span className="v1c-exp-seeall" aria-hidden>
-                    {races.length === 1 ? '1 event' : `${races.length} events`}
-                  </span>
-                </div>
-                {/* Grid, not the hub's scroller: on a lander this list IS the
-                    page, so it gets the full-width treatment. */}
-                {/* toRaceCardData: RaceCard is a client component, so the
-                    raw ApiEvent would serialise ~30 full events (including
-                    descriptions and scraped Instagram comment threads) into
-                    this lander's flight payload. */}
-                <div className="v1c-exp-grid">
-                  {races.map((r) => (
-                    <RaceCard key={r.id} r={toRaceCardData(r)} />
-                  ))}
-                </div>
-              </section>
-
-              {/* The city intro, moved out of the hero where it dominated the
-                  fold. It stays on the page on purpose: it is the only
-                  hand-written, city-specific copy here, and without it a
-                  lander is an H1 over a generated list — the doorway-page
-                  shape. Below the races it reads as context rather than
-                  preamble. */}
-              <section className="v1c-lander-about">
-                <h2 className="v1c-lander-about-h">
-                  Running in {cityPage.name}
-                </h2>
-                <p>{cityPage.intro}</p>
-              </section>
             </div>
           </section>
         </div>
