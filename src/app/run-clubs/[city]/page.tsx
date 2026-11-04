@@ -5,8 +5,7 @@ import Footer from '@/components/Footer';
 import ClubsView from '@/app/clubs/ClubsView';
 import type { ApiClub } from '@/app/clubs/page';
 import type { DiscoverHit } from '@/components/HeroSearchPanel';
-import { clubsApi, type MyClubClaim, type MyClubMembership } from '@/lib/api';
-import { getSessionEmail, getSessionToken } from '@/lib/session';
+import { buildEventsJsonLd, getEvents, istTodayFloor } from '@/app/clubs/clubs-experiences-page';
 import {
   CLUB_CITY_PAGES,
   MIN_CLUBS_PER_CITY,
@@ -14,7 +13,6 @@ import {
   getClubCityPage,
 } from '@/lib/club-city-pages';
 import { fetchAllClubsList } from '@/lib/clubs-list';
-import { fetchFeaturedFull } from '@/lib/clubs-featured';
 
 const SITE = 'https://www.endorfin.run';
 
@@ -27,8 +25,6 @@ export const revalidate = 3600;
 // The list endpoint carries every field the grid cards + JSON-LD need
 // (city, logo, tags, establishedYear, stats.members), so we map it straight
 // into the DiscoverHit shape ClubsView's grid consumes — no per-club N+1.
-// nextEvent is left null here; the featured-5 strip gets the rich
-// detail+events via fetchFeaturedFull below.
 function toDiscoverHit(c: ApiClub): DiscoverHit {
   return {
     kind: 'club',
@@ -161,57 +157,44 @@ export default async function RunClubsCityPage(
   const page = getClubCityPage(city);
   if (!page) notFound();
 
-  const token = await getSessionToken();
-  const [allClubs, myClubs, userEmail] = await Promise.all([
+  // No session read: the page stays ISR (revalidate above) instead of
+  // rendering per request.
+  const [allClubs, eventsAround] = await Promise.all([
     fetchAllClubsList<ApiClub>(),
-    token
-      ? clubsApi.listMyClubs(token, 'all', { includePending: true }).catch(() => [])
-      : Promise.resolve([]),
-    getSessionEmail(),
+    getEvents(
+      'club_event',
+      `city=${encodeURIComponent(page.name)}&dateFrom=${istTodayFloor()}&sort=upcoming&limit=12`,
+    ),
   ]);
 
-  // City-scoped, biggest clubs first (mirrors /clubs' members-desc order so
-  // the featured strip and grid show the most prominent clubs first).
+  // City-scoped, biggest clubs first (mirrors /clubs' members-desc order).
   const cityClubs = clubsForCityPage(allClubs, page)
     .filter((c) => !!c.slug)
     .sort((a, b) => (b.stats?.members ?? 0) - (a.stats?.members ?? 0));
   if (cityClubs.length < MIN_CLUBS_PER_CITY) notFound();
 
   const clubs = cityClubs.map(toDiscoverHit);
-  const featuredSlugs = cityClubs.slice(0, 5).map((c) => c.slug);
-  const featuredFull = await fetchFeaturedFull(featuredSlugs);
-
-  const membershipBySlug: Record<string, MyClubMembership> = {};
-  const claimBySlug: Record<string, MyClubClaim> = {};
-  for (const c of myClubs) {
-    if (c.membership) membershipBySlug[c.slug] = c.membership;
-    if (c.claim) claimBySlug[c.slug] = c.claim;
-  }
-
-  // Single-city facet so the hero/chips know they're scoped to one city.
-  const cityFacets = [{ value: page.name, count: cityClubs.length }];
   const jsonLd = buildJsonLd(page, cityClubs);
+  const eventsJsonLd = buildEventsJsonLd(eventsAround, `Upcoming run-club events in ${page.name}`);
 
   return (
-    <main id="main-content" className="overflow-x-hidden">
+    // overflow-x: clip, not hidden — hidden breaks the sticky search dock.
+    <main id="main-content" style={{ overflowX: 'clip' }}>
       {jsonLd && (
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       )}
+      {eventsJsonLd && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(eventsJsonLd).replace(/</g, '\\u003c') }}
+        />
+      )}
       <Header />
       <div className="v1-clubs-page">
-        <ClubsView
-          clubs={clubs}
-          featuredFull={featuredFull}
-          cityFacets={cityFacets}
-          membershipBySlug={membershipBySlug}
-          claimBySlug={claimBySlug}
-          isAuthed={!!token}
-          userEmail={userEmail}
-          cityName={page.name}
-        />
+        <ClubsView clubs={clubs} eventsAround={eventsAround} cityName={page.name} />
       </div>
       <Footer />
     </main>

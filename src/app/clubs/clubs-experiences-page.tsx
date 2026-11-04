@@ -1,13 +1,9 @@
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import ClubsView from './ClubsView';
-import type { ApiClub } from './page';
-import { clubsApi, type MyClubClaim, type MyClubMembership } from '@/lib/api';
-import { getSessionEmail, getSessionToken } from '@/lib/session';
 import { getRequestGeo } from '@/lib/geo';
 import type { DiscoverHit } from '@/components/HeroSearchPanel';
 import type { RaceCardData } from '@/lib/race-card-data';
-import { fetchFeaturedFull, toFeaturedCardData } from '@/lib/clubs-featured';
 import { eventPlaceJsonLd } from '@/lib/event-seo';
 import { safeEndDate } from '@/lib/event-schema';
 
@@ -32,9 +28,6 @@ const MAX_PAGES = 10;
 interface DiscoverPage {
   items: DiscoverHit[];
   total: number;
-  facets?: {
-    cities?: { value: string; count: number }[];
-  } | null;
 }
 
 /**
@@ -42,13 +35,13 @@ interface DiscoverPage {
  * in parallel. Returns clubs sorted by member count desc — featured strip
  * slices the top 5; the all-clubs grid uses the rest in the same order.
  */
-async function getAllClubs(): Promise<{ clubs: DiscoverHit[]; cityFacets: { value: string; count: number }[] }> {
+async function getAllClubs(): Promise<DiscoverHit[]> {
   try {
     const firstRes = await fetch(
-      `${API}/discover/smart?kind=club&limit=${PAGE_SIZE}&offset=0&includeFacets=true&sort=newest`,
+      `${API}/discover/smart?kind=club&limit=${PAGE_SIZE}&offset=0&sort=newest`,
       { next: { revalidate: 3600 } },
     );
-    if (!firstRes.ok) return { clubs: [], cityFacets: [] };
+    if (!firstRes.ok) return [];
     const first = (await firstRes.json()) as DiscoverPage;
 
     const total = first.total ?? first.items.length;
@@ -76,11 +69,9 @@ async function getAllClubs(): Promise<{ clubs: DiscoverHit[]; cityFacets: { valu
     // Sort by members desc, nulls last. The featured strip and all-clubs
     // grid both consume this ordering so users see the biggest clubs first.
     all.sort((a, b) => (b.members ?? 0) - (a.members ?? 0));
-
-    const cityFacets = first.facets?.cities ?? [];
-    return { clubs: all, cityFacets };
+    return all;
   } catch {
-    return { clubs: [], cityFacets: [] };
+    return [];
   }
 }
 
@@ -93,7 +84,7 @@ async function getAllClubs(): Promise<{ clubs: DiscoverHit[]; cityFacets: { valu
  * Failures degrade to []: that rail simply doesn't render, the rest of the
  * page is unaffected.
  */
-async function getEvents(kind: string, query: string): Promise<DiscoverHit[]> {
+export async function getEvents(kind: string, query: string): Promise<DiscoverHit[]> {
   try {
     const res = await fetch(`${API}/discover/smart?kind=${kind}&${query}`, {
       next: { revalidate: 900 },
@@ -154,7 +145,7 @@ function mergeUpcoming(hits: DiscoverHit[], limit: number): DiscoverHit[] {
 // Today's date (IST, YYYY-MM-DD) as a lower bound for "upcoming" queries.
 // `sort=upcoming` only sorts ascending — it does NOT filter out past events
 // — so without a dateFrom floor the rail surfaces events from years ago.
-function istTodayFloor(): string {
+export function istTodayFloor(): string {
   const ist = new Date(Date.now() + 5.5 * 60 * 60 * 1000);
   return ist.toISOString().slice(0, 10);
 }
@@ -226,7 +217,10 @@ function eventHref(hit: DiscoverHit): string | null {
 
 // ItemList of the surfaced upcoming events — mirrors the events shown
 // prominently in the rails so crawlers see them as structured Events.
-function buildEventsJsonLd(events: DiscoverHit[]) {
+export function buildEventsJsonLd(
+  events: DiscoverHit[],
+  name = 'Upcoming run-club events in India',
+) {
   const seen = new Set<string>();
   const items = events
     .filter((e) => {
@@ -271,7 +265,7 @@ function buildEventsJsonLd(events: DiscoverHit[]) {
   return {
     '@context': 'https://schema.org',
     '@type': 'ItemList',
-    name: 'Upcoming run-club events in India',
+    name,
     numberOfItems: items.length,
     itemListElement: items,
   };
@@ -336,39 +330,21 @@ export default async function ClubsExperiencesPage({
    *  which wants price/currency fields the discover payload lacks). */
   races?: RaceCardData[];
 }) {
-  const token = await getSessionToken();
   // /running-events carries races alongside club events (in their own rail);
   // /clubs stays the club directory and shows club events only.
   const includeRaces = variant === 'running-events';
   // Resolve the visitor's city from Vercel edge geo (IP-based). The page is
   // already dynamic (reads the session cookie), so headers() is free here.
   const { city: geoCity } = await getRequestGeo();
-  const [{ clubs, cityFacets }, around, eventsWeekend, upcomingRaces, myClubs, userEmail] = await Promise.all([
+  const [clubs, around, eventsWeekend, upcomingRaces] = await Promise.all([
     getAllClubs(),
     getEventsAroundYou(geoCity, includeRaces),
     getEvents('club_event', 'eventsWindow=this_weekend&sort=upcoming&limit=12'),
     includeRaces ? getUpcomingRaceCount(istTodayFloor()) : Promise.resolve(0),
-    token
-      ? clubsApi.listMyClubs(token, 'all', { includePending: true }).catch(() => [])
-      : Promise.resolve([]),
-    getSessionEmail(),
   ]);
   const eventsAround = around.clubEvents;
   const racesAround = around.races;
   const aroundCity = around.city;
-  // Featured strip — fetch rich detail for the top 5 by members.
-  const featuredSlugs = clubs
-    .slice(0, 5)
-    .map((c) => c.slug)
-    .filter((s): s is string => Boolean(s));
-  const featuredFull = await fetchFeaturedFull(featuredSlugs);
-  const membershipBySlug: Record<string, MyClubMembership> = {};
-  const claimBySlug: Record<string, MyClubClaim> = {};
-  for (const c of myClubs) {
-    if (c.membership) membershipBySlug[c.slug] = c.membership;
-    if (c.claim) claimBySlug[c.slug] = c.claim;
-  }
-  const isAuthed = !!token;
   const canonicalUrl = `${SITE}${variant === 'running-events' ? '/running-events' : '/clubs'}`;
   const jsonLd = buildJsonLd(clubs, canonicalUrl);
   const eventsJsonLd = buildEventsJsonLd([...racesAround, ...eventsAround, ...eventsWeekend]);
@@ -396,13 +372,8 @@ export default async function ClubsExperiencesPage({
       )}
       <Header />
       <div className="v1-clubs-page">
-        {/* featuredFull is projected: full ApiClub objects carry each club's
-            event history, including scraped Instagram comment threads that
-            nothing on this page renders. */}
         <ClubsView
           clubs={clubs}
-          featuredFull={featuredFull.map(toFeaturedCardData)}
-          cityFacets={cityFacets}
           eventsAround={eventsAround}
           racesAround={racesAround}
           allRaces={races}
@@ -410,10 +381,6 @@ export default async function ClubsExperiencesPage({
           geoCity={geoCity}
           aroundCity={aroundCity}
           eventsWeekend={eventsWeekend}
-          membershipBySlug={membershipBySlug}
-          claimBySlug={claimBySlug}
-          isAuthed={isAuthed}
-          userEmail={userEmail}
           variant={variant}
         />
       </div>

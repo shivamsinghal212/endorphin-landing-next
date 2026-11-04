@@ -3743,6 +3743,8 @@ body { padding-top: var(--nav-h, 68px); }
   flex-shrink: 0; width: 200px; scroll-snap-align: start; text-decoration: none; color: inherit;
 }
 .v1-clubs-page .v1c-exp-grid .v1c-exp-club-card { width: auto; }
+/* City pages: the whole directory as a dense grid of the same tiles. */
+.v1-clubs-page .v1c-exp-grid.is-clubs { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 26px 18px; }
 @media (max-width: 768px) {
   .v1-clubs-page .v1c-exp-scroller .v1c-exp-club-card { width: 58vw; max-width: 240px; }
 }
