@@ -104,7 +104,7 @@ export default function PrivacyPolicy() {
 
           <section>
             <h2 className="text-xl font-display font-semibold uppercase text-foreground mb-3">4. Garmin Connect</h2>
-            <p className="mb-3">You can choose to connect your <span className="text-foreground/80">Garmin Connect</span> account to Endorfin. The connection is <span className="text-foreground/80">opt-in</span> and off by default. You start it from Settings → Connected Apps, and you sign in and grant permission on Garmin&apos;s own consent screen. Endorfin never sees or stores your Garmin password; Garmin gives us an access token that only works for the permissions you approved. We receive no Garmin data until you complete that step.</p>
+            <p className="mb-3">You can choose to connect your <span className="text-foreground/80">Garmin Connect</span> account to Endorfin. The connection is <span className="text-foreground/80">opt-in</span> and off by default. You start it from Settings → Connect apps and devices → Garmin Connect, and you sign in and grant permission on Garmin&apos;s own consent screen. Endorfin never sees or stores your Garmin password; Garmin gives us an access token that only works for the permissions you approved. We receive no Garmin data until you complete that step.</p>
 
             <h3 className="text-base font-display font-semibold uppercase text-foreground mt-5 mb-2">4.1 What we receive from Garmin</h3>
             <p className="mb-3">After you connect, Garmin sends us the activities you record on your Garmin device from that point on. For each activity we receive:</p>
@@ -139,8 +139,8 @@ export default function PrivacyPolicy() {
 
             <h3 className="text-base font-display font-semibold uppercase text-foreground mt-5 mb-2">4.5 Disconnecting and deletion</h3>
             <ul className="list-disc list-inside space-y-2 ml-2">
-              <li>You can disconnect Garmin at any time in Settings → Connected Apps, or remove Endorfin from the connected apps in your Garmin Connect account. Either way, we stop receiving your Garmin data immediately and delete our Garmin access token.</li>
-              <li>Activities already imported stay in your history until you delete them. You can delete individual activities in the app, or email <a href="mailto:hello@endorfin.run" className="text-accent hover:underline">hello@endorfin.run</a> to have all data we received from Garmin deleted; we complete such requests within 30 days.</li>
+              <li>You can disconnect Garmin at any time in Settings → Connect apps and devices, or remove Endorfin from the connected apps in your Garmin Connect account. Either way, we stop receiving your Garmin data immediately and delete our Garmin access token.</li>
+              <li>Activities already imported stay in your history until you delete them. When you disconnect in the app you can choose to delete all your Garmin activities at the same time; you can also delete individual activities, or email <a href="mailto:hello@endorfin.run" className="text-accent hover:underline">hello@endorfin.run</a> to have all data we received from Garmin deleted; we complete such requests within 30 days.</li>
               <li>If you delete your Endorfin account, all data we received from Garmin is deleted within 30 days, as described in Section 8.</li>
               <li>You can ask for a copy of your Garmin data held by Endorfin at any time (see Section 9).</li>
             </ul>
